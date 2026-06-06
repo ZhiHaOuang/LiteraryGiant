@@ -1,0 +1,85 @@
+#!/bin/bash
+#BSUB -J hard_processing
+#BSUB -q 63
+#BSUB -n 4
+#BSUB -W 04:00
+#BSUB -R "span[hosts=1]"
+#BSUB -R "rusage[mem=4000]"
+#BSUB -o runs/logs/%J.out
+#BSUB -e runs/logs/%J.err
+
+set -euo pipefail
+
+echo "Running on $(hostname)"
+echo "Using $LSB_DJOB_NUMPROC cores"
+
+PROJECT_ROOT="${PROJECT_ROOT:-$HOME/LiteraryGiant}"
+INPUT_PATH="${INPUT_PATH:-$PROJECT_ROOT/Yggdrasil/sources/raw_text}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$PROJECT_ROOT/Yggdrasil/derived/chapters}"
+PATTERN="${PATTERN:-*.txt}"
+ENCODING="${ENCODING:-utf-8}"
+CHUNK_SIZE="${CHUNK_SIZE:-1800}"
+CHUNK_OVERLAP="${CHUNK_OVERLAP:-300}"
+NON_RECURSIVE="${NON_RECURSIVE:-0}"
+SYNC_PIPELINE_STATE="${SYNC_PIPELINE_STATE:-1}"
+MATERIALIZE_SOURCE_CHAPTERS="${MATERIALIZE_SOURCE_CHAPTERS:-1}"
+
+echo "PROJECT_ROOT=$PROJECT_ROOT"
+echo "INPUT_PATH=$INPUT_PATH"
+echo "OUTPUT_ROOT=$OUTPUT_ROOT"
+echo "PATTERN=$PATTERN"
+echo "ENCODING=$ENCODING"
+echo "CHUNK_SIZE=$CHUNK_SIZE"
+echo "CHUNK_OVERLAP=$CHUNK_OVERLAP"
+echo "SYNC_PIPELINE_STATE=$SYNC_PIPELINE_STATE"
+echo "MATERIALIZE_SOURCE_CHAPTERS=$MATERIALIZE_SOURCE_CHAPTERS"
+
+cd "$PROJECT_ROOT"
+
+module load python/anaconda3/2022.10
+
+if command -v conda >/dev/null 2>&1; then
+  eval "$(conda shell.bash hook)"
+  if conda env list | awk '{print $1}' | grep -qx "LitCodex"; then
+    conda activate LitCodex
+  elif [[ -f ".venv/bin/activate" ]]; then
+    source .venv/bin/activate
+  else
+    echo "No conda env named LitCodex and no .venv found." >&2
+    exit 1
+  fi
+elif [[ -f ".venv/bin/activate" ]]; then
+  source .venv/bin/activate
+else
+  echo "Conda is unavailable and .venv/bin/activate was not found." >&2
+  exit 1
+fi
+
+mkdir -p "$OUTPUT_ROOT"
+
+cmd=(
+  python -m Jormungandr.hardmodel "$INPUT_PATH"
+  -o "$OUTPUT_ROOT"
+  --pattern "$PATTERN"
+  --encoding "$ENCODING"
+  --chunk-size "$CHUNK_SIZE"
+  --chunk-overlap "$CHUNK_OVERLAP"
+)
+
+if [[ "$NON_RECURSIVE" == "1" ]]; then
+  cmd+=(--non-recursive)
+fi
+
+if [[ "$SYNC_PIPELINE_STATE" == "0" ]]; then
+  cmd+=(--no-sync-state)
+fi
+
+if [[ "$MATERIALIZE_SOURCE_CHAPTERS" == "1" ]]; then
+  cmd+=(--materialize-source-chapters)
+fi
+
+echo "Executing:"
+printf '  %q' "${cmd[@]}"
+printf '\n'
+
+"${cmd[@]}"

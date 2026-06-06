@@ -1,0 +1,13 @@
+reference_policy:
+  primary_indexes:
+    - Yggdrasil/indexes/reference_index.jsonl
+  allowed_reference_types:
+    - plot_pattern
+    - trope
+    - style
+    - character_role
+    - setting_pattern
+  allow_derived_lookup: true
+  derived_lookup_requires_source_ref: true
+  forbid_verbatim_source_prose: true
+  max_source_similarity: low

@@ -1,0 +1,52 @@
+# Python cache and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+
+# IDE files
+.idea/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Claude Code local-only state
+/.claude/settings.local.json
+/.claude/agent-memory-local/*
+!/.claude/agent-memory-local/.gitkeep
+
+# Canonical Yggdrasil layout. Track directory structure and project templates
+# only; keep real source texts, derived artifacts, indexes, and outputs out of git.
+/Yggdrasil/**
+!/Yggdrasil/
+!/Yggdrasil/**/
+!/Yggdrasil/**/.gitkeep
+!/Yggdrasil/projects/_template/**
+
+# Legacy data root. New code should not write here, but ignore it if old
+# commands accidentally recreate it.
+/data/**
+
+# Canonical model layout. Weight snapshots stay outside git.
+/models/**
+!/models/
+!/models/**/
+!/models/**/.gitkeep
+
+# Reproducible run outputs and metrics.
+/runs/**
+!/runs/
+!/runs/**/
+!/runs/**/.gitkeep
+
+# Legacy state files from pre-canonical runs.
+/retrieval_file/
+
+# Secrets and local environment files
+.env
+.env.*
+*.secret
+*secret*
+*token*
+*key*

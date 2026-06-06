@@ -1,0 +1,156 @@
+#!/bin/bash
+#BSUB -J clusterarc
+#BSUB -q 8v100-32-sc
+#BSUB -n 2
+#BSUB -W 08:00
+#BSUB -R "span[hosts=1]"
+#BSUB -R "rusage[mem=16000]"
+#BSUB -gpu "num=1:mode=exclusive_process:mps=yes:j_exclusive=yes"
+#BSUB -o runs/logs/%J.out
+#BSUB -e runs/logs/%J.err
+
+set -euo pipefail
+
+mkdir -p runs/logs
+
+echo "Running on $(hostname)"
+echo "Using ${LSB_DJOB_NUMPROC:-0} cores"
+echo "CUDA_VISIBLE_DEVICES=${CUDA_VISIBLE_DEVICES:-unset}"
+echo "LSB_GPU_IDS=${LSB_GPU_IDS:-unset}"
+echo "LSB_GPU_DEVICES=${LSB_GPU_DEVICES:-unset}"
+
+PROJECT_ROOT="${PROJECT_ROOT:-${LS_SUBCWD:-$PWD}}"
+INPUT_PATH="${INPUT_PATH:-$PROJECT_ROOT/Yggdrasil/derived/features}"
+OUTPUT_ROOT="${OUTPUT_ROOT:-$PROJECT_ROOT/Yggdrasil/derived/plots}"
+WINDOW_SIZE="${WINDOW_SIZE:-20}"
+WINDOW_OVERLAP="${WINDOW_OVERLAP:-10}"
+MIN_WINDOW_SIZE="${MIN_WINDOW_SIZE:-8}"
+MODEL_SIZE="${MODEL_SIZE:-14b}"
+LOCAL_MODEL="${LOCAL_MODEL:-}"
+WINDOW_MAX_INPUT_CHARS="${WINDOW_MAX_INPUT_CHARS:-14000}"
+FUSION_MAX_INPUT_CHARS="${FUSION_MAX_INPUT_CHARS:-7000}"
+MAX_NEW_TOKENS="${MAX_NEW_TOKENS:-1400}"
+BOUNDARY_VOTE_THRESHOLD="${BOUNDARY_VOTE_THRESHOLD:-0.45}"
+STRONG_BOUNDARY_THRESHOLD="${STRONG_BOUNDARY_THRESHOLD:-0.70}"
+MIN_BOUNDARY_VOTES="${MIN_BOUNDARY_VOTES:-1}"
+MAX_PLOT_CHAPTERS="${MAX_PLOT_CHAPTERS:-24}"
+MAX_REFINEMENT_ROUNDS="${MAX_REFINEMENT_ROUNDS:-2}"
+REFINEMENT_WINDOW_SIZE="${REFINEMENT_WINDOW_SIZE:-32}"
+REFINEMENT_WINDOW_OVERLAP="${REFINEMENT_WINDOW_OVERLAP:-12}"
+REFINEMENT_MIN_WINDOW_SIZE="${REFINEMENT_MIN_WINDOW_SIZE:-10}"
+DEVICE_MAP="${DEVICE_MAP:-auto}"
+COMPACT_OUTPUT="${COMPACT_OUTPUT:-0}"
+CONDA_ENV_NAME="${CONDA_ENV_NAME:-LitCodex}"
+
+# Prefer LSF-assigned GPU IDs when available
+if [ -n "${LSB_GPU_IDS:-}" ]; then
+  export CUDA_VISIBLE_DEVICES="${LSB_GPU_IDS}"
+  echo "CUDA_VISIBLE_DEVICES set from LSB_GPU_IDS=${LSB_GPU_IDS}"
+elif [ -n "${LSB_GPU_DEVICES:-}" ]; then
+  export CUDA_VISIBLE_DEVICES="${LSB_GPU_DEVICES}"
+  echo "CUDA_VISIBLE_DEVICES set from LSB_GPU_DEVICES=${LSB_GPU_DEVICES}"
+elif [ -z "${CUDA_VISIBLE_DEVICES:-}" ]; then
+  export CUDA_VISIBLE_DEVICES=0
+  echo "CUDA_VISIBLE_DEVICES was empty; set to 0"
+fi
+
+export CUDA_DEVICE_ORDER=PCI_BUS_ID
+export TOKENIZERS_PARALLELISM=false
+export HF_HUB_OFFLINE=1
+export TRANSFORMERS_OFFLINE=1
+
+echo "PROJECT_ROOT=$PROJECT_ROOT"
+echo "INPUT_PATH=$INPUT_PATH"
+echo "OUTPUT_ROOT=$OUTPUT_ROOT"
+echo "WINDOW_SIZE=$WINDOW_SIZE"
+echo "WINDOW_OVERLAP=$WINDOW_OVERLAP"
+echo "MIN_WINDOW_SIZE=$MIN_WINDOW_SIZE"
+echo "MODEL_SIZE=$MODEL_SIZE"
+echo "LOCAL_MODEL=${LOCAL_MODEL:-unset}"
+echo "WINDOW_MAX_INPUT_CHARS=$WINDOW_MAX_INPUT_CHARS"
+echo "FUSION_MAX_INPUT_CHARS=$FUSION_MAX_INPUT_CHARS"
+echo "MAX_NEW_TOKENS=$MAX_NEW_TOKENS"
+echo "BOUNDARY_VOTE_THRESHOLD=$BOUNDARY_VOTE_THRESHOLD"
+echo "STRONG_BOUNDARY_THRESHOLD=$STRONG_BOUNDARY_THRESHOLD"
+echo "MIN_BOUNDARY_VOTES=$MIN_BOUNDARY_VOTES"
+echo "MAX_PLOT_CHAPTERS=$MAX_PLOT_CHAPTERS"
+echo "MAX_REFINEMENT_ROUNDS=$MAX_REFINEMENT_ROUNDS"
+echo "REFINEMENT_WINDOW_SIZE=$REFINEMENT_WINDOW_SIZE"
+echo "REFINEMENT_WINDOW_OVERLAP=$REFINEMENT_WINDOW_OVERLAP"
+echo "REFINEMENT_MIN_WINDOW_SIZE=$REFINEMENT_MIN_WINDOW_SIZE"
+echo "DEVICE_MAP=$DEVICE_MAP"
+echo "CONDA_ENV_NAME=$CONDA_ENV_NAME"
+
+cd "$PROJECT_ROOT"
+export PYTHONPATH="$PROJECT_ROOT${PYTHONPATH:+:$PYTHONPATH}"
+
+nvidia-smi || true
+date
+
+module load python/anaconda3/2022.10
+module load cuda/12.4
+
+eval "$(conda shell.bash hook)"
+
+if conda env list | awk '{print $1}' | grep -qx "$CONDA_ENV_NAME"; then
+  conda activate "$CONDA_ENV_NAME"
+elif [[ -f ".venv/bin/activate" ]]; then
+  source .venv/bin/activate
+else
+  echo "No conda env named $CONDA_ENV_NAME and no .venv found." >&2
+  exit 1
+fi
+
+python - <<'PY'
+try:
+    import torch
+    print("torch_version=", torch.__version__)
+    print("torch_cuda_build=", torch.version.cuda)
+    print("cuda_available=", torch.cuda.is_available())
+    print("cuda_device_count=", torch.cuda.device_count())
+except Exception as exc:
+    print("torch_check_failed=", repr(exc))
+
+try:
+    import transformers
+    print("transformers_version=", transformers.__version__)
+except Exception as exc:
+    print("transformers_check_failed=", repr(exc))
+PY
+
+mkdir -p "$OUTPUT_ROOT"
+
+cmd=(
+  python -m infermodel "$INPUT_PATH"
+  -o "$OUTPUT_ROOT"
+  --window-size "$WINDOW_SIZE"
+  --window-overlap "$WINDOW_OVERLAP"
+  --min-window-size "$MIN_WINDOW_SIZE"
+  --model-size "$MODEL_SIZE"
+  --window-max-input-chars "$WINDOW_MAX_INPUT_CHARS"
+  --fusion-max-input-chars "$FUSION_MAX_INPUT_CHARS"
+  --max-new-tokens "$MAX_NEW_TOKENS"
+  --boundary-vote-threshold "$BOUNDARY_VOTE_THRESHOLD"
+  --strong-boundary-threshold "$STRONG_BOUNDARY_THRESHOLD"
+  --min-boundary-votes "$MIN_BOUNDARY_VOTES"
+  --max-plot-chapters "$MAX_PLOT_CHAPTERS"
+  --max-refinement-rounds "$MAX_REFINEMENT_ROUNDS"
+  --refinement-window-size "$REFINEMENT_WINDOW_SIZE"
+  --refinement-window-overlap "$REFINEMENT_WINDOW_OVERLAP"
+  --refinement-min-window-size "$REFINEMENT_MIN_WINDOW_SIZE"
+  --device-map "$DEVICE_MAP"
+)
+
+if [[ -n "$LOCAL_MODEL" ]]; then
+  cmd+=(--local-model "$LOCAL_MODEL")
+fi
+
+if [[ "$COMPACT_OUTPUT" == "1" ]]; then
+  cmd+=(--compact)
+fi
+
+echo "Executing:"
+printf '  %q' "${cmd[@]}"
+printf '\n'
+
+"${cmd[@]}"

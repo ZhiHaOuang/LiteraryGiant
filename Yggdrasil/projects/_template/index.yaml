@@ -1,0 +1,17 @@
+project_id: book_template
+paths:
+  book: book.yaml
+  style: bible/style.md
+  worldview: bible/worldview.md
+  characters: bible/characters.yaml
+  timeline: bible/timeline.yaml
+  clues: bible/clue_registry.yaml
+  constraints: bible/constraints.md
+  reference_policy: bible/reference_policy.yaml
+  book_outline: outlines/book_outline.md
+  volume_outline: outlines/volume_outline.yaml
+  arc_outline: outlines/arc_outline.yaml
+  chapter_plans: outlines/chapter_plans
+  drafts: drafts
+  reviews: reviews
+  runs: runs
