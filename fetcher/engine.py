@@ -16,35 +16,67 @@ from __future__ import annotations
 import json as _json
 import logging
 import shutil
+import threading
 import time
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from datetime import datetime, timezone
 from pathlib import Path
-from threading import Lock
-from urllib.parse import urljoin
 
 from bs4 import BeautifulSoup
 from shared.constants import RUNS_ROOT
 
 from .adapters.base import BaseAdapter, ChapterEntry
-from .registry import BookRegistry
-from .utils import RateLimiter, build_session, decode_response, random_user_agent
+from .registry import BookRegistry, _canonicalize_url
+from .utils import (
+    FileLock,
+    RateLimiter,
+    build_session,
+    decode_response,
+    fetch_with_retry,
+    random_user_agent,
+)
 
 logger = logging.getLogger(__name__)
 
 RUNS_FETCH_DIR = RUNS_ROOT / "fetch"
-MAX_CHAPTER_PAGES = 20  # safety cap for multi-page chapters
+CHECKPOINT_INTERVAL = 10  # flush manifest to disk every N completed chapters
+BOOK_MIN_DISCOVERED_PARTS = 20
+BOOK_MIN_TOTAL_CHARS = 100_000
+BOOK_STRONG_TOTAL_CHARS = 180_000
+STORY_MIN_CHARS = 50
+
+
+def _utc_now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _atomic_write_json(path: Path, payload: dict) -> None:
+    """Write *payload* as JSON to *path* atomically (tmp + rename)."""
+    tmp_path = path.with_suffix(path.suffix + ".tmp")
+    tmp_path.write_text(
+        _json.dumps(payload, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+    tmp_path.replace(path)
+
+
+def _chapter_file_name(order: int) -> str:
+    """Return the canonical chapter filename for a 1-based chapter order."""
+    return f"chapter_{order:04d}.txt"
 
 
 class FetcherEngine:
-    """Orchestrate the download of a complete web novel.
+    """Orchestrate the download of a complete web novel or short story.
 
     Parameters:
         adapter: Site-specific adapter for DOM parsing.
         min_delay: Minimum seconds between chapter batches.
-        max_chapters: Stop after N chapters (for testing).
+        max_chapters: Stop after N chapters (for testing). Ignored for stories.
         concurrency: How many chapters to fetch in parallel (1 = serial).
         min_completion: Fraction of chapters that must succeed (0.0–1.0).
+        content_type: ``"book"`` (multi-chapter novel) or ``"story"`` (single page).
+        rate_limiter: Optional shared rate limiter for cross-site coordination.
     """
 
     def __init__(
@@ -57,19 +89,26 @@ class FetcherEngine:
         run_id: str | None = None,
         concurrency: int = 3,
         min_completion: float = 0.8,
+        content_type: str = "auto",
+        rate_limiter: RateLimiter | None = None,
     ) -> None:
+        if content_type not in {"auto", "book", "story"}:
+            raise ValueError("content_type must be one of: auto, book, story")
         self.adapter = adapter
-        self.rate_limiter = RateLimiter(min_delay=min_delay)
+        self.rate_limiter = rate_limiter or RateLimiter(min_delay=min_delay)
         self.max_chapters = max_chapters
         self.output_encoding = output_encoding
         self.run_id = run_id or uuid.uuid4().hex[:12]
         self.concurrency = max(1, concurrency)
         self.min_completion = min_completion
-        self.session = build_session()
+        self.content_type = content_type
         self.registry = BookRegistry()
 
+        # Thread-safe sessions: each thread gets its own Session via _get_session()
+        self._local = threading.local()
+
         # Thread-safe manifest lock
-        self._manifest_lock = Lock()
+        self._manifest_lock = threading.Lock()
 
         # Run-level stats
         self._started_at: float = 0.0
@@ -78,73 +117,465 @@ class FetcherEngine:
         self._failed_chapter_urls: list[str] = []
 
     # ------------------------------------------------------------------
+    # Thread-safe session factory
+    # ------------------------------------------------------------------
+
+    def _get_session(self):
+        """Return a thread-local ``requests.Session`` (lazy, thread-safe)."""
+        if not hasattr(self._local, "session"):
+            self._local.session = build_session()
+        return self._local.session
+
+    # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
 
     def fetch_novel(self, url: str) -> Path:
-        """Fetch a complete novel: stage, validate, promote."""
+        """Fetch a novel or story — auto-detects book vs story from content.
+
+        Classification is based on fetched content statistics, not just whether
+        the page exposes multiple links. A multi-part short story still becomes
+        a ``story_XXXX`` idea seed unless it looks like a long-form book.
+        """
         self._started_at = time.monotonic()
 
-        # 1. Fetch index page
-        index_html, index_url = self._fetch_page(url)
-        index_soup = BeautifulSoup(index_html, "html.parser")
+        # 1. Fetch page
+        html_text, final_url = self._fetch_page(url)
+        html_text = self.adapter.preprocess_html(html_text, final_url)
+        soup = BeautifulSoup(html_text, "html.parser")
 
-        # 2. Extract metadata
-        title = self.adapter.extract_title(index_soup, index_url)
-        chapters = self.adapter.extract_chapter_list(index_soup, index_url)
+        title = self.adapter.extract_title(soup, final_url)
+
+        # 2. Try to extract chapter list → auto-detect book vs story
+        try:
+            chapters = self.adapter.extract_chapter_list(soup, final_url)
+        except Exception:
+            chapters = []
+
+        # 2b. Merge chapters from additional chapter-list pages (pagination)
+        try:
+            extra_pages = self.adapter.discover_chapter_list_urls(soup, final_url)
+        except Exception:
+            extra_pages = []
+        for page_url in extra_pages:
+            try:
+                page_html, _ = self._fetch_page(page_url)
+                page_soup = BeautifulSoup(page_html, "html.parser")
+                page_chapters = self.adapter.extract_chapter_list(page_soup, page_url)
+                # Re-number to continue from the previous page's last order
+                offset = len(chapters)
+                for i, ch in enumerate(page_chapters):
+                    ch = ChapterEntry(title=ch.title, url=ch.url, order=offset + i + 1)
+                    chapters.append(ch)
+            except Exception as exc:
+                logger.warning("Failed to fetch chapter-list page %s: %s", page_url, exc)
+
+        if chapters and len(chapters) >= 2:
+            return self._fetch_as_book(url, final_url, soup, title, chapters)
+
+        if self.content_type == "book":
+            raise RuntimeError(
+                f"Forced book classification but no chapter list was found for {url}"
+            )
+
+        # 3. No chapter list → treat as single-page story
+        return self._fetch_as_story(url, final_url, soup, title)
+
+    # ------------------------------------------------------------------
+    # Book path (multi-chapter)
+    # ------------------------------------------------------------------
+
+    def _fetch_as_book(
+        self, url: str, final_url: str, soup, title: str, chapters: list[ChapterEntry],
+    ) -> Path:
+        discovered_chapter_count = len(chapters)
         if self.max_chapters is not None:
             chapters = chapters[: self.max_chapters]
         self._total_chapters = len(chapters)
 
-        # 3. Register book → numeric ID
-        book_slug = self.registry.register(
-            title, source_url=url, adapter_domain=self.adapter.domain,
-        )
-        logger.info("Book: %s → %s  (%d chapters, concurrency=%d)",
-                     title, book_slug, self._total_chapters, self.concurrency)
-
-        # 4. Fetch chapters → staging (parallel)
-        staging_dir = RUNS_FETCH_DIR / self.run_id / book_slug
+        candidate_slug = f"candidate_{uuid.uuid4().hex[:12]}"
+        staging_dir = RUNS_FETCH_DIR / self.run_id / candidate_slug
         staging_dir.mkdir(parents=True, exist_ok=True)
 
-        manifest = self._build_manifest(title, url, book_slug, chapters)
+        manifest = self._build_manifest(
+            title,
+            url,
+            candidate_slug,
+            chapters,
+            discovered_chapter_count=discovered_chapter_count,
+        )
         self._fetched_chapters = self._fetch_all_chapters_parallel(
             chapters, staging_dir, manifest,
         )
+        self._tidy_manifest(manifest)
+        _atomic_write_json(staging_dir / "index.json", manifest)
+        self._validate_or_raise(staging_dir, manifest)
 
-        # 5. Write index.json
-        index_path = staging_dir / "index.json"
-        index_path.write_text(
-            _json.dumps(manifest, ensure_ascii=False, indent=2),
-            encoding="utf-8",
+        classification = self._classify_chaptered_work(
+            manifest,
+            staging_dir,
+            discovered_chapter_count=discovered_chapter_count,
+        )
+        manifest.update(classification)
+
+        content_type = classification["content_type"]
+        slug = self.registry.register(
+            title,
+            source_url=url,
+            adapter_domain=self.adapter.domain,
+            content_type=content_type,
+        )
+        manifest["book_slug"] = slug
+        if content_type == "story":
+            manifest["story_slug"] = slug
+
+        logger.info(
+            "%s: %s → %s  (parts=%d/%d, chars=%d, profile=%s)",
+            content_type.title(),
+            title,
+            slug,
+            classification["content_stats"]["fetched_parts"],
+            discovered_chapter_count,
+            classification["content_stats"]["total_chars"],
+            classification["processing_profile"],
         )
 
-        # 6. Validate → promote
-        self._validate_or_raise(staging_dir, manifest)
-        canonical_dir = self._promote(staging_dir, book_slug)
-        self._write_run_summary(book_slug, canonical_dir, manifest, success=True)
+        with self._slug_lock(slug):
+            existing_dir = self._existing_alternate_content_dir(slug, url)
+            if existing_dir is not None:
+                manifest["skipped_reason"] = "duplicate_title_alternate_source"
+                self._write_run_summary(slug, existing_dir, manifest, success=True)
+                shutil.rmtree(staging_dir, ignore_errors=True)
+                logger.info("Skipping duplicate alternate source for %s: %s", slug, url)
+                return existing_dir
+
+            if content_type == "story":
+                self._convert_chaptered_staging_to_story(staging_dir, manifest)
+                self._validate_or_raise_story(staging_dir, manifest)
+
+            _atomic_write_json(staging_dir / "index.json", manifest)
+            canonical_dir = self._promote(staging_dir, slug)
+            self._update_registry_profile(slug, manifest)
+            self._write_run_summary(slug, canonical_dir, manifest, success=True)
 
         elapsed = time.monotonic() - self._started_at
-        logger.info("Done: %s → %s  (%d chapters, %.1fs)", url, canonical_dir, self._fetched_chapters, elapsed)
+        logger.info("Done: %s → %s  (%d parts, %.1fs)", url, canonical_dir, self._fetched_chapters, elapsed)
         return canonical_dir
+
+    # ------------------------------------------------------------------
+    # Story path (single page)
+    # ------------------------------------------------------------------
+
+    def _fetch_as_story(
+        self, url: str, final_url: str, soup, title: str,
+    ) -> Path:
+        if self.content_type == "book":
+            raise RuntimeError(
+                f"Forced book classification but {url} looks like a single-page story"
+            )
+
+        content = self._extract_page_content(soup, final_url)
+        char_count = len(content)
+
+        if char_count < STORY_MIN_CHARS:
+            manifest = {
+                "title": title, "source_url": url,
+                "content_type": "story", "char_count": char_count,
+                "fetcher_run_id": self.run_id, "fetched_at": _utc_now(),
+                "adapter_domain": self.adapter.domain,
+            }
+            self._write_run_summary("unregistered_story", None, manifest,
+                                     success=False, errors=[f"Story content too short ({char_count} chars)"])
+            raise RuntimeError(f"Story content too short ({char_count} chars) for {url}")
+
+        story_slug = self.registry.register(
+            title, source_url=url, adapter_domain=self.adapter.domain, content_type="story",
+        )
+        classification = self._single_story_classification(char_count)
+
+        manifest = {
+            "title": title, "source_url": url,
+            "story_slug": story_slug, "content_type": "story",
+            "fetcher_run_id": self.run_id, "fetched_at": _utc_now(),
+            "adapter_domain": self.adapter.domain, "char_count": char_count,
+            **classification,
+        }
+
+        with self._slug_lock(story_slug):
+            existing_dir = self._existing_alternate_content_dir(story_slug, url)
+            if existing_dir is not None:
+                manifest["skipped_reason"] = "duplicate_title_alternate_source"
+                self._write_run_summary(story_slug, existing_dir, manifest, success=True)
+                logger.info("Skipping duplicate alternate source for %s: %s", story_slug, url)
+                return existing_dir
+
+            staging_dir = RUNS_FETCH_DIR / self.run_id / story_slug
+            staging_dir.mkdir(parents=True, exist_ok=True)
+            story_path = staging_dir / "story.txt"
+            story_path.write_text(content, encoding=self.output_encoding)
+
+            _atomic_write_json(staging_dir / "index.json", manifest)
+            self._validate_or_raise_story(staging_dir, manifest)
+            canonical_dir = self._promote(staging_dir, story_slug)
+            self._update_registry_profile(story_slug, manifest)
+            self._write_run_summary(story_slug, canonical_dir, manifest, success=True)
+
+        elapsed = time.monotonic() - self._started_at
+        logger.info("Story: %s → %s  (%d chars, %.1fs)", title, story_slug, char_count, elapsed)
+        return canonical_dir
+
+    def _validate_or_raise_story(self, staging_dir: Path, manifest: dict) -> None:
+        """Minimal validation for a single story."""
+        story_path = staging_dir / "story.txt"
+        if not story_path.exists():
+            raise RuntimeError(f"Missing story.txt in {staging_dir}")
+        if story_path.stat().st_size == 0:
+            raise RuntimeError(f"Empty story.txt in {staging_dir}")
+
+    # ------------------------------------------------------------------
+    # Classification
+    # ------------------------------------------------------------------
+
+    def _single_story_classification(self, char_count: int) -> dict:
+        return {
+            "processing_profile": "idea_seed",
+            "structure_type": "single_part",
+            "story_form": self._story_form(char_count),
+            "content_stats": {
+                "discovered_parts": 1,
+                "fetched_parts": 1,
+                "total_chars": char_count,
+                "avg_part_chars": char_count,
+            },
+            "classification": {
+                "mode": self.content_type,
+                "decision": "story",
+                "reasons": ["single_content_page"],
+            },
+        }
+
+    def _classify_chaptered_work(
+        self,
+        manifest: dict,
+        staging_dir: Path,
+        *,
+        discovered_chapter_count: int,
+    ) -> dict:
+        stats = self._chaptered_content_stats(manifest, staging_dir, discovered_chapter_count)
+        reasons: list[str] = []
+
+        if self.content_type == "book":
+            content_type = "book"
+            reasons.append("forced_book")
+        elif self.content_type == "story":
+            content_type = "story"
+            reasons.append("forced_story")
+        elif getattr(self.adapter, "supports_story_collections", False):
+            content_type = "story"
+            reasons.append("adapter_marks_collection_like_story_source")
+        elif stats["discovered_parts"] >= BOOK_MIN_DISCOVERED_PARTS:
+            content_type = "book"
+            reasons.append(f"discovered_parts>={BOOK_MIN_DISCOVERED_PARTS}")
+        elif stats["total_chars"] >= BOOK_STRONG_TOTAL_CHARS:
+            content_type = "book"
+            reasons.append(f"total_chars>={BOOK_STRONG_TOTAL_CHARS}")
+        elif stats["total_chars"] >= BOOK_MIN_TOTAL_CHARS and stats["fetched_parts"] >= 8:
+            content_type = "book"
+            reasons.append(f"total_chars>={BOOK_MIN_TOTAL_CHARS}_and_fetched_parts>=8")
+        else:
+            content_type = "story"
+            reasons.append("below_longform_thresholds")
+
+        if content_type == "book":
+            structure_type = "chaptered"
+            processing_profile = "longform_book"
+            story_form = None
+        else:
+            structure_type = "multi_part"
+            processing_profile = "idea_seed"
+            story_form = self._story_form(stats["total_chars"])
+
+        payload = {
+            "content_type": content_type,
+            "processing_profile": processing_profile,
+            "structure_type": structure_type,
+            "content_stats": stats,
+            "classification": {
+                "mode": self.content_type,
+                "decision": content_type,
+                "reasons": reasons,
+                "thresholds": {
+                    "book_min_discovered_parts": BOOK_MIN_DISCOVERED_PARTS,
+                    "book_min_total_chars": BOOK_MIN_TOTAL_CHARS,
+                    "book_strong_total_chars": BOOK_STRONG_TOTAL_CHARS,
+                },
+            },
+        }
+        if story_form:
+            payload["story_form"] = story_form
+        return payload
+
+    def _chaptered_content_stats(
+        self,
+        manifest: dict,
+        staging_dir: Path,
+        discovered_chapter_count: int,
+    ) -> dict:
+        successful_entries = [
+            entry for entry in manifest.get("chapters", [])
+            if entry.get("status") in ("ok", "cached")
+        ]
+        total_chars = 0
+        char_counts: list[int] = []
+
+        for entry in successful_entries:
+            chapter_path = staging_dir / entry.get("file_name", "")
+            if chapter_path.exists():
+                char_count = len(chapter_path.read_text(encoding=self.output_encoding))
+                entry["char_count"] = char_count
+            else:
+                char_count = int(entry.get("char_count") or 0)
+            char_counts.append(char_count)
+            total_chars += char_count
+
+        fetched_parts = len(successful_entries)
+        return {
+            "discovered_parts": discovered_chapter_count,
+            "fetched_parts": fetched_parts,
+            "total_chars": total_chars,
+            "avg_part_chars": round(total_chars / fetched_parts, 2) if fetched_parts else 0,
+            "min_part_chars": min(char_counts) if char_counts else 0,
+            "max_part_chars": max(char_counts) if char_counts else 0,
+        }
+
+    @staticmethod
+    def _story_form(total_chars: int) -> str:
+        if total_chars < 30_000:
+            return "short_story"
+        if total_chars < 80_000:
+            return "novelette"
+        return "novella"
+
+    def _convert_chaptered_staging_to_story(self, staging_dir: Path, manifest: dict) -> None:
+        """Convert fetched chapter files into a multi-part story layout."""
+        successful_entries = [
+            entry for entry in manifest.get("chapters", [])
+            if entry.get("status") in ("ok", "cached")
+        ]
+        successful_entries.sort(key=lambda entry: int(entry["order"]))
+        if not successful_entries:
+            raise RuntimeError(f"No fetched parts available to build story.txt in {staging_dir}")
+
+        parts_dir = staging_dir / "parts"
+        parts_dir.mkdir(parents=True, exist_ok=True)
+        story_sections: list[str] = []
+        parts: list[dict] = []
+
+        for part_order, entry in enumerate(successful_entries, start=1):
+            source_name = entry.get("file_name", _chapter_file_name(int(entry["order"])))
+            source_path = staging_dir / source_name
+            if not source_path.exists():
+                raise RuntimeError(f"Missing fetched part file: {source_path}")
+
+            title = str(entry.get("title") or f"part_{part_order:04d}").strip()
+            content = source_path.read_text(encoding=self.output_encoding).strip()
+            part_name = f"part_{part_order:04d}.txt"
+            part_text = f"{title}\n\n{content}\n" if content else f"{title}\n"
+            (parts_dir / part_name).write_text(part_text, encoding=self.output_encoding)
+            story_sections.append(part_text.strip())
+            parts.append(
+                {
+                    "order": part_order,
+                    "title": title,
+                    "file_name": f"parts/{part_name}",
+                    "source_url": entry.get("url", ""),
+                    "char_count": len(content),
+                }
+            )
+            source_path.unlink()
+
+        story_text = "\n\n".join(section for section in story_sections if section).strip()
+        if len(story_text) < STORY_MIN_CHARS:
+            raise RuntimeError(
+                f"Combined story content too short ({len(story_text)} chars) in {staging_dir}"
+            )
+        (staging_dir / "story.txt").write_text(story_text + "\n", encoding=self.output_encoding)
+
+        manifest.pop("chapters", None)
+        manifest["parts"] = parts
+        manifest["source_type"] = "multi_part_story"
+        manifest["char_count"] = len(story_text)
+        manifest["total_expected"] = len(parts)
+        manifest["total_fetched"] = len(parts)
+
+    def _update_registry_profile(self, slug: str, manifest: dict) -> None:
+        updates = {
+            key: manifest[key]
+            for key in (
+                "content_type",
+                "processing_profile",
+                "structure_type",
+                "story_form",
+                "content_stats",
+                "classification",
+            )
+            if key in manifest
+        }
+        if updates:
+            self.registry.update(slug, **updates)
 
     # ------------------------------------------------------------------
     # Manifest
     # ------------------------------------------------------------------
 
-    def _build_manifest(self, title: str, url: str, book_slug: str,
-                        chapters: list[ChapterEntry]) -> dict:
+    def _build_manifest(
+        self,
+        title: str,
+        url: str,
+        book_slug: str,
+        chapters: list[ChapterEntry],
+        *,
+        discovered_chapter_count: int | None = None,
+    ) -> dict:
         return {
             "title": title, "source_url": url, "book_slug": book_slug,
+            "content_type": "unclassified",
             "fetcher_run_id": self.run_id,
-            "fetched_at": _json.dumps(int(time.time())),
+            "fetched_at": _utc_now(),
             "adapter_domain": self.adapter.domain,
+            "total_discovered": discovered_chapter_count or len(chapters),
             "total_expected": len(chapters), "total_fetched": 0,
             "total_failed": 0, "chapters": [],
         }
 
-    # ------------------------------------------------------------------
-    # Parallel chapter fetching
+    @staticmethod
+    def _tidy_manifest(manifest: dict) -> None:
+        """Sort chapter entries by order and deduplicate.
+
+        Called after all chapters are fetched to produce a clean, ordered
+        ``index.json`` regardless of the parallel fetch completion order.
+        """
+        entries = manifest.get("chapters", [])
+        if not entries:
+            return
+
+        # Dedup by order — keep last occurrence (most recent status)
+        seen: dict[int, dict] = {}
+        for entry in entries:
+            try:
+                order = int(entry["order"])
+            except (KeyError, ValueError):
+                continue
+            seen[order] = entry
+
+        # Sort by order
+        deduped = [seen[order] for order in sorted(seen)]
+        ok_count = sum(1 for e in deduped if e.get("status") in ("ok", "cached"))
+        failed_count = sum(1 for e in deduped if e.get("status") == "failed")
+
+        manifest["chapters"] = deduped
+        manifest["total_fetched"] = ok_count
+        manifest["total_failed"] = failed_count
     # ------------------------------------------------------------------
 
     def _fetch_all_chapters_parallel(
@@ -153,170 +584,183 @@ class FetcherEngine:
         staging_dir: Path,
         manifest: dict,
     ) -> int:
-        """Fetch chapters concurrently with bounded parallelism."""
+        """Fetch chapters concurrently with bounded parallelism.
+
+        Supports **resume**: if a previous run left chapters on disk (and a
+        partial ``index.json``), those chapters are skipped and counted as
+        cached.  The manifest is checkpointed to disk every
+        ``CHECKPOINT_INTERVAL`` completed chapters so that a crash loses at
+        most one batch of work.
+        """
         total = len(chapters)
+
+        # --- Resume: load existing manifest if present ---
+        checkpoint_path = staging_dir / "index.json"
+        completed_orders: set[int] = set()
+        if checkpoint_path.exists():
+            try:
+                prev = _json.loads(checkpoint_path.read_text(encoding="utf-8"))
+                for entry in prev.get("chapters", []):
+                    if entry.get("status") not in ("ok", "cached"):
+                        continue
+                    order = int(entry["order"])
+                    chapter_path = staging_dir / _chapter_file_name(order)
+                    if chapter_path.exists() and chapter_path.stat().st_size > 0:
+                        completed_orders.add(order)
+                    else:
+                        logger.warning(
+                            "Ignoring stale checkpoint entry for missing chapter file: %s",
+                            chapter_path.name,
+                        )
+                if completed_orders:
+                    logger.info("Resuming: %d chapters already on disk", len(completed_orders))
+            except (_json.JSONDecodeError, KeyError, ValueError):
+                pass
+
+        # Seed manifest with cached chapters
         written = 0
         failed = 0
+        for chapter in chapters:
+            order = chapter.order
+            if order in completed_orders:
+                file_name = _chapter_file_name(order)
+                chapter_path = staging_dir / file_name
+                file_size = chapter_path.stat().st_size if chapter_path.exists() else 0
+                manifest["chapters"].append({
+                    "order": order, "title": chapter.title,
+                    "file_name": file_name, "url": chapter.url,
+                    "status": "cached",
+                    "file_size": file_size,
+                })
+                written += 1
 
+        # --- Submit remaining chapters ---
         with ThreadPoolExecutor(max_workers=self.concurrency) as pool:
-            # Submit all chapter-fetch tasks
             futures: dict = {}
-            for idx, chapter in enumerate(chapters, 1):
-                file_name = f"chapter_{idx:04d}.txt"
+            for chapter in chapters:
+                order = chapter.order
+                if order in completed_orders:
+                    continue
+
+                file_name = _chapter_file_name(order)
                 chapter_path = staging_dir / file_name
 
-                # Skip cached
+                # Check for on-disk cache (from an earlier run without manifest)
                 if chapter_path.exists() and chapter_path.stat().st_size > 0:
-                    manifest["chapters"].append({
-                        "order": idx, "title": chapter.title,
-                        "file_name": file_name, "url": chapter.url,
-                        "status": "cached",
-                        "file_size": chapter_path.stat().st_size,
-                    })
+                    with self._manifest_lock:
+                        manifest["chapters"].append({
+                            "order": order, "title": chapter.title,
+                            "file_name": file_name, "url": chapter.url,
+                            "status": "cached",
+                            "file_size": chapter_path.stat().st_size,
+                        })
                     written += 1
+                    completed_orders.add(order)
                     continue
 
                 future = pool.submit(
-                    self._fetch_chapter_with_index, idx, chapter, chapter_path,
+                    self._fetch_chapter_with_index, order, chapter, chapter_path,
                 )
-                futures[future] = (idx, chapter, file_name)
+                futures[future] = (order, chapter, file_name)
 
-            # Collect results as they complete
+            # --- Collect results as they complete ---
             for future in as_completed(futures):
                 idx, chapter, file_name = futures[future]
                 try:
-                    content = future.result()
-                    self._manifest_lock.acquire()
-                    try:
+                    char_count, error = future.result()
+                    if error:
+                        raise RuntimeError(error)
+
+                    with self._manifest_lock:
                         manifest["chapters"].append({
                             "order": idx, "title": chapter.title,
                             "file_name": file_name, "url": chapter.url,
                             "status": "ok",
-                            "char_count": len(content),
+                            "char_count": char_count,
                         })
-                    finally:
-                        self._manifest_lock.release()
                     written += 1
+
                 except Exception as exc:
-                    self._manifest_lock.acquire()
-                    try:
+                    with self._manifest_lock:
                         manifest["chapters"].append({
                             "order": idx, "title": chapter.title,
                             "file_name": file_name, "url": chapter.url,
                             "status": "failed",
                             "error": str(exc)[:200],
                         })
-                    finally:
-                        self._manifest_lock.release()
                     self._failed_chapter_urls.append(chapter.url)
                     failed += 1
                     logger.error("Failed chapter %d/%d: %s — %s",
                                  idx, total, chapter.title, exc)
 
-                if (written + failed) % 50 == 0 or (written + failed) == total:
-                    logger.info("Progress: %d/%d chapters (%d failed)",
-                                written + failed, total, failed)
+                completed = written + failed
+                if completed % CHECKPOINT_INTERVAL == 0:
+                    with self._manifest_lock:
+                        manifest["total_fetched"] = written
+                        manifest["total_failed"] = failed
+                        _atomic_write_json(checkpoint_path, manifest)
+                    logger.info("Checkpoint: %d/%d chapters (%d failed)",
+                                completed, total, failed)
 
+                if completed % 50 == 0 or completed == total:
+                    logger.info("Progress: %d/%d chapters (%d failed)",
+                                completed, total, failed)
+
+        manifest["chapters"].sort(key=lambda entry: int(entry["order"]))
         manifest["total_fetched"] = written
         manifest["total_failed"] = failed
         return written
 
     def _fetch_chapter_with_index(
         self, idx: int, chapter: ChapterEntry, chapter_path: Path,
-    ) -> str:
-        """Fetch one chapter and write to disk.  Thread-safe."""
+    ) -> tuple[int, str | None]:
+        """Fetch one chapter and write to disk.
+
+        Returns:
+            ``(char_count, None)`` on success, ``(0, error_msg)`` on failure.
+            The content is never returned — only written to disk — to keep
+            memory usage bounded.
+        """
         content = self._fetch_chapter(chapter)
         chapter_path.write_text(content, encoding=self.output_encoding)
-        return content
+        return len(content), None
 
     # ------------------------------------------------------------------
     # Single-chapter fetch (with intra-chapter page parallelism)
     # ------------------------------------------------------------------
 
     def _fetch_chapter(self, chapter: ChapterEntry) -> str:
-        """Fetch one chapter — pages in parallel, ordered on assembly.
+        """Fetch one chapter, following "next page" links until none remain.
 
-        1. Fetch page 1 serially to discover the pagination pattern.
-        2. Predict page-2 … page-N URLs and fetch them in parallel.
-        3. Assemble all pages in order.
+        No blind page prediction — we only request page N+1 when page N
+        actually has a next-page link.  This handles 1-page, 2-page, and
+        3+-page chapters correctly without wasted requests.
         """
-        self.rate_limiter.wait()
+        _MAX_PAGES = 10  # safety cap
 
-        # --- Page 1 (serial — to discover multi-page structure) ---
-        html_text, final_url = self._fetch_page(chapter.url)
-        html_text = self.adapter.preprocess_html(html_text, final_url)
-        soup = BeautifulSoup(html_text, "html.parser")
+        all_parts: list[str] = []
+        current_url = chapter.url
 
-        next_url = self.adapter.extract_next_page_url(soup, final_url)
-        part1 = self._extract_page_content(soup, final_url)
+        for _ in range(_MAX_PAGES):
+            html_text, final_url = self._fetch_page(current_url)
+            html_text = self.adapter.preprocess_html(html_text, final_url)
+            soup = BeautifulSoup(html_text, "html.parser")
 
-        if not next_url:
-            # Single-page chapter — done
-            return part1
+            all_parts.append(self._extract_page_content(soup, final_url))
 
-        # --- Predict remaining page URLs ---
-        # bqquge pattern: /book_id/chap_id → /book_id/chap_id-2 → chap_id-3 …
-        # We fetch pages 2..N in parallel, then check if page N+1 exists.
-        page_urls = self._discover_page_urls(chapter.url, next_url)
-        all_parts: list[str] = [part1] if part1 else []
+            next_url = self.adapter.extract_next_page_url(soup, final_url)
+            if not next_url:
+                break
+            current_url = next_url
 
-        # Fetch extra pages in parallel
-        if page_urls:
-            with ThreadPoolExecutor(max_workers=min(len(page_urls), 8)) as pool:
-                page_futures = {
-                    pool.submit(self._fetch_single_page, url): (i, url)
-                    for i, url in enumerate(page_urls, 2)
-                }
-                page_results: dict[int, str] = {}
-                for future in as_completed(page_futures):
-                    pg, url = page_futures[future]
-                    try:
-                        page_results[pg] = future.result()
-                    except Exception as exc:
-                        logger.warning("Page %d failed for %s: %s", pg, chapter.url, exc)
-
-                # Assemble in page order
-                for pg in sorted(page_results):
-                    if page_results[pg]:
-                        all_parts.append(page_results[pg])
-
-        logger.debug("Chapter: %d pages", len(all_parts))
+        if len(all_parts) > 1:
+            logger.debug("Chapter: %d pages", len(all_parts))
         return "\n\n".join(all_parts)
-
-    def _discover_page_urls(
-        self, first_url: str, next_url: str,
-    ) -> list[str]:
-        """Given page 1 URL and page 2 URL, predict page 3…N URLs.
-
-        Fetches pages speculatively — stops when a predicted URL 404s.
-        """
-        urls = [next_url]
-        # Try to predict the pattern: if next_url ends with "-2",
-        # page 3 is "-3", etc.
-        if next_url.endswith("-2") and not first_url.endswith("-2"):
-            base = next_url[:-2]  # strip "-2"
-            # Try up to MAX_CHAPTER_PAGES
-            for n in range(3, MAX_CHAPTER_PAGES + 1):
-                urls.append(f"{base}-{n}")
-        return urls
-
-    def _fetch_single_page(self, url: str) -> str:
-        """Fetch a single page → extract content.  Used for parallel page fetches."""
-        # Each thread needs its own session
-        sess = build_session()
-        sess.headers.update({"User-Agent": random_user_agent()})
-        resp = sess.get(url)
-        resp.raise_for_status()
-        text = decode_response(resp)
-        text = self.adapter.preprocess_html(text, url)
-        soup = BeautifulSoup(text, "html.parser")
-        return self._extract_page_content(soup, url)
 
     def _extract_page_content(self, soup: BeautifulSoup, url: str) -> str:
         """Extract and minimally normalise text from one page."""
         part = self.adapter.extract_content(soup, url)
-        part = part.replace("\r\n", "\n").replace("\r", "\n")
-        return part.strip()
+        return self.adapter.postprocess_content(part)
 
     # ------------------------------------------------------------------
     # Validation
@@ -337,6 +781,29 @@ class FetcherEngine:
         for txt_file in sorted(staging_dir.glob("chapter_*.txt")):
             if txt_file.stat().st_size == 0:
                 failures.append(f"Empty file: {txt_file.name}")
+        actual_files = {
+            txt_file.name for txt_file in staging_dir.glob("chapter_*.txt")
+            if txt_file.is_file() and txt_file.stat().st_size > 0
+        }
+        successful_entries = [
+            entry for entry in manifest.get("chapters", [])
+            if entry.get("status") in ("ok", "cached")
+        ]
+        expected_files = {
+            entry.get("file_name", _chapter_file_name(int(entry["order"])))
+            for entry in successful_entries
+        }
+        missing_files = sorted(expected_files - actual_files)
+        if missing_files:
+            failures.append(
+                "Missing chapter files referenced by manifest: "
+                + ", ".join(missing_files[:5])
+            )
+        if len(actual_files) != len(successful_entries):
+            failures.append(
+                f"Manifest/file mismatch: {len(successful_entries)} successful entries "
+                f"but {len(actual_files)} non-empty chapter files"
+            )
         if not (staging_dir / "index.json").exists():
             failures.append("Missing index.json")
         if fetched == 0:
@@ -360,18 +827,42 @@ class FetcherEngine:
 
     def _promote(self, staging_dir: Path, book_slug: str) -> Path:
         canonical_dir = self.registry.source_dir(book_slug)
+        backup_dir = canonical_dir.with_name(
+            f"{canonical_dir.name}.backup_{self.run_id}"
+        )
         if canonical_dir.exists():
             logger.info("Replacing existing: %s", canonical_dir)
-            shutil.rmtree(canonical_dir)
+            if backup_dir.exists():
+                shutil.rmtree(backup_dir)
+            shutil.move(str(canonical_dir), str(backup_dir))
         canonical_dir.parent.mkdir(parents=True, exist_ok=True)
-        shutil.move(str(staging_dir), str(canonical_dir))
+        try:
+            shutil.move(str(staging_dir), str(canonical_dir))
+        except Exception:
+            if backup_dir.exists() and not canonical_dir.exists():
+                shutil.move(str(backup_dir), str(canonical_dir))
+            raise
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
         logger.info("Promoted: %s → %s", staging_dir.name, canonical_dir)
 
-        chapter_count = len(list(canonical_dir.glob("chapter_*.txt")))
-        self.registry.update(book_slug, last_fetched={
-            "run_id": self.run_id, "chapters": chapter_count,
-            "at": _json.dumps(int(time.time())),
-        })
+        story_file = canonical_dir / "story.txt"
+        if story_file.exists():
+            part_count = len(list((canonical_dir / "parts").glob("part_*.txt")))
+            self.registry.update(book_slug, last_fetched={
+                "run_id": self.run_id,
+                "source_type": "story",
+                "bytes": story_file.stat().st_size,
+                "parts": part_count,
+                "at": _utc_now(),
+            })
+        else:
+            chapter_count = len(list(canonical_dir.glob("chapter_*.txt")))
+            self.registry.update(book_slug, last_fetched={
+                "run_id": self.run_id, "source_type": "per_chapter",
+                "chapters": chapter_count,
+                "at": _utc_now(),
+            })
         return canonical_dir
 
     # ------------------------------------------------------------------
@@ -383,16 +874,12 @@ class FetcherEngine:
                            errors: list[str] | None = None) -> None:
         run_index_path = RUNS_FETCH_DIR / "run_index.json"
         run_index_path.parent.mkdir(parents=True, exist_ok=True)
-        if run_index_path.exists():
-            run_index = _json.loads(run_index_path.read_text(encoding="utf-8"))
-        else:
-            run_index = {"runs": []}
-
         elapsed = time.monotonic() - self._started_at
         entry = {
             "run_id": self.run_id, "book_slug": book_slug,
             "title": manifest.get("title", ""),
             "source_url": manifest.get("source_url", ""),
+            "content_type": manifest.get("content_type", "book"),
             "status": "ok" if success else "failed",
             "elapsed_sec": round(elapsed, 1),
             "concurrency": self.concurrency,
@@ -403,11 +890,30 @@ class FetcherEngine:
         }
         if errors:
             entry["errors"] = errors
-        run_index["runs"].append(entry)
-        run_index_path.write_text(
-            _json.dumps(run_index, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        if "story_slug" in manifest:
+            entry["story_slug"] = manifest["story_slug"]
+        for key in (
+            "processing_profile",
+            "structure_type",
+            "story_form",
+            "content_stats",
+            "classification",
+        ):
+            if key in manifest:
+                entry[key] = manifest[key]
+        if "skipped_reason" in manifest:
+            entry["skipped_reason"] = manifest["skipped_reason"]
+        with FileLock(str(run_index_path) + ".lock"):
+            if run_index_path.exists():
+                try:
+                    run_index = _json.loads(run_index_path.read_text(encoding="utf-8"))
+                except _json.JSONDecodeError:
+                    logger.warning("Could not parse %s, starting a fresh run index", run_index_path)
+                    run_index = {"runs": []}
+            else:
+                run_index = {"runs": []}
+            run_index.setdefault("runs", []).append(entry)
+            _atomic_write_json(run_index_path, run_index)
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -415,12 +921,15 @@ class FetcherEngine:
 
     def _fetch_page(self, url: str, encoding: str | None = None) -> tuple[str, str]:
         """Fetch a page, detect encoding, return (html_text, final_url)."""
-        self.session.headers.update({"User-Agent": random_user_agent()})
-        response = self.session.get(url)
-        response.raise_for_status()
+        self.rate_limiter.wait()
+        session = self._get_session()
+        session.headers.update({"User-Agent": random_user_agent()})
+        response = fetch_with_retry(session, url)
 
         if encoding:
             text = response.content.decode(encoding, errors="replace")
+        elif getattr(self.adapter, "encoding", None):
+            text = response.content.decode(self.adapter.encoding, errors="replace")
         else:
             text = decode_response(response)
 
@@ -429,3 +938,39 @@ class FetcherEngine:
                 f"Fetched page at {url} is too short ({len(text)} chars)"
             )
         return text, response.url
+
+    def _slug_lock(self, slug: str) -> FileLock:
+        """Return a cross-process lock for fetches that target the same slug."""
+        lock_dir = RUNS_FETCH_DIR / "locks"
+        lock_dir.mkdir(parents=True, exist_ok=True)
+        return FileLock(str(lock_dir / f"{slug}.lock"))
+
+    def _existing_alternate_content_dir(self, slug: str, source_url: str) -> Path | None:
+        """Return existing content for duplicate alternate sources, if present."""
+        info = self.registry.lookup(slug)
+        if not info:
+            return None
+
+        primary_url = info.get("source_url", "")
+        if not primary_url:
+            return None
+        if _canonicalize_url(primary_url) == _canonicalize_url(source_url):
+            return None
+
+        canonical_dir = self.registry.source_dir(slug)
+        if self._has_content(canonical_dir):
+            return canonical_dir
+        return None
+
+    @staticmethod
+    def _has_content(path: Path) -> bool:
+        if not path.exists():
+            return False
+        if (path / "story.txt").is_file() and (path / "story.txt").stat().st_size > 0:
+            return True
+        if (path / "source.txt").is_file() and (path / "source.txt").stat().st_size > 0:
+            return True
+        return any(
+            chapter.is_file() and chapter.stat().st_size > 0
+            for chapter in path.glob("chapter_*.txt")
+        )

@@ -2,17 +2,24 @@
 
 from __future__ import annotations
 
+import fcntl
 import logging
 import random
 import re
+import threading
 import time
-from collections import Counter
 
 import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 logger = logging.getLogger(__name__)
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+DEFAULT_TIMEOUT: int = 30
 
 # ---------------------------------------------------------------------------
 # Default HTTP headers to avoid being blocked
@@ -47,6 +54,51 @@ def random_user_agent() -> str:
 
 
 # ---------------------------------------------------------------------------
+# File lock — cross-process safe via fcntl
+# ---------------------------------------------------------------------------
+
+
+class FileLock:
+    """Cross-process file lock backed by ``fcntl.flock``.
+
+    Usage as context manager::
+
+        with FileLock("/path/to/file.lock"):
+            # exclusive access
+            ...
+    """
+
+    def __init__(self, path: str) -> None:
+        self.lock_path = path
+        self._fd = None
+
+    def acquire(self) -> None:
+        """Acquire an exclusive lock (blocking)."""
+        self._fd = open(self.lock_path, "w")
+        fcntl.flock(self._fd, fcntl.LOCK_EX)
+
+    def release(self) -> None:
+        """Release the lock and close the file descriptor."""
+        if self._fd is not None:
+            try:
+                fcntl.flock(self._fd, fcntl.LOCK_UN)
+            except Exception:
+                pass
+            try:
+                self._fd.close()
+            except Exception:
+                pass
+            self._fd = None
+
+    def __enter__(self) -> FileLock:
+        self.acquire()
+        return self
+
+    def __exit__(self, *args) -> None:
+        self.release()
+
+
+# ---------------------------------------------------------------------------
 # Rate limiter
 # ---------------------------------------------------------------------------
 
@@ -58,15 +110,17 @@ class RateLimiter:
         self._min_delay = float(min_delay)
         self._jitter = float(jitter)
         self._last_call: float = 0.0
+        self._lock = threading.Lock()
 
     def wait(self) -> None:
         """Block until at least `min_delay` seconds have passed since last call."""
-        now = time.monotonic()
-        elapsed = now - self._last_call
-        if elapsed < self._min_delay:
-            sleep_time = self._min_delay - elapsed + random.uniform(0, self._jitter)
-            time.sleep(sleep_time)
-        self._last_call = time.monotonic()
+        with self._lock:
+            now = time.monotonic()
+            elapsed = now - self._last_call
+            if elapsed < self._min_delay:
+                sleep_time = self._min_delay - elapsed + random.uniform(0, self._jitter)
+                time.sleep(sleep_time)
+            self._last_call = time.monotonic()
 
 
 # ---------------------------------------------------------------------------
@@ -107,7 +161,7 @@ def _score_text(text: str) -> float:
     total = len(text)
     cjk_count = sum(1 for ch in text if _is_cjk(ch))
     printable = sum(1 for ch in text if ch.isprintable() or ch in ("\n", "\r", "\t"))
-    replacements = text.count("�")
+    replacements = text.count("\ufffd")
     nulls = text.count("\x00")
 
     if total == 0:
@@ -142,7 +196,6 @@ def detect_encoding(
         try:
             decoded = raw_bytes.decode(declared_charset)
             score = _score_text(decoded)
-            # If score is borderline, still prefer declared but validate
             if score > -0.5:
                 return declared_charset
         except (LookupError, UnicodeDecodeError):
@@ -207,24 +260,26 @@ def decode_response(response: requests.Response) -> str:
 
 
 # ---------------------------------------------------------------------------
-# Retry helper
+# Session & retry
 # ---------------------------------------------------------------------------
 
 
 def build_session(
     max_retries: int = 3,
     backoff_factor: float = 1.0,
-    timeout: int = 30,
 ) -> requests.Session:
     """Build a ``requests.Session`` with retry logic and default headers.
 
+    Retries cover transient HTTP errors (429, 5xx), connection failures,
+    and read timeouts — all common during large-scale web scraping.
+
     Args:
-        max_retries: Maximum number of retries on transient errors.
-        backoff_factor: Backoff multiplier for retries (1.0 → 1s, 2s, 4s).
-        timeout: Request timeout in seconds.
+        max_retries: Maximum number of retries per request.
+        backoff_factor: Backoff multiplier (1.0 → 1s, 2s, 4s, 8s).
 
     Returns:
-        A configured ``requests.Session``.
+        A configured ``requests.Session``.  Callers should pass ``timeout=``
+        explicitly on each ``.get()`` call.
     """
     session = requests.Session()
     session.headers.update(DEFAULT_HEADERS)
@@ -234,21 +289,77 @@ def build_session(
         backoff_factor=backoff_factor,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
+        connect=max_retries,
+        read=max_retries,
     )
     adapter = HTTPAdapter(max_retries=retry_strategy)
     session.mount("http://", adapter)
     session.mount("https://", adapter)
-    # Inject timeout as a default for every request
-    session.request = lambda method, url, **kwargs: requests.Session.request(  # type: ignore[assignment]
-        session, method, url, timeout=timeout, **kwargs
-    )
     return session
+
+
+def fetch_with_retry(
+    session: requests.Session,
+    url: str,
+    *,
+    max_tries: int = 3,
+    backoff: float = 2.0,
+    timeout: int = DEFAULT_TIMEOUT,
+) -> requests.Response:
+    """GET *url* with exponential-backoff retries.
+
+    Handles scenarios that ``urllib3.Retry`` does not cover:
+    * HTTP 403 (temporary IP ban) — retry with longer wait.
+    * ``requests.ConnectionError`` — DNS / TCP failures.
+    * ``requests.ReadTimeout`` — slow server.
+
+    Args:
+        session: A ``requests.Session``.
+        url: The URL to GET.
+        max_tries: Maximum attempts (including the first).
+        backoff: Exponential backoff base in seconds.
+        timeout: Per-request timeout in seconds.
+
+    Returns:
+        The successful ``requests.Response``.
+
+    Raises:
+        requests.RequestException: If all attempts fail.
+    """
+    last_exc: Exception | None = None
+
+    for attempt in range(max_tries):
+        try:
+            resp = session.get(url, timeout=timeout)
+
+            # 403 often means temporary IP ban — retry with longer backoff
+            if resp.status_code == 403 and attempt < max_tries - 1:
+                wait = backoff ** attempt + random.uniform(1, 3)
+                logger.debug("403 on %s, retrying in %.1fs (attempt %d/%d)",
+                             url, wait, attempt + 1, max_tries)
+                time.sleep(wait)
+                continue
+
+            resp.raise_for_status()
+            return resp
+
+        except (requests.ConnectionError, requests.ReadTimeout) as exc:
+            last_exc = exc
+            if attempt < max_tries - 1:
+                wait = backoff ** attempt + random.uniform(0, 1)
+                logger.debug("%s on %s, retrying in %.1fs (attempt %d/%d)",
+                             type(exc).__name__, url, wait, attempt + 1, max_tries)
+                time.sleep(wait)
+
+    raise last_exc  # type: ignore[misc]
 
 
 def fetch_page(
     session: requests.Session,
     url: str,
     encoding: str | None = None,
+    *,
+    timeout: int = DEFAULT_TIMEOUT,
 ) -> tuple[str, str]:
     """Fetch a web page and return (decoded_text, final_url).
 
@@ -256,12 +367,12 @@ def fetch_page(
         session: A ``requests.Session`` to use.
         url: The URL to fetch.
         encoding: Force a specific encoding. Detected automatically if ``None``.
+        timeout: Request timeout in seconds.
 
     Returns:
         Tuple of (decoded HTML text, final URL after redirects).
     """
-    response = session.get(url)
-    response.raise_for_status()
+    response = fetch_with_retry(session, url, timeout=timeout)
 
     if encoding:
         text = response.content.decode(encoding, errors="replace")

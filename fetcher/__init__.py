@@ -20,6 +20,9 @@ from .adapters import (
     BaseAdapter,
     BqqugeAdapter,
     ChapterEntry,
+    IbiqugeAdapter,
+    TrxsAdapter,
+    WuyouShuchengAdapter,
     get_adapter_for_url,
 )
 from .engine import FetcherEngine
@@ -34,5 +37,8 @@ __all__ = [
     "BqqugeAdapter",
     "ChapterEntry",
     "FetcherEngine",
+    "IbiqugeAdapter",
+    "TrxsAdapter",
+    "WuyouShuchengAdapter",
     "get_adapter_for_url",
 ]

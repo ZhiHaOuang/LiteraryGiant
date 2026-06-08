@@ -9,6 +9,7 @@ from .processor import (
     process_txt_file,
 )
 from .source_resolver import BookSource, ChapterSource, resolve_input
+from .llm_noise_classifier import QwenWeakNoiseClassifier
 
 __version__ = "0.1.0"
 
@@ -18,6 +19,7 @@ __all__ = [
     "ChapterSource",
     "ChunkRecord",
     "RawNovelBook",
+    "QwenWeakNoiseClassifier",
     "discover_txt_files",
     "process_txt_file",
     "resolve_input",

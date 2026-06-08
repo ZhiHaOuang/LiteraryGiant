@@ -1,0 +1,12 @@
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+
+[dev]
+
+[gpu]
+accelerate>=0.33.0
+pillow>=10.0.0
+safetensors>=0.4.3
+sentencepiece>=0.2.0
+torch>=2.2.0
+transformers<5,>=4.45.0

@@ -160,6 +160,7 @@ def _process_per_chapter_incremental(
     new_records: list[dict] = []
     skipped_count = 0
     processed_count = 0
+    book._line_frequency_counts = book._build_frequency_counts_for_sources(chapter_sources)
 
     for ch_src in chapter_sources:
         ch_signature = compute_path_signature(ch_src.source_path)
@@ -251,16 +252,26 @@ def _process_per_chapter_incremental(
     # Compute book-level metadata
     total_chars = sum(r["char_count"] for r in new_records)
     total_paragraphs = sum(r["paragraph_count"] for r in new_records)
+    cleaning_summary = _build_cleaning_summary(
+        book.cleaning_stats,
+        book.discarded_line_examples,
+        book.trimmed_line_examples,
+    )
 
     result = {
         "book_metadata": {
             "book_id": source.book_id,
+            "content_type": source.content_type,
+            "processing_profile": source.processing_profile,
             "source_path": str(source.source_dir),
             "chapter_count": len(new_records),
             "volume_count": len({r.get("volume_title") for r in new_records if r.get("volume_title")}),
             "total_chars": total_chars,
             "total_paragraphs": total_paragraphs,
             "avg_chapter_chars": round(total_chars / len(new_records), 2) if new_records else 0,
+            "cleaning_stats": dict(book.cleaning_stats),
+            "cleaning_summary": cleaning_summary,
+            "chapter_anomalies": _detect_chapter_anomalies(new_records),
         },
         "chapters": new_records,
     }
@@ -281,6 +292,8 @@ def _process_per_chapter_incremental(
             output_path=output_dir,
             metadata={
                 "book_id": source.book_id,
+                "content_type": source.content_type,
+                "processing_profile": source.processing_profile,
                 "chapter_count": len(new_records),
                 "total_chars": total_chars,
                 "total_paragraphs": total_paragraphs,
@@ -332,3 +345,94 @@ def process_txt_file(
         chunk_overlap=chunk_overlap,
     )
 
+
+def _detect_chapter_anomalies(records: list[dict]) -> list[dict[str, object]]:
+    if not records:
+        return []
+    anomalies: list[dict[str, object]] = []
+    lengths = [int(record.get("char_count") or 0) for record in records if int(record.get("char_count") or 0) > 0]
+    avg_chars = sum(lengths) / len(lengths) if lengths else 0
+    expected_order = 1
+    for record in records:
+        order = int(record.get("order") or 0)
+        char_count = int(record.get("char_count") or 0)
+        paragraph_count = int(record.get("paragraph_count") or 0)
+        reasons: list[str] = []
+        if order != expected_order:
+            reasons.append(f"non_contiguous_order_expected_{expected_order}")
+            expected_order = order
+        expected_order += 1
+        if char_count == 0:
+            reasons.append("empty_content")
+        elif char_count < 80:
+            reasons.append("very_short_content")
+        elif avg_chars and char_count < avg_chars * 0.12:
+            reasons.append("short_length_outlier")
+        elif avg_chars and char_count > avg_chars * 4:
+            reasons.append("long_length_outlier")
+        if paragraph_count <= 1 and char_count > 300:
+            reasons.append("single_paragraph_long_chapter")
+        if reasons:
+            anomalies.append(
+                {
+                    "order": order,
+                    "chapter_id": str(record.get("chapter_id") or ""),
+                    "clean_title": str(record.get("clean_title") or record.get("raw_title") or ""),
+                    "char_count": char_count,
+                    "paragraph_count": paragraph_count,
+                    "reasons": reasons,
+                }
+            )
+    return anomalies
+
+
+def _build_cleaning_summary(stats: dict[str, int], examples: list[dict], trim_examples: list[dict]) -> dict:
+    lines_seen = int(stats.get("lines_seen") or 0)
+    strong_dropped = int(stats.get("strong_dropped") or 0)
+    weak_dropped = int(stats.get("weak_dropped") or 0)
+    discarded_total = strong_dropped + weak_dropped
+    weak_candidates = int(stats.get("weak_candidates") or 0)
+    trimmed_lines = int(stats.get("trimmed_lines") or 0)
+    return {
+        "lines_seen": lines_seen,
+        "discarded_lines": discarded_total,
+        "strong_dropped": strong_dropped,
+        "weak_candidates": weak_candidates,
+        "weak_dropped": weak_dropped,
+        "discard_rate": round(discarded_total / lines_seen, 4) if lines_seen else 0.0,
+        "weak_candidate_rate": round(weak_candidates / lines_seen, 4) if lines_seen else 0.0,
+        "typical_discarded_lines": _dedupe_discarded_line_examples(examples, limit=10),
+        "trimmed_lines": trimmed_lines,
+        "rule_trimmed": int(stats.get("rule_trimmed") or 0),
+        "llm_trimmed": int(stats.get("llm_trimmed") or 0),
+        "trim_rate": round(trimmed_lines / lines_seen, 4) if lines_seen else 0.0,
+        "typical_trimmed_lines": _dedupe_trimmed_line_examples(trim_examples, limit=10),
+    }
+
+
+def _dedupe_discarded_line_examples(examples: list[dict], *, limit: int = 10) -> list[dict]:
+    seen: set[tuple[str, str]] = set()
+    result: list[dict] = []
+    for item in examples:
+        key = (str(item.get("line") or ""), str(item.get("reason") or ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(item)
+        if len(result) >= limit:
+            break
+    return result
+
+
+def _dedupe_trimmed_line_examples(examples: list[dict], *, limit: int = 10) -> list[dict]:
+    seen: set[tuple[str, str]] = set()
+    result: list[dict] = []
+    for item in examples:
+        key = (str(item.get("original_line") or ""), str(item.get("cleaned_line") or ""))
+        if key in seen:
+            continue
+        seen.add(key)
+        result.append(item)
+        if len(result) >= limit:
+            break
+    return result

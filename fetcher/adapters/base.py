@@ -42,6 +42,7 @@ class BaseAdapter(ABC):
     """
 
     domain: str = ""
+    supports_story_collections: bool = False
 
     # ------------------------------------------------------------------
     # Abstract methods — every adapter MUST implement these
@@ -150,6 +151,43 @@ class BaseAdapter(ABC):
             Absolute URL of the next page, or ``None``.
         """
         return None
+
+    def discover_chapter_list_urls(
+        self, soup: BeautifulSoup, base_url: str
+    ) -> list[str]:
+        """Discover additional chapter-list page URLs (pagination).
+
+        Some sites paginate their chapter index (e.g. ``index_2.html``,
+        ``index_3.html``).  Override this in adapters that need multi-page
+        chapter list merging.
+
+        Args:
+            soup: Parsed HTML of the first chapter-list page.
+            base_url: The resolved URL of that page.
+
+        Returns:
+            List of absolute URLs for additional chapter-list pages.
+        """
+        return []
+
+    def predict_page_urls(self, first_url: str, page2_url: str) -> list[str]:
+        """Predict URLs for pages 3..N of a multi-page chapter.
+
+        Called after ``extract_next_page_url`` returns a page-2 URL, to
+        generate the remaining page URLs without fetching each one first.
+        Site adapters that use predictable URL patterns (e.g. ``-2``, ``-3``
+        suffixes) should override this method.
+
+        The default implementation returns an empty list (no prediction).
+
+        Args:
+            first_url: The original chapter URL (page 1).
+            page2_url: The discovered page-2 URL from ``extract_next_page_url``.
+
+        Returns:
+            List of absolute URLs for predicted pages 3, 4, … N.
+        """
+        return []
 
     def postprocess_content(self, content: str) -> str:
         """Minimal post-processing after DOM extraction.

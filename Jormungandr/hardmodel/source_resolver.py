@@ -68,6 +68,8 @@ class BookSource:
     source_dir: Path  # directory containing the input file(s)
     chapters: list[ChapterSource] = field(default_factory=list)
     book_id_hint: str | None = None
+    content_type: str = "book"
+    processing_profile: str = "longform_book"
 
     @property
     def book_id(self) -> str:
@@ -128,7 +130,8 @@ def _resolve_whole_book(txt_path: Path) -> BookSource:
 
 
 def _resolve_canonical_whole_book(dir_path: Path, txt_path: Path) -> BookSource:
-    title = _title_from_index(dir_path) or dir_path.name
+    payload = _index_payload(dir_path)
+    title = str(payload.get("title") or dir_path.name)
     book_id_hint = _book_id_from_index(dir_path) or dir_path.name
     return BookSource(
         mode="whole",
@@ -136,6 +139,23 @@ def _resolve_canonical_whole_book(dir_path: Path, txt_path: Path) -> BookSource:
         source_dir=dir_path,
         book_id_hint=book_id_hint,
         chapters=[ChapterSource(source_path=txt_path, order=1, title=title)],
+        content_type=str(payload.get("content_type") or "book"),
+        processing_profile=str(payload.get("processing_profile") or "longform_book"),
+    )
+
+
+def _resolve_canonical_story(dir_path: Path, txt_path: Path) -> BookSource:
+    payload = _index_payload(dir_path)
+    title = str(payload.get("title") or dir_path.name)
+    story_slug = str(payload.get("story_slug") or payload.get("book_slug") or dir_path.name)
+    return BookSource(
+        mode="whole",
+        title=title,
+        source_dir=dir_path,
+        book_id_hint=story_slug,
+        chapters=[ChapterSource(source_path=txt_path, order=1, title=title)],
+        content_type="story",
+        processing_profile=str(payload.get("processing_profile") or "idea_seed"),
     )
 
 
@@ -157,7 +177,12 @@ def _resolve_per_chapter_dir(dir_path: Path, *, title: str | None = None) -> Boo
         try:
             payload = json.loads(index_path.read_text(encoding="utf-8"))
             book_title = payload.get("title", book_title)
-            book_id_hint = str(payload.get("book_id") or payload.get("book_slug") or book_id_hint)
+            book_id_hint = str(
+                payload.get("book_id")
+                or payload.get("story_slug")
+                or payload.get("book_slug")
+                or book_id_hint
+            )
             raw_entries = payload.get("chapters", [])
             if not isinstance(raw_entries, list):
                 logger.warning("chapters must be a list in %s, using filename heuristics", index_path)
@@ -243,11 +268,17 @@ def _resolve_per_chapter_dir(dir_path: Path, *, title: str | None = None) -> Boo
         source_dir=dir_path,
         chapters=chapters,
         book_id_hint=book_id_hint,
+        content_type=str(_index_payload(dir_path).get("content_type") or "book"),
+        processing_profile=str(_index_payload(dir_path).get("processing_profile") or "longform_book"),
     )
 
 
 def _resolve_directory(dir_path: Path) -> list[BookSource]:
     """Resolve a directory — may be one book or many."""
+    canonical_story = dir_path / "story.txt"
+    if canonical_story.exists():
+        return [_resolve_canonical_story(dir_path, canonical_story)]
+
     # Check if dir has .txt files directly → per-chapter mode, single book
     direct_txts = list(dir_path.glob("*.txt"))
     if direct_txts:
@@ -278,6 +309,10 @@ def _resolve_directory(dir_path: Path) -> list[BookSource]:
 
 def _resolve_directory_entry(dir_path: Path) -> BookSource:
     """Resolve a single subdirectory that may be whole or per-chapter."""
+    canonical_story = dir_path / "story.txt"
+    if canonical_story.exists():
+        return _resolve_canonical_story(dir_path, canonical_story)
+
     # Check if it contains .txt files = per-chapter book
     direct_txts = list(dir_path.glob("*.txt"))
     if direct_txts:
@@ -300,27 +335,26 @@ def _resolve_directory_entry(dir_path: Path) -> BookSource:
 
 def _title_from_index(dir_path: Path) -> str | None:
     """Try to read the book title from ``index.json`` in *dir_path*."""
-    index_path = dir_path / "index.json"
-    if not index_path.exists():
-        return None
-    try:
-        payload = json.loads(index_path.read_text(encoding="utf-8"))
-        return payload.get("title")
-    except (json.JSONDecodeError, KeyError):
-        return None
+    return _index_payload(dir_path).get("title")
 
 
 def _book_id_from_index(dir_path: Path) -> str | None:
     """Try to read the canonical book id/slug from ``index.json`` in *dir_path*."""
+    payload = _index_payload(dir_path)
+    value = payload.get("book_id") or payload.get("story_slug") or payload.get("book_slug")
+    return str(value) if value else None
+
+
+def _index_payload(dir_path: Path) -> dict:
+    """Read ``index.json`` if present; return an empty dict on absence/error."""
     index_path = dir_path / "index.json"
     if not index_path.exists():
-        return None
+        return {}
     try:
         payload = json.loads(index_path.read_text(encoding="utf-8"))
-        value = payload.get("book_id") or payload.get("book_slug")
-        return str(value) if value else None
-    except (json.JSONDecodeError, KeyError):
-        return None
+        return payload if isinstance(payload, dict) else {}
+    except json.JSONDecodeError:
+        return {}
 
 
 # ---------------------------------------------------------------------------

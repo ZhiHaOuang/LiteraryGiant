@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: literary-giant
+Version: 0.2.0
+Summary: Chinese web-novel analysis pipeline: fetching, chapter splitting, semantic feature extraction, plot segmentation, and generation.
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: beautifulsoup4>=4.12.0
+Requires-Dist: requests>=2.31.0
+Provides-Extra: gpu
+Requires-Dist: accelerate>=0.33.0; extra == "gpu"
+Requires-Dist: pillow>=10.0.0; extra == "gpu"
+Requires-Dist: safetensors>=0.4.3; extra == "gpu"
+Requires-Dist: sentencepiece>=0.2.0; extra == "gpu"
+Requires-Dist: torch>=2.2.0; extra == "gpu"
+Requires-Dist: transformers<5,>=4.45.0; extra == "gpu"
+Provides-Extra: dev

@@ -25,11 +25,11 @@ _AD_SELECTORS: list[str] = [
     "script",
     "style",
     "ins",
-    '[class*="ads"]',
-    '[class*="ad_"]',
-    '[id*="ads"]',
     ".footer",
     ".prenext",
+    ".copyright",
+    '[class*="gg_"]',
+    '[class*="gg "]',
 ]
 
 #: Suffixes to strip from ``<title>``-based title extraction.
@@ -170,6 +170,10 @@ class BqqugeAdapter(BaseAdapter):
         for heading in content_div.find_all(["h1", "h2", "h3"]):
             heading.decompose()
 
+        # Convert <br> to newlines so paragraph structure survives get_text().
+        for br in content_div.find_all("br"):
+            br.replace_with("\n")
+
         # Extract text from <p> tags (natural paragraph separation)
         paragraphs: list[str] = []
         for p in content_div.find_all("p"):
@@ -178,7 +182,7 @@ class BqqugeAdapter(BaseAdapter):
                 paragraphs.append(text)
 
         if not paragraphs:
-            text = content_div.get_text()
+            text = content_div.get_text("\n")
             paragraphs = [l.strip() for l in text.splitlines() if l.strip()]
 
         # Join with double newlines; Jormungandr hardmodel will normalise further.
@@ -242,6 +246,26 @@ class BqqugeAdapter(BaseAdapter):
                 if href:
                     return urljoin(base_url, href)
         return None
+
+    def predict_page_urls(self, first_url: str, page2_url: str) -> list[str]:
+        """Predict remaining page URLs for the bqquge ``-N`` suffix pattern.
+
+        On bqquge, multi-page chapters follow the pattern::
+
+            /{book_id}/{chap_id}      (page 1)
+            /{book_id}/{chap_id}-2    (page 2)
+            /{book_id}/{chap_id}-3    (page 3)
+            ...
+
+        Pages are predicted up to ``MAX_CHAPTER_PAGES`` (20).  URLs that don't
+        exist will 404 — the engine handles that gracefully.
+        """
+        MAX_CHAPTER_PAGES = 20
+        if not (page2_url.endswith("-2") and not first_url.endswith("-2")):
+            return []
+
+        base = page2_url[:-2]
+        return [f"{base}-{n}" for n in range(3, MAX_CHAPTER_PAGES + 1)]
 
     def is_index_url(self, url: str) -> bool:
         """Check if *url* is a book page (chapter list), not a chapter page."""

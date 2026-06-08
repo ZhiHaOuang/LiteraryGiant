@@ -14,6 +14,7 @@ from .processor import (
     resolve_output_dir,
     write_result_file,
 )
+from .llm_noise_classifier import QwenWeakNoiseClassifier
 
 
 logger = logging.getLogger(__name__)
@@ -85,6 +86,28 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_false",
         help="Do not write progress or chapter state into runs/pipeline_state/state.json for this run.",
     )
+    parser.add_argument(
+        "--noise-classifier-model",
+        default=None,
+        help="Optional local Qwen model path used to classify weak-noise windows.",
+    )
+    parser.add_argument(
+        "--noise-classifier-batch-size",
+        type=int,
+        default=32,
+        help="Weak-noise windows per LLM classification prompt. Default: 32.",
+    )
+    parser.add_argument(
+        "--noise-classifier-max-new-tokens",
+        type=int,
+        default=128,
+        help="Max new tokens for each weak-noise classification prompt.",
+    )
+    parser.add_argument(
+        "--noise-classifier-device-map",
+        default="auto",
+        help="Transformers device_map for the weak-noise classifier. Default: auto.",
+    )
     return parser
 
 
@@ -101,6 +124,14 @@ def main(argv: list[str] | None = None) -> int:
 
     pretty = not args.compact
     written_dirs: list[Path] = []
+    noise_classifier = None
+    if args.noise_classifier_model:
+        noise_classifier = QwenWeakNoiseClassifier(
+            args.noise_classifier_model,
+            batch_size=args.noise_classifier_batch_size,
+            max_new_tokens=args.noise_classifier_max_new_tokens,
+            device_map=args.noise_classifier_device_map,
+        )
     state = PipelineState() if args.sync_state else None
     if state is not None:
         state.begin_run("hardmodel", total_candidates=total_books)
@@ -125,6 +156,7 @@ def main(argv: list[str] | None = None) -> int:
                     chunk_size=args.chunk_size,
                     chunk_overlap=args.chunk_overlap,
                     state=state,
+                    noise_classifier=noise_classifier,
                 )
 
                 if not book_result:
@@ -173,6 +205,7 @@ def main(argv: list[str] | None = None) -> int:
                             "encoding": args.encoding,
                             "chunk_size": args.chunk_size,
                             "chunk_overlap": args.chunk_overlap,
+                            "noise_classifier_model": str(args.noise_classifier_model or ""),
                         },
                         metadata=book_result["book_metadata"],
                     )

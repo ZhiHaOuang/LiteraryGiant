@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
@@ -56,51 +57,78 @@ class BookRegistry:
         *,
         source_url: str = "",
         adapter_domain: str = "",
+        content_type: str = "book",
     ) -> str:
-        """Register a new book and return its ``book_XXXX`` ID.
+        """Register a new book or story and return its ID.
+
+        Returns ``book_XXXX`` for novels, ``story_XXXX`` for short stories.
 
         If *source_url* (canonicalised) matches an existing entry, its
         existing ID is returned.
         """
+        from .utils import FileLock
+
         canonical_url = _canonicalize_url(source_url) if source_url else ""
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = str(self.path) + ".lock"
+        with FileLock(lock_path):
+            self.payload = self._load()
 
-        # Check for duplicate by canonical URL
-        if canonical_url:
-            existing_id = self.lookup_by_url(canonical_url)
-            if existing_id is not None:
-                logger.info("Book already registered: %s → %s", source_url, existing_id)
-                self._touch(existing_id)
-                return existing_id
+            if canonical_url:
+                existing_id = self.lookup_by_url(canonical_url)
+                if existing_id is not None:
+                    logger.info("Book already registered: %s → %s", source_url, existing_id)
+                    self._touch(existing_id, persist=False)
+                    self._write_payload_unlocked()
+                    return existing_id
 
-        # Check by title as secondary dedup
-        for bid, info in self.payload.get("books", {}).items():
-            if info.get("title") == title and info.get("source_url") == canonical_url:
-                logger.info("Book already registered by title+url: %s → %s", title, bid)
-                self._touch(bid)
-                return bid
+            for bid, info in self.payload.get("books", {}).items():
+                if info.get("title") == title and info.get("source_url") == canonical_url:
+                    slug = info.get("story_slug") or info.get("book_slug", bid)
+                    logger.info("Book already registered by title+url: %s → %s", title, slug)
+                    self._touch(slug, persist=False)
+                    self._write_payload_unlocked()
+                    return slug
 
-        book_id = self._next_id()
-        book_slug = f"book_{int(book_id):04d}"
+            # Cross-site dedup: same title from different URL → skip, log source
+            existing = self._lookup_by_title(title, content_type=content_type)
+            if existing is not None:
+                slug = existing.get("story_slug") or existing.get("book_slug", "")
+                logger.info(
+                    "Duplicate title — skipping: %r already registered as %s (%s)",
+                    title, slug, existing.get("source_url", "?"),
+                )
+                # Record the alternate URL for reference
+                alternate_urls = existing.setdefault("alternate_urls", [])
+                if canonical_url and canonical_url not in alternate_urls:
+                    alternate_urls.append(canonical_url)
+                self._write_payload_unlocked()
+                return slug
 
-        self.payload.setdefault("books", {})[book_id] = {
-            "book_id": book_id,
-            "book_slug": book_slug,
-            "title": title,
-            "source_url": canonical_url,
-            "adapter_domain": adapter_domain,
-            "created_at": _utc_now(),
-            "updated_at": _utc_now(),
-            "paths": {
-                "raw_text": f"sources/raw_text/{book_slug}",
-                "chapters": f"derived/chapters/{book_slug}",
-                "features": f"derived/features/{book_slug}",
-                "plots": f"derived/plots/{book_slug}",
-            },
-        }
-        self.payload["last_id"] = int(book_id)
-        self.save()
-        logger.info("Registered %s → %s (%s)", book_slug, title, canonical_url)
-        return book_slug
+            content_id = self._next_id()
+            prefix = "story" if content_type == "story" else "book"
+            slug = f"{prefix}_{int(content_id):04d}"
+
+            entry = {
+                "book_id": content_id,
+                "book_slug": slug,
+                "content_type": content_type,
+                "title": title,
+                "source_url": canonical_url,
+                "adapter_domain": adapter_domain,
+                "created_at": _utc_now(),
+                "updated_at": _utc_now(),
+                "paths": {
+                    "raw_text": f"sources/raw_text/{slug}",
+                },
+            }
+            if content_type == "story":
+                entry["story_slug"] = slug
+            self.payload.setdefault("books", {})[content_id] = entry
+            self.payload["last_id"] = int(content_id)
+            self._write_payload_unlocked()
+            logger.info("Registered %s → %s (%s)", slug, title, canonical_url)
+            return slug
 
     def lookup(self, book_id: str) -> dict | None:
         """Return metadata for *book_id* (or *book_slug*)."""
@@ -110,7 +138,7 @@ class BookRegistry:
             return books[book_id]
         # Try matching by book_slug
         for info in books.values():
-            if info.get("book_slug") == book_id:
+            if info.get("book_slug") == book_id or info.get("story_slug") == book_id:
                 return info
         return None
 
@@ -118,18 +146,55 @@ class BookRegistry:
         """Return the book_id for *canonical_url*, or ``None``."""
         url = _canonicalize_url(canonical_url)
         for bid, info in self.payload.get("books", {}).items():
-            if _canonicalize_url(info.get("source_url", "")) == url:
-                return info.get("book_slug", bid)
+            known_urls = [info.get("source_url", "")]
+            known_urls.extend(info.get("alternate_urls", []))
+            if any(_canonicalize_url(known_url) == url for known_url in known_urls if known_url):
+                return info.get("story_slug") or info.get("book_slug", bid)
+        return None
+
+    def _lookup_by_title(self, title: str, *, content_type: str = "book") -> dict | None:
+        """Return the first book/story whose title matches *title*.
+
+        Comparison is done after normalising whitespace and stripping common
+        decorative wrappers (e.g. ``《…》``) so that the same work listed on
+        different sites still matches. Books and stories are kept separate so
+        a short story title cannot suppress a novel with the same title.
+        """
+        import re
+
+        def _normalize(t: str) -> str:
+            t = t.strip()
+            if t.startswith("《") and t.endswith("》"):
+                t = t[1:-1]
+            # Collapse all whitespace to a single space
+            t = re.sub(r"\s+", " ", t)
+            return t.strip().lower()
+
+        needle = _normalize(title)
+        if not needle:
+            return None
+
+        for info in self.payload.get("books", {}).values():
+            if info.get("content_type", "book") != content_type:
+                continue
+            if _normalize(info.get("title", "")) == needle:
+                return info
         return None
 
     def update(self, book_id: str, **kwargs) -> None:
         """Update metadata fields for *book_id*."""
-        info = self.lookup(book_id)
-        if info is None:
-            raise KeyError(f"Unknown book_id: {book_id}")
-        info.update(kwargs)
-        info["updated_at"] = _utc_now()
-        self.save()
+        from .utils import FileLock
+
+        self.path.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = str(self.path) + ".lock"
+        with FileLock(lock_path):
+            self.payload = self._load()
+            info = self.lookup(book_id)
+            if info is None:
+                raise KeyError(f"Unknown book_id: {book_id}")
+            info.update(kwargs)
+            info["updated_at"] = _utc_now()
+            self._write_payload_unlocked()
 
     def list_books(self) -> list[tuple[str, dict]]:
         """Return all registered books as ``(book_id, info)`` tuples."""
@@ -145,7 +210,11 @@ class BookRegistry:
 
     def source_dir(self, book_id: str) -> Path:
         info = self.lookup(book_id)
-        slug = info.get("book_slug", book_id) if info else book_id
+        slug = (
+            (info.get("story_slug") or info.get("book_slug", book_id))
+            if info
+            else book_id
+        )
         return self.source_root / slug
 
     # ------------------------------------------------------------------
@@ -225,26 +294,40 @@ class BookRegistry:
         """
         books_summary: list[dict] = []
         for book_id, info in self.list_books():
-            slug = info.get("book_slug", book_id)
+            slug = info.get("story_slug") or info.get("book_slug", book_id)
             source_dir = self.source_dir(slug)
             entry: dict = {
                 "book_id": book_id,
                 "book_slug": slug,
+                "content_type": info.get("content_type", "book"),
+                "processing_profile": info.get("processing_profile", ""),
+                "structure_type": info.get("structure_type", ""),
+                "story_form": info.get("story_form", ""),
                 "title": info.get("title", ""),
                 "source_url": info.get("source_url", ""),
                 "adapter_domain": info.get("adapter_domain", ""),
                 "created_at": info.get("created_at", ""),
                 "updated_at": info.get("updated_at", ""),
             }
+            if info.get("story_slug"):
+                entry["story_slug"] = info["story_slug"]
 
             # Inspect on-disk state
             if source_dir.exists():
                 index_path = source_dir / "index.json"
                 source_txt = source_dir / "source.txt"
+                story_txt = source_dir / "story.txt"
+                part_files = sorted((source_dir / "parts").glob("part_*.txt"))
                 chapter_files = sorted(source_dir.glob("chapter_*.txt"))
 
-                entry["source_type"] = "whole_book" if source_txt.exists() else "per_chapter"
+                if story_txt.exists():
+                    entry["source_type"] = "story"
+                elif source_txt.exists():
+                    entry["source_type"] = "whole_book"
+                else:
+                    entry["source_type"] = "per_chapter"
                 entry["chapter_count"] = len(chapter_files)
+                entry["part_count"] = len(part_files)
 
                 if index_path.exists():
                     try:
@@ -253,17 +336,21 @@ class BookRegistry:
                         entry["total_fetched"] = idx.get("total_fetched")
                         entry["total_failed"] = idx.get("total_failed")
                         entry["fetcher_run_id"] = idx.get("fetcher_run_id")
+                        entry["content_stats"] = idx.get("content_stats")
                     except json.JSONDecodeError:
                         pass
 
                 total_size = sum(
                     f.stat().st_size for f in chapter_files if f.is_file()
-                ) + (source_txt.stat().st_size if source_txt.exists() else 0)
+                )
+                total_size += source_txt.stat().st_size if source_txt.exists() else 0
+                total_size += story_txt.stat().st_size if story_txt.exists() else 0
                 entry["total_size_bytes"] = total_size
                 entry["has_raw_text"] = True
             else:
                 entry["has_raw_text"] = False
                 entry["chapter_count"] = 0
+                entry["part_count"] = 0
 
             books_summary.append(entry)
 
@@ -281,11 +368,12 @@ class BookRegistry:
         last = self.payload.get("last_id", 0)
         return str(last + 1)
 
-    def _touch(self, book_id: str) -> None:
+    def _touch(self, book_id: str, *, persist: bool = True) -> None:
         info = self.lookup(book_id)
         if info:
             info["updated_at"] = _utc_now()
-            self.save()
+            if persist:
+                self.save()
 
     def _load(self) -> dict:
         if self.path.exists():
@@ -302,8 +390,22 @@ class BookRegistry:
         }
 
     def save(self) -> None:
+        """Persist the registry atomically with file locking.
+
+        Uses ``fcntl.flock`` to serialise concurrent writers (threads or
+        processes) and writes to a ``.tmp`` file that is atomically renamed
+        over the target path (POSIX ``os.replace``).
+        """
+        from .utils import FileLock
+
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        self.path.write_text(
-            json.dumps(self.payload, ensure_ascii=False, indent=2),
-            encoding="utf-8",
-        )
+        lock_path = str(self.path) + ".lock"
+        with FileLock(lock_path):
+            self._write_payload_unlocked()
+
+    def _write_payload_unlocked(self) -> None:
+        """Write the current payload assuming the caller already holds the lock."""
+        tmp_path = str(self.path) + ".tmp"
+        with open(tmp_path, "w", encoding="utf-8") as fh:
+            json.dump(self.payload, fh, ensure_ascii=False, indent=2)
+        os.replace(tmp_path, self.path)

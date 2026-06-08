@@ -14,7 +14,9 @@ def normalize_fs_name(name: str) -> str:
 def canonical_book_slug(book_id: str) -> str:
     """Return the canonical derived/source directory slug for a book id."""
     normalized = normalize_fs_name(str(book_id).strip())
-    return normalized if normalized.startswith("book_") else f"book_{normalized}"
+    if normalized.startswith(("book_", "story_")):
+        return normalized
+    return f"book_{normalized}"
 
 
 def load_json(path: str | Path) -> dict:

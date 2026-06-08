@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "literary-giant"
 version = "0.2.0"
-description = "Chinese web-novel analysis pipeline: chapter splitting, semantic feature extraction, plot segmentation, and generation."
+description = "Chinese web-novel analysis pipeline: fetching, chapter splitting, semantic feature extraction, plot segmentation, and generation."
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
@@ -14,7 +14,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-local-models = [
+gpu = [
     "accelerate>=0.33.0",
     "pillow>=10.0.0",
     "safetensors>=0.4.3",
@@ -25,16 +25,12 @@ local-models = [
 dev = []
 
 [project.scripts]
-jormungandr-hard-run = "Jormungandr.hardmodel.scheduling:main"
-hardmodel-run = "Jormungandr.hardmodel.scheduling:main"
-softmodel-run = "softmodel.scheduling:main"
-part2-run = "softmodel.scheduling:main"
-infermodel-run = "infermodel.scheduling:main"
-part3-run = "infermodel.scheduling:main"
-generatemodel-run = "generatemodel.scheduling:main"
-part4-run = "generatemodel.scheduling:main"
-rename = "scripts.rename:run"
 fetcher-run = "fetcher.scheduling:main"
+hardmodel-run = "hardmodel.scheduling:main"
+softmodel-run = "softmodel.scheduling:main"
+infermodel-run = "infermodel.scheduling:main"
+generatemodel-run = "generatemodel.scheduling:main"
+rename = "scripts.rename:run"
 data-sync-legacy = "scripts.sync_legacy_data:main"
 data-validate = "scripts.validate_data_layout:main"
 
