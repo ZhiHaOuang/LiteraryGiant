@@ -20,12 +20,13 @@ import logging
 import sys
 import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
 from urllib.parse import urlparse
 
 from .adapters import ADAPTER_REGISTRY, get_adapter_for_url
 from .engine import FetcherEngine
-from .registry import BookRegistry
+from .registry import BookRegistry, _canonicalize_url, normalize_title
 from .utils import RateLimiter
 
 logger = logging.getLogger(__name__)
@@ -38,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
         description=(
             "Site-agnostic web novel fetcher.  Adapters auto-detected from "
             "URL domain.  Chapters are staged in runs/fetch/<run_id>/ and "
-            "promoted to Yggdrasil/sources/raw_text/<book_id>/ after validation."
+            "promoted to Library/rawdata/novels or Library/rawdata/stories after validation."
         ),
     )
     parser.add_argument(
@@ -65,7 +66,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--max-chapters",
         type=int,
         default=None,
-        help="Stop after fetching N chapters; in story mode, limit expanded stories.",
+        help="Stop after fetching N chapters for chaptered works.",
+    )
+    parser.add_argument(
+        "--max-stories",
+        type=int,
+        default=None,
+        help="When expanding a story collection, fetch at most N stories.",
     )
     parser.add_argument(
         "--concurrency",
@@ -114,12 +121,28 @@ def build_parser() -> argparse.ArgumentParser:
         help="When --discover is used, also list items already in the registry.",
     )
     parser.add_argument(
+        "--discover-site",
+        action="append",
+        default=None,
+        metavar="DOMAIN",
+        help=(
+            "When --discover is used without URLs, limit curated discovery to "
+            "one adapter domain. May be repeated."
+        ),
+    )
+    parser.add_argument(
+        "--discover-limit",
+        type=int,
+        default=None,
+        help="When --discover is used, print at most N new items per source.",
+    )
+    parser.add_argument(
         "--import",
         dest="import_file",
         default=None,
         metavar="FILE.txt",
         help="Import a whole-book .txt file into the canonical layout "
-             "(Yggdrasil/sources/raw_text/<book_slug>/source.txt + index.json). "
+             "(Library/rawdata/novels/<book_slug>/source.txt + index.json). "
              "Use --title to set the book name.",
     )
     parser.add_argument(
@@ -332,8 +355,14 @@ def _expand_story_collection_urls(args, urls: list[str]) -> list[str]:
             continue
 
         rate_limiters[_domain_key(url)].wait()
+        for header in ("Referer", "Origin", "Upgrade-Insecure-Requests"):
+            session.headers.pop(header, None)
         session.headers.update({"User-Agent": random_user_agent()})
-        resp = fetch_with_retry(session, url)
+        extra_headers = adapter.get_request_headers(url)
+        if extra_headers:
+            session.headers.update(extra_headers)
+        extra_cookies = adapter.get_cookies()
+        resp = fetch_with_retry(session, url, cookies=extra_cookies if extra_cookies else None)
         if getattr(adapter, "encoding", None):
             text = resp.content.decode(adapter.encoding, errors="replace")
         else:
@@ -347,7 +376,8 @@ def _expand_story_collection_urls(args, urls: list[str]) -> list[str]:
             expanded.append(url)
             continue
 
-        limit = args.max_chapters if args.max_chapters is not None else len(stories)
+        max_stories = getattr(args, "max_stories", None)
+        limit = max_stories if max_stories is not None else len(stories)
         selected = stories[:limit]
         expanded.extend(story["url"] for story in selected)
         logger.info("Expanded %s into %d story URL(s)", url, len(selected))
@@ -378,6 +408,15 @@ def _resolve_adapter(args, url: str):
 # ---------------------------------------------------------------------------
 
 
+@dataclass(frozen=True, slots=True)
+class _ResolvedDiscoverySource:
+    domain: str
+    label: str
+    url: str
+    kind: str
+    priority: int
+
+
 def _cmd_list_adapters() -> int:
     """Print registered adapters.  Book vs story is auto-detected at fetch time."""
     print("Supported site adapters (book/story auto-detected from content):\n")
@@ -389,32 +428,117 @@ def _cmd_list_adapters() -> int:
     return 0
 
 
+def _resolve_discovery_sources(args) -> list[_ResolvedDiscoverySource]:
+    """Resolve curated or explicit discovery sources for ``--discover``."""
+    if args.urls:
+        sources: list[_ResolvedDiscoverySource] = []
+        for url in args.urls:
+            adapter_cls = _resolve_adapter(args, url)
+            sources.append(
+                _ResolvedDiscoverySource(
+                    domain=adapter_cls.domain,
+                    label="explicit",
+                    url=url,
+                    kind="listing",
+                    priority=50,
+                )
+            )
+        return sources
+
+    selected_domains = set(args.discover_site or [])
+    if args.adapter:
+        selected_domains.add(args.adapter)
+
+    sources: list[_ResolvedDiscoverySource] = []
+    seen_urls: set[str] = set()
+    for domain, adapter_cls in sorted(ADAPTER_REGISTRY.items()):
+        if selected_domains and domain not in selected_domains and _domain_key(f"https://{domain}") not in selected_domains:
+            continue
+        adapter = adapter_cls()
+        for source in adapter.discovery_sources():
+            key = _canonicalize_url(source.url)
+            if key in seen_urls:
+                continue
+            seen_urls.add(key)
+            sources.append(
+                _ResolvedDiscoverySource(
+                    domain=domain,
+                    label=f"{domain}:{source.label}",
+                    url=source.url,
+                    kind=source.kind,
+                    priority=source.priority,
+                )
+            )
+
+    sources.sort(key=lambda source: (-source.priority, source.domain, source.label))
+    if selected_domains and not sources:
+        available = ", ".join(sorted(ADAPTER_REGISTRY))
+        raise ValueError(f"No discovery sources for {sorted(selected_domains)}. Available: {available}")
+    return sources
+
+
+def _source_content_type(args, adapter, source: _ResolvedDiscoverySource) -> str:
+    if args.content_type in {"book", "story"}:
+        return args.content_type
+    if source.kind == "story_collection" or getattr(adapter, "supports_story_collections", False):
+        return "story"
+    return "book"
+
+
+def _clean_discovered_title(title: str) -> str:
+    """Clean noisy listing-card text before dedupe/output."""
+    import re
+
+    title = re.sub(r"\s+", " ", title or "").strip()
+    title = re.sub(r"^\d+\s*[.、]\s*", "", title)
+    title = re.split(r"\d+个评分[:：]|作者[:：]|[0-9.]+\s*MB\s*\d{4}-\d{2}-\d{2}", title)[0]
+    title = re.sub(r"[（(](?:全本|完本|连载中|已完结)[)）]\s*$", "", title).strip()
+    return title[:120].strip()
+
+
 def _cmd_discover(args) -> int:
     """Discover books from listing pages, filtering out registered ones."""
     from bs4 import BeautifulSoup
     from .utils import build_session, decode_response, fetch_with_retry, random_user_agent
 
-    urls = args.urls if args.urls else [
-        "https://www.bqquge.com/paihang",
-    ]
+    sources = _resolve_discovery_sources(args)
+    if not sources:
+        print("No discovery sources configured for the selected adapter(s).", file=sys.stderr)
+        return 1
 
     registry = BookRegistry()
     session = build_session()
     rate_limiters = {
         domain: RateLimiter(min_delay=args.delay)
-        for domain in {_domain_key(url) for url in urls}
+        for domain in {_domain_key(source.url) for source in sources}
     }
     total_new = 0
     total_known = 0
+    total_duplicates = 0
+    seen_urls: set[str] = set()
+    seen_titles: dict[tuple[str, str], str] = {}
 
-    for url in urls:
+    for source in sources:
+        url = source.url
         try:
-            adapter_cls = _resolve_adapter(args, url)
+            adapter_cls = (
+                ADAPTER_REGISTRY.get(source.domain)
+                if isinstance(source, _ResolvedDiscoverySource)
+                else None
+            )
+            adapter_cls = adapter_cls or _resolve_adapter(args, url)
             adapter = adapter_cls()
+            source_content_type = _source_content_type(args, adapter, source)
 
             rate_limiters[_domain_key(url)].wait()
+            for header in ("Referer", "Origin", "Upgrade-Insecure-Requests"):
+                session.headers.pop(header, None)
             session.headers.update({"User-Agent": random_user_agent()})
-            resp = fetch_with_retry(session, url)
+            extra_headers = adapter.get_request_headers(url)
+            if extra_headers:
+                session.headers.update(extra_headers)
+            extra_cookies = adapter.get_cookies()
+            resp = fetch_with_retry(session, url, cookies=extra_cookies if extra_cookies else None)
             if getattr(adapter, "encoding", None):
                 text = resp.content.decode(adapter.encoding, errors="replace")
             else:
@@ -426,37 +550,70 @@ def _cmd_discover(args) -> int:
 
             new_books: list[dict] = []
             known_books: list[dict] = []
+            duplicate_books: list[dict] = []
             for book in books:
-                existing = registry.lookup_by_url(book["url"])
-                if existing is not None:
-                    known_books.append({**book, "book_slug": existing})
-                else:
-                    new_books.append(book)
+                title = _clean_discovered_title(book.get("title", ""))
+                book_url = book.get("url", "")
+                if not title or not book_url:
+                    continue
 
-            item_label = _item_label(args.content_type)
+                url_key = _canonicalize_url(book_url)
+                title_key = (source_content_type, normalize_title(title))
+                existing = (
+                    registry.lookup_by_url(book_url, content_type=source_content_type)
+                    or registry.lookup_by_title(title, content_type=source_content_type)
+                )
+                if existing is not None:
+                    known_books.append({**book, "title": title, "book_slug": existing})
+                elif url_key in seen_urls or title_key in seen_titles:
+                    duplicate_books.append({
+                        **book,
+                        "title": title,
+                        "duplicate_of": seen_titles.get(title_key, url_key),
+                    })
+                else:
+                    seen_urls.add(url_key)
+                    seen_titles[title_key] = book_url
+                    new_books.append({**book, "title": title})
+
+            item_label = _item_label(source_content_type)
             print(f"\n{'='*60}")
-            print(f"{url}  —  {len(new_books)} new {item_label}, {len(known_books)} known")
-            print(f"       index: Yggdrasil/indexes/books.json")
+            print(
+                f"{source.label} [{source.kind}, p{source.priority}]  {url}\n"
+                f"  —  {len(new_books)} new {item_label}, "
+                f"{len(known_books)} known, {len(duplicate_books)} duplicate-in-run"
+            )
+            index_name = "stories.json" if source_content_type == "story" else "books.json"
+            print(f"       index: Library/indexes/{index_name}")
             print(f"{'='*60}")
 
-            for i, book in enumerate(new_books, 1):
+            limit = args.discover_limit if args.discover_limit is not None else len(new_books)
+            for i, book in enumerate(new_books[:limit], 1):
                 print(f"  {i:4d}.  {book['title']:30s}  {book['url']}")
+            if len(new_books) > limit:
+                print(f"  ... {len(new_books) - limit} more new {item_label} hidden by --discover-limit")
 
             if args.show_known and known_books:
-                print(f"  --- {len(known_books)} already in Yggdrasil/indexes/books.json ---")
+                print(f"  --- {len(known_books)} already in Library/indexes/books.json ---")
                 for book in known_books:
                     print(f"  [known]  {book['title']:30s}  → {book['book_slug']}")
+            if args.show_known and duplicate_books:
+                print(f"  --- {len(duplicate_books)} duplicate(s) already seen in this discover run ---")
+                for book in duplicate_books[:limit]:
+                    print(f"  [dupe]   {book['title']:30s}  → {book['duplicate_of']}")
 
             total_new += len(new_books)
             total_known += len(known_books)
+            total_duplicates += len(duplicate_books)
 
         except Exception as exc:
             print(f"[FAIL] {url}: {exc}", file=sys.stderr)
 
     item_label = _item_label(args.content_type)
     print(
-        f"\n{total_new} new {item_label}, {total_known} known "
-        "(checked against Yggdrasil/indexes/books.json)"
+        f"\n{total_new} new {item_label}, {total_known} known, "
+        f"{total_duplicates} duplicate-in-run "
+        "(checked against Library/indexes/books.json)"
     )
     if total_new:
         content_flag = "" if args.content_type == "auto" else f" --content-type {args.content_type}"
@@ -499,8 +656,8 @@ def _cmd_summary(args) -> int:
     registry = BookRegistry()
     summary = registry.summary()
 
-    print(f"Book index:  Yggdrasil/indexes/books.json")
-    print(f"Total books: {summary['total_books']}")
+    print(f"Book index:  Library/indexes/books.json")
+    print(f"Total items: {summary['total_books']}")
     print()
 
     for book in summary["books"]:
@@ -515,8 +672,8 @@ def _cmd_summary(args) -> int:
         print(f"          source: {source_type}  chapters: {n_ch}  size: {size_kb} KB")
         if url:
             print(f"          url:    {url}")
-        if not book.get("has_raw_text"):
-            print(f"          ⚠ no raw_text on disk")
+        if not book.get("has_rawdata", book.get("has_raw_text")):
+            print(f"          no rawdata on disk")
         print()
 
     return 0

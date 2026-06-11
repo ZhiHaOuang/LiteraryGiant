@@ -128,6 +128,7 @@ class RawNovelBook:
             "strong_dropped": 0,
             "weak_candidates": 0,
             "weak_windows_built": 0,
+            "soft_weak_candidates": 0,
             "weak_dropped": 0,
             "protected_by_prose": 0,
             "position_promoted": 0,
@@ -555,7 +556,9 @@ class RawNovelBook:
                             discard_indices.add(target_index)
                         elif action == "trim":
                             cleaned_line = str(result.get("cleaned_line") or "").strip()
-                            if self._is_safe_trim_remainder(cleaned_line):
+                            candidate = candidates_by_kept_index.get(target_index)
+                            original_candidate = str(candidate.get("line") or "") if candidate else ""
+                            if self._is_safe_llm_trim(original_candidate, cleaned_line):
                                 trim_updates[target_index] = {
                                     "cleaned_line": cleaned_line,
                                     "result": result,
@@ -662,6 +665,10 @@ class RawNovelBook:
         suffix_patterns = [
             (r"\s*[（(]?(?:本章完|未完待续)[）)]?\s*$", "end_marker_suffix"),
             (r"\s+(?:https?://\S+|www\.\S+)\s*$", "url_suffix"),
+            (
+                r"\s*[（(][^（）()\n]{0,80}(?:求收藏|求月票|求推荐票|请投票|求订阅|求打赏|求追读)[^（）()\n]{0,80}[）)]\s*$",
+                "solicitation_parenthetical_suffix",
+            ),
             (r"[，。:：、\s]+(?:请收藏(?:本站|本书)?|求收藏|求月票|求推荐票|请投票|求订阅|求打赏).{0,40}$", "solicitation_suffix"),
         ]
 
@@ -711,12 +718,44 @@ class RawNovelBook:
 
     def _is_safe_trim_remainder(self, text: str) -> bool:
         cleaned = text.strip()
+        if self.parse_chapter_line(cleaned):
+            return True
         if len(re.findall(r"[一-鿿]", cleaned)) < 8:
             return False
         prose_score, _ = self._prose_score(cleaned)
         if prose_score >= 2:
             return True
         return bool(re.search(r"[，。！？；]", cleaned)) and len(cleaned) >= 16
+
+    def _is_safe_llm_trim(self, original: str, cleaned: str) -> bool:
+        original_text = original.strip()
+        cleaned_text = cleaned.strip()
+        if not original_text or not cleaned_text or original_text == cleaned_text:
+            return False
+        if not self._is_safe_trim_remainder(cleaned_text):
+            return False
+        start = original_text.find(cleaned_text)
+        if start < 0:
+            return False
+        removed = (original_text[:start] + original_text[start + len(cleaned_text) :]).strip()
+        if not removed:
+            return False
+        if len(removed) <= 2 and re.fullmatch(r"[“”\"'‘’\)\]】》〉。！？~～\s]+", removed):
+            return False
+        return self._looks_like_trim_noise(removed)
+
+    def _looks_like_trim_noise(self, text: str) -> bool:
+        probe = text.strip()
+        if not probe:
+            return False
+        if re.search(
+            r"(?:ps|PS|作者有话|题外话|求收藏|求月票|求推荐票|求订阅|求打赏|求追读|"
+            r"请投票|书友群|读者群|QQ群|微信群|加群|群号|收藏|月票|推荐票|订阅|打赏|追更|催更|"
+            r"https?://|www\.|最新网址|首发地址|本书首发|请记住本站)",
+            probe,
+        ):
+            return True
+        return self._has_single_weak_signal(probe)
 
     def _record_discarded_line_example(
         self,
@@ -908,6 +947,23 @@ class RawNovelBook:
             return True
         return any(pattern.search(line) for pattern in WEAK_NOISE_PATTERNS)
 
+    def _has_soft_meta_noise_signal(self, line: str) -> bool:
+        """Return True for reader-facing meta notes worth sending to the LLM."""
+        return bool(
+            re.search(
+                r"(?:"
+                r"(?:求|请|跪求|拜求).{0,16}(?:收藏|月票|推荐票|订阅|打赏|追读|首订|投票)|"
+                r"(?:感谢|谢谢).{0,20}(?:大家|读者|书友|支持|打赏|月票|推荐票|粉红票|催更票)|"
+                r"(?:大家|读者|书友).{0,16}(?:支持|收藏|订阅|投票|打赏|追读)|"
+                r"(?:首订|追读|粉红票|催更票|求票)|"
+                r"(?:(?:上架|爆更|更新慢)|(?:票|粉红).{0,8}加更|加更.{0,8}(?:章|票))|"
+                r"(?:书友群|读者群|QQ群|微信群|群号)|"
+                r"(?:作者有话|题外话|作家的话)"
+                r")",
+                line,
+            )
+        )
+
     def _classify_line(
         self,
         line: str,
@@ -961,7 +1017,7 @@ class RawNovelBook:
             return (False, False, details)
 
         # Pure punctuation / symbol lines are strong noise
-        if re.fullmatch(r"[0-9\-\.,，。:：_/\\|]+", normalised):
+        if re.fullmatch(r"[0-9\-\.,，。:：_/\\|—…~～!！?？;；、\s]+", normalised):
             if prose_score >= 4:
                 self.cleaning_stats["protected_by_prose"] += 1
                 details["weak_reason"] = "protected_punctuation"
@@ -998,10 +1054,22 @@ class RawNovelBook:
 
         # High symbol ratio on short lines is strong noise
         if len(normalised) < 50 and symbol_ratio > 0.35:
-            return (True, False, details)
+            if prose_score >= 2:
+                self.cleaning_stats["protected_by_prose"] += 1
+                details["weak_reason"] = "protected_symbol_ratio_prose"
+                return (False, False, details)
+            if chinese_chars == 0 and alnum_chars == 0:
+                return (True, False, details)
+            details["weak_reason"] = "protected_textual_symbol_ratio"
         # High alnum ratio with few Chinese chars is strong noise
         if len(normalised) < 50 and alnum_ratio > 0.6 and chinese_chars < 5:
-            return (True, False, details)
+            if prose_score >= 2:
+                self.cleaning_stats["protected_by_prose"] += 1
+                details["weak_reason"] = "protected_alnum_ratio_prose"
+                return (False, False, details)
+            if re.fullmatch(r"[A-Za-z0-9_.:/?&=%#@+\-]{8,}", normalised):
+                return (True, False, details)
+            details["weak_reason"] = "protected_textual_alnum_ratio"
 
         noise_score = 0
         if is_weak:
@@ -1010,6 +1078,11 @@ class RawNovelBook:
             is_weak = True
             noise_score += 1
             details["weak_reason"] = "single_boundary_weak_signal"
+        elif self._has_soft_meta_noise_signal(normalised) and prose_score <= 2:
+            is_weak = True
+            self.cleaning_stats["soft_weak_candidates"] += 1
+            noise_score += 1
+            details["weak_reason"] = "soft_meta_candidate"
         noise_score += position_score
         noise_score += pattern_frequency_score
         details["noise_score"] = noise_score
@@ -1254,14 +1327,17 @@ class RawNovelBook:
         weak_dropped = int(self.cleaning_stats.get("weak_dropped") or 0)
         discarded_total = strong_dropped + weak_dropped
         weak_candidates = int(self.cleaning_stats.get("weak_candidates") or 0)
+        soft_weak_candidates = int(self.cleaning_stats.get("soft_weak_candidates") or 0)
         return {
             "lines_seen": lines_seen,
             "discarded_lines": discarded_total,
             "strong_dropped": strong_dropped,
             "weak_candidates": weak_candidates,
+            "soft_weak_candidates": soft_weak_candidates,
             "weak_dropped": weak_dropped,
             "discard_rate": round(discarded_total / lines_seen, 4) if lines_seen else 0.0,
             "weak_candidate_rate": round(weak_candidates / lines_seen, 4) if lines_seen else 0.0,
+            "soft_weak_candidate_rate": round(soft_weak_candidates / lines_seen, 4) if lines_seen else 0.0,
             "typical_discarded_lines": self._dedupe_discarded_line_examples(limit=10),
             "trimmed_lines": int(self.cleaning_stats.get("trimmed_lines") or 0),
             "rule_trimmed": int(self.cleaning_stats.get("rule_trimmed") or 0),

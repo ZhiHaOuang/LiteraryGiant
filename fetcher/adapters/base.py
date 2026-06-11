@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 
 from bs4 import BeautifulSoup
 
@@ -21,6 +21,16 @@ class ChapterEntry:
     title: str
     url: str
     order: int
+
+
+@dataclass(frozen=True, slots=True)
+class DiscoverySource:
+    """A curated listing/ranking/category page for one adapter."""
+
+    label: str
+    url: str
+    kind: str = "listing"
+    priority: int = 50
 
 
 class BaseAdapter(ABC):
@@ -137,6 +147,33 @@ class BaseAdapter(ABC):
         """
         return []
 
+    def discovery_sources(self) -> list[DiscoverySource]:
+        """Return curated discovery pages for this adapter.
+
+        These should be stable ranking/category/listing pages that produce
+        reasonable candidates via :meth:`extract_book_list`.
+        """
+        return []
+
+    def paginate_discovery_url(self, base_url: str, page_num: int) -> str | None:
+        """Generate the Nth page URL for a discovery listing.
+
+        Most sites use ``?page=N``.  Override if a site uses a different
+        pattern (e.g. ``index_N.html``).
+
+        Args:
+            base_url: The source URL from :meth:`discovery_sources`.
+            page_num: 1-based page number (1 = first page).
+
+        Returns:
+            The page URL, or ``None`` if the site does not support pagination.
+        """
+        if page_num <= 1:
+            return base_url
+        # Default: ?page=N
+        sep = "&" if "?" in base_url else "?"
+        return f"{base_url}{sep}page={page_num}"
+
     def extract_next_page_url(self, soup: BeautifulSoup, base_url: str) -> str | None:
         """Extract the URL of the next page of a multi-page chapter.
 
@@ -173,6 +210,9 @@ class BaseAdapter(ABC):
     def predict_page_urls(self, first_url: str, page2_url: str) -> list[str]:
         """Predict URLs for pages 3..N of a multi-page chapter.
 
+        Deprecated: the current engine follows explicit next-page links and no
+        longer calls this hook.  It is kept for adapter compatibility.
+
         Called after ``extract_next_page_url`` returns a page-2 URL, to
         generate the remaining page URLs without fetching each one first.
         Site adapters that use predictable URL patterns (e.g. ``-2``, ``-3``
@@ -207,3 +247,23 @@ class BaseAdapter(ABC):
         """
         content = content.replace("\r\n", "\n").replace("\r", "\n")
         return content.strip()
+
+    def get_request_headers(self, url: str) -> dict[str, str]:
+        """Return extra HTTP headers to send when fetching *url*.
+
+        Override in subclasses when the site requires specific headers (e.g.
+        ``Referer``, ``Origin``) to avoid 403/anti-bot responses.
+
+        The default implementation returns an empty dict.
+        """
+        return {}
+
+    def get_cookies(self) -> dict[str, str]:
+        """Return cookies to set on each request.
+
+        Override in subclasses when the site requires specific cookies
+        (e.g. consent cookies, session tokens).
+
+        The default implementation returns an empty dict.
+        """
+        return {}

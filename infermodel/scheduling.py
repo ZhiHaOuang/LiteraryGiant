@@ -4,7 +4,7 @@ import argparse
 import os
 from pathlib import Path
 
-from shared import DATA_ROOT
+from shared import FACT_CHAPTER_FEATURES_ROOT, FACT_PLOT_SEGMENTS_ROOT
 
 from .api_client import ApiConfig
 from .merger import PlotSegmentMerger
@@ -19,8 +19,15 @@ def build_parser() -> argparse.ArgumentParser:
         prog="infermodel-run",
         description="Extract global plot segments from chapter summaries using overlapping windows, LLM API segmentation, and window voting merge.",
     )
-    parser.add_argument("input", help="Input Yggdrasil/derived/features root or one feature book directory.")
-    parser.add_argument("-o", "--output", help=f"Output root directory. Defaults to {DATA_ROOT / 'derived' / 'plots'}.")
+    parser.add_argument(
+        "input",
+        help=f"Input {FACT_CHAPTER_FEATURES_ROOT} root or one feature book directory.",
+    )
+    parser.add_argument(
+        "-o",
+        "--output",
+        help=f"Output root directory. Defaults to {FACT_PLOT_SEGMENTS_ROOT}.",
+    )
 
     # -- windowing ---------------------------------------------------------------
     parser.add_argument("--window-size", type=int, default=20,

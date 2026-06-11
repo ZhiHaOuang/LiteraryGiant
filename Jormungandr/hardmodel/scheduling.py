@@ -5,7 +5,7 @@ import logging
 from pathlib import Path
 import sys
 
-from shared import PipelineState, compute_path_signature, serialize_payload
+from shared import FACT_CLEANED_CHAPTERS_ROOT, PipelineState, compute_path_signature, serialize_payload
 
 from .source_resolver import resolve_input
 from .processor import (
@@ -14,7 +14,7 @@ from .processor import (
     resolve_output_dir,
     write_result_file,
 )
-from .llm_noise_classifier import QwenWeakNoiseClassifier
+from .llm_noise_classifier import QwenWeakNoiseClassifier, VLLMWeakNoiseClassifier
 
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-o",
         "--output",
-        help="Output root directory. Defaults to Yggdrasil/derived/chapters.",
+        help=f"Output root directory. Defaults to {FACT_CLEANED_CHAPTERS_ROOT}.",
     )
     parser.add_argument(
         "--pattern",
@@ -89,19 +89,42 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--noise-classifier-model",
         default=None,
-        help="Optional local Qwen model path used to classify weak-noise windows.",
+        help="Optional local model path for backend=local, or served model name for backend=vllm.",
+    )
+    parser.add_argument(
+        "--noise-classifier-backend",
+        choices=("local", "vllm"),
+        default="local",
+        help="Weak-noise classifier backend. Default: local transformers.",
+    )
+    parser.add_argument(
+        "--noise-classifier-url",
+        default="http://127.0.0.1:8000/v1",
+        help="OpenAI-compatible vLLM base URL when backend=vllm. Default: http://127.0.0.1:8000/v1.",
     )
     parser.add_argument(
         "--noise-classifier-batch-size",
         type=int,
-        default=32,
-        help="Weak-noise windows per LLM classification prompt. Default: 32.",
+        default=16,
+        help="Weak-noise windows per LLM classification prompt. Default: 16.",
     )
     parser.add_argument(
         "--noise-classifier-max-new-tokens",
         type=int,
         default=128,
         help="Max new tokens for each weak-noise classification prompt.",
+    )
+    parser.add_argument(
+        "--noise-classifier-temperature",
+        type=float,
+        default=0.0,
+        help="Sampling temperature for weak-noise classifier. Default: 0.",
+    )
+    parser.add_argument(
+        "--noise-classifier-timeout",
+        type=float,
+        default=120.0,
+        help="HTTP timeout in seconds for backend=vllm. Default: 120.",
     )
     parser.add_argument(
         "--noise-classifier-device-map",
@@ -126,12 +149,22 @@ def main(argv: list[str] | None = None) -> int:
     written_dirs: list[Path] = []
     noise_classifier = None
     if args.noise_classifier_model:
-        noise_classifier = QwenWeakNoiseClassifier(
-            args.noise_classifier_model,
-            batch_size=args.noise_classifier_batch_size,
-            max_new_tokens=args.noise_classifier_max_new_tokens,
-            device_map=args.noise_classifier_device_map,
-        )
+        if args.noise_classifier_backend == "vllm":
+            noise_classifier = VLLMWeakNoiseClassifier(
+                api_base_url=args.noise_classifier_url,
+                model_name=args.noise_classifier_model,
+                batch_size=args.noise_classifier_batch_size,
+                max_new_tokens=args.noise_classifier_max_new_tokens,
+                temperature=args.noise_classifier_temperature,
+                timeout=args.noise_classifier_timeout,
+            )
+        else:
+            noise_classifier = QwenWeakNoiseClassifier(
+                args.noise_classifier_model,
+                batch_size=args.noise_classifier_batch_size,
+                max_new_tokens=args.noise_classifier_max_new_tokens,
+                device_map=args.noise_classifier_device_map,
+            )
     state = PipelineState() if args.sync_state else None
     if state is not None:
         state.begin_run("hardmodel", total_candidates=total_books)
@@ -205,6 +238,7 @@ def main(argv: list[str] | None = None) -> int:
                             "encoding": args.encoding,
                             "chunk_size": args.chunk_size,
                             "chunk_overlap": args.chunk_overlap,
+                            "noise_classifier_backend": args.noise_classifier_backend,
                             "noise_classifier_model": str(args.noise_classifier_model or ""),
                         },
                         metadata=book_result["book_metadata"],

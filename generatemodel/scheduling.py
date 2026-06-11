@@ -3,7 +3,12 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from shared import DATA_ROOT, detect_default_weights_root
+from shared import (
+    FACT_CHAPTER_FEATURES_ROOT,
+    FACT_PLOT_SEGMENTS_ROOT,
+    PROJECTS_ROOT,
+    detect_default_weights_root,
+)
 
 from .generator import (
     CRITIC_MODEL_VARIANTS,
@@ -22,11 +27,17 @@ def build_parser() -> argparse.ArgumentParser:
         prog="generatemodel-run",
         description="Generate new plot/chapter JSON files from existing plot and chapter libraries with generator-critic refinement.",
     )
-    parser.add_argument("input", help="Input Yggdrasil/derived/plots root or one cluster book directory.")
+    parser.add_argument(
+        "input",
+        help=f"Input {FACT_PLOT_SEGMENTS_ROOT} root or one cluster book directory.",
+    )
     parser.add_argument(
         "--feature-root",
         default=None,
-        help="Optional Yggdrasil/derived/features root. Used when cluster index.json does not contain a valid source_feature_dir.",
+        help=(
+            f"Optional {FACT_CHAPTER_FEATURES_ROOT} root. Used when plot index.json "
+            "does not contain a valid source_feature_dir."
+        ),
     )
     parser.add_argument(
         "--weights-root",
@@ -37,7 +48,7 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output",
         default=None,
-        help=f"Output root directory. Defaults to {DATA_ROOT / 'derived' / 'generations'}.",
+        help=f"Output root directory. Defaults to {PROJECTS_ROOT / '_generated'}.",
     )
     parser.add_argument(
         "--target-book-id",

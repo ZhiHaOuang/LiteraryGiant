@@ -138,6 +138,6 @@ def validate_plot_payload(
     missing = [str(chapter_id) for chapter_id in chapter_ids if str(chapter_id) not in valid_chapter_ids]
     if missing:
         raise ArtifactManifestError(
-            f"{file_name}: plot references chapter_ids not present in FeatureData/{book_id}: "
+            f"{file_name}: plot references chapter_ids not present in chapter_features/{book_id}: "
             + ", ".join(missing[:20])
         )

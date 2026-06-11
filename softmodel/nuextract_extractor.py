@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import copy
 import json
+import os
 import re
 from pathlib import Path
 from typing import Any
@@ -21,8 +22,9 @@ NUEXTRACT_MODEL_VARIANTS = {
     "4b": "NuExtract_4B",
     "8b": "NuExtract_8B",
 }
-DEFAULT_NUEXTRACT_VARIANT = "2b"
+DEFAULT_NUEXTRACT_VARIANT = "8b"
 DEFAULT_NUEXTRACT_MODEL = NUEXTRACT_MODEL_VARIANTS[DEFAULT_NUEXTRACT_VARIANT]
+DEFAULT_INFERENCE_BACKEND = "vllm"
 
 DEFAULT_SCHEMA_TEMPLATE = {
     "summary": "",
@@ -104,6 +106,11 @@ class NuExtractExtractor:
         detailed_summary_chunk_chars: int = 300,
         detailed_summary_max_new_tokens: int = 96,
         device_map: str = "auto",
+        inference_backend: str = DEFAULT_INFERENCE_BACKEND,
+        vllm_tensor_parallel_size: int = 1,
+        vllm_gpu_memory_utilization: float = 0.85,
+        vllm_max_model_len: int = 8192,
+        vllm_enforce_eager: bool = False,
     ) -> None:
         self.model_variant = model_variant.lower()
         self.model_name = model_name
@@ -113,9 +120,15 @@ class NuExtractExtractor:
         self.detailed_summary_chunk_chars = detailed_summary_chunk_chars
         self.detailed_summary_max_new_tokens = detailed_summary_max_new_tokens
         self.device_map = device_map
+        self.inference_backend = str(inference_backend or DEFAULT_INFERENCE_BACKEND).strip().lower()
+        self.vllm_tensor_parallel_size = max(1, int(vllm_tensor_parallel_size))
+        self.vllm_gpu_memory_utilization = max(0.5, min(0.98, float(vllm_gpu_memory_utilization)))
+        self.vllm_max_model_len = max(2048, int(vllm_max_model_len))
+        self.vllm_enforce_eager = bool(vllm_enforce_eager)
         self._tokenizer = None
         self._model = None
         self._backend = "causal_lm"
+        self._runtime_backend = "transformers"
         self.resolved_model_source: str | None = None
         self._config_data: dict[str, Any] = {}
 
@@ -129,13 +142,16 @@ class NuExtractExtractor:
         if self._model is not None and self._tokenizer is not None:
             return
         try:
-            import torch
             import transformers
         except ImportError as exc:
             raise RuntimeError(
-                "transformers/torch are not installed. Please install the Conda environment from "
+                "transformers is not installed. Please install the Conda environment from "
                 "environment.litcodex-gpu-cu124.yml before running part2."
             ) from exc
+        try:
+            import torch
+        except ImportError:
+            torch = None
 
         requested_model_name = self.requested_model_name
         self.resolved_model_source = resolve_model_source(
@@ -158,25 +174,36 @@ class NuExtractExtractor:
         self._config_data = config_data
         self._validate_nuextract_snapshot(source_path if is_local_dir else None, config_data)
         self._backend = self._detect_backend(source_path if is_local_dir else None, config_data)
+        self._runtime_backend = self._resolve_runtime_backend()
 
         common_kwargs: dict[str, Any] = {
             "device_map": self.device_map,
-            "dtype": torch.float16 if torch.cuda.is_available() else torch.float32,
+            "dtype": torch.float16 if (torch is not None and torch.cuda.is_available()) else (torch.float32 if torch is not None else None),
         }
+        if common_kwargs["dtype"] is None:
+            common_kwargs.pop("dtype")
         tokenizer_kwargs: dict[str, Any] = {}
 
         if is_local_dir:
             common_kwargs["local_files_only"] = True
             tokenizer_kwargs["local_files_only"] = True
 
-        print(f"[NuExtract] backend={self._backend} source={self.resolved_model_source}")
+        print(
+            f"[NuExtract] model_backend={self._backend} runtime_backend={self._runtime_backend} "
+            f"source={self.resolved_model_source}"
+        )
+
+        self._tokenizer = self._load_tokenizer(transformers, tokenizer_kwargs, is_local_dir)
+
+        if self._runtime_backend == "vllm":
+            self._model = self._load_vllm_engine()
+            return
 
         if self._backend == "phi3v_custom":
-            auto_tokenizer_cls = getattr(transformers, "AutoTokenizer", None)
             auto_causal_lm_cls = getattr(transformers, "AutoModelForCausalLM", None)
-            if auto_tokenizer_cls is None or auto_causal_lm_cls is None:
+            if auto_causal_lm_cls is None:
                 raise RuntimeError(
-                    "Current transformers version does not provide AutoTokenizer or AutoModelForCausalLM."
+                    "Current transformers version does not provide AutoModelForCausalLM."
                 )
             missing_modules = self._missing_custom_code_files(source_path, config_data) if is_local_dir else []
             if missing_modules:
@@ -187,13 +214,6 @@ class NuExtractExtractor:
                     "into models/weights/NuExtract_*."
                 )
 
-            self._tokenizer = auto_tokenizer_cls.from_pretrained(
-                self.resolved_model_source,
-                trust_remote_code=True,
-                **tokenizer_kwargs,
-            )
-            if hasattr(self._tokenizer, "padding_side"):
-                self._tokenizer.padding_side = "left"
             self._model = auto_causal_lm_cls.from_pretrained(
                 self.resolved_model_source,
                 trust_remote_code=True,
@@ -202,13 +222,6 @@ class NuExtractExtractor:
             return
 
         if self._backend == "vision2seq":
-            auto_tokenizer_cls = getattr(transformers, "AutoTokenizer", None)
-            if auto_tokenizer_cls is None:
-                raise RuntimeError(
-                    "Current transformers version does not provide AutoTokenizer, so local NuExtract text-only "
-                    "extraction cannot be loaded."
-                )
-
             vision_model_cls = (
                 getattr(transformers, "AutoModelForImageTextToText", None)
                 or getattr(transformers, "AutoModelForVision2Seq", None)
@@ -221,14 +234,6 @@ class NuExtractExtractor:
                     "or Qwen2VLForConditionalGeneration."
                 )
 
-            self._tokenizer = auto_tokenizer_cls.from_pretrained(
-                self.resolved_model_source,
-                trust_remote_code=False,
-                use_fast=False,
-                **tokenizer_kwargs,
-            )
-            if hasattr(self._tokenizer, "padding_side"):
-                self._tokenizer.padding_side = "left"
             self._model = vision_model_cls.from_pretrained(
                 self.resolved_model_source,
                 trust_remote_code=False,
@@ -236,20 +241,12 @@ class NuExtractExtractor:
             )
             return
 
-        auto_tokenizer_cls = getattr(transformers, "AutoTokenizer", None)
         auto_causal_lm_cls = getattr(transformers, "AutoModelForCausalLM", None)
-        if auto_tokenizer_cls is None or auto_causal_lm_cls is None:
+        if auto_causal_lm_cls is None:
             raise RuntimeError(
-                "Current transformers version does not provide AutoTokenizer or AutoModelForCausalLM."
+                "Current transformers version does not provide AutoModelForCausalLM."
             )
 
-        self._tokenizer = auto_tokenizer_cls.from_pretrained(
-            self.resolved_model_source,
-            trust_remote_code=not is_local_dir,
-            **tokenizer_kwargs,
-        )
-        if hasattr(self._tokenizer, "padding_side"):
-            self._tokenizer.padding_side = "left"
         self._model = auto_causal_lm_cls.from_pretrained(
             self.resolved_model_source,
             trust_remote_code=not is_local_dir,
@@ -362,12 +359,23 @@ class NuExtractExtractor:
         document = self._build_document_text(title=title, content=content)
         schema = json.dumps(MAIN_EXTRACTION_SCHEMA_TEMPLATE, ensure_ascii=False, indent=2)
         messages = [{"role": "user", "content": document}]
-        prompt = self._tokenizer.apply_chat_template(
-            messages,
-            template=schema,
-            tokenize=False,
-            add_generation_prompt=True,
-        )
+        prompt = self._render_schema_chat_prompt(messages=messages, schema=schema)
+        if self._runtime_backend == "vllm":
+            generated_text = self._generate_vllm_from_rendered_prompt(prompt, max_new_tokens=max_new_tokens)
+            payload = self.parse_json_payload(generated_text)
+            payload = self._normalize_payload(payload)
+            payload = self._postprocess_payload(payload)
+            if self._needs_structural_backfill(payload):
+                payload = self._merge_backfill_payload(
+                    payload,
+                    self.extract_structural_backfill(title=title, content=content),
+                )
+            payload["detailed_summary"] = self.build_detailed_summary(title=title, content=content)
+            payload = self._merge_role_fields(
+                payload,
+                self.extract_role_entities(title=title, content=content),
+            )
+            return SemanticFeatures.from_dict(payload)
         model_inputs = self._tokenizer(
             prompt,
             return_tensors="pt",
@@ -513,15 +521,9 @@ class NuExtractExtractor:
         return model_inputs
 
     def generate_text(self, prompt: str, *, max_new_tokens: int) -> str:
-        if self._backend in {"vision2seq", "phi3v_custom"} and hasattr(self._tokenizer, "apply_chat_template"):
-            messages = [{"role": "user", "content": prompt}]
-            rendered_prompt = self._tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,
-            )
-        else:
-            rendered_prompt = prompt
+        rendered_prompt = self._render_prompt(prompt)
+        if self._runtime_backend == "vllm":
+            return self._generate_vllm_from_rendered_prompt(rendered_prompt, max_new_tokens=max_new_tokens)
 
         model_inputs = self._tokenizer(
             rendered_prompt,
@@ -687,8 +689,11 @@ class NuExtractExtractor:
     def generate_text_batch(self, prompts: list[str], *, max_new_tokens: int) -> list[str]:
         if not prompts:
             return []
+        rendered_prompts = [self._render_prompt(prompt) for prompt in prompts]
+        if self._runtime_backend == "vllm":
+            return self._generate_vllm_batch_from_rendered_prompts(rendered_prompts, max_new_tokens=max_new_tokens)
         model_inputs = self._tokenizer(
-            prompts,
+            rendered_prompts,
             return_tensors="pt",
             padding=True,
             truncation=True,
@@ -706,6 +711,95 @@ class NuExtractExtractor:
             generated_tokens = outputs[index][int(prompt_length):]
             text = self._tokenizer.decode(generated_tokens, skip_special_tokens=True)
             generated_texts.append(text)
+        return generated_texts
+
+    def _resolve_runtime_backend(self) -> str:
+        backend = self.inference_backend or DEFAULT_INFERENCE_BACKEND
+        if backend == "auto":
+            backend = DEFAULT_INFERENCE_BACKEND
+        if backend not in {"transformers", "vllm"}:
+            raise ValueError(f"Unsupported NuExtract inference backend: {backend}")
+        return backend
+
+    def _load_tokenizer(self, transformers_module, tokenizer_kwargs: dict[str, Any], is_local_dir: bool):
+        auto_tokenizer_cls = getattr(transformers_module, "AutoTokenizer", None)
+        if auto_tokenizer_cls is None:
+            raise RuntimeError("Current transformers version does not provide AutoTokenizer.")
+        load_kwargs = dict(tokenizer_kwargs)
+        load_kwargs["trust_remote_code"] = not is_local_dir and self._backend == "phi3v_custom"
+        if self._backend == "vision2seq":
+            load_kwargs["use_fast"] = False
+        tokenizer = auto_tokenizer_cls.from_pretrained(
+            self.resolved_model_source,
+            **load_kwargs,
+        )
+        if hasattr(tokenizer, "padding_side"):
+            tokenizer.padding_side = "left"
+        return tokenizer
+
+    def _load_vllm_engine(self):
+        try:
+            from vllm import LLM
+        except ImportError as exc:
+            raise RuntimeError("vLLM is not installed, but inference_backend='vllm' was requested.") from exc
+
+        os.environ.setdefault("VLLM_WORKER_MULTIPROC_METHOD", "spawn")
+        return LLM(
+            model=self.resolved_model_source,
+            tokenizer=self.resolved_model_source,
+            trust_remote_code=False,
+            tensor_parallel_size=self.vllm_tensor_parallel_size,
+            gpu_memory_utilization=self.vllm_gpu_memory_utilization,
+            max_model_len=min(self.resolve_tokenizer_max_length(), self.vllm_max_model_len),
+            max_seq_len_to_capture=min(8192, self.vllm_max_model_len),
+            enforce_eager=self.vllm_enforce_eager,
+            disable_log_stats=True,
+        )
+
+    def _render_prompt(self, prompt: str) -> str:
+        if self._backend in {"vision2seq", "phi3v_custom"} and hasattr(self._tokenizer, "apply_chat_template"):
+            messages = [{"role": "user", "content": prompt}]
+            return self._tokenizer.apply_chat_template(
+                messages,
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        return prompt
+
+    def _render_schema_chat_prompt(self, *, messages: list[dict[str, Any]], schema: str) -> str:
+        if hasattr(self._tokenizer, "apply_chat_template"):
+            return self._tokenizer.apply_chat_template(
+                messages,
+                template=schema,
+                tokenize=False,
+                add_generation_prompt=True,
+            )
+        return f"{schema}\n\n{messages[0]['content']}"
+
+    def _build_sampling_params(self, *, max_new_tokens: int):
+        try:
+            from vllm import SamplingParams
+        except ImportError as exc:
+            raise RuntimeError("vLLM is not installed, but vLLM sampling was requested.") from exc
+        return SamplingParams(
+            temperature=0.0,
+            max_tokens=max_new_tokens,
+        )
+
+    def _generate_vllm_from_rendered_prompt(self, prompt: str, *, max_new_tokens: int) -> str:
+        outputs = self._model.generate([prompt], sampling_params=self._build_sampling_params(max_new_tokens=max_new_tokens))
+        if not outputs or not outputs[0].outputs:
+            return ""
+        return outputs[0].outputs[0].text
+
+    def _generate_vllm_batch_from_rendered_prompts(self, prompts: list[str], *, max_new_tokens: int) -> list[str]:
+        outputs = self._model.generate(prompts, sampling_params=self._build_sampling_params(max_new_tokens=max_new_tokens))
+        generated_texts: list[str] = []
+        for output in outputs:
+            if not output.outputs:
+                generated_texts.append("")
+                continue
+            generated_texts.append(output.outputs[0].text)
         return generated_texts
 
     def resolve_tokenizer_max_length(self) -> int:

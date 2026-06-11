@@ -46,6 +46,8 @@ include = [
     "softmodel*",
 ]
 exclude = [
+    "Library*",
+    "Projects*",
     "Yggdrasil*",
     "docs*",
     "models*",

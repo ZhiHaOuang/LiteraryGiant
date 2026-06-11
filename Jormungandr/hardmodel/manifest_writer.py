@@ -1,4 +1,4 @@
-"""Write cleaned hardmodel artifacts into the canonical derived layout."""
+"""Write cleaned hardmodel artifacts into the canonical facts layout."""
 
 from __future__ import annotations
 
@@ -6,7 +6,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from shared import DATA_ROOT, canonical_book_slug, serialize_payload
+from shared import FACT_CLEANED_CHAPTERS_ROOT, canonical_book_slug, serialize_payload
 
 from .source_resolver import BookSource
 from .validator import validate_processed_book_result, validate_written_book_dir
@@ -19,7 +19,7 @@ def resolve_output_dir(result: dict, *, output_root: str | Path | None = None) -
 
 
 def resolve_book_output_dir(book_id: str, *, output_root: str | Path | None = None) -> Path:
-    root = Path(output_root) if output_root is not None else DATA_ROOT / "derived" / "chapters"
+    root = Path(output_root) if output_root is not None else FACT_CLEANED_CHAPTERS_ROOT
     return root / canonical_book_slug(book_id)
 
 

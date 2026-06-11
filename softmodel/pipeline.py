@@ -35,6 +35,7 @@ class ChapterFeaturePipeline:
                 "generated_at": datetime.now(timezone.utc).isoformat(),
                 "nuextract_model": self.nuextract_extractor.model_name,
                 "nuextract_model_source": self.nuextract_extractor.resolved_model_source or self.nuextract_extractor.model_name,
+                "inference_backend": self.nuextract_extractor.inference_backend,
             },
         }
 

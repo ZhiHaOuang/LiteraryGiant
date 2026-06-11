@@ -3,7 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from shared import (
-    DATA_ROOT,
+    FACT_CHAPTER_FEATURES_ROOT,
     PipelineState,
     canonical_book_slug,
     compute_path_signature,
@@ -22,7 +22,7 @@ def discover_processed_books(input_path: str | Path) -> list[Path]:
     if path.is_dir() and (path / "index.json").exists():
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a derived chapters root or a processed book directory: {path}")
+        raise ValueError(f"Input path must be a cleaned_chapters facts root or a processed book directory: {path}")
     books = sorted(item for item in path.iterdir() if item.is_dir() and (item / "index.json").exists())
     if not books:
         raise FileNotFoundError(f"No processed book directories found under {path}")
@@ -48,7 +48,7 @@ def load_book_bundle(book_dir: str | Path) -> dict:
 
 
 def resolve_feature_output_dir(book_bundle: dict, *, output_root: str | Path | None = None) -> Path:
-    root = Path(output_root) if output_root is not None else DATA_ROOT / "derived" / "features"
+    root = Path(output_root) if output_root is not None else FACT_CHAPTER_FEATURES_ROOT
     if "index" in book_bundle:
         book_id = book_bundle["index"]["book_metadata"]["book_id"]
     else:
@@ -91,6 +91,11 @@ def process_book_dir(book_dir: str | Path, *, pipeline: ChapterFeaturePipeline) 
             "nuextract_model_source": pipeline.nuextract_extractor.resolved_model_source or pipeline.nuextract_extractor.requested_model_name,
             "nuextract_max_input_chars": pipeline.nuextract_extractor.max_input_chars,
             "nuextract_max_new_tokens": pipeline.nuextract_extractor.max_new_tokens,
+            "inference_backend": pipeline.nuextract_extractor.inference_backend,
+            "vllm_tensor_parallel_size": pipeline.nuextract_extractor.vllm_tensor_parallel_size,
+            "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
+            "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
+            "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
         },
     }
 
@@ -102,6 +107,11 @@ def build_extractor_config(pipeline: ChapterFeaturePipeline) -> dict:
         "nuextract_model_source": pipeline.nuextract_extractor.resolved_model_source or pipeline.nuextract_extractor.requested_model_name,
         "nuextract_max_input_chars": pipeline.nuextract_extractor.max_input_chars,
         "nuextract_max_new_tokens": pipeline.nuextract_extractor.max_new_tokens,
+        "inference_backend": pipeline.nuextract_extractor.inference_backend,
+        "vllm_tensor_parallel_size": pipeline.nuextract_extractor.vllm_tensor_parallel_size,
+        "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
+        "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
+        "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
     }
 
 

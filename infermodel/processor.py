@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from shared import DATA_ROOT, canonical_book_slug, load_chapters_from_manifest, load_json, serialize_payload
+from shared import FACT_PLOT_SEGMENTS_ROOT, canonical_book_slug, load_chapters_from_manifest, load_json, serialize_payload
 
 from .pipeline import InferModelPipeline
 
@@ -22,7 +22,7 @@ def discover_feature_books(input_path: str | Path) -> list[Path]:
     if _looks_like_feature_book_dir(path):
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a derived features root or one feature book directory: {path}")
+        raise ValueError(f"Input path must be a chapter_features facts root or one feature book directory: {path}")
     books = sorted(item for item in path.iterdir() if _looks_like_feature_book_dir(item))
     if not books:
         raise FileNotFoundError(f"No feature book directories found under {path}")
@@ -81,7 +81,7 @@ def _build_synthetic_index(book_path: Path, chapters: list[dict], chapter_files:
 
 
 def resolve_cluster_output_dir(feature_book: dict, *, output_root: str | Path | None = None) -> Path:
-    root = Path(output_root) if output_root is not None else DATA_ROOT / "derived" / "plots"
+    root = Path(output_root) if output_root is not None else FACT_PLOT_SEGMENTS_ROOT
     if "index" in feature_book:
         book_id = feature_book["index"]["book_metadata"]["book_id"]
     else:

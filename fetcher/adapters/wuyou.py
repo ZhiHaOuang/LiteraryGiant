@@ -12,7 +12,7 @@ from urllib.parse import urldefrag, urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from .base import BaseAdapter, ChapterEntry
+from .base import BaseAdapter, ChapterEntry, DiscoverySource
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,16 @@ class WuyouShuchengAdapter(BaseAdapter):
     supports_story_collections = True
 
     _STORY_RE = re.compile(r"^/[^/]+/[^/]+/\d+\.html?$")
+
+    def discovery_sources(self) -> list[DiscoverySource]:
+        return [
+            DiscoverySource(
+                "liu_cixin_short_stories",
+                "https://www.51shucheng.net/kehuan/liucixinduanpian/",
+                "story_collection",
+                90,
+            ),
+        ]
 
     def extract_title(self, soup: BeautifulSoup, base_url: str) -> str:
         title_tag = soup.find("title")
@@ -127,13 +137,26 @@ class WuyouShuchengAdapter(BaseAdapter):
 
         paragraphs: list[str] = []
         for p in content.find_all("p"):
-            text = p.get_text(strip=True)
+            text = p.get_text("\n").strip()
             if text:
-                paragraphs.append(text)
+                for line in text.splitlines():
+                    line = line.strip()
+                    if line:
+                        paragraphs.append(line)
 
         if not paragraphs:
             text = content.get_text("\n", strip=True)
-            paragraphs = [line.strip() for line in text.splitlines() if line.strip()]
+            for line in text.splitlines():
+                line = line.strip()
+                if line:
+                    paragraphs.append(line)
+
+        # If the result is still one blob, split on Chinese sentence endings
+        if len(paragraphs) <= 1 and paragraphs:
+            import re
+            blob = paragraphs[0] if paragraphs else ""
+            chunks = re.split(r"(?<=[。！？])\s*", blob)
+            paragraphs = [c.strip() for c in chunks if c.strip()]
 
         return "\n\n".join(paragraphs)
 

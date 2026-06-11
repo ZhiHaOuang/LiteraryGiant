@@ -1,4 +1,4 @@
-"""Validate canonical Yggdrasil novel-agent data layout."""
+"""Validate canonical Library novel-agent data layout."""
 
 from __future__ import annotations
 
@@ -38,6 +38,10 @@ def iter_book_dirs(root: Path, book_id: str | None) -> list[Path]:
     return sorted(path for path in root.glob("book_*") if path.is_dir())
 
 
+def iter_story_dirs(root: Path) -> list[Path]:
+    return sorted(path for path in root.glob("story_*") if path.is_dir())
+
+
 def collect_chapter_ids(book_dir: Path, stage_name: str, errors: list[str]) -> set[str]:
     index_path = book_dir / "index.json"
     if not index_path.exists():
@@ -61,7 +65,7 @@ def collect_chapter_ids(book_dir: Path, stage_name: str, errors: list[str]) -> s
 
 
 def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -> None:
-    raw_root = data_root / "sources" / "raw_text"
+    raw_root = data_root / "rawdata" / "novels"
     for book_dir in iter_book_dirs(raw_root, book_id):
         source = book_dir / "source.txt"
         metadata = book_dir / "metadata.json"
@@ -69,9 +73,9 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
         chapter_files = sorted(book_dir.glob("chapter_*.txt"))
         if source.exists():
             if not metadata.exists() and not index.exists():
-                errors.append(f"raw_text: missing metadata.json or index.json in {book_dir}")
+                errors.append(f"rawdata: missing metadata.json or index.json in {book_dir}")
                 continue
-            print(f"[OK] raw_text: {book_dir}")
+            print(f"[OK] rawdata: {book_dir}")
             continue
         if index.exists() and chapter_files:
             try:
@@ -81,7 +85,7 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
                 continue
             manifest = payload.get("chapters") or []
             if not isinstance(manifest, list):
-                errors.append(f"raw_text: chapters must be a list in {index}")
+                errors.append(f"rawdata: chapters must be a list in {index}")
                 continue
             indexed_files = {
                 as_text(entry.get("file_name"))
@@ -91,14 +95,28 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
             actual_files = {path.name for path in chapter_files}
             missing = sorted(indexed_files - actual_files)
             if missing:
-                errors.append(f"raw_text: {book_dir} misses indexed chapter files: {missing[:5]}")
+                errors.append(f"rawdata: {book_dir} misses indexed chapter files: {missing[:5]}")
                 continue
             if not indexed_files:
-                errors.append(f"raw_text: no chapter files listed in {index}")
+                errors.append(f"rawdata: no chapter files listed in {index}")
                 continue
-            print(f"[OK] raw_text: {book_dir} ({len(indexed_files)} indexed chapters)")
+            print(f"[OK] rawdata: {book_dir} ({len(indexed_files)} indexed chapters)")
             continue
-        errors.append(f"raw_text: missing source.txt or indexed chapter_*.txt files in {book_dir}")
+        errors.append(f"rawdata: missing source.txt or indexed chapter_*.txt files in {book_dir}")
+
+
+def validate_raw_stories(data_root: Path, errors: list[str]) -> None:
+    story_root = data_root / "rawdata" / "stories"
+    for story_dir in iter_story_dirs(story_root):
+        story = story_dir / "story.txt"
+        index = story_dir / "index.json"
+        if not story.exists():
+            errors.append(f"rawdata stories: missing story.txt in {story_dir}")
+            continue
+        if not index.exists():
+            errors.append(f"rawdata stories: missing index.json in {story_dir}")
+            continue
+        print(f"[OK] rawdata story: {story_dir}")
 
 
 def validate_plots(
@@ -107,11 +125,11 @@ def validate_plots(
     feature_ids_by_book: dict[str, set[str]],
     errors: list[str],
 ) -> None:
-    plots_root = data_root / "derived" / "plots"
+    plots_root = data_root / "reference" / "facts" / "plot_segments"
     for book_dir in iter_book_dirs(plots_root, book_id):
         index_path = book_dir / "index.json"
         if not index_path.exists():
-            errors.append(f"plots: missing index.json in {book_dir}")
+            errors.append(f"plot_segments: missing index.json in {book_dir}")
             continue
         index = read_json(index_path)
         metadata = index.get("book_metadata") if isinstance(index.get("book_metadata"), dict) else {}
@@ -119,27 +137,27 @@ def validate_plots(
         valid_chapter_ids = feature_ids_by_book.get(resolved_book_id, set())
         manifest = index.get("plot_manifest") or index.get("cluster_manifest") or []
         if not isinstance(manifest, list):
-            errors.append(f"plots: plot_manifest must be a list in {book_dir}")
+            errors.append(f"plot_segments: plot_manifest must be a list in {book_dir}")
             continue
 
         seen_plot_ids: set[str] = set()
         checked = 0
         for entry_index, entry in enumerate(manifest, start=1):
             if not isinstance(entry, dict):
-                errors.append(f"plots: manifest entry {entry_index} is not an object in {book_dir}")
+                errors.append(f"plot_segments: manifest entry {entry_index} is not an object in {book_dir}")
                 continue
             file_name = as_text(entry.get("file_name"))
             plot_id = as_text(entry.get("plot_id"))
             if not file_name:
-                errors.append(f"plots: manifest entry {entry_index} has no file_name in {book_dir}")
+                errors.append(f"plot_segments: manifest entry {entry_index} has no file_name in {book_dir}")
                 continue
             if plot_id in seen_plot_ids:
-                errors.append(f"plots: duplicate plot_id {plot_id} in {book_dir}")
+                errors.append(f"plot_segments: duplicate plot_id {plot_id} in {book_dir}")
             if plot_id:
                 seen_plot_ids.add(plot_id)
             plot_path = book_dir / file_name
             if not plot_path.exists():
-                errors.append(f"plots: missing plot file listed in manifest: {plot_path}")
+                errors.append(f"plot_segments: missing plot file listed in manifest: {plot_path}")
                 continue
             payload = read_json(plot_path)
             if valid_chapter_ids:
@@ -153,7 +171,7 @@ def validate_plots(
                 except ArtifactManifestError as exc:
                     errors.append(str(exc))
             checked += 1
-        print(f"[OK] plots: {book_dir} ({checked} plots)")
+        print(f"[OK] plot_segments: {book_dir} ({checked} plots)")
 
 
 def validate_layout(data_root: Path, book_id: str | None) -> int:
@@ -161,22 +179,24 @@ def validate_layout(data_root: Path, book_id: str | None) -> int:
     warnings: list[str] = []
 
     validate_raw_text(data_root, book_id, errors)
+    if book_id is None:
+        validate_raw_stories(data_root, errors)
 
     chapter_ids_by_book: dict[str, set[str]] = {}
-    for book_dir in iter_book_dirs(data_root / "derived" / "chapters", book_id):
-        ids = collect_chapter_ids(book_dir, "chapters", errors)
+    for book_dir in iter_book_dirs(data_root / "reference" / "facts" / "cleaned_chapters", book_id):
+        ids = collect_chapter_ids(book_dir, "cleaned_chapters", errors)
         if ids:
             chapter_ids_by_book[book_dir.name.removeprefix("book_")] = ids
 
     feature_ids_by_book: dict[str, set[str]] = {}
-    for book_dir in iter_book_dirs(data_root / "derived" / "features", book_id):
-        ids = collect_chapter_ids(book_dir, "features", errors)
+    for book_dir in iter_book_dirs(data_root / "reference" / "facts" / "chapter_features", book_id):
+        ids = collect_chapter_ids(book_dir, "chapter_features", errors)
         resolved_book_id = book_dir.name.removeprefix("book_")
         feature_ids_by_book[resolved_book_id] = ids
         missing_features = sorted(chapter_ids_by_book.get(resolved_book_id, set()) - ids)
         if missing_features:
             warnings.append(
-                f"features: {book_dir} misses {len(missing_features)} chapter ids present in chapters"
+                f"chapter_features: {book_dir} misses {len(missing_features)} chapter ids present in cleaned_chapters"
             )
 
     validate_plots(data_root, book_id, feature_ids_by_book, errors)
@@ -192,11 +212,11 @@ def validate_layout(data_root: Path, book_id: str | None) -> int:
 
 
 def build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(description="Validate canonical Yggdrasil layout.")
+    parser = argparse.ArgumentParser(description="Validate canonical Library layout.")
     parser.add_argument(
         "--data-root",
         default=str(DATA_ROOT),
-        help="Canonical data root. Default: Yggdrasil.",
+        help="Canonical data root. Default: Library.",
     )
     parser.add_argument("--book-id", default=None, help="Optional book id to validate, e.g. 0001.")
     return parser

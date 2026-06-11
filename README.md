@@ -5,11 +5,13 @@
 ## 项目结构
 
 ```
+Library/          # 数据与参考库：rawdata、facts、abstractions、ideas、indexes
+Projects/         # 每本新书的独立创作工作区
 fetcher/          # 网站小说抓取引擎（当前焦点）
-hardmodel/        # 规则切章：原始 txt → 章节 JSON
-softmodel/        # 语义抽取：章节正文 → 角色/冲突/伏笔等特征
-infermodel/       # 情节聚合：章节特征 → 全局 plot 段
-generatemodel/    # 结构生成：plot 库 → 新 plot/chapter JSON
+hardmodel/        # 规则切章：原始 txt → cleaned_chapters JSON
+softmodel/        # 语义抽取：cleaned_chapters → chapter_features
+infermodel/       # 情节聚合：chapter_features → plot_segments
+generatemodel/    # 结构生成：plot 库 → Projects 下的新 plot/chapter JSON
 Jormungandr/      # hardmodel 的另一套实现
 shared/           # 公共工具（路径常量、状态管理、JSON 解析）
 scripts/          # 辅助脚本（数据同步、校验）
@@ -49,8 +51,17 @@ python -m fetcher --site-concurrency 4 --concurrency 3 --delay 0.5 \
 python -m fetcher --content-type story \
   https://www.51shucheng.net/kehuan/liucixinduanpian/18513.html
 
+# 展开短篇集合时限制故事数量
+python -m fetcher --max-stories 10 https://www.51shucheng.net/kehuan/liucixinduanpian/
+
 # 发现新书（排行榜）
 python -m fetcher --discover https://www.bqquge.com/paihang
+
+# 使用各 adapter 内置的排行榜/分类入口进行发现，并按标题去重
+python -m fetcher --discover --discover-limit 20
+
+# 只发现某个站点的候选书
+python -m fetcher --discover --discover-site www.kanunu8.com --discover-limit 20
 
 # 导入本地 txt 文件
 python -m fetcher --import 平行万宙.txt --title 平行万宙
@@ -79,7 +90,7 @@ engine = FetcherEngine(
     min_delay=0.3,      # 请求间隔 0.3 秒
 )
 path = engine.fetch_novel("https://www.bqquge.com/507")
-print(path)  # → Yggdrasil/sources/raw_text/book_0001/
+print(path)  # → Library/rawdata/novels/book_0001/
 ```
 
 ### 数据流
@@ -89,10 +100,10 @@ CLI: python -m fetcher <url>
   → fetcher/scheduling.py:main()
     → FetcherEngine(adapter).fetch_novel(url)
       → 1. 抓取目录页 → 提取书名 + 章节列表
-      → 2. 注册到 Yggdrasil/indexes/books.json
+      → 2. 注册到 Library/indexes/books.json
       → 3. 并行抓取章节 → runs/fetch/<run_id>/<book_slug>/
       → 4. 校验（完成率、空文件检查）
-      → 5. 提升到正式目录 → Yggdrasil/sources/raw_text/<book_slug>/
+      → 5. 提升到正式目录 → Library/rawdata/novels/<book_slug>/
 ```
 
 ### 适配器架构

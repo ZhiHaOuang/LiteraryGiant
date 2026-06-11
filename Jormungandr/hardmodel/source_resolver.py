@@ -6,7 +6,7 @@ hardmodel accepts two input layouts::
         TextM/平行万宙.txt              ← one file, all chapters
 
     Whole-book mode (canonical)
-        Yggdrasil/sources/raw_text/book_0001/
+        Library/rawdata/novels/book_0001/
             source.txt                  ← one file, all chapters
 
     Per-chapter mode (new)
@@ -17,7 +17,7 @@ hardmodel accepts two input layouts::
             ...
 
     Per-chapter mode (canonical)
-        Yggdrasil/sources/raw_text/book_0001/
+        Library/rawdata/novels/book_0001/
             chapters/
                 index.json               ← chapter manifest (optional)
                 chapter_0001.txt

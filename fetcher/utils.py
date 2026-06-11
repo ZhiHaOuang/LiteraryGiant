@@ -305,6 +305,7 @@ def fetch_with_retry(
     max_tries: int = 3,
     backoff: float = 2.0,
     timeout: int = DEFAULT_TIMEOUT,
+    cookies: dict | None = None,
 ) -> requests.Response:
     """GET *url* with exponential-backoff retries.
 
@@ -330,7 +331,7 @@ def fetch_with_retry(
 
     for attempt in range(max_tries):
         try:
-            resp = session.get(url, timeout=timeout)
+            resp = session.get(url, timeout=timeout, cookies=cookies)
 
             # 403 often means temporary IP ban — retry with longer backoff
             if resp.status_code == 403 and attempt < max_tries - 1:

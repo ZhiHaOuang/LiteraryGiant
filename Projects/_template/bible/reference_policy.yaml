@@ -1,0 +1,21 @@
+reference_policy:
+  primary_indexes:
+    - Library/indexes/reference_index.jsonl
+  allowed_reference_roots:
+    - Library/reference/facts
+    - Library/reference/abstractions
+    - Library/ideas
+  allowed_reference_types:
+    - cleaned_chapter
+    - chapter_feature
+    - plot_segment
+    - plot_pattern
+    - trope
+    - style
+    - character_role
+    - setting_pattern
+  allow_fact_lookup: true
+  fact_lookup_requires_source_ref: true
+  allow_idea_lookup: true
+  forbid_verbatim_source_prose: true
+  max_source_similarity: low

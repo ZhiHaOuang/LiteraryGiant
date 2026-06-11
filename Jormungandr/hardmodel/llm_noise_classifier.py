@@ -12,6 +12,8 @@ import re
 from pathlib import Path
 from typing import Any
 
+import requests
+
 
 class QwenWeakNoiseClassifier:
     """Batch weak-noise window classifier backed by a local Qwen model."""
@@ -89,7 +91,7 @@ class QwenWeakNoiseClassifier:
         )
         generated = output_ids[0][inputs["input_ids"].shape[-1] :]
         raw_text = self.tokenizer.decode(generated, skip_special_tokens=True)
-        return self._parse_actions(raw_text, {int(item["candidate_id"]) for item in batch})
+        return self._parse_actions(raw_text, [int(item["candidate_id"]) for item in batch])
 
     def _build_prompt(self, batch: list[dict[str, Any]]) -> str:
         compact = []
@@ -111,16 +113,18 @@ class QwenWeakNoiseClassifier:
             )
         return (
             "下面是 hardmodel 规则系统拿不准的 weak-noise 小窗口。\n"
-            "请为每个候选返回 action：keep、drop 或 trim。\n"
+            "请为每个候选返回 candidate_id 和 action：keep、drop 或 trim。\n"
             "drop：整行都是广告、求票、求收藏、站点提示、作者题外话、读者群、更新安排、导航提示。\n"
             "trim：只有前缀或后缀是噪声，正文部分应保留；cleaned_line 必须原文截取，不得改写正文。\n"
             "keep：小说正文、对白、动作、心理活动、世界观设定、系统面板、角色真正说出的话。\n"
-            "输出 JSON 数组，不要解释。\n"
+            "输出 JSON 数组，不要解释。必须包含 candidate_id；如果遗漏，将按候选顺序解释。\n"
             f"候选：\n{json.dumps(compact, ensure_ascii=False)}"
         )
 
     @staticmethod
-    def _parse_actions(raw_text: str, valid_ids: set[int]) -> list[Any]:
+    def _parse_actions(raw_text: str, valid_ids: set[int] | list[int]) -> list[Any]:
+        ordered_ids = list(valid_ids)
+        valid_id_set = set(ordered_ids)
         cleaned = raw_text.strip()
         if cleaned.startswith("```"):
             cleaned = re.sub(r"^```(?:json)?", "", cleaned).strip()
@@ -146,10 +150,12 @@ class QwenWeakNoiseClassifier:
                 except json.JSONDecodeError:
                     candidates = []
         result: list[Any] = []
-        for item in candidates:
+        for position, item in enumerate(candidates):
             if isinstance(item, dict):
                 candidate_id = QwenWeakNoiseClassifier._optional_int(item.get("candidate_id"))
-                if candidate_id not in valid_ids:
+                if candidate_id is None and position < len(ordered_ids):
+                    candidate_id = ordered_ids[position]
+                if candidate_id not in valid_id_set:
                     continue
                 action = str(item.get("action") or "").strip().lower()
                 if action not in {"keep", "drop", "trim"}:
@@ -163,7 +169,7 @@ class QwenWeakNoiseClassifier:
                 value = int(item)
             except (TypeError, ValueError):
                 continue
-            if value in valid_ids:
+            if value in valid_id_set:
                 result.append(value)
         return result
 
@@ -197,3 +203,93 @@ class QwenWeakNoiseClassifier:
 
     # Backward-compatible alias for older tests/callers.
     _parse_discard_ids = _parse_actions
+
+
+class VLLMWeakNoiseClassifier:
+    """Weak-noise classifier using a vLLM OpenAI-compatible chat endpoint."""
+
+    def __init__(
+        self,
+        *,
+        api_base_url: str = "http://127.0.0.1:8000/v1",
+        model_name: str = "Qwen_8B",
+        batch_size: int = 16,
+        max_new_tokens: int = 192,
+        temperature: float = 0.0,
+        timeout: float = 120.0,
+    ) -> None:
+        self.api_base_url = api_base_url.rstrip("/")
+        self.model_name = model_name
+        self.batch_size = max(1, int(batch_size))
+        self.max_new_tokens = max(16, int(max_new_tokens))
+        self.temperature = float(temperature)
+        self.timeout = float(timeout)
+        self._session = requests.Session()
+        self._session.trust_env = False
+
+    def __call__(self, candidates: list[dict[str, Any]]) -> list[Any]:
+        actions: list[Any] = []
+        for start in range(0, len(candidates), self.batch_size):
+            batch = candidates[start : start + self.batch_size]
+            actions.extend(self._classify_batch(batch))
+        return QwenWeakNoiseClassifier._dedupe_actions(actions)
+
+    def _classify_batch(self, batch: list[dict[str, Any]]) -> list[Any]:
+        payload = {
+            "model": self.model_name,
+            "messages": [
+                {
+                    "role": "system",
+                    "content": (
+                        "你是中文网文清洗器。只判断候选行是否是正文外噪声。"
+                        "不要删除小说正文、对白、人物心理、世界观设定或系统提示。"
+                        "必须只输出 JSON 数组，不要解释。每项格式为 "
+                        "{\"candidate_id\":0,\"action\":\"keep|drop|trim\",\"cleaned_line\":\"...\"}。"
+                    ),
+                },
+                {"role": "user", "content": self._build_prompt(batch)},
+            ],
+            "temperature": self.temperature,
+            "max_tokens": self.max_new_tokens,
+        }
+        response = self._session.post(
+            f"{self.api_base_url}/chat/completions",
+            json=payload,
+            timeout=self.timeout,
+        )
+        response.raise_for_status()
+        data = response.json()
+        raw_text = data["choices"][0]["message"]["content"]
+        return QwenWeakNoiseClassifier._parse_actions(
+            raw_text,
+            [int(item["candidate_id"]) for item in batch],
+        )
+
+    @staticmethod
+    def _build_prompt(batch: list[dict[str, Any]]) -> str:
+        compact = []
+        for item in batch:
+            compact.append(
+                {
+                    "candidate_id": item.get("candidate_id"),
+                    "line": item.get("line"),
+                    "context": item.get("context"),
+                    "position_score": item.get("position_score"),
+                    "pattern_frequency_score": item.get("pattern_frequency_score"),
+                    "prose_score": item.get("prose_score"),
+                    "prose_reasons": item.get("prose_reasons"),
+                    "noise_score": item.get("noise_score"),
+                    "boundary_zone": item.get("boundary_zone"),
+                    "weak_reason": item.get("weak_reason"),
+                    "allowed_actions": item.get("allowed_actions") or ["keep", "drop", "trim"],
+                }
+            )
+        return (
+            "下面是 hardmodel 规则系统拿不准的 weak-noise 小窗口。\n"
+            "请为每个候选返回 candidate_id 和 action：keep、drop 或 trim。\n"
+            "drop：整行都是广告、求票、求收藏、站点提示、作者题外话、读者群、更新安排、导航提示。\n"
+            "trim：只有前缀或后缀是噪声，正文部分应保留；cleaned_line 必须原文截取，不得改写正文。\n"
+            "keep：小说正文、对白、动作、心理活动、世界观设定、系统面板、角色真正说出的话。\n"
+            "输出 JSON 数组，不要解释。必须包含 candidate_id；如果遗漏，将按候选顺序解释。\n"
+            f"候选：\n{json.dumps(compact, ensure_ascii=False)}"
+        )

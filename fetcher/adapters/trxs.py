@@ -14,7 +14,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from .base import BaseAdapter, ChapterEntry
+from .base import BaseAdapter, ChapterEntry, DiscoverySource
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,12 @@ class TrxsAdapter(BaseAdapter):
 
     _INDEX_RE = re.compile(r"^/tongren/(\d+)\.html?$")
     _CHAPTER_RE = re.compile(r"^/tongren/(\d+)/(\d+)\.html?$")
+
+    def discovery_sources(self) -> list[DiscoverySource]:
+        return [
+            DiscoverySource("homepage_ranked", "https://www.trxs.cc/", "homepage", 70),
+            DiscoverySource("tongren_category", "https://www.trxs.cc/tongren/", "category", 65),
+        ]
 
     # ------------------------------------------------------------------
     # Abstract methods

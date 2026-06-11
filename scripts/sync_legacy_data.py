@@ -1,4 +1,4 @@
-"""Copy legacy project artifacts into the canonical Yggdrasil layout."""
+"""Copy legacy project artifacts into the canonical Library layout."""
 
 from __future__ import annotations
 
@@ -16,8 +16,8 @@ from shared import DATA_ROOT
 LAYOUT_VERSION = "novel-agent-data-v1"
 
 CHAPTER_STAGE_MAP = {
-    "chapters": ("ProcessData", Path("derived/chapters")),
-    "features": ("FeatureData", Path("derived/features")),
+    "chapters": ("ProcessData", Path("reference/facts/cleaned_chapters")),
+    "features": ("FeatureData", Path("reference/facts/chapter_features")),
 }
 
 
@@ -69,10 +69,10 @@ def canonical_chapter_file(order: int) -> str:
 
 def copy_raw_text(project_root: Path, data_root: Path, book_id: str) -> dict[str, Any]:
     source = project_root / "RawData" / f"{book_id}.txt"
-    target_dir = data_root / "sources" / "raw_text" / book_slug(book_id)
+    target_dir = data_root / "rawdata" / "novels" / book_slug(book_id)
     target = target_dir / "source.txt"
     if not source.exists():
-        return {"stage": "raw_text", "status": "missing", "source": str(source)}
+        return {"stage": "rawdata", "status": "missing", "source": str(source)}
 
     target_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source, target)
@@ -80,14 +80,14 @@ def copy_raw_text(project_root: Path, data_root: Path, book_id: str) -> dict[str
         "layout_version": LAYOUT_VERSION,
         "book_id": book_id,
         "book_slug": book_slug(book_id),
-        "artifact_stage": "raw_text",
+        "artifact_stage": "rawdata",
         "file_name": target.name,
         "legacy_source": str(source.relative_to(project_root)),
         "sha256": file_sha256(target),
         "size_bytes": target.stat().st_size,
     }
     write_json(target_dir / "metadata.json", metadata)
-    return {"stage": "raw_text", "status": "copied", "target": str(target)}
+    return {"stage": "rawdata", "status": "copied", "target": str(target)}
 
 
 def _legacy_manifest_by_file(index: dict[str, Any]) -> dict[str, dict[str, Any]]:
@@ -202,7 +202,7 @@ def canonical_plot_file(index: int) -> str:
 
 def copy_plots(project_root: Path, data_root: Path, book_id: str) -> dict[str, Any]:
     source_dir = project_root / "ClusterData" / book_id
-    target_dir = data_root / "derived" / "plots" / book_slug(book_id)
+    target_dir = data_root / "reference" / "facts" / "plot_segments" / book_slug(book_id)
     if not source_dir.exists():
         return {"stage": "plots", "status": "missing", "source": str(source_dir)}
 
@@ -297,24 +297,24 @@ def update_books_index(data_root: Path, book_id: str, results: list[dict[str, An
         if result.get("status") != "copied":
             continue
         stage = result["stage"]
-        if stage == "raw_text":
-            paths[stage] = f"sources/raw_text/{book_slug(book_id)}"
+        if stage == "rawdata":
+            paths[stage] = f"rawdata/novels/{book_slug(book_id)}"
         elif stage == "chapters":
-            paths[stage] = f"derived/chapters/{book_slug(book_id)}"
+            paths[stage] = f"reference/facts/cleaned_chapters/{book_slug(book_id)}"
         elif stage == "features":
-            paths[stage] = f"derived/features/{book_slug(book_id)}"
+            paths[stage] = f"reference/facts/chapter_features/{book_slug(book_id)}"
         elif stage == "plots":
-            paths[stage] = f"derived/plots/{book_slug(book_id)}"
+            paths[stage] = f"reference/facts/plot_segments/{book_slug(book_id)}"
     write_json(path, index)
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Copy legacy RawData/ProcessData/FeatureData/ClusterData artifacts into Yggdrasil/."
+        description="Copy legacy RawData/ProcessData/FeatureData/ClusterData artifacts into Library/."
     )
     parser.add_argument("--book-id", default="0001", help="Legacy book id to copy. Default: 0001.")
     parser.add_argument("--project-root", default=".", help="Project root. Default: current directory.")
-    parser.add_argument("--data-root", default=str(DATA_ROOT), help="Canonical data root. Default: Yggdrasil.")
+    parser.add_argument("--data-root", default=str(DATA_ROOT), help="Canonical data root. Default: Library.")
     return parser
 
 

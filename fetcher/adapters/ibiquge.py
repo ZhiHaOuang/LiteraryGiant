@@ -14,7 +14,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from .base import BaseAdapter, ChapterEntry
+from .base import BaseAdapter, ChapterEntry, DiscoverySource
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,11 @@ class IbiqugeAdapter(BaseAdapter):
     _INDEX_RE = re.compile(r"^/(\d+)/?$")
     _CHAPTER_RE = re.compile(r"^/(\d+)/(\d+)\.html?$")
     _MULTI_PAGE_RE = re.compile(r"^(.+)_(\d+)\.html?$")
+
+    def discovery_sources(self) -> list[DiscoverySource]:
+        return [
+            DiscoverySource("homepage_featured", "https://www.ibiquge.com/", "homepage", 80),
+        ]
 
     # ------------------------------------------------------------------
     # Abstract method implementations
@@ -240,7 +245,7 @@ class IbiqugeAdapter(BaseAdapter):
         Capped at a conservative max to avoid hammering the server with
         requests for non-existent pages (most chapters have 2–3 pages).
         """
-        _MAX_PREDICTED_PAGES = 0  # only fetch page 2, don't blindly predict
+        _MAX_PREDICTED_PAGES = 3  # predict pages 3-5 (most chapters ≤ 3 pages)
 
         m = self._MULTI_PAGE_RE.search(page2_url)
         if m is None:

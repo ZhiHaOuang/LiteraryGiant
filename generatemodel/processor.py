@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Any
 
 from shared import (
-    DATA_ROOT,
+    PROJECTS_ROOT,
     canonical_book_slug,
     load_chapters_from_manifest,
     load_json,
@@ -27,7 +27,7 @@ def discover_cluster_books(input_path: str | Path) -> list[Path]:
     if _looks_like_cluster_book_dir(path):
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a derived plots root or one cluster book directory: {path}")
+        raise ValueError(f"Input path must be a plot_segments facts root or one cluster book directory: {path}")
     books = sorted(item for item in path.iterdir() if _looks_like_cluster_book_dir(item))
     if not books:
         raise FileNotFoundError(f"No cluster book directories found under {path}")
@@ -143,7 +143,7 @@ def load_library_bundle(cluster_book_dir: str | Path, *, feature_root: str | Pat
 
 
 def resolve_generation_output_dir(processed_book: dict[str, Any], *, output_root: str | Path | None = None) -> Path:
-    root = Path(output_root) if output_root is not None else DATA_ROOT / "derived" / "generations"
+    root = Path(output_root) if output_root is not None else PROJECTS_ROOT / "_generated"
     book_id = str((processed_book.get("book_metadata") or {}).get("book_id") or "generated_book")
     return root / canonical_book_slug(book_id)
 

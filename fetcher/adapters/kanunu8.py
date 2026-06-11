@@ -15,7 +15,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from .base import BaseAdapter, ChapterEntry
+from .base import BaseAdapter, ChapterEntry, DiscoverySource
 
 logger = logging.getLogger(__name__)
 
@@ -54,12 +54,25 @@ class Kanunu8Adapter(BaseAdapter):
     domain = "www.kanunu8.com"
     encoding = "gb18030"
 
-    _INDEX_RE = re.compile(r"^/(book\d+|10[0-9]|files|zt|author)/([^/]+)/?$")
-    _CHAPTER_RE = re.compile(r"^/(book\d+|10[0-9]|files|zt|author)/([^/]+)/(\d+\w*)\.html?$")
+    _INDEX_RE = re.compile(
+        r"^/(book\d+|10[0-9]|files|zt|author)/([^/]+)/(?:index\.html?)?$"
+    )
+    _CHAPTER_RE = re.compile(
+        r"^/(book\d+|10[0-9]|files|zt|author)/([^/]+)/(\d+\w*)\.html?$"
+    )
+    _CATEGORY_RE = re.compile(r"^/files/([a-z]{2,10}|\d+\.html?)$")
     # Category pages under /files/ have short slugs (e.g. "sf", "dushi", "world").
     # Real books under /files/ have longer identifiers (e.g. "2025/somebook").
     _CATEGORY_SLUG = re.compile(r"^[a-z]{2,10}$")     # /files/sf/
     _CATEGORY_FILE = re.compile(r"^\d+\.html?$")       # /files/7.html
+
+    def discovery_sources(self) -> list[DiscoverySource]:
+        return [
+            DiscoverySource("science_fiction", "https://www.kanunu8.com/files/sf/", "category", 90),
+            DiscoverySource("world_literature", "https://www.kanunu8.com/files/world/", "category", 85),
+            DiscoverySource("chinese_literature", "https://www.kanunu8.com/files/chinese/", "category", 80),
+            DiscoverySource("overseas_chinese", "https://www.kanunu8.com/files/7.html", "category", 60),
+        ]
 
     # ------------------------------------------------------------------
     # Abstract methods
@@ -104,6 +117,19 @@ class Kanunu8Adapter(BaseAdapter):
         if not list_divs:
             list_divs = soup.find_all("div", class_="catalog")
         if not list_divs:
+            best_container = None
+            best_count = 0
+            for container in soup.find_all(["table", "div", "ul"]):
+                links = [
+                    a for a in container.find_all("a", href=True)
+                    if self._CHAPTER_RE.search(urlparse(urljoin(base_url, a["href"])).path)
+                ]
+                if len(links) > best_count:
+                    best_count = len(links)
+                    best_container = container
+            if best_container is not None:
+                list_divs = [best_container]
+        if not list_divs:
             raise ValueError(
                 f"Could not find mulu-list container on {base_url}."
             )
@@ -112,6 +138,12 @@ class Kanunu8Adapter(BaseAdapter):
         seen_urls: set[str] = set()
         order = 0
         volume_count = 0
+        base_path = urlparse(base_url).path
+        book_prefix = (
+            base_path.rsplit("/", 1)[0] + "/"
+            if base_path.endswith((".html", ".htm"))
+            else base_path.rstrip("/") + "/"
+        )
 
         for list_div in list_divs:
             # Skip recommendation blocks
@@ -125,6 +157,11 @@ class Kanunu8Adapter(BaseAdapter):
                     continue
 
                 full_url = urljoin(base_url, href)
+                full_path = urlparse(full_url).path
+                if not full_path.startswith(book_prefix):
+                    continue
+                if not self._CHAPTER_RE.search(full_path):
+                    continue
                 if full_url in seen_urls:
                     continue
                 seen_urls.add(full_url)
@@ -181,12 +218,17 @@ class Kanunu8Adapter(BaseAdapter):
 
         paragraphs: list[str] = []
         for p in content_div.find_all("p"):
-            text = p.get_text(strip=True)
-            if text and len(text) > 2:
-                paragraphs.append(text)
+            # Use \n separator so <br>-based paragraphs stay separate
+            text = p.get_text("\n").replace("\xa0", " ").strip()
+            if not text:
+                continue
+            for line in text.splitlines():
+                line = line.strip()
+                if line and len(line) > 2:
+                    paragraphs.append(line)
 
         if not paragraphs:
-            text = content_div.get_text("\n")
+            text = content_div.get_text("\n").replace("\xa0", " ")
             for line in text.splitlines():
                 line = line.strip()
                 if line and len(line) > 2:
@@ -202,7 +244,7 @@ class Kanunu8Adapter(BaseAdapter):
         area = content if content else soup
         for link in area.find_all("a"):
             text = link.get_text(strip=True)
-            if text in ("下一页", "下一章", "下一节", "下一頁"):
+            if text in ("下一页", "下一頁"):
                 href = link.get("href")
                 if href and href != "#":
                     return urljoin(base_url, href)
@@ -223,7 +265,8 @@ class Kanunu8Adapter(BaseAdapter):
             href = link.get("href", "").strip()
             if not href:
                 continue
-            m = self._INDEX_RE.match(href)
+            full_url = urljoin(base_url, href)
+            m = self._INDEX_RE.match(urlparse(full_url).path)
             if not m:
                 continue
             section, slug = m.group(1), m.group(2)
@@ -237,8 +280,13 @@ class Kanunu8Adapter(BaseAdapter):
             title = link.get_text(strip=True)
             if not title or len(title) < 2:
                 continue
+            for sep in ("：", ":"):
+                if sep in title:
+                    prefix, rest = title.split(sep, 1)
+                    if 1 < len(prefix) <= 12 and rest.strip():
+                        title = rest.strip()
+                    break
 
-            full_url = urljoin(base_url, href)
             if full_url in seen_urls:
                 continue
             seen_urls.add(full_url)
@@ -252,6 +300,8 @@ class Kanunu8Adapter(BaseAdapter):
         path = parsed.path.rstrip("/")
 
         if self._CHAPTER_RE.search(path):
+            return False
+        if self._CATEGORY_RE.search(path):
             return False
         if self._INDEX_RE.search(path):
             return True

@@ -153,20 +153,43 @@ class FetcherEngine:
             chapters = []
 
         # 2b. Merge chapters from additional chapter-list pages (pagination)
+        seen_chapter_urls = {_canonicalize_url(ch.url) for ch in chapters}
+        seen_list_urls: set[str] = {_canonicalize_url(final_url)}
+        pending: list[str] = []
         try:
-            extra_pages = self.adapter.discover_chapter_list_urls(soup, final_url)
+            pending = self.adapter.discover_chapter_list_urls(soup, final_url)
         except Exception:
-            extra_pages = []
-        for page_url in extra_pages:
+            pass
+
+        while pending:
+            page_url = pending.pop(0)
+            page_key = _canonicalize_url(page_url)
+            if page_key in seen_list_urls:
+                continue
+            seen_list_urls.add(page_key)
+
             try:
                 page_html, _ = self._fetch_page(page_url)
                 page_soup = BeautifulSoup(page_html, "html.parser")
                 page_chapters = self.adapter.extract_chapter_list(page_soup, page_url)
-                # Re-number to continue from the previous page's last order
-                offset = len(chapters)
-                for i, ch in enumerate(page_chapters):
-                    ch = ChapterEntry(title=ch.title, url=ch.url, order=offset + i + 1)
-                    chapters.append(ch)
+
+                for ch in page_chapters:
+                    url_key = _canonicalize_url(ch.url)
+                    if url_key in seen_chapter_urls:
+                        continue
+                    seen_chapter_urls.add(url_key)
+                    chapters.append(ChapterEntry(
+                        title=ch.title, url=ch.url, order=len(chapters) + 1,
+                    ))
+
+                # Recursively discover further pages from THIS page
+                try:
+                    more = self.adapter.discover_chapter_list_urls(page_soup, page_url)
+                    for u in more:
+                        if _canonicalize_url(u) not in seen_list_urls:
+                            pending.append(u)
+                except Exception:
+                    pass
             except Exception as exc:
                 logger.warning("Failed to fetch chapter-list page %s: %s", page_url, exc)
 
@@ -193,74 +216,86 @@ class FetcherEngine:
             chapters = chapters[: self.max_chapters]
         self._total_chapters = len(chapters)
 
-        candidate_slug = f"candidate_{uuid.uuid4().hex[:12]}"
-        staging_dir = RUNS_FETCH_DIR / self.run_id / candidate_slug
-        staging_dir.mkdir(parents=True, exist_ok=True)
-
-        manifest = self._build_manifest(
-            title,
-            url,
-            candidate_slug,
-            chapters,
-            discovered_chapter_count=discovered_chapter_count,
-        )
-        self._fetched_chapters = self._fetch_all_chapters_parallel(
-            chapters, staging_dir, manifest,
-        )
-        self._tidy_manifest(manifest)
-        _atomic_write_json(staging_dir / "index.json", manifest)
-        self._validate_or_raise(staging_dir, manifest)
-
-        classification = self._classify_chaptered_work(
-            manifest,
-            staging_dir,
-            discovered_chapter_count=discovered_chapter_count,
-        )
-        manifest.update(classification)
-
-        content_type = classification["content_type"]
+        # ── Register FIRST (3 ms) to prevent duplicate concurrent downloads ──
+        # Provisional guess: many chapters → book, few chapters → story.
+        # If the final classification disagrees, we fix the registration below.
+        provisional_type = "book" if len(chapters) >= BOOK_MIN_DISCOVERED_PARTS else "story"
         slug = self.registry.register(
             title,
             source_url=url,
             adapter_domain=self.adapter.domain,
-            content_type=content_type,
+            content_type=provisional_type,
+        )
+
+        candidate_slug = slug  # use the canonical slug directly
+        staging_dir = RUNS_FETCH_DIR / self.run_id / candidate_slug
+        if staging_dir.exists():
+            shutil.rmtree(staging_dir, ignore_errors=True)
+        staging_dir.mkdir(parents=True, exist_ok=True)
+
+        manifest = self._build_manifest(
+            title, url, candidate_slug, chapters,
+            discovered_chapter_count=discovered_chapter_count,
         )
         manifest["book_slug"] = slug
-        if content_type == "story":
-            manifest["story_slug"] = slug
 
-        logger.info(
-            "%s: %s → %s  (parts=%d/%d, chars=%d, profile=%s)",
-            content_type.title(),
-            title,
-            slug,
-            classification["content_stats"]["fetched_parts"],
-            discovered_chapter_count,
-            classification["content_stats"]["total_chars"],
-            classification["processing_profile"],
-        )
+        try:
+            # ── Download ──────────────────────────────────────────────
+            self._fetched_chapters = self._fetch_all_chapters_parallel(
+                chapters, staging_dir, manifest,
+            )
+            self._tidy_manifest(manifest)
+            _atomic_write_json(staging_dir / "index.json", manifest)
+            self._validate_or_raise(staging_dir, manifest)
 
-        with self._slug_lock(slug):
-            existing_dir = self._existing_alternate_content_dir(slug, url)
-            if existing_dir is not None:
-                manifest["skipped_reason"] = "duplicate_title_alternate_source"
-                self._write_run_summary(slug, existing_dir, manifest, success=True)
-                shutil.rmtree(staging_dir, ignore_errors=True)
-                logger.info("Skipping duplicate alternate source for %s: %s", slug, url)
-                return existing_dir
+            classification = self._classify_chaptered_work(
+                manifest, staging_dir, discovered_chapter_count=discovered_chapter_count,
+            )
+            manifest.update(classification)
+
+            content_type = classification["content_type"]
+            # Fix registration if provisional guess was wrong
+            if content_type != provisional_type:
+                logger.info("Reclassifying: provisional=%s final=%s, re-registering", provisional_type, content_type)
+                self.registry.deregister(slug)
+                slug = self.registry.register(
+                    title, source_url=url,
+                    adapter_domain=self.adapter.domain,
+                    content_type=content_type,
+                )
+                manifest["book_slug"] = slug
 
             if content_type == "story":
-                self._convert_chaptered_staging_to_story(staging_dir, manifest)
-                self._validate_or_raise_story(staging_dir, manifest)
+                manifest["story_slug"] = slug
 
-            _atomic_write_json(staging_dir / "index.json", manifest)
-            canonical_dir = self._promote(staging_dir, slug)
-            self._update_registry_profile(slug, manifest)
-            self._write_run_summary(slug, canonical_dir, manifest, success=True)
+            logger.info(
+                "%s: %s → %s  (parts=%d/%d, chars=%d, profile=%s)",
+                content_type.title(), title, slug,
+                classification["content_stats"]["fetched_parts"],
+                discovered_chapter_count,
+                classification["content_stats"]["total_chars"],
+                classification["processing_profile"],
+            )
 
-        elapsed = time.monotonic() - self._started_at
-        logger.info("Done: %s → %s  (%d parts, %.1fs)", url, canonical_dir, self._fetched_chapters, elapsed)
-        return canonical_dir
+            with self._slug_lock(slug):
+                if content_type == "story":
+                    self._convert_chaptered_staging_to_story(staging_dir, manifest)
+                    self._validate_or_raise_story(staging_dir, manifest)
+                _atomic_write_json(staging_dir / "index.json", manifest)
+                canonical_dir = self._promote(staging_dir, slug)
+                self._update_registry_profile(slug, manifest)
+                self._write_run_summary(slug, canonical_dir, manifest, success=True)
+
+            elapsed = time.monotonic() - self._started_at
+            logger.info("Done: %s → %s  (%d parts, %.1fs)", url, canonical_dir, self._fetched_chapters, elapsed)
+            return canonical_dir
+
+        except Exception:
+            # ── Clean up failed download ──────────────────────────────
+            logger.warning("Download failed for %s, deregistering %s", url, slug)
+            shutil.rmtree(staging_dir, ignore_errors=True)
+            self.registry.deregister(slug)
+            raise
 
     # ------------------------------------------------------------------
     # Story path (single page)
@@ -301,28 +336,33 @@ class FetcherEngine:
             **classification,
         }
 
-        with self._slug_lock(story_slug):
-            existing_dir = self._existing_alternate_content_dir(story_slug, url)
-            if existing_dir is not None:
-                manifest["skipped_reason"] = "duplicate_title_alternate_source"
-                self._write_run_summary(story_slug, existing_dir, manifest, success=True)
-                logger.info("Skipping duplicate alternate source for %s: %s", story_slug, url)
-                return existing_dir
+        staging_dir = RUNS_FETCH_DIR / self.run_id / story_slug
+        try:
+            with self._slug_lock(story_slug):
+                existing_dir = self._existing_alternate_content_dir(story_slug, url)
+                if existing_dir is not None:
+                    manifest["skipped_reason"] = "duplicate_title_alternate_source"
+                    self._write_run_summary(story_slug, existing_dir, manifest, success=True)
+                    logger.info("Skipping duplicate alternate source for %s: %s", story_slug, url)
+                    return existing_dir
 
-            staging_dir = RUNS_FETCH_DIR / self.run_id / story_slug
-            staging_dir.mkdir(parents=True, exist_ok=True)
-            story_path = staging_dir / "story.txt"
-            story_path.write_text(content, encoding=self.output_encoding)
+                staging_dir.mkdir(parents=True, exist_ok=True)
+                story_path = staging_dir / "story.txt"
+                story_path.write_text(content, encoding=self.output_encoding)
 
-            _atomic_write_json(staging_dir / "index.json", manifest)
-            self._validate_or_raise_story(staging_dir, manifest)
-            canonical_dir = self._promote(staging_dir, story_slug)
-            self._update_registry_profile(story_slug, manifest)
-            self._write_run_summary(story_slug, canonical_dir, manifest, success=True)
+                _atomic_write_json(staging_dir / "index.json", manifest)
+                self._validate_or_raise_story(staging_dir, manifest)
+                canonical_dir = self._promote(staging_dir, story_slug)
+                self._update_registry_profile(story_slug, manifest)
+                self._write_run_summary(story_slug, canonical_dir, manifest, success=True)
 
-        elapsed = time.monotonic() - self._started_at
-        logger.info("Story: %s → %s  (%d chars, %.1fs)", title, story_slug, char_count, elapsed)
-        return canonical_dir
+            elapsed = time.monotonic() - self._started_at
+            logger.info("Story: %s → %s  (%d chars, %.1fs)", title, story_slug, char_count, elapsed)
+            return canonical_dir
+        except Exception:
+            shutil.rmtree(staging_dir, ignore_errors=True)
+            self.registry.deregister(story_slug)
+            raise
 
     def _validate_or_raise_story(self, staging_dir: Path, manifest: dict) -> None:
         """Minimal validation for a single story."""
@@ -370,18 +410,15 @@ class FetcherEngine:
         elif self.content_type == "story":
             content_type = "story"
             reasons.append("forced_story")
-        elif getattr(self.adapter, "supports_story_collections", False):
-            content_type = "story"
-            reasons.append("adapter_marks_collection_like_story_source")
-        elif stats["discovered_parts"] >= BOOK_MIN_DISCOVERED_PARTS:
-            content_type = "book"
-            reasons.append(f"discovered_parts>={BOOK_MIN_DISCOVERED_PARTS}")
         elif stats["total_chars"] >= BOOK_STRONG_TOTAL_CHARS:
             content_type = "book"
             reasons.append(f"total_chars>={BOOK_STRONG_TOTAL_CHARS}")
         elif stats["total_chars"] >= BOOK_MIN_TOTAL_CHARS and stats["fetched_parts"] >= 8:
             content_type = "book"
             reasons.append(f"total_chars>={BOOK_MIN_TOTAL_CHARS}_and_fetched_parts>=8")
+        elif stats["discovered_parts"] >= BOOK_MIN_DISCOVERED_PARTS:
+            content_type = "book"
+            reasons.append(f"discovered_parts>={BOOK_MIN_DISCOVERED_PARTS}")
         else:
             content_type = "story"
             reasons.append("below_longform_thresholds")
@@ -730,26 +767,60 @@ class FetcherEngine:
     # ------------------------------------------------------------------
 
     def _fetch_chapter(self, chapter: ChapterEntry) -> str:
-        """Fetch one chapter, following "next page" links until none remain.
+        """Fetch one chapter, following next-page links until none remain.
 
-        No blind page prediction — we only request page N+1 when page N
-        actually has a next-page link.  This handles 1-page, 2-page, and
-        3+-page chapters correctly without wasted requests.
+        1. Fetch current page, extract content.
+        2. Ask adapter for an explicit "next page" link.
+        3. If none found, try speculative ``_N.html`` suffix for sites like ibiquge
+           that don't always render visible pagination links.
         """
-        _MAX_PAGES = 10  # safety cap
+        _MAX_PAGES = 10
 
         all_parts: list[str] = []
+        seen_page_urls: set[str] = set()
         current_url = chapter.url
+        base_url = chapter.url  # original page-1 URL
 
-        for _ in range(_MAX_PAGES):
-            html_text, final_url = self._fetch_page(current_url)
+        for page_num in range(1, _MAX_PAGES + 1):
+            current_key = _canonicalize_url(current_url)
+            if current_key in seen_page_urls:
+                break
+            seen_page_urls.add(current_key)
+
+            try:
+                html_text, final_url = self._fetch_page(current_url)
+            except Exception:
+                if page_num > 1:
+                    break  # speculative page doesn't exist — stop
+                raise
             html_text = self.adapter.preprocess_html(html_text, final_url)
             soup = BeautifulSoup(html_text, "html.parser")
 
-            all_parts.append(self._extract_page_content(soup, final_url))
+            # 1. Explicit "next page" link in the DOM — must be called BEFORE
+            #    _extract_page_content because extract_content() may decompose
+            #    navigation links (e.g. "下一章" <a> tags).
+            explicit_next = self.adapter.extract_next_page_url(soup, final_url)
 
-            next_url = self.adapter.extract_next_page_url(soup, final_url)
+            page_content = self._extract_page_content(soup, final_url)
+            all_parts.append(page_content)
+
+            next_url: str | None = explicit_next
+
+            # 2. Fallback: speculative _N.html pattern (invisible pagination)
             if not next_url:
+                # Only try speculative when the current page actually had content
+                if not page_content:
+                    break
+                import re
+                next_page = page_num + 1
+                speculative = re.sub(r"(\.html?)$", f"_{next_page}\\1", base_url)
+                if (speculative != current_url
+                        and _canonicalize_url(speculative) not in seen_page_urls):
+                    next_url = speculative
+
+            if not next_url:
+                break
+            if _canonicalize_url(next_url) in seen_page_urls:
                 break
             current_url = next_url
 
@@ -923,8 +994,17 @@ class FetcherEngine:
         """Fetch a page, detect encoding, return (html_text, final_url)."""
         self.rate_limiter.wait()
         session = self._get_session()
-        session.headers.update({"User-Agent": random_user_agent()})
-        response = fetch_with_retry(session, url)
+        # Keep a stable UA per Session. Some sites compare index/chapter
+        # requests and redirect when the UA changes mid-session.
+        if "User-Agent" not in session.headers:
+            session.headers.update({"User-Agent": random_user_agent()})
+        # Apply adapter-specific headers (e.g. Referer for anti-bot sites)
+        extra_headers = self.adapter.get_request_headers(url)
+        if extra_headers:
+            session.headers.update(extra_headers)
+        # Apply adapter-specific cookies (e.g. consent cookies)
+        extra_cookies = self.adapter.get_cookies()
+        response = fetch_with_retry(session, url, cookies=extra_cookies if extra_cookies else None)
 
         if encoding:
             text = response.content.decode(encoding, errors="replace")

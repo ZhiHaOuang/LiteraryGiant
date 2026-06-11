@@ -3,9 +3,25 @@ from __future__ import annotations
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
-YGGDRASIL_ROOT = PROJECT_ROOT / "Yggdrasil"
-# Compatibility alias for older code. New code should prefer YGGDRASIL_ROOT.
-DATA_ROOT = YGGDRASIL_ROOT
+LIBRARY_ROOT = PROJECT_ROOT / "Library"
+PROJECTS_ROOT = PROJECT_ROOT / "Projects"
+RAWDATA_ROOT = LIBRARY_ROOT / "rawdata"
+RAWDATA_NOVELS_ROOT = RAWDATA_ROOT / "novels"
+RAWDATA_STORIES_ROOT = RAWDATA_ROOT / "stories"
+RAWDATA_REVIEWS_ROOT = RAWDATA_ROOT / "reviews"
+REFERENCE_ROOT = LIBRARY_ROOT / "reference"
+FACTS_ROOT = REFERENCE_ROOT / "facts"
+FACT_CLEANED_CHAPTERS_ROOT = FACTS_ROOT / "cleaned_chapters"
+FACT_CHAPTER_FEATURES_ROOT = FACTS_ROOT / "chapter_features"
+FACT_PLOT_SEGMENTS_ROOT = FACTS_ROOT / "plot_segments"
+ABSTRACTIONS_ROOT = REFERENCE_ROOT / "abstractions"
+IDEAS_ROOT = LIBRARY_ROOT / "ideas"
+INDEXES_ROOT = LIBRARY_ROOT / "indexes"
+
+# Compatibility aliases for older code. New code should prefer the explicit
+# Library/Projects constants above.
+YGGDRASIL_ROOT = LIBRARY_ROOT
+DATA_ROOT = LIBRARY_ROOT
 MODELS_ROOT = PROJECT_ROOT / "models"
 RUNS_ROOT = PROJECT_ROOT / "runs"
 CANONICAL_WEIGHTS_ROOT = MODELS_ROOT / "weights"

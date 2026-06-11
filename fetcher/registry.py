@@ -1,6 +1,6 @@
 """Book registry — maps numeric book IDs to metadata.
 
-Uses the canonical ``Yggdrasil/indexes/books.json`` file defined in the
+Uses the canonical ``Library/indexes/books.json`` file defined in the
 project data layout (:file:`docs/data_layout.md`).
 """
 
@@ -13,12 +13,16 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
-from shared.constants import YGGDRASIL_ROOT
+from shared.constants import INDEXES_ROOT, RAWDATA_NOVELS_ROOT, RAWDATA_STORIES_ROOT
 
 logger = logging.getLogger(__name__)
 
-REGISTRY_PATH = YGGDRASIL_ROOT / "indexes" / "books.json"
-SOURCES_RAW_TEXT = YGGDRASIL_ROOT / "sources" / "raw_text"
+REGISTRY_PATH = INDEXES_ROOT / "books.json"
+STORIES_PATH = INDEXES_ROOT / "stories.json"
+RAWDATA_BOOKS_ROOT = RAWDATA_NOVELS_ROOT
+
+def _registry_path(content_type: str = "book") -> Path:
+    return STORIES_PATH if content_type == "story" else REGISTRY_PATH
 
 
 def _utc_now() -> str:
@@ -37,15 +41,35 @@ def _canonicalize_url(url: str) -> str:
     return f"{parsed.scheme}://{parsed.hostname}{path}"
 
 
+def normalize_title(title: str) -> str:
+    """Normalise a title for duplicate detection across sites."""
+    import re
+
+    title = title.strip()
+    title = re.sub(r"^\s*\d+\s*[.、]\s*", "", title)
+    title = re.sub(r"[（(](?:全本|完本|连载中|已完结)[)）]\s*$", "", title)
+    for suffix in ("最新章节", "全文阅读", "免费阅读", "txt下载", "TXT下载"):
+        title = title.replace(suffix, "")
+    if title.startswith("《") and title.endswith("》"):
+        title = title[1:-1]
+    title = re.sub(r"\s+", " ", title)
+    return title.strip().lower()
+
+
 class BookRegistry:
     """Persistent registry that maps ``book_XXXX`` IDs to book metadata.
 
-    Backed by ``Yggdrasil/indexes/books.json``.
+    Backed by ``Library/indexes/books.json``.
     """
 
     def __init__(self, path: str | Path = REGISTRY_PATH) -> None:
         self.path = Path(path)
+        self._stories_path = STORIES_PATH
         self.payload: dict = self._load()
+
+    def _path_for(self, content_type: str = "book") -> Path:
+        """Return the registry file path for *content_type*."""
+        return self._stories_path if content_type == "story" else self.path
 
     # ------------------------------------------------------------------
     # Public API
@@ -69,25 +93,43 @@ class BookRegistry:
         from .utils import FileLock
 
         canonical_url = _canonicalize_url(source_url) if source_url else ""
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        lock_path = str(self.path) + ".lock"
+        path = self._path_for(content_type)
+        path.parent.mkdir(parents=True, exist_ok=True)
+
+        # Clean up stale registrations (previous run killed mid-download)
+        if canonical_url:
+            existing_id = self.lookup_by_url(canonical_url, content_type=content_type)
+            if existing_id is not None:
+                source_dir = self.source_dir(existing_id)
+                if not source_dir.exists() or not any(source_dir.iterdir()):
+                    logger.warning("Stale registration (no content), removing: %s", existing_id)
+                    self.deregister(existing_id)
+
+        lock_path = str(path) + ".lock"
         with FileLock(lock_path):
-            self.payload = self._load()
+            self.payload = self._load_path(path)
 
             if canonical_url:
-                existing_id = self.lookup_by_url(canonical_url)
+                existing_id = self.lookup_by_url(
+                    canonical_url,
+                    content_type=content_type,
+                )
                 if existing_id is not None:
                     logger.info("Book already registered: %s → %s", source_url, existing_id)
                     self._touch(existing_id, persist=False)
-                    self._write_payload_unlocked()
+                    self._write_payload_unlocked(path)
                     return existing_id
 
             for bid, info in self.payload.get("books", {}).items():
-                if info.get("title") == title and info.get("source_url") == canonical_url:
+                if (
+                    info.get("content_type", "book") == content_type
+                    and info.get("title") == title
+                    and info.get("source_url") == canonical_url
+                ):
                     slug = info.get("story_slug") or info.get("book_slug", bid)
                     logger.info("Book already registered by title+url: %s → %s", title, slug)
                     self._touch(slug, persist=False)
-                    self._write_payload_unlocked()
+                    self._write_payload_unlocked(path)
                     return slug
 
             # Cross-site dedup: same title from different URL → skip, log source
@@ -102,7 +144,7 @@ class BookRegistry:
                 alternate_urls = existing.setdefault("alternate_urls", [])
                 if canonical_url and canonical_url not in alternate_urls:
                     alternate_urls.append(canonical_url)
-                self._write_payload_unlocked()
+                self._write_payload_unlocked(path)
                 return slug
 
             content_id = self._next_id()
@@ -119,14 +161,18 @@ class BookRegistry:
                 "created_at": _utc_now(),
                 "updated_at": _utc_now(),
                 "paths": {
-                    "raw_text": f"sources/raw_text/{slug}",
+                    "rawdata": (
+                        f"rawdata/stories/{slug}"
+                        if content_type == "story"
+                        else f"rawdata/novels/{slug}"
+                    ),
                 },
             }
             if content_type == "story":
                 entry["story_slug"] = slug
             self.payload.setdefault("books", {})[content_id] = entry
             self.payload["last_id"] = int(content_id)
-            self._write_payload_unlocked()
+            self._write_payload_unlocked(path)
             logger.info("Registered %s → %s (%s)", slug, title, canonical_url)
             return slug
 
@@ -142,13 +188,40 @@ class BookRegistry:
                 return info
         return None
 
-    def lookup_by_url(self, canonical_url: str) -> str | None:
+    def lookup_by_url(
+        self,
+        canonical_url: str,
+        *,
+        content_type: str | None = None,
+    ) -> str | None:
         """Return the book_id for *canonical_url*, or ``None``."""
         url = _canonicalize_url(canonical_url)
-        for bid, info in self.payload.get("books", {}).items():
-            known_urls = [info.get("source_url", "")]
-            known_urls.extend(info.get("alternate_urls", []))
-            if any(_canonicalize_url(known_url) == url for known_url in known_urls if known_url):
+        paths = (
+            [self._path_for(content_type)]
+            if content_type is not None
+            else [self.path, self._stories_path]
+        )
+        for path in paths:
+            payload = self._load_path(path)
+            for bid, info in payload.get("books", {}).items():
+                if content_type is not None and info.get("content_type", "book") != content_type:
+                    continue
+                known_urls = [info.get("source_url", "")]
+                known_urls.extend(info.get("alternate_urls", []))
+                if any(_canonicalize_url(known_url) == url for known_url in known_urls if known_url):
+                    return info.get("story_slug") or info.get("book_slug", bid)
+        return None
+
+    def lookup_by_title(self, title: str, *, content_type: str = "book") -> str | None:
+        """Return an existing slug whose normalised title matches *title*."""
+        payload = self._load_path(self._path_for(content_type))
+        needle = normalize_title(title)
+        if not needle:
+            return None
+        for bid, info in payload.get("books", {}).items():
+            if info.get("content_type", "book") != content_type:
+                continue
+            if normalize_title(info.get("title", "")) == needle:
                 return info.get("story_slug") or info.get("book_slug", bid)
         return None
 
@@ -160,45 +233,93 @@ class BookRegistry:
         different sites still matches. Books and stories are kept separate so
         a short story title cannot suppress a novel with the same title.
         """
-        import re
-
-        def _normalize(t: str) -> str:
-            t = t.strip()
-            if t.startswith("《") and t.endswith("》"):
-                t = t[1:-1]
-            # Collapse all whitespace to a single space
-            t = re.sub(r"\s+", " ", t)
-            return t.strip().lower()
-
-        needle = _normalize(title)
+        needle = normalize_title(title)
         if not needle:
             return None
 
         for info in self.payload.get("books", {}).values():
             if info.get("content_type", "book") != content_type:
                 continue
-            if _normalize(info.get("title", "")) == needle:
+            if normalize_title(info.get("title", "")) == needle:
                 return info
         return None
 
     def update(self, book_id: str, **kwargs) -> None:
-        """Update metadata fields for *book_id*."""
+        """Update metadata fields for *book_id*.
+
+        Searches both ``books.json`` and ``stories.json`` so that updates
+        work regardless of which registry the entry was originally written to.
+        """
         from .utils import FileLock
 
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        lock_path = str(self.path) + ".lock"
+        # Determine which registry file contains this entry
+        found_in: Path | None = None
+        for candidate_path in (self.path, self._stories_path):
+            self.payload = self._load_path(candidate_path)
+            info = self.lookup(book_id)
+            if info is not None:
+                found_in = candidate_path
+                break
+
+        if found_in is None:
+            raise KeyError(f"Unknown book_id: {book_id}")
+
+        found_in.parent.mkdir(parents=True, exist_ok=True)
+        lock_path = str(found_in) + ".lock"
         with FileLock(lock_path):
-            self.payload = self._load()
+            self.payload = self._load_path(found_in)
             info = self.lookup(book_id)
             if info is None:
                 raise KeyError(f"Unknown book_id: {book_id}")
             info.update(kwargs)
             info["updated_at"] = _utc_now()
-            self._write_payload_unlocked()
+            self._write_payload_unlocked(found_in)
+
+    def deregister(self, book_id: str) -> None:
+        """Remove a book/story entry from the registry.
+
+        Used to clean up after a failed download so the slot can be reused
+        by the next successful registration.
+        """
+        from .utils import FileLock
+
+        found_in: Path | None = None
+        for candidate_path in (self.path, self._stories_path):
+            self.payload = self._load_path(candidate_path)
+            info = self.lookup(book_id)
+            if info is not None:
+                found_in = candidate_path
+                break
+
+        if found_in is None:
+            return  # already gone, nothing to do
+
+        lock_path = str(found_in) + ".lock"
+        with FileLock(lock_path):
+            self.payload = self._load_path(found_in)
+            books = self.payload.get("books", {})
+            keys_to_remove = [
+                bid for bid, info in books.items()
+                if (info.get("story_slug") or info.get("book_slug") or bid) == book_id
+            ]
+            for key in keys_to_remove:
+                del books[key]
+                logger.info("Deregistered %s (%s)", book_id, key)
+            self._write_payload_unlocked(found_in)
 
     def list_books(self) -> list[tuple[str, dict]]:
-        """Return all registered books as ``(book_id, info)`` tuples."""
-        return sorted(self.payload.get("books", {}).items())
+        """Return all registered books/stories as ``(book_id, info)`` tuples."""
+        items: list[tuple[str, dict]] = []
+        for path in (self.path, self._stories_path):
+            payload = self._load_path(path)
+            items.extend(payload.get("books", {}).items())
+        return sorted(
+            items,
+            key=lambda item: (
+                item[1].get("content_type", "book"),
+                item[1].get("story_slug") or item[1].get("book_slug") or item[0],
+            ),
+        )
 
     # ------------------------------------------------------------------
     # Path helpers
@@ -206,7 +327,7 @@ class BookRegistry:
 
     @property
     def source_root(self) -> Path:
-        return SOURCES_RAW_TEXT
+        return RAWDATA_BOOKS_ROOT
 
     def source_dir(self, book_id: str) -> Path:
         info = self.lookup(book_id)
@@ -215,7 +336,12 @@ class BookRegistry:
             if info
             else book_id
         )
-        return self.source_root / slug
+        content_type = (info or {}).get(
+            "content_type",
+            "story" if str(slug).startswith("story_") else "book",
+        )
+        root = RAWDATA_STORIES_ROOT if content_type == "story" else RAWDATA_BOOKS_ROOT
+        return root / slug
 
     # ------------------------------------------------------------------
     # Import — normalise a whole-book txt into canonical structure
@@ -230,7 +356,7 @@ class BookRegistry:
     ) -> str:
         """Import a whole-book ``.txt`` file into the canonical layout.
 
-        Creates ``Yggdrasil/sources/raw_text/<book_slug>/source.txt`` and an
+        Creates ``Library/rawdata/novels/<book_slug>/source.txt`` and an
         accompanying ``index.json`` manifest.
 
         Args:
@@ -256,7 +382,6 @@ class BookRegistry:
         shutil.copy2(txt_path, dest)
 
         # Build index.json
-        import time as _time
         stat = dest.stat()
         index = {
             "title": title,
@@ -346,8 +471,10 @@ class BookRegistry:
                 total_size += source_txt.stat().st_size if source_txt.exists() else 0
                 total_size += story_txt.stat().st_size if story_txt.exists() else 0
                 entry["total_size_bytes"] = total_size
+                entry["has_rawdata"] = True
                 entry["has_raw_text"] = True
             else:
+                entry["has_rawdata"] = False
                 entry["has_raw_text"] = False
                 entry["chapter_count"] = 0
                 entry["part_count"] = 0
@@ -375,19 +502,22 @@ class BookRegistry:
             if persist:
                 self.save()
 
-    def _load(self) -> dict:
-        if self.path.exists():
+    def _load_path(self, path: Path) -> dict:
+        if path.exists():
             try:
-                payload = json.loads(self.path.read_text(encoding="utf-8"))
+                payload = json.loads(path.read_text(encoding="utf-8"))
                 payload.setdefault("last_id", len(payload.get("books", {})))
                 return payload
             except json.JSONDecodeError:
-                logger.warning("Could not parse %s, starting fresh", self.path)
+                logger.warning("Could not parse %s, starting fresh", path)
         return {
             "layout_version": "novel-agent-data-v1",
             "last_id": 0,
             "books": {},
         }
+
+    def _load(self) -> dict:
+        return self._load_path(self.path)
 
     def save(self) -> None:
         """Persist the registry atomically with file locking.
@@ -403,9 +533,10 @@ class BookRegistry:
         with FileLock(lock_path):
             self._write_payload_unlocked()
 
-    def _write_payload_unlocked(self) -> None:
+    def _write_payload_unlocked(self, target: Path | None = None) -> None:
         """Write the current payload assuming the caller already holds the lock."""
-        tmp_path = str(self.path) + ".tmp"
+        dest = target or self.path
+        tmp_path = str(dest) + ".tmp"
         with open(tmp_path, "w", encoding="utf-8") as fh:
             json.dump(self.payload, fh, ensure_ascii=False, indent=2)
-        os.replace(tmp_path, self.path)
+        os.replace(tmp_path, dest)

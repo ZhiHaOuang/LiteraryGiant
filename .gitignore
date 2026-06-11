@@ -16,13 +16,27 @@ __pycache__/
 /.claude/agent-memory-local/*
 !/.claude/agent-memory-local/.gitkeep
 
-# Canonical Yggdrasil layout. Track directory structure and project templates
-# only; keep real source texts, derived artifacts, indexes, and outputs out of git.
+# Canonical Library layout. Track directory structure only; keep real source
+# texts, extracted facts, indexes, ideas, and reference artifacts out of git.
+/Library/**
+!/Library/
+!/Library/**/
+!/Library/**/.gitkeep
+
+# Creative project workspaces. Track the reusable template, but keep actual
+# project drafts, generated outputs, and run products out of git.
+/Projects/**
+!/Projects/
+!/Projects/**/
+!/Projects/**/.gitkeep
+!/Projects/_template/**
+
+# Legacy Yggdrasil layout. Kept ignored so old local data can remain in place
+# without being migrated or accidentally committed.
 /Yggdrasil/**
 !/Yggdrasil/
 !/Yggdrasil/**/
 !/Yggdrasil/**/.gitkeep
-!/Yggdrasil/projects/_template/**
 
 # Legacy data root. New code should not write here, but ignore it if old
 # commands accidentally recreate it.
@@ -42,6 +56,11 @@ __pycache__/
 
 # Legacy state files from pre-canonical runs.
 /retrieval_file/
+
+# Temporary / debug / test scripts
+/TempForTrain/
+debug_*.py
+test_fetch*.py
 
 # Secrets and local environment files
 .env

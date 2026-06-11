@@ -13,7 +13,7 @@ from urllib.parse import urljoin, urlparse
 
 from bs4 import BeautifulSoup
 
-from .base import BaseAdapter, ChapterEntry
+from .base import BaseAdapter, ChapterEntry, DiscoverySource
 
 logger = logging.getLogger(__name__)
 
@@ -60,6 +60,11 @@ class BqqugeAdapter(BaseAdapter):
 
     _INDEX_RE = re.compile(r"^/(\d+)/?$")
     _CHAPTER_RE = re.compile(r"^/(\d+)/(\d+)/?$")
+
+    def discovery_sources(self) -> list[DiscoverySource]:
+        return [
+            DiscoverySource("ranking", "https://www.bqquge.com/paihang", "ranking", 80),
+        ]
 
     # ------------------------------------------------------------------
     # Abstract method implementations
