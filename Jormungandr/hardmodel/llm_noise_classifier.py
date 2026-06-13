@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import json
 import re
+import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
@@ -117,7 +119,7 @@ class QwenWeakNoiseClassifier:
             "drop：整行都是广告、求票、求收藏、站点提示、作者题外话、读者群、更新安排、导航提示。\n"
             "trim：只有前缀或后缀是噪声，正文部分应保留；cleaned_line 必须原文截取，不得改写正文。\n"
             "keep：小说正文、对白、动作、心理活动、世界观设定、系统面板、角色真正说出的话。\n"
-            "输出 JSON 数组，不要解释。必须包含 candidate_id；如果遗漏，将按候选顺序解释。\n"
+            "输出 JSON 数组，不要解释。必须使用候选里的 candidate_id，不要从 0 重新编号；如果遗漏，将按候选顺序解释。\n"
             f"候选：\n{json.dumps(compact, ensure_ascii=False)}"
         )
 
@@ -153,7 +155,10 @@ class QwenWeakNoiseClassifier:
         for position, item in enumerate(candidates):
             if isinstance(item, dict):
                 candidate_id = QwenWeakNoiseClassifier._optional_int(item.get("candidate_id"))
-                if candidate_id is None and position < len(ordered_ids):
+                if (
+                    (candidate_id is None or candidate_id not in valid_id_set)
+                    and position < len(ordered_ids)
+                ):
                     candidate_id = ordered_ids[position]
                 if candidate_id not in valid_id_set:
                     continue
@@ -217,6 +222,7 @@ class VLLMWeakNoiseClassifier:
         max_new_tokens: int = 192,
         temperature: float = 0.0,
         timeout: float = 120.0,
+        max_concurrency: int = 1,
     ) -> None:
         self.api_base_url = api_base_url.rstrip("/")
         self.model_name = model_name
@@ -224,15 +230,40 @@ class VLLMWeakNoiseClassifier:
         self.max_new_tokens = max(16, int(max_new_tokens))
         self.temperature = float(temperature)
         self.timeout = float(timeout)
-        self._session = requests.Session()
-        self._session.trust_env = False
+        self.max_concurrency = max(1, int(max_concurrency))
+        self._thread_local = threading.local()
 
     def __call__(self, candidates: list[dict[str, Any]]) -> list[Any]:
+        batches = [
+            candidates[start : start + self.batch_size]
+            for start in range(0, len(candidates), self.batch_size)
+        ]
+        if self.max_concurrency <= 1 or len(batches) <= 1:
+            actions = []
+            for batch in batches:
+                actions.extend(self._classify_batch(batch))
+            return QwenWeakNoiseClassifier._dedupe_actions(actions)
+
         actions: list[Any] = []
-        for start in range(0, len(candidates), self.batch_size):
-            batch = candidates[start : start + self.batch_size]
-            actions.extend(self._classify_batch(batch))
+        workers = min(self.max_concurrency, len(batches))
+        with ThreadPoolExecutor(max_workers=workers) as executor:
+            futures = [executor.submit(self._classify_batch, batch) for batch in batches]
+            for future in as_completed(futures):
+                try:
+                    actions.extend(future.result())
+                except Exception:
+                    # Keep candidates from failed requests.  The rule cleaner is
+                    # intentionally conservative when the model path is flaky.
+                    continue
         return QwenWeakNoiseClassifier._dedupe_actions(actions)
+
+    def _get_session(self) -> requests.Session:
+        session = getattr(self._thread_local, "session", None)
+        if session is None:
+            session = requests.Session()
+            session.trust_env = False
+            self._thread_local.session = session
+        return session
 
     def _classify_batch(self, batch: list[dict[str, Any]]) -> list[Any]:
         payload = {
@@ -252,11 +283,14 @@ class VLLMWeakNoiseClassifier:
             "temperature": self.temperature,
             "max_tokens": self.max_new_tokens,
         }
-        response = self._session.post(
+        response = self._get_session().post(
             f"{self.api_base_url}/chat/completions",
             json=payload,
             timeout=self.timeout,
         )
+        if response.status_code == 400 and len(batch) > 1:
+            midpoint = max(1, len(batch) // 2)
+            return self._classify_batch(batch[:midpoint]) + self._classify_batch(batch[midpoint:])
         response.raise_for_status()
         data = response.json()
         raw_text = data["choices"][0]["message"]["content"]
@@ -290,6 +324,6 @@ class VLLMWeakNoiseClassifier:
             "drop：整行都是广告、求票、求收藏、站点提示、作者题外话、读者群、更新安排、导航提示。\n"
             "trim：只有前缀或后缀是噪声，正文部分应保留；cleaned_line 必须原文截取，不得改写正文。\n"
             "keep：小说正文、对白、动作、心理活动、世界观设定、系统面板、角色真正说出的话。\n"
-            "输出 JSON 数组，不要解释。必须包含 candidate_id；如果遗漏，将按候选顺序解释。\n"
+            "输出 JSON 数组，不要解释。必须使用候选里的 candidate_id，不要从 0 重新编号；如果遗漏，将按候选顺序解释。\n"
             f"候选：\n{json.dumps(compact, ensure_ascii=False)}"
         )

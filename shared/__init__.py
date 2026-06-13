@@ -31,6 +31,11 @@ from .artifact_manifest import (
 from .json_parser import parse_json_payload
 from .model_resolution import resolve_model_source
 from .retrieval_tracker import PipelineState, compute_path_signature
+from .cleaned_registry import (
+    CLEANED_BOOKS_REGISTRY_PATH,
+    CleanedBookRegistry,
+    compute_source_fingerprint,
+)
 from .text_utils import (
     collapse_blank_lines,
     is_blank_line,
@@ -130,4 +135,8 @@ __all__ = [
     # --- state tracking ---
     "PipelineState",
     "compute_path_signature",
+    # --- cleaned corpus registry ---
+    "CLEANED_BOOKS_REGISTRY_PATH",
+    "CleanedBookRegistry",
+    "compute_source_fingerprint",
 ]

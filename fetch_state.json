@@ -1,0 +1,125 @@
+{
+  "updated_at": "2026-06-12T06:58:40.324551+00:00",
+  "adapters": {
+    "m.parto.cn": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.sudugu.org": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 4,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.ibiquge.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 32,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.bqquge.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 4,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.daishuzw.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.baishuwu.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.51shucheng.net": {
+      "status": "active",
+      "cooldown_until": 140403.711855688,
+      "consecutive_errors": 0,
+      "total_fetched": 4,
+      "total_failed": 12,
+      "last_error": "403 Client Error: Forbidden for url: https://www.51shucheng.net/kehuan/liucixinduanpian/18521.html"
+    },
+    "www.dingdian365.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.kanunu8.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 43,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.deqixs.co": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.qushucheng.com": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 31,
+      "total_failed": 2,
+      "last_error": "Validation FAILED — promotion blocked:\n  Empty file: chapter_0028.txt\n  Empty file: chapter_0029.txt"
+    },
+    "ixdzs.tw": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 28,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.xxsy.net": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    },
+    "www.trxs.cc": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 37,
+      "total_failed": 1,
+      "last_error": "Validation FAILED — promotion blocked:\n  Empty file: chapter_0748.txt\n  Missing chapter files refere"
+    },
+    "www.deqixs.org": {
+      "status": "active",
+      "cooldown_until": 0.0,
+      "consecutive_errors": 0,
+      "total_fetched": 0,
+      "total_failed": 0,
+      "last_error": ""
+    }
+  }
+}

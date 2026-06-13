@@ -26,8 +26,8 @@ dev = []
 
 [project.scripts]
 fetcher-run = "fetcher.scheduling:main"
-hardmodel-run = "hardmodel.scheduling:main"
-softmodel-run = "softmodel.scheduling:main"
+hardmodel-run = "Jormungandr.hardmodel.scheduling:main"
+softmodel-run = "Jormungandr.softmodel.scheduling:main"
 infermodel-run = "infermodel.scheduling:main"
 generatemodel-run = "generatemodel.scheduling:main"
 rename = "scripts.rename:run"

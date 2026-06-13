@@ -1,7 +1,6 @@
 Jormungandr
 fetcher
 generatemodel
-hardmodel
 infermodel
 scripts
 shared

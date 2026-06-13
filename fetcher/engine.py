@@ -294,6 +294,7 @@ class FetcherEngine:
             # ── Clean up failed download ──────────────────────────────
             logger.warning("Download failed for %s, deregistering %s", url, slug)
             shutil.rmtree(staging_dir, ignore_errors=True)
+            self.registry.mark_failed(url)
             self.registry.deregister(slug)
             raise
 
@@ -361,6 +362,7 @@ class FetcherEngine:
             return canonical_dir
         except Exception:
             shutil.rmtree(staging_dir, ignore_errors=True)
+            self.registry.mark_failed(url)
             self.registry.deregister(story_slug)
             raise
 

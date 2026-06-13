@@ -73,6 +73,22 @@ class ChapterRecord:
         }
 
 
+@dataclass(slots=True)
+class CleanTextDraft:
+    """Intermediate cleaned text before optional weak-noise LLM decisions."""
+
+    kept: list[str]
+    uncertain_windows: list[dict[str, Any]]
+
+
+@dataclass(slots=True)
+class ChapterCleanDraft:
+    """Intermediate chapter state used for book-level weak-noise batching."""
+
+    chapter_source: ChapterSource
+    text: CleanTextDraft
+
+
 class RawNovelBook:
     """Rule-based processor for a raw TXT novel.
 
@@ -136,6 +152,10 @@ class RawNovelBook:
             "trimmed_lines": 0,
             "rule_trimmed": 0,
             "llm_trimmed": 0,
+            "weak_classifier_calls": 0,
+            "weak_classifier_windows": 0,
+            "weak_classifier_failures": 0,
+            "weak_llm_drop_rejected": 0,
         }
         self.discarded_line_examples: list[dict[str, Any]] = []
         self.trimmed_line_examples: list[dict[str, Any]] = []
@@ -172,20 +192,27 @@ class RawNovelBook:
         )
 
     @classmethod
-    def from_book_source(cls, source: BookSource, **kwargs) -> RawNovelBook:
+    def from_book_source(
+        cls,
+        source: BookSource,
+        *,
+        book_id_override: str | None = None,
+        **kwargs,
+    ) -> RawNovelBook:
         """Construct from a :class:`BookSource` (preferred entry point)."""
+        book_id = book_id_override or source.book_id
         if source.mode == "per_chapter":
             return cls.from_chapter_files(
                 source.source_dir,
                 source.chapters,
-                book_id=source.book_id,
+                book_id=book_id,
                 content_type=source.content_type,
                 processing_profile=source.processing_profile,
                 **kwargs,
             )
         return cls.from_whole_book(
             source.primary_source,
-            book_id=source.book_id,
+            book_id=book_id,
             content_type=source.content_type,
             processing_profile=source.processing_profile,
             **kwargs,
@@ -226,6 +253,12 @@ class RawNovelBook:
 
     def _process_single_chapter(self, ch_src: ChapterSource) -> ChapterRecord:
         """Read, normalise, clean a single chapter file → ChapterRecord."""
+        draft = self.prepare_chapter_cleaning(ch_src)
+        self.apply_classifier_to_clean_text(draft.text, self.noise_classifier)
+        return self.finalize_chapter_cleaning(draft)
+
+    def prepare_chapter_cleaning(self, ch_src: ChapterSource) -> ChapterCleanDraft:
+        """Read and rule-clean one chapter, deferring weak-noise LLM decisions."""
         try:
             raw = ch_src.source_path.read_text(encoding=self.encoding)
         except UnicodeDecodeError:
@@ -235,8 +268,15 @@ class RawNovelBook:
 
         normalised = self.normalize_text(raw)
         normalised = self._ensure_paragraphs(normalised)
-        cleaned = self.clean_text(normalised, noise_classifier=self.noise_classifier)
+        return ChapterCleanDraft(
+            chapter_source=ch_src,
+            text=self.prepare_clean_text(normalised),
+        )
 
+    def finalize_chapter_cleaning(self, draft: ChapterCleanDraft) -> ChapterRecord:
+        """Convert a chapter draft into its final ChapterRecord."""
+        ch_src = draft.chapter_source
+        cleaned = self.render_clean_text(draft.text)
         # Use the title from ChapterSource (from index.json or filename)
         resolved_title = ch_src.title or f"chapter_{ch_src.order}"
         cleaned_lines = cleaned.splitlines()
@@ -460,6 +500,12 @@ class RawNovelBook:
         Returns:
             Cleaned text with noise lines removed.
         """
+        draft = self.prepare_clean_text(text)
+        self.apply_classifier_to_clean_text(draft, noise_classifier)
+        return self.render_clean_text(draft)
+
+    def prepare_clean_text(self, text: str) -> CleanTextDraft:
+        """Rule-clean text and collect weak-noise windows without calling an LLM."""
         frequency_counts = self._line_frequency_counts or {}
         if not frequency_counts:
             frequency_counts = {}
@@ -468,7 +514,6 @@ class RawNovelBook:
         source_lines = text.splitlines()
         boundary_positions = self._chapter_boundary_positions(source_lines)
 
-        # First pass: separate lines into keep / discard / uncertain.
         kept: list[str] = []
         uncertain_windows: list[dict[str, Any]] = []
 
@@ -496,7 +541,6 @@ class RawNovelBook:
                 if not stripped:
                     continue
 
-            # Delegate to the tiered, context-aware classifier.
             position_score = boundary_positions.get(line_index, 0)
             frequency_score = self._pattern_frequency_score(stripped, frequency_counts)
             is_strong, is_weak, details = self._classify_line_details(
@@ -514,7 +558,6 @@ class RawNovelBook:
                 )
                 continue
             if is_weak:
-                # Track position in the kept list for potential removal later
                 uncertain_windows.append(
                     self._build_weak_noise_window(
                         candidate_id=len(uncertain_windows),
@@ -530,90 +573,115 @@ class RawNovelBook:
                 continue
             kept.append(stripped)
 
-        # Second pass: resolve uncertain windows via model fallback.
-        if uncertain_windows and noise_classifier is not None:
-            discard_indices: set[int] = set()
-            trim_updates: dict[int, dict[str, Any]] = {}
-            candidates_by_kept_index = {
-                int(candidate["kept_index"]): candidate for candidate in uncertain_windows
-            }
-            try:
-                classifier_results = noise_classifier(uncertain_windows)
-                discard_values: set[int] = set()
-                for result in classifier_results:
-                    if isinstance(result, dict):
-                        action = str(result.get("action") or "").strip().lower()
-                        candidate_id = self._optional_int(result.get("candidate_id"))
-                        kept_index = self._optional_int(result.get("kept_index"))
-                        target_index = self._resolve_candidate_kept_index(
-                            uncertain_windows,
-                            candidate_id=candidate_id,
-                            kept_index=kept_index,
-                        )
-                        if target_index is None:
-                            continue
-                        if action == "drop":
-                            discard_indices.add(target_index)
-                        elif action == "trim":
-                            cleaned_line = str(result.get("cleaned_line") or "").strip()
-                            candidate = candidates_by_kept_index.get(target_index)
-                            original_candidate = str(candidate.get("line") or "") if candidate else ""
-                            if self._is_safe_llm_trim(original_candidate, cleaned_line):
-                                trim_updates[target_index] = {
-                                    "cleaned_line": cleaned_line,
-                                    "result": result,
-                                }
-                        continue
-                    try:
-                        discard_values.add(int(result))
-                    except (TypeError, ValueError):
-                        continue
-                for candidate in uncertain_windows:
-                    candidate_id = int(candidate["candidate_id"])
-                    kept_index = int(candidate["kept_index"])
-                    if candidate_id in discard_values or kept_index in discard_values:
-                        discard_indices.add(kept_index)
-            except Exception:
-                # If the model classifier fails, keep all uncertain lines
-                # rather than losing potentially valid content.
-                pass
+        return CleanTextDraft(kept=kept, uncertain_windows=uncertain_windows)
 
-            for kept_index, update in trim_updates.items():
-                if kept_index in discard_indices:
+    def apply_classifier_to_clean_text(
+        self,
+        draft: CleanTextDraft,
+        noise_classifier: NoiseClassifier | None,
+    ) -> None:
+        """Resolve one draft's weak windows with a classifier, keeping on failure."""
+        if not draft.uncertain_windows or noise_classifier is None:
+            return
+        self.cleaning_stats["weak_classifier_calls"] += 1
+        self.cleaning_stats["weak_classifier_windows"] += len(draft.uncertain_windows)
+        try:
+            classifier_results = noise_classifier(draft.uncertain_windows)
+        except Exception:
+            self.cleaning_stats["weak_classifier_failures"] += 1
+            return
+        self.apply_weak_noise_results(draft, classifier_results)
+
+    def apply_weak_noise_results(self, draft: CleanTextDraft, classifier_results: list[Any]) -> None:
+        """Apply classifier actions to a draft in place."""
+        if not draft.uncertain_windows or not classifier_results:
+            return
+        kept = draft.kept
+        uncertain_windows = draft.uncertain_windows
+        discard_indices: set[int] = set()
+        trim_updates: dict[int, dict[str, Any]] = {}
+        candidates_by_kept_index = {
+            int(candidate["kept_index"]): candidate for candidate in uncertain_windows
+        }
+        discard_values: set[int] = set()
+        for result in classifier_results:
+            if isinstance(result, dict):
+                action = str(result.get("action") or "").strip().lower()
+                candidate_id = self._optional_int(result.get("candidate_id"))
+                kept_index = self._optional_int(result.get("kept_index"))
+                target_index = self._resolve_candidate_kept_index(
+                    uncertain_windows,
+                    candidate_id=candidate_id,
+                    kept_index=kept_index,
+                )
+                if target_index is None:
                     continue
+                if action == "drop":
+                    candidate = candidates_by_kept_index.get(target_index)
+                    if candidate and self._is_safe_llm_drop(candidate):
+                        discard_indices.add(target_index)
+                    else:
+                        self.cleaning_stats["weak_llm_drop_rejected"] += 1
+                elif action == "trim":
+                    cleaned_line = str(result.get("cleaned_line") or "").strip()
+                    candidate = candidates_by_kept_index.get(target_index)
+                    original_candidate = str(candidate.get("line") or "") if candidate else ""
+                    if self._is_safe_llm_trim(original_candidate, cleaned_line):
+                        trim_updates[target_index] = {
+                            "cleaned_line": cleaned_line,
+                            "result": result,
+                        }
+                continue
+            try:
+                discard_values.add(int(result))
+            except (TypeError, ValueError):
+                continue
+        for candidate in uncertain_windows:
+            candidate_id = int(candidate["candidate_id"])
+            kept_index = int(candidate["kept_index"])
+            if candidate_id in discard_values or kept_index in discard_values:
+                if self._is_safe_llm_drop(candidate):
+                    discard_indices.add(kept_index)
+                else:
+                    self.cleaning_stats["weak_llm_drop_rejected"] += 1
+
+        for kept_index, update in trim_updates.items():
+            if kept_index in discard_indices:
+                continue
+            candidate = candidates_by_kept_index.get(kept_index)
+            cleaned_line = str(update.get("cleaned_line") or "").strip()
+            if candidate and cleaned_line and kept_index < len(kept):
+                self._record_trimmed_line_example(
+                    original_line=str(candidate.get("line") or kept[kept_index]),
+                    cleaned_line=cleaned_line,
+                    source_index=int(candidate.get("source_index") or 0),
+                    reason="llm_trim",
+                    details=update.get("result") if isinstance(update.get("result"), dict) else {},
+                )
+                kept[kept_index] = cleaned_line
+                self.cleaning_stats["trimmed_lines"] += 1
+                self.cleaning_stats["llm_trimmed"] += 1
+
+        if discard_indices:
+            for kept_index in sorted(discard_indices):
                 candidate = candidates_by_kept_index.get(kept_index)
-                cleaned_line = str(update.get("cleaned_line") or "").strip()
-                if candidate and cleaned_line and kept_index < len(kept):
-                    self._record_trimmed_line_example(
-                        original_line=str(candidate.get("line") or kept[kept_index]),
-                        cleaned_line=cleaned_line,
+                if candidate:
+                    self._record_discarded_line_example(
+                        line=str(candidate.get("line") or ""),
                         source_index=int(candidate.get("source_index") or 0),
-                        reason="llm_trim",
-                        details=update.get("result") if isinstance(update.get("result"), dict) else {},
+                        reason="weak_llm",
+                        details=candidate,
                     )
-                    kept[kept_index] = cleaned_line
-                    self.cleaning_stats["trimmed_lines"] += 1
-                    self.cleaning_stats["llm_trimmed"] += 1
+            draft.kept = [
+                line
+                for idx, line in enumerate(kept)
+                if idx not in discard_indices
+            ]
+            self.cleaning_stats["weak_dropped"] += len(discard_indices)
 
-            if discard_indices:
-                for kept_index in sorted(discard_indices):
-                    candidate = candidates_by_kept_index.get(kept_index)
-                    if candidate:
-                        self._record_discarded_line_example(
-                            line=str(candidate.get("line") or ""),
-                            source_index=int(candidate.get("source_index") or 0),
-                            reason="weak_llm",
-                            details=candidate,
-                        )
-                # Rebuild kept list without discarded indices
-                kept = [
-                    line
-                    for idx, line in enumerate(kept)
-                    if idx not in discard_indices
-                ]
-                self.cleaning_stats["weak_dropped"] += len(discard_indices)
-
-        cleaned = "\n".join(kept)
+    @staticmethod
+    def render_clean_text(draft: CleanTextDraft) -> str:
+        cleaned = "\n".join(draft.kept)
         cleaned = re.sub(r"\n{3,}", "\n\n", cleaned)
         return cleaned.strip()
 
@@ -743,6 +811,30 @@ class RawNovelBook:
         if len(removed) <= 2 and re.fullmatch(r"[“”\"'‘’\)\]】》〉。！？~～\s]+", removed):
             return False
         return self._looks_like_trim_noise(removed)
+
+    def _is_safe_llm_drop(self, candidate: dict[str, Any]) -> bool:
+        """Constrain model drops to lines with explicit non-prose noise signals."""
+        line = str(candidate.get("line") or "").strip()
+        if not line:
+            return False
+        normalized = self.normalize_line(line)
+        prose_score = int(candidate.get("prose_score") or 0)
+        if prose_score >= 4:
+            return False
+        frequency_score = int(candidate.get("pattern_frequency_score") or 0)
+        if self._is_repeated_boilerplate_noise(normalized, frequency_score):
+            return True
+        if self._looks_like_trim_noise(normalized):
+            return True
+        if self._has_soft_meta_noise_signal(normalized):
+            return True
+        if re.search(
+            r"(?:催更|求票|月票|推荐票|收藏|订阅|打赏|书友群|读者群|QQ群|微信群|群号|"
+            r"作者有话|题外话|作家的话|本章完|未完待续|最新网址|最新章节|首发地址|请记住本站)",
+            normalized,
+        ):
+            return True
+        return False
 
     def _looks_like_trim_noise(self, text: str) -> bool:
         probe = text.strip()
@@ -947,6 +1039,29 @@ class RawNovelBook:
             return True
         return any(pattern.search(line) for pattern in WEAK_NOISE_PATTERNS)
 
+    def _is_repeated_boilerplate_noise(self, line: str, pattern_frequency_score: int) -> bool:
+        """Return True for repeated site templates that should not spend LLM time."""
+        if line == "关于 Google":
+            return True
+        if re.fullmatch(r"作者[:：][^，。！？；：:\s]{1,30}", line):
+            return True
+        if pattern_frequency_score <= 0:
+            return False
+        if re.search(
+            r"(?:Cookie|全部接受|全部拒绝|g\.co/privacytools|Google 搜索|"
+            r"个性化(?:内容|广告)|非个性化(?:内容|广告)|隐私设置)",
+            line,
+            re.IGNORECASE,
+        ):
+            return True
+        if pattern_frequency_score >= 2 and re.search(
+            r"(?:连载中(?:都市|仙侠|古代|现代|玄幻|科幻|悬疑|历史)?(?:小说|言情|奇缘)?|"
+            r"作者：|更新时间最新三章节|最新三章节)",
+            line,
+        ):
+            return True
+        return False
+
     def _has_soft_meta_noise_signal(self, line: str) -> bool:
         """Return True for reader-facing meta notes worth sending to the LLM."""
         return bool(
@@ -1011,6 +1126,13 @@ class RawNovelBook:
         prose_score, prose_reasons = self._prose_score(normalised)
         details["prose_score"] = prose_score
         details["prose_reasons"] = prose_reasons
+
+        if self._is_repeated_boilerplate_noise(normalised, pattern_frequency_score):
+            details["noise_score"] = pattern_frequency_score + 3
+            details["weak_reason"] = "repeated_boilerplate"
+            if pattern_frequency_score:
+                self.cleaning_stats["frequency_promoted"] += 1
+            return (True, False, details)
 
         # Very short lines are not noise (could be dialogue fragments)
         if len(normalised) <= 2:

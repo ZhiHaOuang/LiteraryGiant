@@ -4,12 +4,12 @@ import argparse
 import os
 from pathlib import Path
 
-from shared import FACT_CHAPTER_FEATURES_ROOT, FACT_PLOT_SEGMENTS_ROOT
+from shared import FACT_CHAPTER_FEATURES_ROOT, FACT_PLOT_SEGMENTS_ROOT, PipelineState, compute_path_signature
 
 from .api_client import ApiConfig
 from .merger import PlotSegmentMerger
 from .pipeline import InferModelPipeline
-from .processor import discover_feature_books, process_and_write_book_dir
+from .processor import discover_feature_books, load_feature_book_bundle, process_and_write_book_dir, resolve_cluster_output_dir
 from .summarizer import DEFAULT_API_MODEL, PlotWindowAnalyzer
 from .windowing import SlidingWindowPlanner
 
@@ -75,6 +75,19 @@ def build_parser() -> argparse.ArgumentParser:
     # -- output ------------------------------------------------------------------
     parser.add_argument("--compact", action="store_true",
                         help="Write compact JSON instead of pretty JSON.")
+    parser.add_argument(
+        "--sync-state",
+        dest="sync_state",
+        action="store_true",
+        default=True,
+        help="Sync book progress into runs/pipeline_state/state.json. Enabled by default.",
+    )
+    parser.add_argument(
+        "--no-sync-state",
+        dest="sync_state",
+        action="store_false",
+        help="Do not write infermodel progress into runs/pipeline_state/state.json for this run.",
+    )
     return parser
 
 
@@ -129,15 +142,120 @@ def main(argv: list[str] | None = None) -> int:
     pretty = not args.compact
     books = discover_feature_books(args.input)
     written_dirs: list[Path] = []
+    state = PipelineState() if args.sync_state else None
+    if state is not None:
+        state.begin_run("infermodel", total_candidates=len(books))
 
-    for book_dir in books:
-        output_dir = process_and_write_book_dir(
-            book_dir, pipeline=pipeline, output_root=args.output, pretty=pretty,
-        )
-        written_dirs.append(output_dir)
-        print(f"[OK] {book_dir} -> {output_dir}")
+    try:
+        for book_dir in books:
+            feature_signature = compute_path_signature(book_dir)
+            feature_book = load_feature_book_bundle(book_dir)
+            output_dir = resolve_cluster_output_dir(feature_book, output_root=args.output)
+            if state is not None:
+                should_skip, matched_book = state.should_skip_step(
+                    step_name="infermodel",
+                    source_path=book_dir,
+                    source_signature=feature_signature,
+                    output_path=output_dir,
+                )
+            else:
+                should_skip, matched_book = False, None
 
-    print(f"Finished. Wrote {len(written_dirs)} plot cluster folder(s).")
+            if should_skip and matched_book is not None and state is not None:
+                state.increment_run_counter("infermodel", "skipped")
+                print(f"[SKIP] {book_dir} -> {output_dir} (index={matched_book.get('index', 'unknown')})")
+                continue
+
+            if state is not None:
+                book_record, is_new_book = state.get_or_create_book(
+                    source_path=book_dir,
+                    source_signature=feature_signature,
+                )
+            else:
+                book_record, is_new_book = None, False
+
+            try:
+                output_dir = process_and_write_book_dir(
+                    book_dir,
+                    pipeline=pipeline,
+                    output_root=args.output,
+                    pretty=pretty,
+                    state=state,
+                    book_record=book_record,
+                )
+                written_dirs.append(output_dir)
+                if state is not None and book_record is not None:
+                    state.record_step(
+                        step_name="infermodel",
+                        book=book_record,
+                        source_signature=feature_signature,
+                        status="completed",
+                        output_path=output_dir,
+                        params={
+                            "window_size": args.window_size,
+                            "window_overlap": args.window_overlap,
+                            "min_window_size": args.min_window_size,
+                            "api_model": args.api_model,
+                            "api_base_url": args.api_base_url,
+                            "api_provider": args.api_provider,
+                            "window_max_input_chars": args.window_max_input_chars,
+                            "fusion_max_input_chars": args.fusion_max_input_chars,
+                            "max_new_tokens": args.max_new_tokens,
+                            "boundary_vote_threshold": args.boundary_vote_threshold,
+                            "strong_boundary_threshold": args.strong_boundary_threshold,
+                            "min_boundary_votes": args.min_boundary_votes,
+                            "max_plot_chapters": args.max_plot_chapters,
+                            "max_refinement_rounds": args.max_refinement_rounds,
+                            "refinement_window_size": args.refinement_window_size,
+                            "refinement_window_overlap": args.refinement_window_overlap,
+                            "refinement_min_window_size": args.refinement_min_window_size,
+                        },
+                        metadata={
+                            "book_index": book_record["index"],
+                            "source_feature_dir": str(book_dir),
+                        },
+                    )
+                    state.increment_run_counter("infermodel", "processed")
+                print(
+                    f"[OK] {book_dir} -> {output_dir} "
+                    f"(index={book_record['index'] if book_record is not None else 'no-state'}, {'new' if is_new_book else 'updated'})"
+                )
+            except Exception as exc:
+                if state is not None and book_record is not None:
+                    state.record_step(
+                        step_name="infermodel",
+                        book=book_record,
+                        source_signature=feature_signature,
+                        status="failed",
+                        output_path=output_dir,
+                        params={
+                            "window_size": args.window_size,
+                            "window_overlap": args.window_overlap,
+                            "min_window_size": args.min_window_size,
+                            "api_model": args.api_model,
+                            "api_base_url": args.api_base_url,
+                            "api_provider": args.api_provider,
+                            "window_max_input_chars": args.window_max_input_chars,
+                            "fusion_max_input_chars": args.fusion_max_input_chars,
+                            "max_new_tokens": args.max_new_tokens,
+                        },
+                        metadata={"book_index": book_record["index"]},
+                        error=str(exc),
+                    )
+                    state.increment_run_counter("infermodel", "failed")
+                raise
+    finally:
+        if state is not None:
+            state.finish_run("infermodel")
+
+    run_stats = state.run_stats("infermodel") if state is not None else {}
+    print(
+        f"Finished. Wrote {len(written_dirs)} plot cluster folder(s). "
+        f"processed={run_stats.get('processed', 0)} "
+        f"skipped={run_stats.get('skipped', 0)} "
+        f"failed={run_stats.get('failed', 0)} "
+        f"tracker={state.path if state is not None else 'disabled'}"
+    )
     return 0
 
 

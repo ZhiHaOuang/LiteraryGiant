@@ -54,6 +54,9 @@ __pycache__/
 !/runs/**/
 !/runs/**/.gitkeep
 
+# Backup of Library directory
+/backup/
+
 # Legacy state files from pre-canonical runs.
 /retrieval_file/
 

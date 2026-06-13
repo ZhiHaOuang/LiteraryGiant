@@ -65,7 +65,9 @@ class BookRegistry:
     def __init__(self, path: str | Path = REGISTRY_PATH) -> None:
         self.path = Path(path)
         self._stories_path = STORIES_PATH
+        self._failed_path = self.path.parent / "failed_urls.json"
         self.payload: dict = self._load()
+        self._failed_urls: set[str] = self._load_failed()
 
     def _path_for(self, content_type: str = "book") -> Path:
         """Return the registry file path for *content_type*."""
@@ -540,3 +542,35 @@ class BookRegistry:
         with open(tmp_path, "w", encoding="utf-8") as fh:
             json.dump(self.payload, fh, ensure_ascii=False, indent=2)
         os.replace(tmp_path, dest)
+
+    # ------------------------------------------------------------------
+    # Failed-URL tracking — prevents retrying permanently broken pages
+    # ------------------------------------------------------------------
+
+    def _load_failed(self) -> set[str]:
+        if self._failed_path.exists():
+            try:
+                data = json.loads(self._failed_path.read_text(encoding="utf-8"))
+                return set(data.get("urls", []))
+            except json.JSONDecodeError:
+                pass
+        return set()
+
+    def _save_failed(self) -> None:
+        self._failed_path.parent.mkdir(parents=True, exist_ok=True)
+        tmp = str(self._failed_path) + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as fh:
+            json.dump({"urls": sorted(self._failed_urls)}, fh, ensure_ascii=False, indent=2)
+        os.replace(tmp, self._failed_path)
+
+    def mark_failed(self, url: str) -> None:
+        """Record *url* as permanently failed — skip on future runs."""
+        canonical = _canonicalize_url(url)
+        if canonical not in self._failed_urls:
+            self._failed_urls.add(canonical)
+            self._save_failed()
+            logger.info("Marked as failed: %s", canonical)
+
+    def is_failed(self, url: str) -> bool:
+        """Check if *url* was previously marked as failed."""
+        return _canonicalize_url(url) in self._failed_urls

@@ -154,6 +154,7 @@ class PipelineState:
             "skipped": 0,
             "failed": 0,
         }
+        self.save()
 
     def increment_run_counter(self, step_name: str, field: str) -> None:
         run = self.payload.setdefault("runs", {}).setdefault(step_name, {})

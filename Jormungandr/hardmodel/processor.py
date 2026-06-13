@@ -10,7 +10,7 @@ import logging
 import json
 from pathlib import Path
 
-from shared import PipelineState, compute_path_signature
+from shared import PipelineState, compute_path_signature, compute_source_fingerprint
 
 from .chapter_cleaner import RawNovelBook
 from .manifest_writer import (
@@ -68,10 +68,15 @@ def process_book_source(
     chunk_overlap: int = 200,
     state: PipelineState | None = None,
     noise_classifier=None,
+    book_id_override: str | None = None,
+    metadata_overrides: dict | None = None,
+    source_signature: str | None = None,
+    chapter_incremental: bool = False,
 ) -> dict:
     """Process a single :class:`BookSource` — dispatches to the right mode."""
     book = RawNovelBook.from_book_source(
         source,
+        book_id_override=book_id_override,
         encoding=encoding,
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
@@ -80,12 +85,25 @@ def process_book_source(
 
     if source.mode == "per_chapter":
         return _process_per_chapter_incremental(
-            source, book, output_root=output_root, state=state
+            source,
+            book,
+            output_root=output_root,
+            state=state,
+            book_id_override=book_id_override,
+            metadata_overrides=metadata_overrides,
+            source_signature=source_signature,
+            chapter_incremental=chapter_incremental,
         )
 
     # Whole-book mode — existing logic
     return _process_whole_book(
-        source, book, output_root=output_root, state=state
+        source,
+        book,
+        output_root=output_root,
+        state=state,
+        book_id_override=book_id_override,
+        metadata_overrides=metadata_overrides,
+        source_signature=source_signature,
     )
 
 
@@ -100,11 +118,15 @@ def _process_whole_book(
     *,
     output_root: str | Path | None = None,
     state: PipelineState | None = None,
+    book_id_override: str | None = None,
+    metadata_overrides: dict | None = None,
+    source_signature: str | None = None,
 ) -> dict:
     """Process a whole-book TXT: read → normalise → clean → split."""
     source_path = source.primary_source
-    source_signature = compute_path_signature(source_path)
-    output_dir = resolve_book_output_dir(source.book_id, output_root=output_root)
+    source_signature = source_signature or compute_source_fingerprint(source)
+    effective_book_id = book_id_override or source.book_id
+    output_dir = resolve_book_output_dir(effective_book_id, output_root=output_root)
 
     # Check PipelineState for skip
     if state is not None:
@@ -120,6 +142,7 @@ def _process_whole_book(
 
     # Process
     result = book.process()
+    _apply_metadata_overrides(result, metadata_overrides)
     return result
 
 
@@ -134,42 +157,52 @@ def _process_per_chapter_incremental(
     *,
     output_root: str | Path | None = None,
     state: PipelineState | None = None,
+    book_id_override: str | None = None,
+    metadata_overrides: dict | None = None,
+    source_signature: str | None = None,
+    chapter_incremental: bool = False,
 ) -> dict:
     """Process a per-chapter book incrementally.
 
-    - Each chapter file is hashed independently.
-    - Chapters whose source hasn't changed since last run are skipped.
-    - New / changed chapters are processed and merged into the book.
+    - The scheduler is expected to skip unchanged books before this function.
+    - By default changed/new books are processed at book granularity, avoiding
+      per-chapter hashing and old JSON cache reads.
+    - ``chapter_incremental=True`` preserves the older per-chapter skip path.
     """
     chapter_sources = source.chapters
     if not chapter_sources:
         raise ValueError(f"No chapters found for book: {source.title}")
 
-    output_dir = resolve_book_output_dir(source.book_id, output_root=output_root)
+    effective_book_id = book_id_override or source.book_id
+    output_dir = resolve_book_output_dir(effective_book_id, output_root=output_root)
 
     # Ensure book is tracked in PipelineState
-    book_signature = compute_path_signature(source.source_dir)
     if state is not None:
+        book_signature = source_signature or compute_source_fingerprint(source)
         book_record, is_new_book = state.get_or_create_book(
             source_path=source.source_dir,
             source_signature=book_signature,
         )
     else:
+        book_signature = ""
         book_record, is_new_book = None, False
 
     new_records: list[dict] = []
+    prepared_items: list[dict] = []
     skipped_count = 0
     processed_count = 0
     book._line_frequency_counts = book._build_frequency_counts_for_sources(chapter_sources)
 
     for ch_src in chapter_sources:
-        ch_signature = compute_path_signature(ch_src.source_path)
+        ch_signature = ""
 
-        # Check if this chapter should be skipped
-        if state is not None and book_record is not None:
+        # The legacy chapter-incremental mode is intentionally opt-in because
+        # it reads every source chapter and old JSON cache before skipping.
+        if chapter_incremental and state is not None and book_record is not None:
+            ch_signature = compute_path_signature(ch_src.source_path)
             chapter_record, _ = state.get_or_create_chapter(
                 book_record,
-                chapter_id=f"{source.book_id}C{ch_src.order:04d}",
+                chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
                 order=ch_src.order,
                 clean_title=ch_src.title,
                 source_path=ch_src.source_path,
@@ -188,15 +221,52 @@ def _process_per_chapter_incremental(
                     new_records.append(existing)
                     skipped_count += 1
                     continue
+        elif state is not None and book_record is not None:
+            ch_signature = f"{book_signature}:chapter:{ch_src.order}:{ch_src.source_path.name}"
 
-        # Process this chapter
+        # Rule-clean this chapter first; weak-noise LLM decisions are resolved
+        # once per book below so vLLM sees large, parallelizable batches.
         try:
-            record = book._process_single_chapter(ch_src)
+            draft = book.prepare_chapter_cleaning(ch_src)
+            prepared_items.append(
+                {
+                    "chapter_source": ch_src,
+                    "chapter_signature": ch_signature,
+                    "draft": draft,
+                }
+            )
+        except Exception:
+            logger.exception("Failed to process chapter %s: %s", ch_src.order, ch_src.source_path)
+            if state is not None and book_record is not None:
+                chapter_record, _ = state.get_or_create_chapter(
+                    book_record,
+                    chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
+                    order=ch_src.order,
+                    clean_title=ch_src.title,
+                    source_path=ch_src.source_path,
+                    source_signature=ch_signature,
+                )
+                state.record_chapter_step(
+                    step_name="hardmodel",
+                    chapter=chapter_record,
+                    input_signature=ch_signature,
+                    status="failed",
+                    output_path=None,
+                )
+            continue
+
+    if prepared_items and book.noise_classifier is not None:
+        _apply_book_level_weak_noise(book, prepared_items)
+
+    for item in prepared_items:
+        ch_src = item["chapter_source"]
+        ch_signature = item["chapter_signature"]
+        try:
+            record = book.finalize_chapter_cleaning(item["draft"])
             record_dict = record.to_dict()
             new_records.append(record_dict)
             processed_count += 1
 
-            # Update PipelineState for this chapter
             if state is not None and book_record is not None:
                 chapter_record, _ = state.get_or_create_chapter(
                     book_record,
@@ -224,11 +294,11 @@ def _process_per_chapter_incremental(
                     },
                 )
         except Exception:
-            logger.exception("Failed to process chapter %s: %s", ch_src.order, ch_src.source_path)
+            logger.exception("Failed to finalize chapter %s: %s", ch_src.order, ch_src.source_path)
             if state is not None and book_record is not None:
                 chapter_record, _ = state.get_or_create_chapter(
                     book_record,
-                    chapter_id=f"{source.book_id}C{ch_src.order:04d}",
+                    chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
                     order=ch_src.order,
                     clean_title=ch_src.title,
                     source_path=ch_src.source_path,
@@ -241,7 +311,6 @@ def _process_per_chapter_incremental(
                     status="failed",
                     output_path=None,
                 )
-            continue
 
     if not new_records:
         raise RuntimeError(f"No chapters could be processed for {source.title}")
@@ -260,7 +329,7 @@ def _process_per_chapter_incremental(
 
     result = {
         "book_metadata": {
-            "book_id": source.book_id,
+            "book_id": effective_book_id,
             "content_type": source.content_type,
             "processing_profile": source.processing_profile,
             "source_path": str(source.source_dir),
@@ -275,6 +344,7 @@ def _process_per_chapter_incremental(
         },
         "chapters": new_records,
     }
+    _apply_metadata_overrides(result, metadata_overrides)
 
     # Update book-level state
     if state is not None and book_record is not None:
@@ -282,7 +352,7 @@ def _process_per_chapter_incremental(
         state.prune_book_chapters(book_record, valid_chapter_ids=valid_ids)
         state.update_raw_stats(
             book_record,
-            {"file_size_bytes": sum(p.stat().st_size for p in [c.source_path for c in chapter_sources])},
+            {"chapter_count": len(chapter_sources)},
         )
         state.record_step(
             step_name="hardmodel",
@@ -291,7 +361,7 @@ def _process_per_chapter_incremental(
             status="completed",
             output_path=output_dir,
             metadata={
-                "book_id": source.book_id,
+                "book_id": effective_book_id,
                 "content_type": source.content_type,
                 "processing_profile": source.processing_profile,
                 "chapter_count": len(new_records),
@@ -307,9 +377,99 @@ def _process_per_chapter_incremental(
     return result
 
 
+def _apply_book_level_weak_noise(book: RawNovelBook, prepared_items: list[dict]) -> None:
+    """Resolve weak-noise candidates across a whole book in one classifier pass.
+
+    The cleaner builds candidate ids locally per chapter.  For vLLM efficiency
+    we remap them to book-unique ids, classify all windows with the classifier's
+    own batching/concurrency, then map actions back to each chapter draft.
+    """
+    noise_classifier = book.noise_classifier
+    if noise_classifier is None:
+        return
+
+    global_candidates: list[dict] = []
+    route_by_global_id: dict[int, tuple[object, int, int]] = {}
+    next_candidate_id = 0
+    for item in prepared_items:
+        chapter_source = item["chapter_source"]
+        draft = item["draft"].text
+        for candidate in draft.uncertain_windows:
+            local_candidate_id = int(candidate["candidate_id"])
+            local_kept_index = int(candidate["kept_index"])
+            global_candidate = dict(candidate)
+            global_candidate["candidate_id"] = next_candidate_id
+            global_candidate["chapter_order"] = chapter_source.order
+            global_candidate["chapter_title"] = chapter_source.title
+            global_candidate["local_candidate_id"] = local_candidate_id
+            global_candidate["local_kept_index"] = local_kept_index
+            route_by_global_id[next_candidate_id] = (
+                draft,
+                local_candidate_id,
+                local_kept_index,
+            )
+            global_candidates.append(global_candidate)
+            next_candidate_id += 1
+
+    if not global_candidates:
+        return
+
+    book.cleaning_stats["weak_classifier_calls"] += 1
+    book.cleaning_stats["weak_classifier_windows"] += len(global_candidates)
+    try:
+        classifier_results = noise_classifier(global_candidates)
+    except Exception:
+        book.cleaning_stats["weak_classifier_failures"] += 1
+        logger.exception("Book-level weak-noise classifier failed for %s", book.source_path)
+        return
+
+    local_results_by_draft_id: dict[int, list] = {}
+    draft_by_id: dict[int, object] = {}
+    for result in classifier_results:
+        if isinstance(result, dict):
+            global_candidate_id = RawNovelBook._optional_int(result.get("candidate_id"))
+            if global_candidate_id is None:
+                continue
+            route = route_by_global_id.get(global_candidate_id)
+            if route is None:
+                continue
+            draft, local_candidate_id, local_kept_index = route
+            local_result = dict(result)
+            local_result["candidate_id"] = local_candidate_id
+            local_result["kept_index"] = local_kept_index
+        else:
+            global_candidate_id = RawNovelBook._optional_int(result)
+            if global_candidate_id is None:
+                continue
+            route = route_by_global_id.get(global_candidate_id)
+            if route is None:
+                continue
+            draft, local_candidate_id, local_kept_index = route
+            local_result = {
+                "candidate_id": local_candidate_id,
+                "kept_index": local_kept_index,
+                "action": "drop",
+            }
+
+        draft_id = id(draft)
+        draft_by_id[draft_id] = draft
+        local_results_by_draft_id.setdefault(draft_id, []).append(local_result)
+
+    for draft_id, local_results in local_results_by_draft_id.items():
+        book.apply_weak_noise_results(draft_by_id[draft_id], local_results)
+
+
 # ---------------------------------------------------------------------------
 # Legacy functions — kept for backward compatibility
 # ---------------------------------------------------------------------------
+
+
+def _apply_metadata_overrides(result: dict, metadata_overrides: dict | None) -> None:
+    if not metadata_overrides:
+        return
+    metadata = result.setdefault("book_metadata", {})
+    for key, value in metadata_overrides.items():
+        metadata[key] = value
 
 
 def discover_txt_files(

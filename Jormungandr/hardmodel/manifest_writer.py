@@ -64,6 +64,14 @@ def write_result_file(
         chapter_path = book_dir / chapter_json_file_name(chapter["order"])
         chapter_path.write_text(serialize_payload(chapter, pretty=pretty), encoding="utf-8")
 
+    expected_chapter_files = {
+        chapter_json_file_name(chapter["order"])
+        for chapter in result["chapters"]
+    }
+    for stale_path in book_dir.glob("chapter_*.json"):
+        if stale_path.name not in expected_chapter_files:
+            stale_path.unlink()
+
     validate_written_book_dir(book_dir)
     return book_dir
 

@@ -2,7 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from shared import FACT_PLOT_SEGMENTS_ROOT, canonical_book_slug, load_chapters_from_manifest, load_json, serialize_payload
+from shared import (
+    FACT_PLOT_SEGMENTS_ROOT,
+    PipelineState,
+    canonical_book_slug,
+    compute_path_signature,
+    load_chapters_from_manifest,
+    load_json,
+    serialize_payload,
+)
 
 from .pipeline import InferModelPipeline
 
@@ -139,7 +147,52 @@ def process_and_write_book_dir(
     pipeline: InferModelPipeline,
     output_root: str | Path | None = None,
     pretty: bool = True,
+    state: PipelineState | None = None,
+    book_record: dict | None = None,
 ) -> Path:
-    processed_book = process_feature_book_dir(book_dir, pipeline=pipeline)
+    book_path = Path(book_dir)
+    feature_book = load_feature_book_bundle(book_path)
+    processed_book = pipeline.process_book(feature_book)
     output_dir = resolve_cluster_output_dir(processed_book, output_root=output_root)
-    return write_cluster_book(output_dir, processed_book, pretty=pretty)
+    written_dir = write_cluster_book(output_dir, processed_book, pretty=pretty)
+
+    if state is not None and book_record is not None:
+        chapter_manifest = processed_book.get("chapter_manifest") or []
+        valid_chapter_ids = {
+            str(chapter.get("chapter_id"))
+            for chapter in chapter_manifest
+            if str(chapter.get("chapter_id") or "").strip()
+        }
+        if valid_chapter_ids:
+            state.prune_book_chapters(book_record, valid_chapter_ids=valid_chapter_ids)
+
+        for chapter in chapter_manifest:
+            chapter_id = str(chapter.get("chapter_id") or "").strip()
+            if not chapter_id:
+                continue
+            file_name = str(chapter.get("file_name") or "")
+            chapter_file = book_path / file_name
+            if not chapter_file.exists():
+                continue
+            chapter_signature = compute_path_signature(chapter_file)
+            chapter_record, _ = state.get_or_create_chapter(
+                book_record,
+                chapter_id=chapter_id,
+                order=int(chapter.get("order") or 0),
+                clean_title=str(chapter.get("clean_title") or ""),
+                source_path=chapter_file,
+                source_signature=chapter_signature,
+            )
+            state.record_chapter_step(
+                step_name="infermodel",
+                chapter=chapter_record,
+                input_signature=chapter_signature,
+                status="completed",
+                output_path=written_dir,
+                metadata={
+                    "book_id": processed_book.get("book_metadata", {}).get("book_id", ""),
+                    "plot_output_dir": str(written_dir),
+                },
+            )
+
+    return written_dir

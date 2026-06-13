@@ -6,7 +6,6 @@ from urllib.parse import urlparse
 
 from .base import BaseAdapter, ChapterEntry, DiscoverySource
 from .baishuwu import BaishuwuAdapter
-from .bqquge import BqqugeAdapter
 from .daishuzw import DaishuzwAdapter
 from .deqixs import DeqixsCoAdapter, DeqixsOrgAdapter
 from .dingdian365 import Dingdian365Adapter
@@ -23,7 +22,6 @@ from .xxsy import XxsyAdapter
 #: Mapping from hostname (as it appears in the URL) to adapter class.
 ADAPTER_REGISTRY: dict[str, type[BaseAdapter]] = {
     # ── Working adapters ──────────────────────────────────────────
-    "www.bqquge.com": BqqugeAdapter,
     "www.dingdian365.com": Dingdian365Adapter,
     "www.ibiquge.com": IbiqugeAdapter,
     "ixdzs.tw": IxdzsAdapter,
@@ -86,7 +84,6 @@ __all__ = [
     "ADAPTER_REGISTRY",
     "get_adapter_for_url",
     "BaishuwuAdapter",
-    "BqqugeAdapter",
     "DaishuzwAdapter",
     "DeqixsCoAdapter",
     "DeqixsOrgAdapter",
