@@ -143,7 +143,9 @@ class PipelineState:
 
     def save(self) -> None:
         self.payload["updated_at"] = _utc_now()
-        self.path.write_text(json.dumps(self.payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp_path = self.path.with_name(f".{self.path.name}.tmp")
+        tmp_path.write_text(json.dumps(self.payload, ensure_ascii=False, indent=2), encoding="utf-8")
+        tmp_path.replace(self.path)
 
     def begin_run(self, step_name: str, *, total_candidates: int) -> None:
         self.payload.setdefault("runs", {})[step_name] = {

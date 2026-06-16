@@ -10,6 +10,11 @@ from shared import (
     compute_path_signature,
     detect_default_weights_root,
 )
+from shared.stage_queue import (
+    mark_stage_done,
+    registry_ordered_book_dirs,
+    stage_is_done,
+)
 
 from .nuextract_extractor import (
     DEFAULT_NUEXTRACT_MODEL,
@@ -18,7 +23,13 @@ from .nuextract_extractor import (
     NuExtractExtractor,
 )
 from .pipeline import DEFAULT_CHAPTER_BATCH_SIZE, ChapterFeaturePipeline
-from .processor import discover_processed_books, load_json, process_and_write_book_dir, resolve_feature_output_dir
+from .processor import (
+    discover_processed_books,
+    feature_book_index_complete,
+    load_json,
+    process_and_write_book_dir,
+    resolve_feature_output_dir,
+)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -109,17 +120,35 @@ def build_parser() -> argparse.ArgumentParser:
         help=f"How many chapters to batch together per vLLM extraction step. Default: {DEFAULT_CHAPTER_BATCH_SIZE}.",
     )
     parser.add_argument(
+        "--index-flush-interval",
+        type=int,
+        default=None,
+        help=(
+            "Flush chapter_features/<book>/index.json every N chapter decisions. "
+            "Defaults to --chapter-batch-size, so completed batches are resumable."
+        ),
+    )
+    parser.add_argument(
+        "--state-save-interval",
+        type=int,
+        default=100,
+        help=(
+            "Flush runs/pipeline_state/state.json every N chapter decisions. "
+            "Use 0 to disable intra-book state flushes. Existing chapter output files are still used for resume."
+        ),
+    )
+    parser.add_argument(
         "--sync-state",
         dest="sync_state",
         action="store_true",
-        default=True,
-        help="Sync book/chapter progress into runs/pipeline_state/state.json. Enabled by default.",
+        default=False,
+        help="Sync book/chapter progress into runs/pipeline_state/state.json. Disabled by default for long softmodel runs.",
     )
     parser.add_argument(
         "--no-sync-state",
         dest="sync_state",
         action="store_false",
-        help="Do not write progress or chapter state into runs/pipeline_state/state.json for this run.",
+        help="Do not write progress or chapter state into runs/pipeline_state/state.json for this run. This is the default.",
     )
     return parser
 
@@ -147,8 +176,24 @@ def main(argv: list[str] | None = None) -> int:
     )
 
     pretty = not args.compact
-    books = discover_processed_books(args.input)
+    queue_result = registry_ordered_book_dirs(
+        args.input,
+        source_stage="cleaned_chapters",
+        output_root=args.output or FACT_CHAPTER_FEATURES_ROOT,
+        output_stage="softmodel",
+    )
+    if queue_result is None:
+        books = discover_processed_books(args.input)
+    else:
+        books, queue_stats = queue_result
+        print(
+            f"[QUEUE] registry={queue_stats.source} queued={queue_stats.queued} "
+            f"curated={queue_stats.curated} done={queue_stats.skipped_done} "
+            f"missing_source={queue_stats.skipped_missing_source} "
+            f"incomplete={queue_stats.skipped_incomplete}"
+        )
     written_dirs: list[Path] = []
+    local_stats = {"processed": 0, "skipped": 0, "failed": 0}
     state = PipelineState() if args.sync_state else None
     if state is not None:
         state.begin_run("softmodel", total_candidates=len(books))
@@ -157,10 +202,32 @@ def main(argv: list[str] | None = None) -> int:
         for book_dir in books:
             index_payload = load_json(Path(book_dir) / "index.json")
             source_book_path = index_payload["book_metadata"]["source_path"]
-            raw_source_signature = compute_path_signature(source_book_path) if Path(source_book_path).exists() else ""
-            processdata_signature = compute_path_signature(book_dir)
             output_dir = resolve_feature_output_dir({"index": index_payload}, output_root=args.output)
+            if stage_is_done(output_dir, "softmodel"):
+                local_stats["skipped"] += 1
+                if state is not None:
+                    state.increment_run_counter("softmodel", "skipped")
+                print(f"[SKIP] {book_dir} -> {output_dir} (done-file)")
+                continue
+            if feature_book_index_complete(book_dir, output_dir):
+                mark_stage_done(
+                    output_dir,
+                    "softmodel",
+                    metadata={
+                        "book_id": index_payload["book_metadata"].get("book_id", ""),
+                        "chapter_count": index_payload["book_metadata"].get("chapter_count", 0),
+                        "source": "feature-index",
+                    },
+                )
+                local_stats["skipped"] += 1
+                if state is not None:
+                    state.increment_run_counter("softmodel", "skipped")
+                print(f"[SKIP] {book_dir} -> {output_dir} (feature-index)")
+                continue
+
             if state is not None:
+                raw_source_signature = compute_path_signature(source_book_path) if Path(source_book_path).exists() else ""
+                processdata_signature = compute_path_signature(book_dir)
                 should_skip, matched_book = state.should_skip_step(
                     step_name="softmodel",
                     source_path=source_book_path,
@@ -169,9 +236,13 @@ def main(argv: list[str] | None = None) -> int:
                 )
             else:
                 should_skip, matched_book = False, None
+                raw_source_signature = ""
+                processdata_signature = ""
 
             if should_skip and matched_book is not None and state is not None:
+                local_stats["skipped"] += 1
                 state.increment_run_counter("softmodel", "skipped")
+                state.save()
                 print(
                     f"[SKIP] {book_dir} -> {output_dir} "
                     f"(index={matched_book.get('index', 'unknown')})"
@@ -194,8 +265,19 @@ def main(argv: list[str] | None = None) -> int:
                     pretty=pretty,
                     state=state,
                     book_record=book_record,
+                    state_save_interval=args.state_save_interval,
+                    index_flush_interval=args.index_flush_interval,
                 )
                 written_dirs.append(output_dir)
+                mark_stage_done(
+                    output_dir,
+                    "softmodel",
+                    metadata={
+                        "book_id": index_payload["book_metadata"].get("book_id", ""),
+                        "chapter_count": index_payload["book_metadata"].get("chapter_count", 0),
+                    },
+                )
+                local_stats["processed"] += 1
                 if state is not None and book_record is not None:
                     state.record_step(
                         step_name="softmodel",
@@ -222,6 +304,7 @@ def main(argv: list[str] | None = None) -> int:
                         },
                     )
                     state.increment_run_counter("softmodel", "processed")
+                    state.save()
                 print(
                     f"[OK] {book_dir} -> {output_dir} "
                     f"(index={book_record['index'] if book_record is not None else 'no-state'}, {'new' if is_new_book else 'updated'})"
@@ -252,12 +335,14 @@ def main(argv: list[str] | None = None) -> int:
                         error=str(exc),
                     )
                     state.increment_run_counter("softmodel", "failed")
+                    state.save()
+                local_stats["failed"] += 1
                 raise
     finally:
         if state is not None:
             state.finish_run("softmodel")
 
-    run_stats = state.run_stats("softmodel") if state is not None else {}
+    run_stats = state.run_stats("softmodel") if state is not None else local_stats
     print(
         f"Finished. Wrote {len(written_dirs)} feature book folder(s). "
         f"processed={run_stats.get('processed', 0)} "

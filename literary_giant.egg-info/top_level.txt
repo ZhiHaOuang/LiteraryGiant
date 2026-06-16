@@ -4,4 +4,3 @@ generatemodel
 infermodel
 scripts
 shared
-softmodel

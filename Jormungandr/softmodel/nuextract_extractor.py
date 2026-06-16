@@ -181,7 +181,15 @@ class NuExtractExtractor:
 
         for index in fallback_indexes:
             item = prepared[index]
-            payloads[index] = self.extract(title=item["title"], content=item["content"]).to_dict()
+            try:
+                payloads[index] = self.extract(title=item["title"], content=item["content"]).to_dict()
+            except ValueError as exc:
+                print(f"[NuExtract batch] item {index} fell back to rule extraction: {exc}")
+                payloads[index] = self._build_rule_fallback_features(
+                    title=item["title"],
+                    content=item["content"],
+                    reason=str(exc),
+                ).to_dict()
 
         assert all(payload is not None for payload in payloads)
         resolved_payloads = [dict(payload) for payload in payloads if payload is not None]
@@ -384,8 +392,163 @@ class NuExtractExtractor:
                 continue
 
         if last_error is not None:
-            raise last_error
+            print(f"[NuExtract] fallback to rule extraction after retries failed: {last_error}")
+            return self._build_rule_fallback_features(
+                title=title,
+                content=content,
+                reason=str(last_error),
+            )
         raise RuntimeError("NuExtract extraction failed without a captured exception.")
+
+    def _build_rule_fallback_features(self, *, title: str, content: str, reason: str = "") -> SemanticFeatures:
+        sentences = self._split_fallback_sentences(content)
+        summary = self._truncate_fallback_text("".join(sentences[:2]) or content, 180)
+        detailed_summary = [
+            self._truncate_fallback_text(sentence, 120)
+            for sentence in sentences[:6]
+            if self._truncate_fallback_text(sentence, 120)
+        ]
+        if not detailed_summary and summary:
+            detailed_summary = [summary]
+
+        protagonist = self._guess_fallback_names(content, limit=3)
+        locations = self._guess_fallback_terms(
+            content,
+            suffixes=("城", "镇", "鎮", "村", "山", "谷", "厅", "廳", "楼", "樓", "街", "宫", "宮", "殿", "界", "域", "餐厅", "餐廳"),
+            limit=3,
+        )
+        items = self._guess_fallback_terms(
+            content,
+            suffixes=("枪", "炮", "剑", "刀", "弹", "药剂", "炸弹", "徽章", "卷轴", "装置"),
+            limit=4,
+        )
+        conflict_sentences = [
+            self._truncate_fallback_text(sentence, 100)
+            for sentence in sentences
+            if any(keyword in sentence for keyword in ("杀", "战", "伤", "血", "逃", "爆", "枪", "冲突", "危"))
+        ][:3]
+        state_changes = [
+            self._truncate_fallback_text(sentence, 100)
+            for sentence in sentences
+            if any(keyword in sentence for keyword in ("受伤", "死亡", "消失", "撤", "逃", "击中", "轰碎", "倒塌"))
+        ][:3]
+        ending_hook = self._truncate_fallback_text(sentences[-1], 120) if sentences else ""
+
+        if reason:
+            print(
+                "[NuExtract fallback] rule-based SemanticFeatures generated "
+                f"title={title!r} content_chars={len(content)} reason={reason[:240]}"
+            )
+
+        return SemanticFeatures(
+            summary=summary,
+            detailed_summary=detailed_summary,
+            protagonist=protagonist,
+            current_scene=locations,
+            current_goal_or_task=[],
+            supporting_characters=[],
+            items_and_props=items,
+            protagonist_current_state=[],
+            chapter_function=["情节推进"] if summary else [],
+            key_scenes=detailed_summary[:3],
+            important_dialogue_topics=[],
+            conflicts=conflict_sentences,
+            foreshadowing=[],
+            clues=[],
+            ending_hook=ending_hook,
+            state_changes=state_changes,
+            relationship_changes=[],
+            world_rules_or_system_changes=[],
+            tone=self._guess_fallback_tone(content),
+            open_questions=[],
+        )
+
+    @staticmethod
+    def _split_fallback_sentences(content: str) -> list[str]:
+        normalized = re.sub(r"\s+", " ", str(content).strip())
+        if not normalized:
+            return []
+        parts = re.split(r"(?<=[。！？!?；;])\s*", normalized)
+        sentences = [part.strip() for part in parts if len(part.strip()) >= 8]
+        if sentences:
+            return sentences
+        return [normalized]
+
+    @staticmethod
+    def _truncate_fallback_text(text: str, limit: int) -> str:
+        cleaned = " ".join(str(text).strip().split())
+        if len(cleaned) <= limit:
+            return cleaned
+        return cleaned[: max(0, limit - 1)].rstrip() + "…"
+
+    @staticmethod
+    def _guess_fallback_names(content: str, *, limit: int) -> list[str]:
+        blocked = {
+            "一個",
+            "這個",
+            "那個",
+            "自己",
+            "對方",
+            "眾人",
+            "男人",
+            "女人",
+            "年輕",
+            "建築",
+            "餐廳",
+            "或者说",
+            "或者說",
+            "下意識",
+            "雷屬性",
+            "土屬性",
+            "之間",
+        }
+        counts: dict[str, int] = {}
+        for token in re.findall(r"[\u4e00-\u9fff·]{2,6}", content):
+            token = token.strip("，。！？；：、“”‘’（）()")
+            token = re.sub(r"[的了中內内后後前]+$", "", token)
+            if len(token) < 2 or token in blocked:
+                continue
+            if re.search(r"\d", token) or token.startswith(("一", "二", "三", "四", "五", "六", "七", "八", "九", "十")):
+                continue
+            if token.endswith(("之後", "之前", "起來", "下意識", "這種", "那種", "可以", "沒有")):
+                continue
+            counts[token] = counts.get(token, 0) + 1
+        ranked = sorted(counts.items(), key=lambda item: (-item[1], len(item[0]), item[0]))
+        return [name for name, _count in ranked[:limit]]
+
+    @staticmethod
+    def _guess_fallback_terms(content: str, *, suffixes: tuple[str, ...], limit: int) -> list[str]:
+        suffix_pattern = "|".join(re.escape(suffix) for suffix in suffixes)
+        pattern = rf"[\u4e00-\u9fff·]{{1,5}}(?:{suffix_pattern})"
+        terms: list[str] = []
+        seen: set[str] = set()
+        for match in re.finditer(pattern, content):
+            term = match.group(0).strip("，。！？；：、“”‘’（）()")
+            term = re.sub(r"^(向|在|到|從|从|穿透|進入|进入|離開|离开|靠近)", "", term)
+            if len(term) < 2 or len(term) > 8 or term in seen:
+                continue
+            if term.startswith(("出現", "來到", "離開", "所有", "這棟", "整棟", "隨時", "發射")):
+                continue
+            seen.add(term)
+            terms.append(term)
+            if len(terms) >= limit:
+                break
+        return terms
+
+    @staticmethod
+    def _guess_fallback_tone(content: str) -> str:
+        tone_keywords = {
+            "紧张": ("危", "逃", "追", "血", "伤", "殺", "杀"),
+            "战斗": ("戰", "战", "枪", "爆", "轰", "击"),
+            "悬疑": ("疑", "秘密", "线索", "不對", "不对"),
+            "日常": ("笑", "宴會", "晚宴", "聊天"),
+        }
+        scores = {
+            tone: sum(str(content).count(keyword) for keyword in keywords)
+            for tone, keywords in tone_keywords.items()
+        }
+        tone, score = max(scores.items(), key=lambda item: item[1])
+        return tone if score > 0 else "叙事"
 
     def extract_role_entities(self, *, title: str, content: str) -> dict[str, list[str]]:
         self.load()

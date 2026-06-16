@@ -1,0 +1,1662 @@
+[SKIP] Library/reference/facts/cleaned_chapters/book_0001 -> /root/private_data/LiteraryGiant/Library/reference/facts/chapter_features/book_0001 (index=0001)
+[SKIP] Library/reference/facts/cleaned_chapters/book_0002 -> /root/private_data/LiteraryGiant/Library/reference/facts/chapter_features/book_0002 (index=0002)
+[CHAPTER-SKIP] 0003 1/4226 -> chapter_0001.json (state)
+[CHAPTER-SKIP] 0003 2/4226 -> chapter_0002.json (state)
+[CHAPTER-SKIP] 0003 3/4226 -> chapter_0003.json (state)
+[CHAPTER-SKIP] 0003 4/4226 -> chapter_0004.json (state)
+[CHAPTER-SKIP] 0003 5/4226 -> chapter_0005.json (state)
+[CHAPTER-SKIP] 0003 6/4226 -> chapter_0006.json (state)
+[CHAPTER-SKIP] 0003 7/4226 -> chapter_0007.json (state)
+[CHAPTER-SKIP] 0003 8/4226 -> chapter_0008.json (state)
+[CHAPTER-SKIP] 0003 9/4226 -> chapter_0009.json (state)
+[CHAPTER-SKIP] 0003 10/4226 -> chapter_0010.json (state)
+[CHAPTER-SKIP] 0003 11/4226 -> chapter_0011.json (state)
+[CHAPTER-SKIP] 0003 12/4226 -> chapter_0012.json (state)
+[CHAPTER-SKIP] 0003 13/4226 -> chapter_0013.json (state)
+[CHAPTER-SKIP] 0003 14/4226 -> chapter_0014.json (state)
+[CHAPTER-SKIP] 0003 15/4226 -> chapter_0015.json (state)
+[CHAPTER-SKIP] 0003 16/4226 -> chapter_0016.json (state)
+[CHAPTER-SKIP] 0003 17/4226 -> chapter_0017.json (state)
+[CHAPTER-SKIP] 0003 18/4226 -> chapter_0018.json (state)
+[CHAPTER-SKIP] 0003 19/4226 -> chapter_0019.json (state)
+[CHAPTER-SKIP] 0003 20/4226 -> chapter_0020.json (state)
+[CHAPTER-SKIP] 0003 21/4226 -> chapter_0021.json (state)
+[CHAPTER-SKIP] 0003 22/4226 -> chapter_0022.json (state)
+[CHAPTER-SKIP] 0003 23/4226 -> chapter_0023.json (state)
+[CHAPTER-SKIP] 0003 24/4226 -> chapter_0024.json (state)
+[CHAPTER-SKIP] 0003 25/4226 -> chapter_0025.json (state)
+[CHAPTER-SKIP] 0003 26/4226 -> chapter_0026.json (state)
+[CHAPTER-SKIP] 0003 27/4226 -> chapter_0027.json (state)
+[CHAPTER-SKIP] 0003 28/4226 -> chapter_0028.json (state)
+[CHAPTER-SKIP] 0003 29/4226 -> chapter_0029.json (state)
+[CHAPTER-SKIP] 0003 30/4226 -> chapter_0030.json (state)
+[CHAPTER-SKIP] 0003 31/4226 -> chapter_0031.json (state)
+[CHAPTER-SKIP] 0003 32/4226 -> chapter_0032.json (state)
+[CHAPTER-SKIP] 0003 33/4226 -> chapter_0033.json (state)
+[CHAPTER-SKIP] 0003 34/4226 -> chapter_0034.json (state)
+[CHAPTER-SKIP] 0003 35/4226 -> chapter_0035.json (state)
+[CHAPTER-SKIP] 0003 36/4226 -> chapter_0036.json (state)
+[CHAPTER-SKIP] 0003 37/4226 -> chapter_0037.json (state)
+[CHAPTER-SKIP] 0003 38/4226 -> chapter_0038.json (state)
+[CHAPTER-SKIP] 0003 39/4226 -> chapter_0039.json (state)
+[CHAPTER-SKIP] 0003 40/4226 -> chapter_0040.json (state)
+[CHAPTER-SKIP] 0003 41/4226 -> chapter_0041.json (state)
+[CHAPTER-SKIP] 0003 42/4226 -> chapter_0042.json (state)
+[CHAPTER-SKIP] 0003 43/4226 -> chapter_0043.json (state)
+[CHAPTER-SKIP] 0003 44/4226 -> chapter_0044.json (state)
+[CHAPTER-SKIP] 0003 45/4226 -> chapter_0045.json (state)
+[CHAPTER-SKIP] 0003 46/4226 -> chapter_0046.json (state)
+[CHAPTER-SKIP] 0003 47/4226 -> chapter_0047.json (state)
+[CHAPTER-SKIP] 0003 48/4226 -> chapter_0048.json (state)
+[CHAPTER-SKIP] 0003 49/4226 -> chapter_0049.json (state)
+[CHAPTER-SKIP] 0003 50/4226 -> chapter_0050.json (state)
+[CHAPTER-SKIP] 0003 51/4226 -> chapter_0051.json (state)
+[CHAPTER-SKIP] 0003 52/4226 -> chapter_0052.json (state)
+[CHAPTER-SKIP] 0003 53/4226 -> chapter_0053.json (state)
+[CHAPTER-SKIP] 0003 54/4226 -> chapter_0054.json (state)
+[CHAPTER-SKIP] 0003 55/4226 -> chapter_0055.json (state)
+[CHAPTER-SKIP] 0003 56/4226 -> chapter_0056.json (state)
+[CHAPTER-SKIP] 0003 57/4226 -> chapter_0057.json (state)
+[CHAPTER-SKIP] 0003 58/4226 -> chapter_0058.json (state)
+[CHAPTER-SKIP] 0003 59/4226 -> chapter_0059.json (state)
+[CHAPTER-SKIP] 0003 60/4226 -> chapter_0060.json (state)
+[CHAPTER-SKIP] 0003 61/4226 -> chapter_0061.json (state)
+[CHAPTER-SKIP] 0003 62/4226 -> chapter_0062.json (state)
+[CHAPTER-SKIP] 0003 63/4226 -> chapter_0063.json (state)
+[CHAPTER-SKIP] 0003 64/4226 -> chapter_0064.json (state)
+[CHAPTER-SKIP] 0003 65/4226 -> chapter_0065.json (state)
+[CHAPTER-SKIP] 0003 66/4226 -> chapter_0066.json (state)
+[CHAPTER-SKIP] 0003 67/4226 -> chapter_0067.json (state)
+[CHAPTER-SKIP] 0003 68/4226 -> chapter_0068.json (state)
+[CHAPTER-SKIP] 0003 69/4226 -> chapter_0069.json (state)
+[CHAPTER-SKIP] 0003 70/4226 -> chapter_0070.json (state)
+[CHAPTER-SKIP] 0003 71/4226 -> chapter_0071.json (state)
+[CHAPTER-SKIP] 0003 72/4226 -> chapter_0072.json (state)
+[CHAPTER-SKIP] 0003 73/4226 -> chapter_0073.json (state)
+[CHAPTER-SKIP] 0003 74/4226 -> chapter_0074.json (state)
+[CHAPTER-SKIP] 0003 75/4226 -> chapter_0075.json (state)
+[CHAPTER-SKIP] 0003 76/4226 -> chapter_0076.json (state)
+[CHAPTER-SKIP] 0003 77/4226 -> chapter_0077.json (state)
+[CHAPTER-SKIP] 0003 78/4226 -> chapter_0078.json (state)
+[CHAPTER-SKIP] 0003 79/4226 -> chapter_0079.json (state)
+[CHAPTER-SKIP] 0003 80/4226 -> chapter_0080.json (state)
+[CHAPTER-SKIP] 0003 81/4226 -> chapter_0081.json (state)
+[CHAPTER-SKIP] 0003 82/4226 -> chapter_0082.json (state)
+[CHAPTER-SKIP] 0003 83/4226 -> chapter_0083.json (state)
+[CHAPTER-SKIP] 0003 84/4226 -> chapter_0084.json (state)
+[CHAPTER-SKIP] 0003 85/4226 -> chapter_0085.json (state)
+[CHAPTER-SKIP] 0003 86/4226 -> chapter_0086.json (state)
+[CHAPTER-SKIP] 0003 87/4226 -> chapter_0087.json (state)
+[CHAPTER-SKIP] 0003 88/4226 -> chapter_0088.json (state)
+[CHAPTER-SKIP] 0003 89/4226 -> chapter_0089.json (state)
+[CHAPTER-SKIP] 0003 90/4226 -> chapter_0090.json (state)
+[CHAPTER-SKIP] 0003 91/4226 -> chapter_0091.json (state)
+[CHAPTER-SKIP] 0003 92/4226 -> chapter_0092.json (state)
+[CHAPTER-SKIP] 0003 93/4226 -> chapter_0093.json (state)
+[CHAPTER-SKIP] 0003 94/4226 -> chapter_0094.json (state)
+[CHAPTER-SKIP] 0003 95/4226 -> chapter_0095.json (state)
+[CHAPTER-SKIP] 0003 96/4226 -> chapter_0096.json (state)
+[CHAPTER-SKIP] 0003 97/4226 -> chapter_0097.json (state)
+[CHAPTER-SKIP] 0003 98/4226 -> chapter_0098.json (state)
+[CHAPTER-SKIP] 0003 99/4226 -> chapter_0099.json (state)
+[CHAPTER-SKIP] 0003 100/4226 -> chapter_0100.json (state)
+[CHAPTER-SKIP] 0003 101/4226 -> chapter_0101.json (state)
+[CHAPTER-SKIP] 0003 102/4226 -> chapter_0102.json (state)
+[CHAPTER-SKIP] 0003 103/4226 -> chapter_0103.json (state)
+[CHAPTER-SKIP] 0003 104/4226 -> chapter_0104.json (state)
+[CHAPTER-SKIP] 0003 105/4226 -> chapter_0105.json (state)
+[CHAPTER-SKIP] 0003 106/4226 -> chapter_0106.json (state)
+[CHAPTER-SKIP] 0003 107/4226 -> chapter_0107.json (state)
+[CHAPTER-SKIP] 0003 108/4226 -> chapter_0108.json (state)
+[CHAPTER-SKIP] 0003 109/4226 -> chapter_0109.json (state)
+[CHAPTER-SKIP] 0003 110/4226 -> chapter_0110.json (state)
+[CHAPTER-SKIP] 0003 111/4226 -> chapter_0111.json (state)
+[CHAPTER-SKIP] 0003 112/4226 -> chapter_0112.json (state)
+[CHAPTER-SKIP] 0003 113/4226 -> chapter_0113.json (state)
+[CHAPTER-SKIP] 0003 114/4226 -> chapter_0114.json (state)
+[CHAPTER-SKIP] 0003 115/4226 -> chapter_0115.json (state)
+[CHAPTER-SKIP] 0003 116/4226 -> chapter_0116.json (state)
+[CHAPTER-SKIP] 0003 117/4226 -> chapter_0117.json (state)
+[CHAPTER-SKIP] 0003 118/4226 -> chapter_0118.json (state)
+[CHAPTER-SKIP] 0003 119/4226 -> chapter_0119.json (state)
+[CHAPTER-SKIP] 0003 120/4226 -> chapter_0120.json (state)
+[CHAPTER-SKIP] 0003 121/4226 -> chapter_0121.json (state)
+[CHAPTER-SKIP] 0003 122/4226 -> chapter_0122.json (state)
+[CHAPTER-SKIP] 0003 123/4226 -> chapter_0123.json (state)
+[CHAPTER-SKIP] 0003 124/4226 -> chapter_0124.json (state)
+[CHAPTER-SKIP] 0003 125/4226 -> chapter_0125.json (state)
+[CHAPTER-SKIP] 0003 126/4226 -> chapter_0126.json (state)
+[CHAPTER-SKIP] 0003 127/4226 -> chapter_0127.json (state)
+[CHAPTER-SKIP] 0003 128/4226 -> chapter_0128.json (state)
+[CHAPTER-SKIP] 0003 129/4226 -> chapter_0129.json (state)
+[CHAPTER-SKIP] 0003 130/4226 -> chapter_0130.json (state)
+[CHAPTER-SKIP] 0003 131/4226 -> chapter_0131.json (state)
+[CHAPTER-SKIP] 0003 132/4226 -> chapter_0132.json (state)
+[CHAPTER-SKIP] 0003 133/4226 -> chapter_0133.json (state)
+[CHAPTER-SKIP] 0003 134/4226 -> chapter_0134.json (state)
+[CHAPTER-SKIP] 0003 135/4226 -> chapter_0135.json (state)
+[CHAPTER-SKIP] 0003 136/4226 -> chapter_0136.json (state)
+[CHAPTER-SKIP] 0003 137/4226 -> chapter_0137.json (state)
+[CHAPTER-SKIP] 0003 138/4226 -> chapter_0138.json (state)
+[CHAPTER-SKIP] 0003 139/4226 -> chapter_0139.json (state)
+[CHAPTER-SKIP] 0003 140/4226 -> chapter_0140.json (state)
+[CHAPTER-SKIP] 0003 141/4226 -> chapter_0141.json (state)
+[CHAPTER-SKIP] 0003 142/4226 -> chapter_0142.json (state)
+[CHAPTER-SKIP] 0003 143/4226 -> chapter_0143.json (state)
+[CHAPTER-SKIP] 0003 144/4226 -> chapter_0144.json (state)
+[CHAPTER-SKIP] 0003 145/4226 -> chapter_0145.json (state)
+[CHAPTER-SKIP] 0003 146/4226 -> chapter_0146.json (state)
+[CHAPTER-SKIP] 0003 147/4226 -> chapter_0147.json (state)
+[CHAPTER-SKIP] 0003 148/4226 -> chapter_0148.json (state)
+[CHAPTER-SKIP] 0003 149/4226 -> chapter_0149.json (state)
+[CHAPTER-SKIP] 0003 150/4226 -> chapter_0150.json (state)
+[CHAPTER-SKIP] 0003 151/4226 -> chapter_0151.json (state)
+[CHAPTER-SKIP] 0003 152/4226 -> chapter_0152.json (state)
+[CHAPTER-SKIP] 0003 153/4226 -> chapter_0153.json (state)
+[CHAPTER-SKIP] 0003 154/4226 -> chapter_0154.json (state)
+[CHAPTER-SKIP] 0003 155/4226 -> chapter_0155.json (state)
+[CHAPTER-SKIP] 0003 156/4226 -> chapter_0156.json (state)
+[CHAPTER-SKIP] 0003 157/4226 -> chapter_0157.json (state)
+[CHAPTER-SKIP] 0003 158/4226 -> chapter_0158.json (state)
+[CHAPTER-SKIP] 0003 159/4226 -> chapter_0159.json (state)
+[CHAPTER-SKIP] 0003 160/4226 -> chapter_0160.json (state)
+[CHAPTER-SKIP] 0003 161/4226 -> chapter_0161.json (state)
+[CHAPTER-SKIP] 0003 162/4226 -> chapter_0162.json (state)
+[CHAPTER-SKIP] 0003 163/4226 -> chapter_0163.json (state)
+[CHAPTER-SKIP] 0003 164/4226 -> chapter_0164.json (state)
+[CHAPTER-SKIP] 0003 165/4226 -> chapter_0165.json (state)
+[CHAPTER-SKIP] 0003 166/4226 -> chapter_0166.json (state)
+[CHAPTER-SKIP] 0003 167/4226 -> chapter_0167.json (state)
+[CHAPTER-SKIP] 0003 168/4226 -> chapter_0168.json (state)
+[CHAPTER-SKIP] 0003 169/4226 -> chapter_0169.json (state)
+[CHAPTER-SKIP] 0003 170/4226 -> chapter_0170.json (state)
+[CHAPTER-SKIP] 0003 171/4226 -> chapter_0171.json (state)
+[CHAPTER-SKIP] 0003 172/4226 -> chapter_0172.json (state)
+[CHAPTER-SKIP] 0003 173/4226 -> chapter_0173.json (state)
+[CHAPTER-SKIP] 0003 174/4226 -> chapter_0174.json (state)
+[CHAPTER-SKIP] 0003 175/4226 -> chapter_0175.json (state)
+[CHAPTER-SKIP] 0003 176/4226 -> chapter_0176.json (state)
+[CHAPTER-SKIP] 0003 177/4226 -> chapter_0177.json (state)
+[CHAPTER-SKIP] 0003 178/4226 -> chapter_0178.json (state)
+[CHAPTER-SKIP] 0003 179/4226 -> chapter_0179.json (state)
+[CHAPTER-SKIP] 0003 180/4226 -> chapter_0180.json (state)
+[CHAPTER-SKIP] 0003 181/4226 -> chapter_0181.json (state)
+[CHAPTER-SKIP] 0003 182/4226 -> chapter_0182.json (state)
+[CHAPTER-SKIP] 0003 183/4226 -> chapter_0183.json (state)
+[CHAPTER-SKIP] 0003 184/4226 -> chapter_0184.json (state)
+[CHAPTER-SKIP] 0003 185/4226 -> chapter_0185.json (state)
+[CHAPTER-SKIP] 0003 186/4226 -> chapter_0186.json (state)
+[CHAPTER-SKIP] 0003 187/4226 -> chapter_0187.json (state)
+[CHAPTER-SKIP] 0003 188/4226 -> chapter_0188.json (state)
+[CHAPTER-SKIP] 0003 189/4226 -> chapter_0189.json (state)
+[CHAPTER-SKIP] 0003 190/4226 -> chapter_0190.json (state)
+[CHAPTER-SKIP] 0003 191/4226 -> chapter_0191.json (state)
+[CHAPTER-SKIP] 0003 192/4226 -> chapter_0192.json (state)
+[CHAPTER-SKIP] 0003 193/4226 -> chapter_0193.json (state)
+[CHAPTER-SKIP] 0003 194/4226 -> chapter_0194.json (state)
+[CHAPTER-SKIP] 0003 195/4226 -> chapter_0195.json (state)
+[CHAPTER-SKIP] 0003 196/4226 -> chapter_0196.json (state)
+[CHAPTER-SKIP] 0003 197/4226 -> chapter_0197.json (state)
+[CHAPTER-SKIP] 0003 198/4226 -> chapter_0198.json (state)
+[CHAPTER-SKIP] 0003 199/4226 -> chapter_0199.json (state)
+[CHAPTER-SKIP] 0003 200/4226 -> chapter_0200.json (state)
+[CHAPTER-SKIP] 0003 201/4226 -> chapter_0201.json (state)
+[CHAPTER-SKIP] 0003 202/4226 -> chapter_0202.json (state)
+[CHAPTER-SKIP] 0003 203/4226 -> chapter_0203.json (state)
+[CHAPTER-SKIP] 0003 204/4226 -> chapter_0204.json (state)
+[CHAPTER-SKIP] 0003 205/4226 -> chapter_0205.json (state)
+[CHAPTER-SKIP] 0003 206/4226 -> chapter_0206.json (state)
+[CHAPTER-SKIP] 0003 207/4226 -> chapter_0207.json (state)
+[CHAPTER-SKIP] 0003 208/4226 -> chapter_0208.json (state)
+[CHAPTER-SKIP] 0003 209/4226 -> chapter_0209.json (state)
+[CHAPTER-SKIP] 0003 210/4226 -> chapter_0210.json (state)
+[CHAPTER-SKIP] 0003 211/4226 -> chapter_0211.json (state)
+[CHAPTER-SKIP] 0003 212/4226 -> chapter_0212.json (state)
+[CHAPTER-SKIP] 0003 213/4226 -> chapter_0213.json (state)
+[CHAPTER-SKIP] 0003 214/4226 -> chapter_0214.json (state)
+[CHAPTER-SKIP] 0003 215/4226 -> chapter_0215.json (state)
+[CHAPTER-SKIP] 0003 216/4226 -> chapter_0216.json (state)
+[CHAPTER-SKIP] 0003 217/4226 -> chapter_0217.json (state)
+[CHAPTER-SKIP] 0003 218/4226 -> chapter_0218.json (state)
+[CHAPTER-SKIP] 0003 219/4226 -> chapter_0219.json (state)
+[CHAPTER-SKIP] 0003 220/4226 -> chapter_0220.json (state)
+[CHAPTER-SKIP] 0003 221/4226 -> chapter_0221.json (state)
+[CHAPTER-SKIP] 0003 222/4226 -> chapter_0222.json (state)
+[CHAPTER-SKIP] 0003 223/4226 -> chapter_0223.json (state)
+[CHAPTER-SKIP] 0003 224/4226 -> chapter_0224.json (state)
+[CHAPTER-SKIP] 0003 225/4226 -> chapter_0225.json (state)
+[CHAPTER-SKIP] 0003 226/4226 -> chapter_0226.json (state)
+[CHAPTER-SKIP] 0003 227/4226 -> chapter_0227.json (state)
+[CHAPTER-SKIP] 0003 228/4226 -> chapter_0228.json (state)
+[CHAPTER-SKIP] 0003 229/4226 -> chapter_0229.json (state)
+[CHAPTER-SKIP] 0003 230/4226 -> chapter_0230.json (state)
+[CHAPTER-SKIP] 0003 231/4226 -> chapter_0231.json (state)
+[CHAPTER-SKIP] 0003 232/4226 -> chapter_0232.json (state)
+[CHAPTER-SKIP] 0003 233/4226 -> chapter_0233.json (state)
+[CHAPTER-SKIP] 0003 234/4226 -> chapter_0234.json (state)
+[CHAPTER-SKIP] 0003 235/4226 -> chapter_0235.json (state)
+[CHAPTER-SKIP] 0003 236/4226 -> chapter_0236.json (state)
+[CHAPTER-SKIP] 0003 237/4226 -> chapter_0237.json (state)
+[CHAPTER-SKIP] 0003 238/4226 -> chapter_0238.json (state)
+[CHAPTER-SKIP] 0003 239/4226 -> chapter_0239.json (state)
+[CHAPTER-SKIP] 0003 240/4226 -> chapter_0240.json (state)
+[CHAPTER-SKIP] 0003 241/4226 -> chapter_0241.json (state)
+[CHAPTER-SKIP] 0003 242/4226 -> chapter_0242.json (state)
+[CHAPTER-SKIP] 0003 243/4226 -> chapter_0243.json (state)
+[CHAPTER-SKIP] 0003 244/4226 -> chapter_0244.json (state)
+[CHAPTER-SKIP] 0003 245/4226 -> chapter_0245.json (state)
+[CHAPTER-SKIP] 0003 246/4226 -> chapter_0246.json (state)
+[CHAPTER-SKIP] 0003 247/4226 -> chapter_0247.json (state)
+[CHAPTER-SKIP] 0003 248/4226 -> chapter_0248.json (state)
+[CHAPTER-SKIP] 0003 249/4226 -> chapter_0249.json (state)
+[CHAPTER-SKIP] 0003 250/4226 -> chapter_0250.json (state)
+[CHAPTER-SKIP] 0003 251/4226 -> chapter_0251.json (state)
+[CHAPTER-SKIP] 0003 252/4226 -> chapter_0252.json (state)
+[CHAPTER-SKIP] 0003 253/4226 -> chapter_0253.json (state)
+[CHAPTER-SKIP] 0003 254/4226 -> chapter_0254.json (state)
+[CHAPTER-SKIP] 0003 255/4226 -> chapter_0255.json (state)
+[CHAPTER-SKIP] 0003 256/4226 -> chapter_0256.json (state)
+[CHAPTER-SKIP] 0003 257/4226 -> chapter_0257.json (state)
+[CHAPTER-SKIP] 0003 258/4226 -> chapter_0258.json (state)
+[CHAPTER-SKIP] 0003 259/4226 -> chapter_0259.json (state)
+[CHAPTER-SKIP] 0003 260/4226 -> chapter_0260.json (state)
+[CHAPTER-SKIP] 0003 261/4226 -> chapter_0261.json (state)
+[CHAPTER-SKIP] 0003 262/4226 -> chapter_0262.json (state)
+[CHAPTER-SKIP] 0003 263/4226 -> chapter_0263.json (state)
+[CHAPTER-SKIP] 0003 264/4226 -> chapter_0264.json (state)
+[CHAPTER-SKIP] 0003 265/4226 -> chapter_0265.json (state)
+[CHAPTER-SKIP] 0003 266/4226 -> chapter_0266.json (state)
+[CHAPTER-SKIP] 0003 267/4226 -> chapter_0267.json (state)
+[CHAPTER-SKIP] 0003 268/4226 -> chapter_0268.json (state)
+[CHAPTER-SKIP] 0003 269/4226 -> chapter_0269.json (state)
+[CHAPTER-SKIP] 0003 270/4226 -> chapter_0270.json (state)
+[CHAPTER-SKIP] 0003 271/4226 -> chapter_0271.json (state)
+[CHAPTER-SKIP] 0003 272/4226 -> chapter_0272.json (state)
+[CHAPTER-SKIP] 0003 273/4226 -> chapter_0273.json (state)
+[CHAPTER-SKIP] 0003 274/4226 -> chapter_0274.json (state)
+[CHAPTER-SKIP] 0003 275/4226 -> chapter_0275.json (state)
+[CHAPTER-SKIP] 0003 276/4226 -> chapter_0276.json (state)
+[CHAPTER-SKIP] 0003 277/4226 -> chapter_0277.json (state)
+[CHAPTER-SKIP] 0003 278/4226 -> chapter_0278.json (state)
+[CHAPTER-SKIP] 0003 279/4226 -> chapter_0279.json (state)
+[CHAPTER-SKIP] 0003 280/4226 -> chapter_0280.json (state)
+[CHAPTER-SKIP] 0003 281/4226 -> chapter_0281.json (state)
+[CHAPTER-SKIP] 0003 282/4226 -> chapter_0282.json (state)
+[CHAPTER-SKIP] 0003 283/4226 -> chapter_0283.json (state)
+[CHAPTER-SKIP] 0003 284/4226 -> chapter_0284.json (state)
+[CHAPTER-SKIP] 0003 285/4226 -> chapter_0285.json (state)
+[CHAPTER-SKIP] 0003 286/4226 -> chapter_0286.json (state)
+[CHAPTER-SKIP] 0003 287/4226 -> chapter_0287.json (state)
+[CHAPTER-SKIP] 0003 288/4226 -> chapter_0288.json (state)
+[CHAPTER-SKIP] 0003 289/4226 -> chapter_0289.json (state)
+[CHAPTER-SKIP] 0003 290/4226 -> chapter_0290.json (state)
+[CHAPTER-SKIP] 0003 291/4226 -> chapter_0291.json (state)
+[CHAPTER-SKIP] 0003 292/4226 -> chapter_0292.json (state)
+[CHAPTER-SKIP] 0003 293/4226 -> chapter_0293.json (state)
+[CHAPTER-SKIP] 0003 294/4226 -> chapter_0294.json (state)
+[CHAPTER-SKIP] 0003 295/4226 -> chapter_0295.json (state)
+[CHAPTER-SKIP] 0003 296/4226 -> chapter_0296.json (state)
+[CHAPTER-SKIP] 0003 297/4226 -> chapter_0297.json (state)
+[CHAPTER-SKIP] 0003 298/4226 -> chapter_0298.json (state)
+[CHAPTER-SKIP] 0003 299/4226 -> chapter_0299.json (state)
+[CHAPTER-SKIP] 0003 300/4226 -> chapter_0300.json (state)
+[CHAPTER-SKIP] 0003 301/4226 -> chapter_0301.json (state)
+[CHAPTER-SKIP] 0003 302/4226 -> chapter_0302.json (state)
+[CHAPTER-SKIP] 0003 303/4226 -> chapter_0303.json (state)
+[CHAPTER-SKIP] 0003 304/4226 -> chapter_0304.json (state)
+[CHAPTER-SKIP] 0003 305/4226 -> chapter_0305.json (state)
+[CHAPTER-SKIP] 0003 306/4226 -> chapter_0306.json (state)
+[CHAPTER-SKIP] 0003 307/4226 -> chapter_0307.json (state)
+[CHAPTER-SKIP] 0003 308/4226 -> chapter_0308.json (state)
+[CHAPTER-SKIP] 0003 309/4226 -> chapter_0309.json (state)
+[CHAPTER-SKIP] 0003 310/4226 -> chapter_0310.json (state)
+[CHAPTER-SKIP] 0003 311/4226 -> chapter_0311.json (state)
+[CHAPTER-SKIP] 0003 312/4226 -> chapter_0312.json (state)
+[CHAPTER-SKIP] 0003 313/4226 -> chapter_0313.json (state)
+[CHAPTER-SKIP] 0003 314/4226 -> chapter_0314.json (state)
+[CHAPTER-SKIP] 0003 315/4226 -> chapter_0315.json (state)
+[CHAPTER-SKIP] 0003 316/4226 -> chapter_0316.json (state)
+[CHAPTER-SKIP] 0003 317/4226 -> chapter_0317.json (state)
+[CHAPTER-SKIP] 0003 318/4226 -> chapter_0318.json (state)
+[CHAPTER-SKIP] 0003 319/4226 -> chapter_0319.json (state)
+[CHAPTER-SKIP] 0003 320/4226 -> chapter_0320.json (state)
+[CHAPTER-SKIP] 0003 321/4226 -> chapter_0321.json (state)
+[CHAPTER-SKIP] 0003 322/4226 -> chapter_0322.json (state)
+[CHAPTER-SKIP] 0003 323/4226 -> chapter_0323.json (state)
+[CHAPTER-SKIP] 0003 324/4226 -> chapter_0324.json (state)
+[CHAPTER-SKIP] 0003 325/4226 -> chapter_0325.json (state)
+[CHAPTER-SKIP] 0003 326/4226 -> chapter_0326.json (state)
+[CHAPTER-SKIP] 0003 327/4226 -> chapter_0327.json (state)
+[CHAPTER-SKIP] 0003 328/4226 -> chapter_0328.json (state)
+[CHAPTER-SKIP] 0003 329/4226 -> chapter_0329.json (state)
+[CHAPTER-SKIP] 0003 330/4226 -> chapter_0330.json (state)
+[CHAPTER-SKIP] 0003 331/4226 -> chapter_0331.json (state)
+[CHAPTER-SKIP] 0003 332/4226 -> chapter_0332.json (state)
+[CHAPTER-SKIP] 0003 333/4226 -> chapter_0333.json (state)
+[CHAPTER-SKIP] 0003 334/4226 -> chapter_0334.json (state)
+[CHAPTER-SKIP] 0003 335/4226 -> chapter_0335.json (state)
+[CHAPTER-SKIP] 0003 336/4226 -> chapter_0336.json (state)
+[CHAPTER-SKIP] 0003 337/4226 -> chapter_0337.json (state)
+[CHAPTER-SKIP] 0003 338/4226 -> chapter_0338.json (state)
+[CHAPTER-SKIP] 0003 339/4226 -> chapter_0339.json (state)
+[CHAPTER-SKIP] 0003 340/4226 -> chapter_0340.json (state)
+[CHAPTER-SKIP] 0003 341/4226 -> chapter_0341.json (state)
+[CHAPTER-SKIP] 0003 342/4226 -> chapter_0342.json (state)
+[CHAPTER-SKIP] 0003 343/4226 -> chapter_0343.json (state)
+[CHAPTER-SKIP] 0003 344/4226 -> chapter_0344.json (state)
+[CHAPTER-SKIP] 0003 345/4226 -> chapter_0345.json (state)
+[CHAPTER-SKIP] 0003 346/4226 -> chapter_0346.json (state)
+[CHAPTER-SKIP] 0003 347/4226 -> chapter_0347.json (state)
+[CHAPTER-SKIP] 0003 348/4226 -> chapter_0348.json (state)
+[CHAPTER-SKIP] 0003 349/4226 -> chapter_0349.json (state)
+[CHAPTER-SKIP] 0003 350/4226 -> chapter_0350.json (state)
+[CHAPTER-SKIP] 0003 351/4226 -> chapter_0351.json (state)
+[CHAPTER-SKIP] 0003 352/4226 -> chapter_0352.json (state)
+[CHAPTER-SKIP] 0003 353/4226 -> chapter_0353.json (state)
+[CHAPTER-SKIP] 0003 354/4226 -> chapter_0354.json (state)
+[CHAPTER-SKIP] 0003 355/4226 -> chapter_0355.json (state)
+[CHAPTER-SKIP] 0003 356/4226 -> chapter_0356.json (state)
+[CHAPTER-SKIP] 0003 357/4226 -> chapter_0357.json (state)
+[CHAPTER-SKIP] 0003 358/4226 -> chapter_0358.json (state)
+[CHAPTER-SKIP] 0003 359/4226 -> chapter_0359.json (state)
+[CHAPTER-SKIP] 0003 360/4226 -> chapter_0360.json (state)
+[CHAPTER-SKIP] 0003 361/4226 -> chapter_0361.json (state)
+[CHAPTER-SKIP] 0003 362/4226 -> chapter_0362.json (state)
+[CHAPTER-SKIP] 0003 363/4226 -> chapter_0363.json (state)
+[CHAPTER-SKIP] 0003 364/4226 -> chapter_0364.json (state)
+[CHAPTER-SKIP] 0003 365/4226 -> chapter_0365.json (state)
+[CHAPTER-SKIP] 0003 366/4226 -> chapter_0366.json (state)
+[CHAPTER-SKIP] 0003 367/4226 -> chapter_0367.json (state)
+[CHAPTER-SKIP] 0003 368/4226 -> chapter_0368.json (state)
+[CHAPTER-SKIP] 0003 369/4226 -> chapter_0369.json (state)
+[CHAPTER-SKIP] 0003 370/4226 -> chapter_0370.json (state)
+[CHAPTER-SKIP] 0003 371/4226 -> chapter_0371.json (state)
+[CHAPTER-SKIP] 0003 372/4226 -> chapter_0372.json (state)
+[CHAPTER-SKIP] 0003 373/4226 -> chapter_0373.json (state)
+[CHAPTER-SKIP] 0003 374/4226 -> chapter_0374.json (state)
+[CHAPTER-SKIP] 0003 375/4226 -> chapter_0375.json (state)
+[CHAPTER-SKIP] 0003 376/4226 -> chapter_0376.json (state)
+[CHAPTER-SKIP] 0003 377/4226 -> chapter_0377.json (state)
+[CHAPTER-SKIP] 0003 378/4226 -> chapter_0378.json (state)
+[CHAPTER-SKIP] 0003 379/4226 -> chapter_0379.json (state)
+[CHAPTER-SKIP] 0003 380/4226 -> chapter_0380.json (state)
+[CHAPTER-SKIP] 0003 381/4226 -> chapter_0381.json (state)
+[CHAPTER-SKIP] 0003 382/4226 -> chapter_0382.json (state)
+[CHAPTER-SKIP] 0003 383/4226 -> chapter_0383.json (state)
+[CHAPTER-SKIP] 0003 384/4226 -> chapter_0384.json (state)
+[CHAPTER-SKIP] 0003 385/4226 -> chapter_0385.json (state)
+[CHAPTER-SKIP] 0003 386/4226 -> chapter_0386.json (state)
+[CHAPTER-SKIP] 0003 387/4226 -> chapter_0387.json (state)
+[CHAPTER-SKIP] 0003 388/4226 -> chapter_0388.json (state)
+[CHAPTER-SKIP] 0003 389/4226 -> chapter_0389.json (state)
+[CHAPTER-SKIP] 0003 390/4226 -> chapter_0390.json (state)
+[CHAPTER-SKIP] 0003 391/4226 -> chapter_0391.json (state)
+[CHAPTER-SKIP] 0003 392/4226 -> chapter_0392.json (state)
+[CHAPTER-SKIP] 0003 393/4226 -> chapter_0393.json (state)
+[CHAPTER-SKIP] 0003 394/4226 -> chapter_0394.json (state)
+[CHAPTER-SKIP] 0003 395/4226 -> chapter_0395.json (state)
+[CHAPTER-SKIP] 0003 396/4226 -> chapter_0396.json (state)
+[CHAPTER-SKIP] 0003 397/4226 -> chapter_0397.json (state)
+[CHAPTER-SKIP] 0003 398/4226 -> chapter_0398.json (state)
+[CHAPTER-SKIP] 0003 399/4226 -> chapter_0399.json (state)
+[CHAPTER-SKIP] 0003 400/4226 -> chapter_0400.json (state)
+[CHAPTER-SKIP] 0003 401/4226 -> chapter_0401.json (state)
+[CHAPTER-SKIP] 0003 402/4226 -> chapter_0402.json (state)
+[CHAPTER-SKIP] 0003 403/4226 -> chapter_0403.json (state)
+[CHAPTER-SKIP] 0003 404/4226 -> chapter_0404.json (state)
+[CHAPTER-SKIP] 0003 405/4226 -> chapter_0405.json (state)
+[CHAPTER-SKIP] 0003 406/4226 -> chapter_0406.json (state)
+[CHAPTER-SKIP] 0003 407/4226 -> chapter_0407.json (state)
+[CHAPTER-SKIP] 0003 408/4226 -> chapter_0408.json (state)
+[CHAPTER-SKIP] 0003 409/4226 -> chapter_0409.json (state)
+[CHAPTER-SKIP] 0003 410/4226 -> chapter_0410.json (state)
+[CHAPTER-SKIP] 0003 411/4226 -> chapter_0411.json (state)
+[CHAPTER-SKIP] 0003 412/4226 -> chapter_0412.json (state)
+[CHAPTER-SKIP] 0003 413/4226 -> chapter_0413.json (state)
+[CHAPTER-SKIP] 0003 414/4226 -> chapter_0414.json (state)
+[CHAPTER-SKIP] 0003 415/4226 -> chapter_0415.json (state)
+[CHAPTER-SKIP] 0003 416/4226 -> chapter_0416.json (state)
+[CHAPTER-SKIP] 0003 417/4226 -> chapter_0417.json (state)
+[CHAPTER-SKIP] 0003 418/4226 -> chapter_0418.json (state)
+[CHAPTER-SKIP] 0003 419/4226 -> chapter_0419.json (state)
+[CHAPTER-SKIP] 0003 420/4226 -> chapter_0420.json (state)
+[CHAPTER-SKIP] 0003 421/4226 -> chapter_0421.json (state)
+[CHAPTER-SKIP] 0003 422/4226 -> chapter_0422.json (state)
+[CHAPTER-SKIP] 0003 423/4226 -> chapter_0423.json (state)
+[CHAPTER-SKIP] 0003 424/4226 -> chapter_0424.json (state)
+[CHAPTER-SKIP] 0003 425/4226 -> chapter_0425.json (state)
+[CHAPTER-SKIP] 0003 426/4226 -> chapter_0426.json (state)
+[CHAPTER-SKIP] 0003 427/4226 -> chapter_0427.json (state)
+[CHAPTER-SKIP] 0003 428/4226 -> chapter_0428.json (state)
+[CHAPTER-SKIP] 0003 429/4226 -> chapter_0429.json (state)
+[CHAPTER-SKIP] 0003 430/4226 -> chapter_0430.json (state)
+[CHAPTER-SKIP] 0003 431/4226 -> chapter_0431.json (state)
+[CHAPTER-SKIP] 0003 432/4226 -> chapter_0432.json (state)
+[CHAPTER-SKIP] 0003 433/4226 -> chapter_0433.json (state)
+[CHAPTER-SKIP] 0003 434/4226 -> chapter_0434.json (state)
+[CHAPTER-SKIP] 0003 435/4226 -> chapter_0435.json (state)
+[CHAPTER-SKIP] 0003 436/4226 -> chapter_0436.json (state)
+[CHAPTER-SKIP] 0003 437/4226 -> chapter_0437.json (state)
+[CHAPTER-SKIP] 0003 438/4226 -> chapter_0438.json (state)
+[CHAPTER-SKIP] 0003 439/4226 -> chapter_0439.json (state)
+[CHAPTER-SKIP] 0003 440/4226 -> chapter_0440.json (state)
+[CHAPTER-SKIP] 0003 441/4226 -> chapter_0441.json (state)
+[CHAPTER-SKIP] 0003 442/4226 -> chapter_0442.json (state)
+[CHAPTER-SKIP] 0003 443/4226 -> chapter_0443.json (state)
+[CHAPTER-SKIP] 0003 444/4226 -> chapter_0444.json (state)
+[CHAPTER-SKIP] 0003 445/4226 -> chapter_0445.json (state)
+[CHAPTER-SKIP] 0003 446/4226 -> chapter_0446.json (state)
+[CHAPTER-SKIP] 0003 447/4226 -> chapter_0447.json (state)
+[CHAPTER-SKIP] 0003 448/4226 -> chapter_0448.json (state)
+[CHAPTER-SKIP] 0003 449/4226 -> chapter_0449.json (state)
+[CHAPTER-SKIP] 0003 450/4226 -> chapter_0450.json (state)
+[CHAPTER-SKIP] 0003 451/4226 -> chapter_0451.json (state)
+[CHAPTER-SKIP] 0003 452/4226 -> chapter_0452.json (state)
+[CHAPTER-SKIP] 0003 453/4226 -> chapter_0453.json (state)
+[CHAPTER-SKIP] 0003 454/4226 -> chapter_0454.json (state)
+[CHAPTER-SKIP] 0003 455/4226 -> chapter_0455.json (state)
+[CHAPTER-SKIP] 0003 456/4226 -> chapter_0456.json (state)
+[CHAPTER-SKIP] 0003 457/4226 -> chapter_0457.json (state)
+[CHAPTER-SKIP] 0003 458/4226 -> chapter_0458.json (state)
+[CHAPTER-SKIP] 0003 459/4226 -> chapter_0459.json (state)
+[CHAPTER-SKIP] 0003 460/4226 -> chapter_0460.json (state)
+[CHAPTER-SKIP] 0003 461/4226 -> chapter_0461.json (state)
+[CHAPTER-SKIP] 0003 462/4226 -> chapter_0462.json (state)
+[CHAPTER-SKIP] 0003 463/4226 -> chapter_0463.json (state)
+[CHAPTER-SKIP] 0003 464/4226 -> chapter_0464.json (state)
+[CHAPTER-SKIP] 0003 465/4226 -> chapter_0465.json (state)
+[CHAPTER-SKIP] 0003 466/4226 -> chapter_0466.json (state)
+[CHAPTER-SKIP] 0003 467/4226 -> chapter_0467.json (state)
+[CHAPTER-SKIP] 0003 468/4226 -> chapter_0468.json (state)
+[CHAPTER-SKIP] 0003 469/4226 -> chapter_0469.json (state)
+[CHAPTER-SKIP] 0003 470/4226 -> chapter_0470.json (state)
+[CHAPTER-SKIP] 0003 471/4226 -> chapter_0471.json (state)
+[CHAPTER-SKIP] 0003 472/4226 -> chapter_0472.json (state)
+[CHAPTER-SKIP] 0003 473/4226 -> chapter_0473.json (state)
+[CHAPTER-SKIP] 0003 474/4226 -> chapter_0474.json (state)
+[CHAPTER-SKIP] 0003 475/4226 -> chapter_0475.json (state)
+[CHAPTER-SKIP] 0003 476/4226 -> chapter_0476.json (state)
+[CHAPTER-SKIP] 0003 477/4226 -> chapter_0477.json (state)
+[CHAPTER-SKIP] 0003 478/4226 -> chapter_0478.json (state)
+[CHAPTER-SKIP] 0003 479/4226 -> chapter_0479.json (state)
+[CHAPTER-SKIP] 0003 480/4226 -> chapter_0480.json (state)
+[CHAPTER-SKIP] 0003 481/4226 -> chapter_0481.json (state)
+[CHAPTER-SKIP] 0003 482/4226 -> chapter_0482.json (state)
+[CHAPTER-SKIP] 0003 483/4226 -> chapter_0483.json (state)
+[CHAPTER-SKIP] 0003 484/4226 -> chapter_0484.json (state)
+[CHAPTER-SKIP] 0003 485/4226 -> chapter_0485.json (state)
+[CHAPTER-SKIP] 0003 486/4226 -> chapter_0486.json (state)
+[CHAPTER-SKIP] 0003 487/4226 -> chapter_0487.json (state)
+[CHAPTER-SKIP] 0003 488/4226 -> chapter_0488.json (state)
+[CHAPTER-SKIP] 0003 489/4226 -> chapter_0489.json (state)
+[CHAPTER-SKIP] 0003 490/4226 -> chapter_0490.json (state)
+[CHAPTER-SKIP] 0003 491/4226 -> chapter_0491.json (state)
+[CHAPTER-SKIP] 0003 492/4226 -> chapter_0492.json (state)
+[CHAPTER-SKIP] 0003 493/4226 -> chapter_0493.json (state)
+[CHAPTER-SKIP] 0003 494/4226 -> chapter_0494.json (state)
+[CHAPTER-SKIP] 0003 495/4226 -> chapter_0495.json (state)
+[CHAPTER-SKIP] 0003 496/4226 -> chapter_0496.json (state)
+[CHAPTER-SKIP] 0003 497/4226 -> chapter_0497.json (state)
+[CHAPTER-SKIP] 0003 498/4226 -> chapter_0498.json (state)
+[CHAPTER-SKIP] 0003 499/4226 -> chapter_0499.json (state)
+[CHAPTER-SKIP] 0003 500/4226 -> chapter_0500.json (state)
+[CHAPTER-SKIP] 0003 501/4226 -> chapter_0501.json (state)
+[CHAPTER-SKIP] 0003 502/4226 -> chapter_0502.json (state)
+[CHAPTER-SKIP] 0003 503/4226 -> chapter_0503.json (state)
+[CHAPTER-SKIP] 0003 504/4226 -> chapter_0504.json (state)
+[CHAPTER-SKIP] 0003 505/4226 -> chapter_0505.json (state)
+[CHAPTER-SKIP] 0003 506/4226 -> chapter_0506.json (state)
+[CHAPTER-SKIP] 0003 507/4226 -> chapter_0507.json (state)
+[CHAPTER-SKIP] 0003 508/4226 -> chapter_0508.json (state)
+[CHAPTER-SKIP] 0003 509/4226 -> chapter_0509.json (state)
+[CHAPTER-SKIP] 0003 510/4226 -> chapter_0510.json (state)
+[CHAPTER-SKIP] 0003 511/4226 -> chapter_0511.json (state)
+[CHAPTER-SKIP] 0003 512/4226 -> chapter_0512.json (state)
+[CHAPTER-SKIP] 0003 513/4226 -> chapter_0513.json (state)
+[CHAPTER-SKIP] 0003 514/4226 -> chapter_0514.json (state)
+[CHAPTER-SKIP] 0003 515/4226 -> chapter_0515.json (state)
+[CHAPTER-SKIP] 0003 516/4226 -> chapter_0516.json (state)
+[CHAPTER-SKIP] 0003 517/4226 -> chapter_0517.json (state)
+[CHAPTER-SKIP] 0003 518/4226 -> chapter_0518.json (state)
+[CHAPTER-SKIP] 0003 519/4226 -> chapter_0519.json (state)
+[CHAPTER-SKIP] 0003 520/4226 -> chapter_0520.json (state)
+[CHAPTER-SKIP] 0003 521/4226 -> chapter_0521.json (state)
+[CHAPTER-SKIP] 0003 522/4226 -> chapter_0522.json (state)
+[CHAPTER-SKIP] 0003 523/4226 -> chapter_0523.json (state)
+[CHAPTER-SKIP] 0003 524/4226 -> chapter_0524.json (state)
+[CHAPTER-SKIP] 0003 525/4226 -> chapter_0525.json (state)
+[CHAPTER-SKIP] 0003 526/4226 -> chapter_0526.json (state)
+[CHAPTER-SKIP] 0003 527/4226 -> chapter_0527.json (state)
+[CHAPTER-SKIP] 0003 528/4226 -> chapter_0528.json (state)
+[CHAPTER-SKIP] 0003 529/4226 -> chapter_0529.json (state)
+[CHAPTER-SKIP] 0003 530/4226 -> chapter_0530.json (state)
+[CHAPTER-SKIP] 0003 531/4226 -> chapter_0531.json (state)
+[CHAPTER-SKIP] 0003 532/4226 -> chapter_0532.json (state)
+[CHAPTER-SKIP] 0003 533/4226 -> chapter_0533.json (state)
+[CHAPTER-SKIP] 0003 534/4226 -> chapter_0534.json (state)
+[CHAPTER-SKIP] 0003 535/4226 -> chapter_0535.json (state)
+[CHAPTER-SKIP] 0003 536/4226 -> chapter_0536.json (state)
+[CHAPTER-SKIP] 0003 537/4226 -> chapter_0537.json (state)
+[CHAPTER-SKIP] 0003 538/4226 -> chapter_0538.json (state)
+[CHAPTER-SKIP] 0003 539/4226 -> chapter_0539.json (state)
+[CHAPTER-SKIP] 0003 540/4226 -> chapter_0540.json (state)
+[CHAPTER-SKIP] 0003 541/4226 -> chapter_0541.json (state)
+[CHAPTER-SKIP] 0003 542/4226 -> chapter_0542.json (state)
+[CHAPTER-SKIP] 0003 543/4226 -> chapter_0543.json (state)
+[CHAPTER-SKIP] 0003 544/4226 -> chapter_0544.json (state)
+[CHAPTER-SKIP] 0003 545/4226 -> chapter_0545.json (state)
+[CHAPTER-SKIP] 0003 546/4226 -> chapter_0546.json (state)
+[CHAPTER-SKIP] 0003 547/4226 -> chapter_0547.json (state)
+[CHAPTER-SKIP] 0003 548/4226 -> chapter_0548.json (state)
+[CHAPTER-SKIP] 0003 549/4226 -> chapter_0549.json (state)
+[CHAPTER-SKIP] 0003 550/4226 -> chapter_0550.json (state)
+[CHAPTER-SKIP] 0003 551/4226 -> chapter_0551.json (state)
+[CHAPTER-SKIP] 0003 552/4226 -> chapter_0552.json (state)
+[CHAPTER-SKIP] 0003 553/4226 -> chapter_0553.json (state)
+[CHAPTER-SKIP] 0003 554/4226 -> chapter_0554.json (state)
+[CHAPTER-SKIP] 0003 555/4226 -> chapter_0555.json (state)
+[CHAPTER-SKIP] 0003 556/4226 -> chapter_0556.json (state)
+[CHAPTER-SKIP] 0003 557/4226 -> chapter_0557.json (state)
+[CHAPTER-SKIP] 0003 558/4226 -> chapter_0558.json (state)
+[CHAPTER-SKIP] 0003 559/4226 -> chapter_0559.json (state)
+[CHAPTER-SKIP] 0003 560/4226 -> chapter_0560.json (state)
+[CHAPTER-SKIP] 0003 561/4226 -> chapter_0561.json (state)
+[CHAPTER-SKIP] 0003 562/4226 -> chapter_0562.json (state)
+[CHAPTER-SKIP] 0003 563/4226 -> chapter_0563.json (state)
+[CHAPTER-SKIP] 0003 564/4226 -> chapter_0564.json (state)
+[CHAPTER-SKIP] 0003 565/4226 -> chapter_0565.json (state)
+[CHAPTER-SKIP] 0003 566/4226 -> chapter_0566.json (state)
+[CHAPTER-SKIP] 0003 567/4226 -> chapter_0567.json (state)
+[CHAPTER-SKIP] 0003 568/4226 -> chapter_0568.json (state)
+[CHAPTER-SKIP] 0003 569/4226 -> chapter_0569.json (state)
+[CHAPTER-SKIP] 0003 570/4226 -> chapter_0570.json (state)
+[CHAPTER-SKIP] 0003 571/4226 -> chapter_0571.json (state)
+[CHAPTER-SKIP] 0003 572/4226 -> chapter_0572.json (state)
+[CHAPTER-SKIP] 0003 573/4226 -> chapter_0573.json (state)
+[CHAPTER-SKIP] 0003 574/4226 -> chapter_0574.json (state)
+[CHAPTER-SKIP] 0003 575/4226 -> chapter_0575.json (state)
+[CHAPTER-SKIP] 0003 576/4226 -> chapter_0576.json (state)
+[CHAPTER-SKIP] 0003 577/4226 -> chapter_0577.json (state)
+[CHAPTER-SKIP] 0003 578/4226 -> chapter_0578.json (state)
+[CHAPTER-SKIP] 0003 579/4226 -> chapter_0579.json (state)
+[CHAPTER-SKIP] 0003 580/4226 -> chapter_0580.json (state)
+[CHAPTER-SKIP] 0003 581/4226 -> chapter_0581.json (state)
+[CHAPTER-SKIP] 0003 582/4226 -> chapter_0582.json (state)
+[CHAPTER-SKIP] 0003 583/4226 -> chapter_0583.json (state)
+[CHAPTER-SKIP] 0003 584/4226 -> chapter_0584.json (state)
+[CHAPTER-SKIP] 0003 585/4226 -> chapter_0585.json (state)
+[CHAPTER-SKIP] 0003 586/4226 -> chapter_0586.json (state)
+[CHAPTER-SKIP] 0003 587/4226 -> chapter_0587.json (state)
+[CHAPTER-SKIP] 0003 588/4226 -> chapter_0588.json (state)
+[CHAPTER-SKIP] 0003 589/4226 -> chapter_0589.json (state)
+[CHAPTER-SKIP] 0003 590/4226 -> chapter_0590.json (state)
+[CHAPTER-SKIP] 0003 591/4226 -> chapter_0591.json (state)
+[CHAPTER-SKIP] 0003 592/4226 -> chapter_0592.json (state)
+[CHAPTER-SKIP] 0003 593/4226 -> chapter_0593.json (state)
+[CHAPTER-SKIP] 0003 594/4226 -> chapter_0594.json (state)
+[CHAPTER-SKIP] 0003 595/4226 -> chapter_0595.json (state)
+[CHAPTER-SKIP] 0003 596/4226 -> chapter_0596.json (state)
+[CHAPTER-SKIP] 0003 597/4226 -> chapter_0597.json (state)
+[CHAPTER-SKIP] 0003 598/4226 -> chapter_0598.json (state)
+[CHAPTER-SKIP] 0003 599/4226 -> chapter_0599.json (state)
+[CHAPTER-SKIP] 0003 600/4226 -> chapter_0600.json (state)
+[CHAPTER-SKIP] 0003 601/4226 -> chapter_0601.json (state)
+[CHAPTER-SKIP] 0003 602/4226 -> chapter_0602.json (state)
+[CHAPTER-SKIP] 0003 603/4226 -> chapter_0603.json (state)
+[CHAPTER-SKIP] 0003 604/4226 -> chapter_0604.json (state)
+[CHAPTER-SKIP] 0003 605/4226 -> chapter_0605.json (state)
+[CHAPTER-SKIP] 0003 606/4226 -> chapter_0606.json (state)
+[CHAPTER-SKIP] 0003 607/4226 -> chapter_0607.json (state)
+[CHAPTER-SKIP] 0003 608/4226 -> chapter_0608.json (state)
+[CHAPTER-SKIP] 0003 609/4226 -> chapter_0609.json (state)
+[CHAPTER-SKIP] 0003 610/4226 -> chapter_0610.json (state)
+[CHAPTER-SKIP] 0003 611/4226 -> chapter_0611.json (state)
+[CHAPTER-SKIP] 0003 612/4226 -> chapter_0612.json (state)
+[CHAPTER-SKIP] 0003 613/4226 -> chapter_0613.json (state)
+[CHAPTER-SKIP] 0003 614/4226 -> chapter_0614.json (state)
+[CHAPTER-SKIP] 0003 615/4226 -> chapter_0615.json (state)
+[CHAPTER-SKIP] 0003 616/4226 -> chapter_0616.json (state)
+[CHAPTER-SKIP] 0003 617/4226 -> chapter_0617.json (state)
+[CHAPTER-SKIP] 0003 618/4226 -> chapter_0618.json (state)
+[CHAPTER-SKIP] 0003 619/4226 -> chapter_0619.json (state)
+[CHAPTER-SKIP] 0003 620/4226 -> chapter_0620.json (state)
+[CHAPTER-SKIP] 0003 621/4226 -> chapter_0621.json (state)
+[CHAPTER-SKIP] 0003 622/4226 -> chapter_0622.json (state)
+[CHAPTER-SKIP] 0003 623/4226 -> chapter_0623.json (state)
+[CHAPTER-SKIP] 0003 624/4226 -> chapter_0624.json (state)
+[CHAPTER-SKIP] 0003 625/4226 -> chapter_0625.json (state)
+[CHAPTER-SKIP] 0003 626/4226 -> chapter_0626.json (state)
+[CHAPTER-SKIP] 0003 627/4226 -> chapter_0627.json (state)
+[CHAPTER-SKIP] 0003 628/4226 -> chapter_0628.json (state)
+[CHAPTER-SKIP] 0003 629/4226 -> chapter_0629.json (state)
+[CHAPTER-SKIP] 0003 630/4226 -> chapter_0630.json (state)
+[CHAPTER-SKIP] 0003 631/4226 -> chapter_0631.json (state)
+[CHAPTER-SKIP] 0003 632/4226 -> chapter_0632.json (state)
+[CHAPTER-SKIP] 0003 633/4226 -> chapter_0633.json (state)
+[CHAPTER-SKIP] 0003 634/4226 -> chapter_0634.json (state)
+[CHAPTER-SKIP] 0003 635/4226 -> chapter_0635.json (state)
+[CHAPTER-SKIP] 0003 636/4226 -> chapter_0636.json (state)
+[CHAPTER-SKIP] 0003 637/4226 -> chapter_0637.json (state)
+[CHAPTER-SKIP] 0003 638/4226 -> chapter_0638.json (state)
+[CHAPTER-SKIP] 0003 639/4226 -> chapter_0639.json (state)
+[CHAPTER-SKIP] 0003 640/4226 -> chapter_0640.json (state)
+[CHAPTER-SKIP] 0003 641/4226 -> chapter_0641.json (state)
+[CHAPTER-SKIP] 0003 642/4226 -> chapter_0642.json (state)
+[CHAPTER-SKIP] 0003 643/4226 -> chapter_0643.json (state)
+[CHAPTER-SKIP] 0003 644/4226 -> chapter_0644.json (state)
+[CHAPTER-SKIP] 0003 645/4226 -> chapter_0645.json (state)
+[CHAPTER-SKIP] 0003 646/4226 -> chapter_0646.json (state)
+[CHAPTER-SKIP] 0003 647/4226 -> chapter_0647.json (state)
+[CHAPTER-SKIP] 0003 648/4226 -> chapter_0648.json (state)
+[CHAPTER-SKIP] 0003 649/4226 -> chapter_0649.json (state)
+[CHAPTER-SKIP] 0003 650/4226 -> chapter_0650.json (state)
+[CHAPTER-SKIP] 0003 651/4226 -> chapter_0651.json (state)
+[CHAPTER-SKIP] 0003 652/4226 -> chapter_0652.json (state)
+[CHAPTER-SKIP] 0003 653/4226 -> chapter_0653.json (state)
+[CHAPTER-SKIP] 0003 654/4226 -> chapter_0654.json (state)
+[CHAPTER-SKIP] 0003 655/4226 -> chapter_0655.json (state)
+[CHAPTER-SKIP] 0003 656/4226 -> chapter_0656.json (state)
+[CHAPTER-SKIP] 0003 657/4226 -> chapter_0657.json (state)
+[CHAPTER-SKIP] 0003 658/4226 -> chapter_0658.json (state)
+[CHAPTER-SKIP] 0003 659/4226 -> chapter_0659.json (state)
+[CHAPTER-SKIP] 0003 660/4226 -> chapter_0660.json (state)
+[CHAPTER-SKIP] 0003 661/4226 -> chapter_0661.json (state)
+[CHAPTER-SKIP] 0003 662/4226 -> chapter_0662.json (state)
+[CHAPTER-SKIP] 0003 663/4226 -> chapter_0663.json (state)
+[CHAPTER-SKIP] 0003 664/4226 -> chapter_0664.json (state)
+[CHAPTER-SKIP] 0003 665/4226 -> chapter_0665.json (state)
+[CHAPTER-SKIP] 0003 666/4226 -> chapter_0666.json (state)
+[CHAPTER-SKIP] 0003 667/4226 -> chapter_0667.json (state)
+[CHAPTER-SKIP] 0003 668/4226 -> chapter_0668.json (state)
+[CHAPTER-SKIP] 0003 669/4226 -> chapter_0669.json (state)
+[CHAPTER-SKIP] 0003 670/4226 -> chapter_0670.json (state)
+[CHAPTER-SKIP] 0003 671/4226 -> chapter_0671.json (state)
+[CHAPTER-SKIP] 0003 672/4226 -> chapter_0672.json (state)
+[CHAPTER-SKIP] 0003 673/4226 -> chapter_0673.json (state)
+[CHAPTER-SKIP] 0003 674/4226 -> chapter_0674.json (state)
+[CHAPTER-SKIP] 0003 675/4226 -> chapter_0675.json (state)
+[CHAPTER-SKIP] 0003 676/4226 -> chapter_0676.json (state)
+[CHAPTER-SKIP] 0003 677/4226 -> chapter_0677.json (state)
+[CHAPTER-SKIP] 0003 678/4226 -> chapter_0678.json (state)
+[CHAPTER-SKIP] 0003 679/4226 -> chapter_0679.json (state)
+[CHAPTER-SKIP] 0003 680/4226 -> chapter_0680.json (state)
+[CHAPTER-SKIP] 0003 681/4226 -> chapter_0681.json (state)
+[CHAPTER-SKIP] 0003 682/4226 -> chapter_0682.json (state)
+[CHAPTER-SKIP] 0003 683/4226 -> chapter_0683.json (state)
+[CHAPTER-SKIP] 0003 684/4226 -> chapter_0684.json (state)
+[CHAPTER-SKIP] 0003 685/4226 -> chapter_0685.json (state)
+[CHAPTER-SKIP] 0003 686/4226 -> chapter_0686.json (state)
+[CHAPTER-SKIP] 0003 687/4226 -> chapter_0687.json (state)
+[CHAPTER-SKIP] 0003 688/4226 -> chapter_0688.json (state)
+[CHAPTER-SKIP] 0003 689/4226 -> chapter_0689.json (state)
+[CHAPTER-SKIP] 0003 690/4226 -> chapter_0690.json (state)
+[CHAPTER-SKIP] 0003 691/4226 -> chapter_0691.json (state)
+[CHAPTER-SKIP] 0003 692/4226 -> chapter_0692.json (state)
+[CHAPTER-SKIP] 0003 693/4226 -> chapter_0693.json (state)
+[CHAPTER-SKIP] 0003 694/4226 -> chapter_0694.json (state)
+[CHAPTER-SKIP] 0003 695/4226 -> chapter_0695.json (state)
+[CHAPTER-SKIP] 0003 696/4226 -> chapter_0696.json (state)
+[CHAPTER-SKIP] 0003 697/4226 -> chapter_0697.json (state)
+[CHAPTER-SKIP] 0003 698/4226 -> chapter_0698.json (state)
+[CHAPTER-SKIP] 0003 699/4226 -> chapter_0699.json (state)
+[CHAPTER-SKIP] 0003 700/4226 -> chapter_0700.json (state)
+[CHAPTER-SKIP] 0003 701/4226 -> chapter_0701.json (state)
+[CHAPTER-SKIP] 0003 702/4226 -> chapter_0702.json (state)
+[CHAPTER-SKIP] 0003 703/4226 -> chapter_0703.json (state)
+[CHAPTER-SKIP] 0003 704/4226 -> chapter_0704.json (state)
+[CHAPTER-SKIP] 0003 705/4226 -> chapter_0705.json (state)
+[CHAPTER-SKIP] 0003 706/4226 -> chapter_0706.json (state)
+[CHAPTER-SKIP] 0003 707/4226 -> chapter_0707.json (state)
+[CHAPTER-SKIP] 0003 708/4226 -> chapter_0708.json (state)
+[CHAPTER-SKIP] 0003 709/4226 -> chapter_0709.json (state)
+[CHAPTER-SKIP] 0003 710/4226 -> chapter_0710.json (state)
+[CHAPTER-SKIP] 0003 711/4226 -> chapter_0711.json (state)
+[CHAPTER-SKIP] 0003 712/4226 -> chapter_0712.json (state)
+[CHAPTER-SKIP] 0003 713/4226 -> chapter_0713.json (state)
+[CHAPTER-SKIP] 0003 714/4226 -> chapter_0714.json (state)
+[CHAPTER-SKIP] 0003 715/4226 -> chapter_0715.json (state)
+[CHAPTER-SKIP] 0003 716/4226 -> chapter_0716.json (state)
+[CHAPTER-SKIP] 0003 717/4226 -> chapter_0717.json (state)
+[CHAPTER-SKIP] 0003 718/4226 -> chapter_0718.json (state)
+[CHAPTER-SKIP] 0003 719/4226 -> chapter_0719.json (state)
+[CHAPTER-SKIP] 0003 720/4226 -> chapter_0720.json (state)
+[CHAPTER-SKIP] 0003 721/4226 -> chapter_0721.json (state)
+[CHAPTER-SKIP] 0003 722/4226 -> chapter_0722.json (state)
+[CHAPTER-SKIP] 0003 723/4226 -> chapter_0723.json (state)
+[CHAPTER-SKIP] 0003 724/4226 -> chapter_0724.json (state)
+[CHAPTER-SKIP] 0003 725/4226 -> chapter_0725.json (state)
+[CHAPTER-SKIP] 0003 726/4226 -> chapter_0726.json (state)
+[CHAPTER-SKIP] 0003 727/4226 -> chapter_0727.json (state)
+[CHAPTER-SKIP] 0003 728/4226 -> chapter_0728.json (state)
+[CHAPTER-SKIP] 0003 729/4226 -> chapter_0729.json (state)
+[CHAPTER-SKIP] 0003 730/4226 -> chapter_0730.json (state)
+[CHAPTER-SKIP] 0003 731/4226 -> chapter_0731.json (state)
+[CHAPTER-SKIP] 0003 732/4226 -> chapter_0732.json (state)
+[CHAPTER-SKIP] 0003 733/4226 -> chapter_0733.json (state)
+[CHAPTER-SKIP] 0003 734/4226 -> chapter_0734.json (state)
+[CHAPTER-SKIP] 0003 735/4226 -> chapter_0735.json (state)
+[CHAPTER-SKIP] 0003 736/4226 -> chapter_0736.json (state)
+[CHAPTER-SKIP] 0003 737/4226 -> chapter_0737.json (state)
+[CHAPTER-SKIP] 0003 738/4226 -> chapter_0738.json (state)
+[CHAPTER-SKIP] 0003 739/4226 -> chapter_0739.json (state)
+[CHAPTER-SKIP] 0003 740/4226 -> chapter_0740.json (state)
+[CHAPTER-SKIP] 0003 741/4226 -> chapter_0741.json (state)
+[CHAPTER-SKIP] 0003 742/4226 -> chapter_0742.json (state)
+[CHAPTER-SKIP] 0003 743/4226 -> chapter_0743.json (state)
+[CHAPTER-SKIP] 0003 744/4226 -> chapter_0744.json (state)
+[CHAPTER-SKIP] 0003 745/4226 -> chapter_0745.json (state)
+[CHAPTER-SKIP] 0003 746/4226 -> chapter_0746.json (state)
+[CHAPTER-SKIP] 0003 747/4226 -> chapter_0747.json (state)
+[CHAPTER-SKIP] 0003 748/4226 -> chapter_0748.json (state)
+[CHAPTER-SKIP] 0003 749/4226 -> chapter_0749.json (state)
+[CHAPTER-SKIP] 0003 750/4226 -> chapter_0750.json (state)
+[CHAPTER-SKIP] 0003 751/4226 -> chapter_0751.json (state)
+[CHAPTER-SKIP] 0003 752/4226 -> chapter_0752.json (state)
+[CHAPTER-SKIP] 0003 753/4226 -> chapter_0753.json (state)
+[CHAPTER-SKIP] 0003 754/4226 -> chapter_0754.json (state)
+[CHAPTER-SKIP] 0003 755/4226 -> chapter_0755.json (state)
+[CHAPTER-SKIP] 0003 756/4226 -> chapter_0756.json (state)
+[CHAPTER-SKIP] 0003 757/4226 -> chapter_0757.json (state)
+[CHAPTER-SKIP] 0003 758/4226 -> chapter_0758.json (state)
+[CHAPTER-SKIP] 0003 759/4226 -> chapter_0759.json (state)
+[CHAPTER-SKIP] 0003 760/4226 -> chapter_0760.json (state)
+[CHAPTER-SKIP] 0003 761/4226 -> chapter_0761.json (state)
+[CHAPTER-SKIP] 0003 762/4226 -> chapter_0762.json (state)
+[CHAPTER-SKIP] 0003 763/4226 -> chapter_0763.json (state)
+[CHAPTER-SKIP] 0003 764/4226 -> chapter_0764.json (state)
+[CHAPTER-SKIP] 0003 765/4226 -> chapter_0765.json (state)
+[CHAPTER-SKIP] 0003 766/4226 -> chapter_0766.json (state)
+[CHAPTER-SKIP] 0003 767/4226 -> chapter_0767.json (state)
+[CHAPTER-SKIP] 0003 768/4226 -> chapter_0768.json (state)
+[CHAPTER-SKIP] 0003 769/4226 -> chapter_0769.json (state)
+[CHAPTER-SKIP] 0003 770/4226 -> chapter_0770.json (state)
+[CHAPTER-SKIP] 0003 771/4226 -> chapter_0771.json (state)
+[CHAPTER-SKIP] 0003 772/4226 -> chapter_0772.json (state)
+[CHAPTER-SKIP] 0003 773/4226 -> chapter_0773.json (state)
+[CHAPTER-SKIP] 0003 774/4226 -> chapter_0774.json (state)
+[CHAPTER-SKIP] 0003 775/4226 -> chapter_0775.json (state)
+[CHAPTER-SKIP] 0003 776/4226 -> chapter_0776.json (state)
+[CHAPTER-SKIP] 0003 777/4226 -> chapter_0777.json (state)
+[CHAPTER-SKIP] 0003 778/4226 -> chapter_0778.json (state)
+[CHAPTER-SKIP] 0003 779/4226 -> chapter_0779.json (state)
+[CHAPTER-SKIP] 0003 780/4226 -> chapter_0780.json (state)
+[CHAPTER-SKIP] 0003 781/4226 -> chapter_0781.json (state)
+[CHAPTER-SKIP] 0003 782/4226 -> chapter_0782.json (state)
+[CHAPTER-SKIP] 0003 783/4226 -> chapter_0783.json (state)
+[CHAPTER-SKIP] 0003 784/4226 -> chapter_0784.json (state)
+[CHAPTER-SKIP] 0003 785/4226 -> chapter_0785.json (state)
+[CHAPTER-SKIP] 0003 786/4226 -> chapter_0786.json (state)
+[CHAPTER-SKIP] 0003 787/4226 -> chapter_0787.json (state)
+[CHAPTER-SKIP] 0003 788/4226 -> chapter_0788.json (state)
+[CHAPTER-SKIP] 0003 789/4226 -> chapter_0789.json (state)
+[CHAPTER-SKIP] 0003 790/4226 -> chapter_0790.json (state)
+[CHAPTER-SKIP] 0003 791/4226 -> chapter_0791.json (state)
+[CHAPTER-SKIP] 0003 792/4226 -> chapter_0792.json (state)
+[CHAPTER-SKIP] 0003 793/4226 -> chapter_0793.json (state)
+[CHAPTER-SKIP] 0003 794/4226 -> chapter_0794.json (state)
+[CHAPTER-SKIP] 0003 795/4226 -> chapter_0795.json (state)
+[CHAPTER-SKIP] 0003 796/4226 -> chapter_0796.json (state)
+[CHAPTER-SKIP] 0003 797/4226 -> chapter_0797.json (state)
+[CHAPTER-SKIP] 0003 798/4226 -> chapter_0798.json (state)
+[CHAPTER-SKIP] 0003 799/4226 -> chapter_0799.json (state)
+[CHAPTER-SKIP] 0003 800/4226 -> chapter_0800.json (state)
+[CHAPTER-SKIP] 0003 801/4226 -> chapter_0801.json (state)
+[CHAPTER-SKIP] 0003 802/4226 -> chapter_0802.json (state)
+[CHAPTER-SKIP] 0003 803/4226 -> chapter_0803.json (state)
+[CHAPTER-SKIP] 0003 804/4226 -> chapter_0804.json (state)
+[CHAPTER-SKIP] 0003 805/4226 -> chapter_0805.json (state)
+[CHAPTER-SKIP] 0003 806/4226 -> chapter_0806.json (state)
+[CHAPTER-SKIP] 0003 807/4226 -> chapter_0807.json (state)
+[CHAPTER-SKIP] 0003 808/4226 -> chapter_0808.json (state)
+[CHAPTER-SKIP] 0003 809/4226 -> chapter_0809.json (state)
+[CHAPTER-SKIP] 0003 810/4226 -> chapter_0810.json (state)
+[CHAPTER-SKIP] 0003 811/4226 -> chapter_0811.json (state)
+[CHAPTER-SKIP] 0003 812/4226 -> chapter_0812.json (state)
+[CHAPTER-SKIP] 0003 813/4226 -> chapter_0813.json (state)
+[CHAPTER-SKIP] 0003 814/4226 -> chapter_0814.json (state)
+[CHAPTER-SKIP] 0003 815/4226 -> chapter_0815.json (state)
+[CHAPTER-SKIP] 0003 816/4226 -> chapter_0816.json (state)
+[CHAPTER-SKIP] 0003 817/4226 -> chapter_0817.json (state)
+[CHAPTER-SKIP] 0003 818/4226 -> chapter_0818.json (state)
+[CHAPTER-SKIP] 0003 819/4226 -> chapter_0819.json (state)
+[CHAPTER-SKIP] 0003 820/4226 -> chapter_0820.json (state)
+[CHAPTER-SKIP] 0003 821/4226 -> chapter_0821.json (state)
+[CHAPTER-SKIP] 0003 822/4226 -> chapter_0822.json (state)
+[CHAPTER-SKIP] 0003 823/4226 -> chapter_0823.json (state)
+[CHAPTER-SKIP] 0003 824/4226 -> chapter_0824.json (state)
+[CHAPTER-SKIP] 0003 825/4226 -> chapter_0825.json (state)
+[CHAPTER-SKIP] 0003 826/4226 -> chapter_0826.json (state)
+[CHAPTER-SKIP] 0003 827/4226 -> chapter_0827.json (state)
+[CHAPTER-SKIP] 0003 828/4226 -> chapter_0828.json (state)
+[CHAPTER-SKIP] 0003 829/4226 -> chapter_0829.json (state)
+[CHAPTER-SKIP] 0003 830/4226 -> chapter_0830.json (state)
+[CHAPTER-SKIP] 0003 831/4226 -> chapter_0831.json (state)
+[CHAPTER-SKIP] 0003 832/4226 -> chapter_0832.json (state)
+[CHAPTER-SKIP] 0003 833/4226 -> chapter_0833.json (state)
+[CHAPTER-SKIP] 0003 834/4226 -> chapter_0834.json (state)
+[CHAPTER-SKIP] 0003 835/4226 -> chapter_0835.json (state)
+[CHAPTER-SKIP] 0003 836/4226 -> chapter_0836.json (state)
+[CHAPTER-SKIP] 0003 837/4226 -> chapter_0837.json (state)
+[CHAPTER-SKIP] 0003 838/4226 -> chapter_0838.json (state)
+[CHAPTER-SKIP] 0003 839/4226 -> chapter_0839.json (state)
+[CHAPTER-SKIP] 0003 840/4226 -> chapter_0840.json (state)
+[CHAPTER-SKIP] 0003 841/4226 -> chapter_0841.json (state)
+[CHAPTER-SKIP] 0003 842/4226 -> chapter_0842.json (state)
+[CHAPTER-SKIP] 0003 843/4226 -> chapter_0843.json (state)
+[CHAPTER-SKIP] 0003 844/4226 -> chapter_0844.json (state)
+[CHAPTER-SKIP] 0003 845/4226 -> chapter_0845.json (state)
+[CHAPTER-SKIP] 0003 846/4226 -> chapter_0846.json (state)
+[CHAPTER-SKIP] 0003 847/4226 -> chapter_0847.json (state)
+[CHAPTER-SKIP] 0003 848/4226 -> chapter_0848.json (state)
+[CHAPTER-SKIP] 0003 849/4226 -> chapter_0849.json (state)
+[CHAPTER-SKIP] 0003 850/4226 -> chapter_0850.json (state)
+[CHAPTER-SKIP] 0003 851/4226 -> chapter_0851.json (state)
+[CHAPTER-SKIP] 0003 852/4226 -> chapter_0852.json (state)
+[CHAPTER-SKIP] 0003 853/4226 -> chapter_0853.json (state)
+[CHAPTER-SKIP] 0003 854/4226 -> chapter_0854.json (state)
+[CHAPTER-SKIP] 0003 855/4226 -> chapter_0855.json (state)
+[CHAPTER-SKIP] 0003 856/4226 -> chapter_0856.json (state)
+[CHAPTER-SKIP] 0003 857/4226 -> chapter_0857.json (state)
+[CHAPTER-SKIP] 0003 858/4226 -> chapter_0858.json (state)
+[CHAPTER-SKIP] 0003 859/4226 -> chapter_0859.json (state)
+[CHAPTER-SKIP] 0003 860/4226 -> chapter_0860.json (state)
+[CHAPTER-SKIP] 0003 861/4226 -> chapter_0861.json (state)
+[CHAPTER-SKIP] 0003 862/4226 -> chapter_0862.json (state)
+[CHAPTER-SKIP] 0003 863/4226 -> chapter_0863.json (state)
+[CHAPTER-SKIP] 0003 864/4226 -> chapter_0864.json (state)
+[CHAPTER-SKIP] 0003 865/4226 -> chapter_0865.json (state)
+[CHAPTER-SKIP] 0003 866/4226 -> chapter_0866.json (state)
+[CHAPTER-SKIP] 0003 867/4226 -> chapter_0867.json (state)
+[CHAPTER-SKIP] 0003 868/4226 -> chapter_0868.json (state)
+[CHAPTER-SKIP] 0003 869/4226 -> chapter_0869.json (state)
+[CHAPTER-SKIP] 0003 870/4226 -> chapter_0870.json (state)
+[CHAPTER-SKIP] 0003 871/4226 -> chapter_0871.json (state)
+[CHAPTER-SKIP] 0003 872/4226 -> chapter_0872.json (state)
+[CHAPTER-SKIP] 0003 873/4226 -> chapter_0873.json (state)
+[CHAPTER-SKIP] 0003 874/4226 -> chapter_0874.json (state)
+[CHAPTER-SKIP] 0003 875/4226 -> chapter_0875.json (state)
+[CHAPTER-SKIP] 0003 876/4226 -> chapter_0876.json (state)
+[CHAPTER-SKIP] 0003 877/4226 -> chapter_0877.json (state)
+[CHAPTER-SKIP] 0003 878/4226 -> chapter_0878.json (state)
+[CHAPTER-SKIP] 0003 879/4226 -> chapter_0879.json (state)
+[CHAPTER-SKIP] 0003 880/4226 -> chapter_0880.json (state)
+[CHAPTER-SKIP] 0003 881/4226 -> chapter_0881.json (state)
+[CHAPTER-SKIP] 0003 882/4226 -> chapter_0882.json (state)
+[CHAPTER-SKIP] 0003 883/4226 -> chapter_0883.json (state)
+[CHAPTER-SKIP] 0003 884/4226 -> chapter_0884.json (state)
+[CHAPTER-SKIP] 0003 885/4226 -> chapter_0885.json (state)
+[CHAPTER-SKIP] 0003 886/4226 -> chapter_0886.json (state)
+[CHAPTER-SKIP] 0003 887/4226 -> chapter_0887.json (state)
+[CHAPTER-SKIP] 0003 888/4226 -> chapter_0888.json (state)
+[CHAPTER-SKIP] 0003 889/4226 -> chapter_0889.json (state)
+[CHAPTER-SKIP] 0003 890/4226 -> chapter_0890.json (state)
+[CHAPTER-SKIP] 0003 891/4226 -> chapter_0891.json (state)
+[CHAPTER-SKIP] 0003 892/4226 -> chapter_0892.json (state)
+[CHAPTER-SKIP] 0003 893/4226 -> chapter_0893.json (state)
+[CHAPTER-SKIP] 0003 894/4226 -> chapter_0894.json (state)
+[CHAPTER-SKIP] 0003 895/4226 -> chapter_0895.json (state)
+[CHAPTER-SKIP] 0003 896/4226 -> chapter_0896.json (state)
+[CHAPTER-SKIP] 0003 897/4226 -> chapter_0897.json (state)
+[CHAPTER-SKIP] 0003 898/4226 -> chapter_0898.json (state)
+[CHAPTER-SKIP] 0003 899/4226 -> chapter_0899.json (state)
+[CHAPTER-SKIP] 0003 900/4226 -> chapter_0900.json (state)
+[CHAPTER-SKIP] 0003 901/4226 -> chapter_0901.json (state)
+[CHAPTER-SKIP] 0003 902/4226 -> chapter_0902.json (state)
+[CHAPTER-SKIP] 0003 903/4226 -> chapter_0903.json (state)
+[CHAPTER-SKIP] 0003 904/4226 -> chapter_0904.json (state)
+[CHAPTER-SKIP] 0003 905/4226 -> chapter_0905.json (state)
+[CHAPTER-SKIP] 0003 906/4226 -> chapter_0906.json (state)
+[CHAPTER-SKIP] 0003 907/4226 -> chapter_0907.json (state)
+[CHAPTER-SKIP] 0003 908/4226 -> chapter_0908.json (state)
+[CHAPTER-SKIP] 0003 909/4226 -> chapter_0909.json (state)
+[CHAPTER-SKIP] 0003 910/4226 -> chapter_0910.json (state)
+[CHAPTER-SKIP] 0003 911/4226 -> chapter_0911.json (state)
+[CHAPTER-SKIP] 0003 912/4226 -> chapter_0912.json (state)
+[CHAPTER-SKIP] 0003 913/4226 -> chapter_0913.json (state)
+[CHAPTER-SKIP] 0003 914/4226 -> chapter_0914.json (state)
+[CHAPTER-SKIP] 0003 915/4226 -> chapter_0915.json (state)
+[CHAPTER-SKIP] 0003 916/4226 -> chapter_0916.json (state)
+[CHAPTER-SKIP] 0003 917/4226 -> chapter_0917.json (state)
+[CHAPTER-SKIP] 0003 918/4226 -> chapter_0918.json (state)
+[CHAPTER-SKIP] 0003 919/4226 -> chapter_0919.json (state)
+[CHAPTER-SKIP] 0003 920/4226 -> chapter_0920.json (state)
+[CHAPTER-SKIP] 0003 921/4226 -> chapter_0921.json (state)
+[CHAPTER-SKIP] 0003 922/4226 -> chapter_0922.json (state)
+[CHAPTER-SKIP] 0003 923/4226 -> chapter_0923.json (state)
+[CHAPTER-SKIP] 0003 924/4226 -> chapter_0924.json (state)
+[CHAPTER-SKIP] 0003 925/4226 -> chapter_0925.json (state)
+[CHAPTER-SKIP] 0003 926/4226 -> chapter_0926.json (state)
+[CHAPTER-SKIP] 0003 927/4226 -> chapter_0927.json (state)
+[CHAPTER-SKIP] 0003 928/4226 -> chapter_0928.json (state)
+[CHAPTER-SKIP] 0003 929/4226 -> chapter_0929.json (state)
+[CHAPTER-SKIP] 0003 930/4226 -> chapter_0930.json (state)
+[CHAPTER-SKIP] 0003 931/4226 -> chapter_0931.json (state)
+[CHAPTER-SKIP] 0003 932/4226 -> chapter_0932.json (state)
+[CHAPTER-SKIP] 0003 933/4226 -> chapter_0933.json (state)
+[CHAPTER-SKIP] 0003 934/4226 -> chapter_0934.json (state)
+[CHAPTER-SKIP] 0003 935/4226 -> chapter_0935.json (state)
+[CHAPTER-SKIP] 0003 936/4226 -> chapter_0936.json (state)
+[CHAPTER-SKIP] 0003 937/4226 -> chapter_0937.json (state)
+[CHAPTER-SKIP] 0003 938/4226 -> chapter_0938.json (state)
+[CHAPTER-SKIP] 0003 939/4226 -> chapter_0939.json (state)
+[CHAPTER-SKIP] 0003 940/4226 -> chapter_0940.json (state)
+[CHAPTER-SKIP] 0003 941/4226 -> chapter_0941.json (state)
+[CHAPTER-SKIP] 0003 942/4226 -> chapter_0942.json (state)
+[CHAPTER-SKIP] 0003 943/4226 -> chapter_0943.json (state)
+[CHAPTER-SKIP] 0003 944/4226 -> chapter_0944.json (state)
+[CHAPTER-SKIP] 0003 945/4226 -> chapter_0945.json (state)
+[CHAPTER-SKIP] 0003 946/4226 -> chapter_0946.json (state)
+[CHAPTER-SKIP] 0003 947/4226 -> chapter_0947.json (state)
+[CHAPTER-SKIP] 0003 948/4226 -> chapter_0948.json (state)
+[CHAPTER-SKIP] 0003 949/4226 -> chapter_0949.json (state)
+[CHAPTER-SKIP] 0003 950/4226 -> chapter_0950.json (state)
+[CHAPTER-SKIP] 0003 951/4226 -> chapter_0951.json (state)
+[CHAPTER-SKIP] 0003 952/4226 -> chapter_0952.json (state)
+[CHAPTER-SKIP] 0003 953/4226 -> chapter_0953.json (state)
+[CHAPTER-SKIP] 0003 954/4226 -> chapter_0954.json (state)
+[CHAPTER-SKIP] 0003 955/4226 -> chapter_0955.json (state)
+[CHAPTER-SKIP] 0003 956/4226 -> chapter_0956.json (state)
+[CHAPTER-SKIP] 0003 957/4226 -> chapter_0957.json (state)
+[CHAPTER-SKIP] 0003 958/4226 -> chapter_0958.json (state)
+[CHAPTER-SKIP] 0003 959/4226 -> chapter_0959.json (state)
+[CHAPTER-SKIP] 0003 960/4226 -> chapter_0960.json (state)
+[CHAPTER-SKIP] 0003 961/4226 -> chapter_0961.json (state)
+[CHAPTER-SKIP] 0003 962/4226 -> chapter_0962.json (state)
+[CHAPTER-SKIP] 0003 963/4226 -> chapter_0963.json (state)
+[CHAPTER-SKIP] 0003 964/4226 -> chapter_0964.json (state)
+[CHAPTER-SKIP] 0003 965/4226 -> chapter_0965.json (state)
+[CHAPTER-SKIP] 0003 966/4226 -> chapter_0966.json (state)
+[CHAPTER-SKIP] 0003 967/4226 -> chapter_0967.json (state)
+[CHAPTER-SKIP] 0003 968/4226 -> chapter_0968.json (state)
+[CHAPTER-SKIP] 0003 969/4226 -> chapter_0969.json (state)
+[CHAPTER-SKIP] 0003 970/4226 -> chapter_0970.json (state)
+[CHAPTER-SKIP] 0003 971/4226 -> chapter_0971.json (state)
+[CHAPTER-SKIP] 0003 972/4226 -> chapter_0972.json (state)
+[CHAPTER-SKIP] 0003 973/4226 -> chapter_0973.json (state)
+[CHAPTER-SKIP] 0003 974/4226 -> chapter_0974.json (state)
+[CHAPTER-SKIP] 0003 975/4226 -> chapter_0975.json (state)
+[CHAPTER-SKIP] 0003 976/4226 -> chapter_0976.json (state)
+[CHAPTER-SKIP] 0003 977/4226 -> chapter_0977.json (state)
+[CHAPTER-SKIP] 0003 978/4226 -> chapter_0978.json (state)
+[CHAPTER-SKIP] 0003 979/4226 -> chapter_0979.json (state)
+[CHAPTER-SKIP] 0003 980/4226 -> chapter_0980.json (state)
+[CHAPTER-SKIP] 0003 981/4226 -> chapter_0981.json (state)
+[CHAPTER-SKIP] 0003 982/4226 -> chapter_0982.json (state)
+[CHAPTER-SKIP] 0003 983/4226 -> chapter_0983.json (state)
+[CHAPTER-SKIP] 0003 984/4226 -> chapter_0984.json (state)
+[CHAPTER-SKIP] 0003 985/4226 -> chapter_0985.json (state)
+[CHAPTER-SKIP] 0003 986/4226 -> chapter_0986.json (state)
+[CHAPTER-SKIP] 0003 987/4226 -> chapter_0987.json (state)
+[CHAPTER-SKIP] 0003 988/4226 -> chapter_0988.json (state)
+[CHAPTER-SKIP] 0003 989/4226 -> chapter_0989.json (state)
+[CHAPTER-SKIP] 0003 990/4226 -> chapter_0990.json (state)
+[CHAPTER-SKIP] 0003 991/4226 -> chapter_0991.json (state)
+[CHAPTER-SKIP] 0003 992/4226 -> chapter_0992.json (state)
+[CHAPTER-SKIP] 0003 993/4226 -> chapter_0993.json (state)
+[CHAPTER-SKIP] 0003 994/4226 -> chapter_0994.json (state)
+[CHAPTER-SKIP] 0003 995/4226 -> chapter_0995.json (state)
+[CHAPTER-SKIP] 0003 996/4226 -> chapter_0996.json (state)
+[CHAPTER-SKIP] 0003 997/4226 -> chapter_0997.json (state)
+[CHAPTER-SKIP] 0003 998/4226 -> chapter_0998.json (state)
+[CHAPTER-SKIP] 0003 999/4226 -> chapter_0999.json (state)
+[CHAPTER-SKIP] 0003 1000/4226 -> chapter_1000.json (state)
+[CHAPTER-SKIP] 0003 1001/4226 -> chapter_1001.json (state)
+[CHAPTER-SKIP] 0003 1002/4226 -> chapter_1002.json (state)
+[CHAPTER-SKIP] 0003 1003/4226 -> chapter_1003.json (state)
+[CHAPTER-SKIP] 0003 1004/4226 -> chapter_1004.json (state)
+[CHAPTER-SKIP] 0003 1005/4226 -> chapter_1005.json (state)
+[CHAPTER-SKIP] 0003 1006/4226 -> chapter_1006.json (state)
+[CHAPTER-SKIP] 0003 1007/4226 -> chapter_1007.json (state)
+[CHAPTER-SKIP] 0003 1008/4226 -> chapter_1008.json (state)
+[CHAPTER-SKIP] 0003 1009/4226 -> chapter_1009.json (state)
+[CHAPTER-SKIP] 0003 1010/4226 -> chapter_1010.json (state)
+[CHAPTER-SKIP] 0003 1011/4226 -> chapter_1011.json (state)
+[CHAPTER-SKIP] 0003 1012/4226 -> chapter_1012.json (state)
+[CHAPTER-SKIP] 0003 1013/4226 -> chapter_1013.json (state)
+[CHAPTER-SKIP] 0003 1014/4226 -> chapter_1014.json (state)
+[CHAPTER-SKIP] 0003 1015/4226 -> chapter_1015.json (state)
+[CHAPTER-SKIP] 0003 1016/4226 -> chapter_1016.json (state)
+[CHAPTER-SKIP] 0003 1017/4226 -> chapter_1017.json (state)
+[CHAPTER-SKIP] 0003 1018/4226 -> chapter_1018.json (state)
+[CHAPTER-SKIP] 0003 1019/4226 -> chapter_1019.json (state)
+[CHAPTER-SKIP] 0003 1020/4226 -> chapter_1020.json (state)
+[CHAPTER-SKIP] 0003 1021/4226 -> chapter_1021.json (state)
+[CHAPTER-SKIP] 0003 1022/4226 -> chapter_1022.json (state)
+[CHAPTER-SKIP] 0003 1023/4226 -> chapter_1023.json (state)
+[CHAPTER-SKIP] 0003 1024/4226 -> chapter_1024.json (state)
+[CHAPTER-SKIP] 0003 1025/4226 -> chapter_1025.json (state)
+[CHAPTER-SKIP] 0003 1026/4226 -> chapter_1026.json (state)
+[CHAPTER-SKIP] 0003 1027/4226 -> chapter_1027.json (state)
+[CHAPTER-SKIP] 0003 1028/4226 -> chapter_1028.json (state)
+[CHAPTER-SKIP] 0003 1029/4226 -> chapter_1029.json (state)
+[CHAPTER-SKIP] 0003 1030/4226 -> chapter_1030.json (state)
+[CHAPTER-SKIP] 0003 1031/4226 -> chapter_1031.json (state)
+[CHAPTER-SKIP] 0003 1032/4226 -> chapter_1032.json (state)
+[CHAPTER-SKIP] 0003 1033/4226 -> chapter_1033.json (state)
+[CHAPTER-SKIP] 0003 1034/4226 -> chapter_1034.json (state)
+[CHAPTER-SKIP] 0003 1035/4226 -> chapter_1035.json (state)
+[CHAPTER-SKIP] 0003 1036/4226 -> chapter_1036.json (state)
+[CHAPTER-SKIP] 0003 1037/4226 -> chapter_1037.json (state)
+[CHAPTER-SKIP] 0003 1038/4226 -> chapter_1038.json (state)
+[CHAPTER-SKIP] 0003 1039/4226 -> chapter_1039.json (state)
+[CHAPTER-SKIP] 0003 1040/4226 -> chapter_1040.json (state)
+[CHAPTER-SKIP] 0003 1041/4226 -> chapter_1041.json (state)
+[CHAPTER-SKIP] 0003 1042/4226 -> chapter_1042.json (state)
+[CHAPTER-SKIP] 0003 1043/4226 -> chapter_1043.json (state)
+[CHAPTER-SKIP] 0003 1044/4226 -> chapter_1044.json (state)
+[CHAPTER-SKIP] 0003 1045/4226 -> chapter_1045.json (state)
+[CHAPTER-SKIP] 0003 1046/4226 -> chapter_1046.json (state)
+[CHAPTER-SKIP] 0003 1047/4226 -> chapter_1047.json (state)
+[CHAPTER-SKIP] 0003 1048/4226 -> chapter_1048.json (state)
+[CHAPTER-SKIP] 0003 1049/4226 -> chapter_1049.json (state)
+[CHAPTER-SKIP] 0003 1050/4226 -> chapter_1050.json (state)
+[CHAPTER-SKIP] 0003 1051/4226 -> chapter_1051.json (state)
+[CHAPTER-SKIP] 0003 1052/4226 -> chapter_1052.json (state)
+[CHAPTER-SKIP] 0003 1053/4226 -> chapter_1053.json (state)
+[CHAPTER-SKIP] 0003 1054/4226 -> chapter_1054.json (state)
+[CHAPTER-SKIP] 0003 1055/4226 -> chapter_1055.json (state)
+[CHAPTER-SKIP] 0003 1056/4226 -> chapter_1056.json (state)
+[CHAPTER-SKIP] 0003 1057/4226 -> chapter_1057.json (state)
+[CHAPTER-SKIP] 0003 1058/4226 -> chapter_1058.json (state)
+[CHAPTER-SKIP] 0003 1059/4226 -> chapter_1059.json (state)
+[CHAPTER-SKIP] 0003 1060/4226 -> chapter_1060.json (state)
+[CHAPTER-SKIP] 0003 1061/4226 -> chapter_1061.json (state)
+[CHAPTER-SKIP] 0003 1062/4226 -> chapter_1062.json (state)
+[CHAPTER-SKIP] 0003 1063/4226 -> chapter_1063.json (state)
+[CHAPTER-SKIP] 0003 1064/4226 -> chapter_1064.json (state)
+[CHAPTER-SKIP] 0003 1065/4226 -> chapter_1065.json (state)
+[CHAPTER-SKIP] 0003 1066/4226 -> chapter_1066.json (state)
+[CHAPTER-SKIP] 0003 1067/4226 -> chapter_1067.json (state)
+[CHAPTER-SKIP] 0003 1068/4226 -> chapter_1068.json (state)
+[CHAPTER-SKIP] 0003 1069/4226 -> chapter_1069.json (state)
+[CHAPTER-SKIP] 0003 1070/4226 -> chapter_1070.json (state)
+[CHAPTER-SKIP] 0003 1071/4226 -> chapter_1071.json (state)
+[CHAPTER-SKIP] 0003 1072/4226 -> chapter_1072.json (state)
+[CHAPTER-SKIP] 0003 1073/4226 -> chapter_1073.json (state)
+[CHAPTER-SKIP] 0003 1074/4226 -> chapter_1074.json (state)
+[CHAPTER-SKIP] 0003 1075/4226 -> chapter_1075.json (state)
+[CHAPTER-SKIP] 0003 1076/4226 -> chapter_1076.json (state)
+[CHAPTER-SKIP] 0003 1077/4226 -> chapter_1077.json (state)
+[CHAPTER-SKIP] 0003 1078/4226 -> chapter_1078.json (state)
+[CHAPTER-SKIP] 0003 1079/4226 -> chapter_1079.json (state)
+[CHAPTER-SKIP] 0003 1080/4226 -> chapter_1080.json (state)
+[CHAPTER-SKIP] 0003 1081/4226 -> chapter_1081.json (state)
+[CHAPTER-SKIP] 0003 1082/4226 -> chapter_1082.json (state)
+[CHAPTER-SKIP] 0003 1083/4226 -> chapter_1083.json (state)
+[CHAPTER-SKIP] 0003 1084/4226 -> chapter_1084.json (state)
+[CHAPTER-SKIP] 0003 1085/4226 -> chapter_1085.json (state)
+[CHAPTER-SKIP] 0003 1086/4226 -> chapter_1086.json (state)
+[CHAPTER-SKIP] 0003 1087/4226 -> chapter_1087.json (state)
+[CHAPTER-SKIP] 0003 1088/4226 -> chapter_1088.json (state)
+[CHAPTER-SKIP] 0003 1089/4226 -> chapter_1089.json (state)
+[CHAPTER-SKIP] 0003 1090/4226 -> chapter_1090.json (state)
+[CHAPTER-SKIP] 0003 1091/4226 -> chapter_1091.json (state)
+[CHAPTER-SKIP] 0003 1092/4226 -> chapter_1092.json (state)
+[CHAPTER-SKIP] 0003 1093/4226 -> chapter_1093.json (state)
+[CHAPTER-SKIP] 0003 1094/4226 -> chapter_1094.json (state)
+[CHAPTER-SKIP] 0003 1095/4226 -> chapter_1095.json (state)
+[CHAPTER-SKIP] 0003 1096/4226 -> chapter_1096.json (state)
+[CHAPTER-SKIP] 0003 1097/4226 -> chapter_1097.json (state)
+[CHAPTER-SKIP] 0003 1098/4226 -> chapter_1098.json (state)
+[CHAPTER-SKIP] 0003 1099/4226 -> chapter_1099.json (state)
+[CHAPTER-SKIP] 0003 1100/4226 -> chapter_1100.json (state)
+[CHAPTER-SKIP] 0003 1101/4226 -> chapter_1101.json (state)
+[CHAPTER-SKIP] 0003 1102/4226 -> chapter_1102.json (state)
+[CHAPTER-SKIP] 0003 1103/4226 -> chapter_1103.json (state)
+[CHAPTER-SKIP] 0003 1104/4226 -> chapter_1104.json (state)
+[CHAPTER-SKIP] 0003 1105/4226 -> chapter_1105.json (state)
+[CHAPTER-SKIP] 0003 1106/4226 -> chapter_1106.json (state)
+[CHAPTER-SKIP] 0003 1107/4226 -> chapter_1107.json (state)
+[CHAPTER-SKIP] 0003 1108/4226 -> chapter_1108.json (state)
+[CHAPTER-SKIP] 0003 1109/4226 -> chapter_1109.json (state)
+[CHAPTER-SKIP] 0003 1110/4226 -> chapter_1110.json (state)
+[CHAPTER-SKIP] 0003 1111/4226 -> chapter_1111.json (state)
+[CHAPTER-SKIP] 0003 1112/4226 -> chapter_1112.json (state)
+[CHAPTER-SKIP] 0003 1113/4226 -> chapter_1113.json (state)
+[CHAPTER-SKIP] 0003 1114/4226 -> chapter_1114.json (state)
+[CHAPTER-SKIP] 0003 1115/4226 -> chapter_1115.json (state)
+[CHAPTER-SKIP] 0003 1116/4226 -> chapter_1116.json (state)
+[CHAPTER-SKIP] 0003 1117/4226 -> chapter_1117.json (state)
+[CHAPTER-SKIP] 0003 1118/4226 -> chapter_1118.json (state)
+[CHAPTER-SKIP] 0003 1119/4226 -> chapter_1119.json (state)
+[CHAPTER-SKIP] 0003 1120/4226 -> chapter_1120.json (state)
+[CHAPTER-SKIP] 0003 1121/4226 -> chapter_1121.json (state)
+[CHAPTER-SKIP] 0003 1122/4226 -> chapter_1122.json (state)
+[CHAPTER-SKIP] 0003 1123/4226 -> chapter_1123.json (state)
+[CHAPTER-SKIP] 0003 1124/4226 -> chapter_1124.json (state)
+[CHAPTER-SKIP] 0003 1125/4226 -> chapter_1125.json (state)
+[CHAPTER-SKIP] 0003 1126/4226 -> chapter_1126.json (state)
+[CHAPTER-SKIP] 0003 1127/4226 -> chapter_1127.json (state)
+[CHAPTER-SKIP] 0003 1128/4226 -> chapter_1128.json (state)
+[CHAPTER-SKIP] 0003 1129/4226 -> chapter_1129.json (state)
+[CHAPTER-SKIP] 0003 1130/4226 -> chapter_1130.json (state)
+[CHAPTER-SKIP] 0003 1131/4226 -> chapter_1131.json (state)
+[CHAPTER-SKIP] 0003 1132/4226 -> chapter_1132.json (state)
+[CHAPTER-SKIP] 0003 1133/4226 -> chapter_1133.json (state)
+[CHAPTER-SKIP] 0003 1134/4226 -> chapter_1134.json (state)
+[CHAPTER-SKIP] 0003 1135/4226 -> chapter_1135.json (state)
+[CHAPTER-SKIP] 0003 1136/4226 -> chapter_1136.json (state)
+[CHAPTER-SKIP] 0003 1137/4226 -> chapter_1137.json (state)
+[CHAPTER-SKIP] 0003 1138/4226 -> chapter_1138.json (state)
+[CHAPTER-SKIP] 0003 1139/4226 -> chapter_1139.json (state)
+[CHAPTER-SKIP] 0003 1140/4226 -> chapter_1140.json (state)
+[CHAPTER-SKIP] 0003 1141/4226 -> chapter_1141.json (state)
+[CHAPTER-SKIP] 0003 1142/4226 -> chapter_1142.json (state)
+[CHAPTER-SKIP] 0003 1143/4226 -> chapter_1143.json (state)
+[CHAPTER-SKIP] 0003 1144/4226 -> chapter_1144.json (state)
+[CHAPTER-SKIP] 0003 1145/4226 -> chapter_1145.json (state)
+[CHAPTER-SKIP] 0003 1146/4226 -> chapter_1146.json (state)
+[CHAPTER-SKIP] 0003 1147/4226 -> chapter_1147.json (state)
+[CHAPTER-SKIP] 0003 1148/4226 -> chapter_1148.json (state)
+[CHAPTER-SKIP] 0003 1149/4226 -> chapter_1149.json (state)
+[CHAPTER-SKIP] 0003 1150/4226 -> chapter_1150.json (state)
+[CHAPTER-SKIP] 0003 1151/4226 -> chapter_1151.json (state)
+[CHAPTER-SKIP] 0003 1152/4226 -> chapter_1152.json (state)
+[CHAPTER-SKIP] 0003 1153/4226 -> chapter_1153.json (state)
+[CHAPTER-SKIP] 0003 1154/4226 -> chapter_1154.json (state)
+[CHAPTER-SKIP] 0003 1155/4226 -> chapter_1155.json (state)
+[CHAPTER-SKIP] 0003 1156/4226 -> chapter_1156.json (state)
+[CHAPTER-SKIP] 0003 1157/4226 -> chapter_1157.json (state)
+[CHAPTER-SKIP] 0003 1158/4226 -> chapter_1158.json (state)
+[CHAPTER-SKIP] 0003 1159/4226 -> chapter_1159.json (state)
+[CHAPTER-SKIP] 0003 1160/4226 -> chapter_1160.json (state)
+[CHAPTER-SKIP] 0003 1161/4226 -> chapter_1161.json (state)
+[CHAPTER-SKIP] 0003 1162/4226 -> chapter_1162.json (state)
+[CHAPTER-SKIP] 0003 1163/4226 -> chapter_1163.json (state)
+[CHAPTER-SKIP] 0003 1164/4226 -> chapter_1164.json (state)
+[CHAPTER-SKIP] 0003 1165/4226 -> chapter_1165.json (state)
+[CHAPTER-SKIP] 0003 1166/4226 -> chapter_1166.json (state)
+[CHAPTER-SKIP] 0003 1167/4226 -> chapter_1167.json (state)
+[CHAPTER-SKIP] 0003 1168/4226 -> chapter_1168.json (state)
+[CHAPTER-SKIP] 0003 1169/4226 -> chapter_1169.json (state)
+[CHAPTER-SKIP] 0003 1170/4226 -> chapter_1170.json (state)
+[CHAPTER-SKIP] 0003 1171/4226 -> chapter_1171.json (state)
+[CHAPTER-SKIP] 0003 1172/4226 -> chapter_1172.json (state)
+[CHAPTER-SKIP] 0003 1173/4226 -> chapter_1173.json (state)
+[CHAPTER-SKIP] 0003 1174/4226 -> chapter_1174.json (state)
+[CHAPTER-SKIP] 0003 1175/4226 -> chapter_1175.json (state)
+[CHAPTER-SKIP] 0003 1176/4226 -> chapter_1176.json (state)
+[CHAPTER-SKIP] 0003 1177/4226 -> chapter_1177.json (state)
+[CHAPTER-SKIP] 0003 1178/4226 -> chapter_1178.json (state)
+[CHAPTER-SKIP] 0003 1179/4226 -> chapter_1179.json (state)
+[CHAPTER-SKIP] 0003 1180/4226 -> chapter_1180.json (state)
+[CHAPTER-SKIP] 0003 1181/4226 -> chapter_1181.json (state)
+[CHAPTER-SKIP] 0003 1182/4226 -> chapter_1182.json (state)
+[CHAPTER-SKIP] 0003 1183/4226 -> chapter_1183.json (state)
+[CHAPTER-SKIP] 0003 1184/4226 -> chapter_1184.json (state)
+[CHAPTER-SKIP] 0003 1185/4226 -> chapter_1185.json (state)
+[CHAPTER-SKIP] 0003 1186/4226 -> chapter_1186.json (state)
+[CHAPTER-SKIP] 0003 1187/4226 -> chapter_1187.json (state)
+[CHAPTER-SKIP] 0003 1188/4226 -> chapter_1188.json (state)
+[CHAPTER-SKIP] 0003 1189/4226 -> chapter_1189.json (state)
+[CHAPTER-SKIP] 0003 1190/4226 -> chapter_1190.json (state)
+[CHAPTER-SKIP] 0003 1191/4226 -> chapter_1191.json (state)
+[CHAPTER-SKIP] 0003 1192/4226 -> chapter_1192.json (state)
+[CHAPTER-SKIP] 0003 1193/4226 -> chapter_1193.json (state)
+[CHAPTER-SKIP] 0003 1194/4226 -> chapter_1194.json (state)
+[CHAPTER-SKIP] 0003 1195/4226 -> chapter_1195.json (state)
+[CHAPTER-SKIP] 0003 1196/4226 -> chapter_1196.json (state)
+[CHAPTER-SKIP] 0003 1197/4226 -> chapter_1197.json (state)
+[CHAPTER-SKIP] 0003 1198/4226 -> chapter_1198.json (state)
+[CHAPTER-SKIP] 0003 1199/4226 -> chapter_1199.json (state)
+[CHAPTER-SKIP] 0003 1200/4226 -> chapter_1200.json (state)
+[CHAPTER-SKIP] 0003 1201/4226 -> chapter_1201.json (state)
+[CHAPTER-SKIP] 0003 1202/4226 -> chapter_1202.json (state)
+[CHAPTER-SKIP] 0003 1203/4226 -> chapter_1203.json (state)
+[CHAPTER-SKIP] 0003 1204/4226 -> chapter_1204.json (state)
+[CHAPTER-SKIP] 0003 1205/4226 -> chapter_1205.json (state)
+[CHAPTER-SKIP] 0003 1206/4226 -> chapter_1206.json (state)
+[CHAPTER-SKIP] 0003 1207/4226 -> chapter_1207.json (state)
+[CHAPTER-SKIP] 0003 1208/4226 -> chapter_1208.json (state)
+[CHAPTER-SKIP] 0003 1209/4226 -> chapter_1209.json (state)
+[CHAPTER-SKIP] 0003 1210/4226 -> chapter_1210.json (state)
+[CHAPTER-SKIP] 0003 1211/4226 -> chapter_1211.json (state)
+[CHAPTER-SKIP] 0003 1212/4226 -> chapter_1212.json (state)
+[CHAPTER-SKIP] 0003 1213/4226 -> chapter_1213.json (state)
+[CHAPTER-SKIP] 0003 1214/4226 -> chapter_1214.json (state)
+[CHAPTER-SKIP] 0003 1215/4226 -> chapter_1215.json (state)
+[CHAPTER-SKIP] 0003 1216/4226 -> chapter_1216.json (state)
+[CHAPTER-SKIP] 0003 1217/4226 -> chapter_1217.json (state)
+[CHAPTER-SKIP] 0003 1218/4226 -> chapter_1218.json (state)
+[CHAPTER-SKIP] 0003 1219/4226 -> chapter_1219.json (state)
+[CHAPTER-SKIP] 0003 1220/4226 -> chapter_1220.json (state)
+[CHAPTER-SKIP] 0003 1221/4226 -> chapter_1221.json (state)
+[CHAPTER-SKIP] 0003 1222/4226 -> chapter_1222.json (state)
+[CHAPTER-SKIP] 0003 1223/4226 -> chapter_1223.json (state)
+[CHAPTER-SKIP] 0003 1224/4226 -> chapter_1224.json (state)
+[CHAPTER-SKIP] 0003 1225/4226 -> chapter_1225.json (state)
+[CHAPTER-SKIP] 0003 1226/4226 -> chapter_1226.json (state)
+[CHAPTER-SKIP] 0003 1227/4226 -> chapter_1227.json (state)
+[CHAPTER-SKIP] 0003 1228/4226 -> chapter_1228.json (state)
+[CHAPTER-SKIP] 0003 1229/4226 -> chapter_1229.json (state)
+[CHAPTER-SKIP] 0003 1230/4226 -> chapter_1230.json (state)
+[CHAPTER-SKIP] 0003 1231/4226 -> chapter_1231.json (state)
+[CHAPTER-SKIP] 0003 1232/4226 -> chapter_1232.json (state)
+[CHAPTER-SKIP] 0003 1233/4226 -> chapter_1233.json (state)
+[CHAPTER-SKIP] 0003 1234/4226 -> chapter_1234.json (state)
+[CHAPTER-SKIP] 0003 1235/4226 -> chapter_1235.json (state)
+[CHAPTER-SKIP] 0003 1236/4226 -> chapter_1236.json (state)
+[CHAPTER-SKIP] 0003 1237/4226 -> chapter_1237.json (state)
+[CHAPTER-SKIP] 0003 1238/4226 -> chapter_1238.json (state)
+[CHAPTER-SKIP] 0003 1239/4226 -> chapter_1239.json (state)
+[CHAPTER-SKIP] 0003 1240/4226 -> chapter_1240.json (state)
+[CHAPTER-SKIP] 0003 1241/4226 -> chapter_1241.json (state)
+[CHAPTER-SKIP] 0003 1242/4226 -> chapter_1242.json (state)
+[CHAPTER-SKIP] 0003 1243/4226 -> chapter_1243.json (state)
+[CHAPTER-SKIP] 0003 1244/4226 -> chapter_1244.json (state)
+[CHAPTER-SKIP] 0003 1245/4226 -> chapter_1245.json (state)
+[CHAPTER-SKIP] 0003 1246/4226 -> chapter_1246.json (state)
+[CHAPTER-SKIP] 0003 1247/4226 -> chapter_1247.json (state)
+[CHAPTER-SKIP] 0003 1248/4226 -> chapter_1248.json (state)
+[NuExtract] model_backend=vision2seq runtime_backend=vllm source=/root/private_data/LiteraryGiant/models/weights/NuExtract_8B
+INFO 06-14 18:26:57 [__init__.py:216] Automatically detected platform cuda.
+INFO 06-14 18:26:59 [utils.py:328] non-default args: {'tokenizer': '/root/private_data/LiteraryGiant/models/weights/NuExtract_8B', 'max_model_len': 8192, 'gpu_memory_utilization': 0.85, 'disable_log_stats': True, 'model': '/root/private_data/LiteraryGiant/models/weights/NuExtract_8B'}
+INFO 06-14 18:27:07 [__init__.py:742] Resolved architecture: Qwen2_5_VLForConditionalGeneration
+`torch_dtype` is deprecated! Use `dtype` instead!
+INFO 06-14 18:27:07 [__init__.py:1815] Using max model len 8192
+INFO 06-14 18:27:09 [scheduler.py:222] Chunked prefill is enabled with max_num_batched_tokens=16384.
+INFO 06-14 18:27:15 [__init__.py:216] Automatically detected platform cuda.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:17 [core.py:654] Waiting for init message from front-end.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:17 [core.py:76] Initializing a V1 LLM engine (v0.10.2) with config: model='/root/private_data/LiteraryGiant/models/weights/NuExtract_8B', speculative_config=None, tokenizer='/root/private_data/LiteraryGiant/models/weights/NuExtract_8B', skip_tokenizer_init=False, tokenizer_mode=auto, revision=None, tokenizer_revision=None, trust_remote_code=False, dtype=torch.bfloat16, max_seq_len=8192, download_dir=None, load_format=auto, tensor_parallel_size=1, pipeline_parallel_size=1, data_parallel_size=1, disable_custom_all_reduce=False, quantization=None, enforce_eager=False, kv_cache_dtype=auto, device_config=cuda, decoding_config=DecodingConfig(backend='auto', disable_fallback=False, disable_any_whitespace=False, disable_additional_properties=False, reasoning_backend=''), observability_config=ObservabilityConfig(show_hidden_metrics_for_version=None, otlp_traces_endpoint=None, collect_detailed_traces=None), seed=0, served_model_name=/root/private_data/LiteraryGiant/models/weights/NuExtract_8B, enable_prefix_caching=True, chunked_prefill_enabled=True, use_async_output_proc=True, pooler_config=None, compilation_config={"level":3,"debug_dump_path":"","cache_dir":"","backend":"","custom_ops":[],"splitting_ops":["vllm.unified_attention","vllm.unified_attention_with_output","vllm.mamba_mixer2","vllm.mamba_mixer","vllm.short_conv","vllm.linear_attention","vllm.plamo2_mamba_mixer","vllm.gdn_attention"],"use_inductor":true,"compile_sizes":[],"inductor_compile_config":{"enable_auto_functionalized_v2":false},"inductor_passes":{},"cudagraph_mode":1,"use_cudagraph":true,"cudagraph_num_of_warmups":1,"cudagraph_capture_sizes":[512,504,496,488,480,472,464,456,448,440,432,424,416,408,400,392,384,376,368,360,352,344,336,328,320,312,304,296,288,280,272,264,256,248,240,232,224,216,208,200,192,184,176,168,160,152,144,136,128,120,112,104,96,88,80,72,64,56,48,40,32,24,16,8,4,2,1],"cudagraph_copy_inputs":false,"full_cuda_graph":false,"pass_config":{},"max_capture_size":512,"local_cache_dir":null}
+[W614 18:27:21.456381381 ProcessGroupNCCL.cpp:981] Warning: TORCH_NCCL_AVOID_RECORD_STREAMS is the default now, this environment variable is thus deprecated. (function operator())
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[Gloo] Rank 0 is connected to 0 peer ranks. Expected number of connected peer ranks is : 0
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:21 [parallel_state.py:1165] rank 0 in world size 1 is assigned as DP rank 0, PP rank 0, TP rank 0, EP rank 0
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:21 [topk_topp_sampler.py:58] Using FlashInfer for top-p & top-k sampling.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m WARNING 06-14 18:27:23 [profiling.py:280] The sequence length (8192) is smaller than the pre-defined worst-case total number of multimodal tokens (58482). This may cause certain multi-modal inputs to fail during inference. To avoid this, you should increase `max_model_len` or reduce `mm_counts`.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:23 [gpu_model_runner.py:2338] Starting to load model /root/private_data/LiteraryGiant/models/weights/NuExtract_8B...
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:24 [gpu_model_runner.py:2370] Loading model from scratch...
+[1;36m(EngineCore_DP0 pid=23540)[0;0m WARNING 06-14 18:27:24 [cuda.py:217] Current `vllm-flash-attn` has a bug inside vision module, so we use xformers backend instead. You can run `pip install flash-attn` to use flash-attention backend.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:24 [cuda.py:362] Using Flash Attention backend on V1 engine.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards:   0% Completed | 0/4 [00:00<?, ?it/s]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards:  25% Completed | 1/4 [00:01<00:05,  1.98s/it]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards:  50% Completed | 2/4 [00:07<00:07,  3.95s/it]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards:  75% Completed | 3/4 [00:13<00:05,  5.12s/it]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:21<00:00,  6.26s/it]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Loading safetensors checkpoint shards: 100% Completed | 4/4 [00:21<00:00,  5.46s/it]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m 
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:46 [default_loader.py:268] Loading weights took 21.90 seconds
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:47 [gpu_model_runner.py:2392] Model loading took 15.6271 GiB and 22.266766 seconds
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:47 [gpu_model_runner.py:3000] Encoder cache will be initialized with a budget of 29241 tokens, and profiled with 1 image items of the maximum feature size.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:59 [backends.py:539] Using cache directory: /root/.cache/vllm/torch_compile_cache/c53c20228e/rank_0_0/backbone for vLLM's torch.compile
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:27:59 [backends.py:550] Dynamo bytecode transform time: 4.54 s
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:02 [backends.py:161] Directly load the compiled graph(s) for dynamic shape from the cache, took 2.943 s
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:06 [monitor.py:34] torch.compile takes 4.54 s in total
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:07 [gpu_worker.py:298] Available KV cache memory: 43.45 GiB
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:07 [kv_cache_utils.py:864] GPU KV cache size: 813,616 tokens
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:07 [kv_cache_utils.py:868] Maximum concurrency for 8,192 tokens per request: 99.32x
+[1;36m(EngineCore_DP0 pid=23540)[0;0m Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   0%|          | 0/67 [00:00<?, ?it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   3%|▎         | 2/67 [00:00<00:03, 19.80it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):   7%|▋         | 5/67 [00:00<00:03, 20.18it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  12%|█▏        | 8/67 [00:00<00:02, 20.34it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  16%|█▋        | 11/67 [00:00<00:02, 20.56it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  21%|██        | 14/67 [00:00<00:02, 20.61it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  25%|██▌       | 17/67 [00:00<00:02, 20.96it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  30%|██▉       | 20/67 [00:00<00:02, 21.45it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  34%|███▍      | 23/67 [00:01<00:01, 22.02it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  39%|███▉      | 26/67 [00:01<00:01, 22.55it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  43%|████▎     | 29/67 [00:01<00:01, 22.88it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  48%|████▊     | 32/67 [00:01<00:01, 23.11it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  52%|█████▏    | 35/67 [00:01<00:01, 24.48it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  57%|█████▋    | 38/67 [00:01<00:01, 25.58it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  61%|██████    | 41/67 [00:01<00:01, 25.74it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  66%|██████▌   | 44/67 [00:01<00:00, 26.61it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  70%|███████   | 47/67 [00:01<00:00, 27.12it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  76%|███████▌  | 51/67 [00:02<00:00, 28.30it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  82%|████████▏ | 55/67 [00:02<00:00, 29.23it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  88%|████████▊ | 59/67 [00:02<00:00, 29.99it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE):  94%|█████████▍| 63/67 [00:02<00:00, 30.54it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 67/67 [00:02<00:00, 29.34it/s]Capturing CUDA graphs (mixed prefill-decode, PIECEWISE): 100%|██████████| 67/67 [00:02<00:00, 25.20it/s]
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:11 [gpu_model_runner.py:3118] Graph capturing finished in 3 secs, took 0.47 GiB
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:11 [gpu_worker.py:391] Free memory on device (78.76/79.25 GiB) on startup. Desired GPU memory utilization is (0.85, 67.36 GiB). Actual usage is 15.63 GiB for weight, 8.26 GiB for peak activation, 0.02 GiB for non-torch memory, and 0.47 GiB for CUDAGraph memory. Replace gpu_memory_utilization config with `--kv-cache-memory=45991594086` to fit into requested memory, or `--kv-cache-memory=58230612480` to fully utilize gpu memory. Current kv cache memory in use is 46656391270 bytes.
+[1;36m(EngineCore_DP0 pid=23540)[0;0m INFO 06-14 18:28:11 [core.py:218] init engine (profile, create kv cache, warmup model) took 23.89 seconds
+INFO 06-14 18:28:12 [llm.py:295] Supported_tasks: ['generate']
+INFO 06-14 18:28:12 [__init__.py:36] No IOProcessor plugins requested by the model
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 240.48it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.71s/it, est. speed input: 507.76 toks/s, output: 72.46 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.95s/it, est. speed input: 952.71 toks/s, output: 135.23 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.71s/it, est. speed input: 1103.25 toks/s, output: 202.79 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.71s/it, est. speed input: 1103.25 toks/s, output: 202.79 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.89s/it, est. speed input: 1103.25 toks/s, output: 202.79 toks/s]
+Adding requests:   0%|          | 0/37 [00:00<?, ?it/s]Adding requests: 100%|██████████| 37/37 [00:00<00:00, 938.14it/s]
+Processed prompts:   0%|          | 0/37 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/37 [00:00<00:30,  1.17it/s, est. speed input: 456.92 toks/s, output: 28.19 toks/s]Processed prompts:  32%|███▏      | 12/37 [00:00<00:01, 16.77it/s, est. speed input: 4369.84 toks/s, output: 355.74 toks/s]Processed prompts:  68%|██████▊   | 25/37 [00:01<00:00, 35.85it/s, est. speed input: 8386.42 toks/s, output: 739.80 toks/s]Processed prompts:  95%|█████████▍| 35/37 [00:01<00:00, 41.80it/s, est. speed input: 10259.80 toks/s, output: 994.33 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 41.80it/s, est. speed input: 10232.63 toks/s, output: 1020.89 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 28.08it/s, est. speed input: 10232.63 toks/s, output: 1020.89 toks/s]
+[CHAPTER] 0003 1249/4226 -> chapter_1249.json
+[CHAPTER] 0003 1250/4226 -> chapter_1250.json
+[CHAPTER] 0003 1251/4226 -> chapter_1251.json
+[CHAPTER] 0003 1252/4226 -> chapter_1252.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 203.37it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.27s/it, est. speed input: 515.42 toks/s, output: 74.43 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.99s/it, est. speed input: 895.71 toks/s, output: 143.74 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.23it/s, est. speed input: 1746.69 toks/s, output: 285.22 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.23it/s, est. speed input: 1746.69 toks/s, output: 285.22 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.22s/it, est. speed input: 1746.69 toks/s, output: 285.22 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 1266.22it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:28,  1.23it/s, est. speed input: 432.80 toks/s, output: 24.66 toks/s]Processed prompts:  28%|██▊       | 10/36 [00:00<00:01, 14.30it/s, est. speed input: 4037.85 toks/s, output: 264.70 toks/s]Processed prompts:  72%|███████▏  | 26/36 [00:01<00:00, 39.49it/s, est. speed input: 9607.10 toks/s, output: 738.31 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 39.41it/s, est. speed input: 10580.68 toks/s, output: 929.23 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 39.41it/s, est. speed input: 10580.68 toks/s, output: 929.23 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 28.15it/s, est. speed input: 10580.68 toks/s, output: 929.23 toks/s]
+[CHAPTER] 0003 1253/4226 -> chapter_1253.json
+[CHAPTER] 0003 1254/4226 -> chapter_1254.json
+[CHAPTER] 0003 1255/4226 -> chapter_1255.json
+[CHAPTER] 0003 1256/4226 -> chapter_1256.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 182.09it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.69s/it, est. speed input: 541.92 toks/s, output: 72.42 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.05s/it, est. speed input: 921.24 toks/s, output: 133.16 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.09s/it, est. speed input: 1540.17 toks/s, output: 246.53 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.09s/it, est. speed input: 1540.17 toks/s, output: 246.53 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.41s/it, est. speed input: 1540.17 toks/s, output: 246.53 toks/s]
+Adding requests:   0%|          | 0/38 [00:00<?, ?it/s]Adding requests: 100%|██████████| 38/38 [00:00<00:00, 1227.84it/s]
+Processed prompts:   0%|          | 0/38 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/38 [00:00<00:31,  1.17it/s, est. speed input: 381.25 toks/s, output: 25.65 toks/s]Processed prompts:  32%|███▏      | 12/38 [00:00<00:01, 16.43it/s, est. speed input: 4333.65 toks/s, output: 317.72 toks/s]Processed prompts:  66%|██████▌   | 25/38 [00:01<00:00, 35.14it/s, est. speed input: 8603.99 toks/s, output: 702.08 toks/s]Processed prompts:  97%|█████████▋| 37/38 [00:01<00:00, 40.96it/s, est. speed input: 10394.06 toks/s, output: 966.32 toks/s]Processed prompts: 100%|██████████| 38/38 [00:01<00:00, 40.96it/s, est. speed input: 10157.81 toks/s, output: 964.50 toks/s]Processed prompts: 100%|██████████| 38/38 [00:01<00:00, 27.61it/s, est. speed input: 10157.81 toks/s, output: 964.50 toks/s]
+[CHAPTER] 0003 1257/4226 -> chapter_1257.json
+[CHAPTER] 0003 1258/4226 -> chapter_1258.json
+[CHAPTER] 0003 1259/4226 -> chapter_1259.json
+[CHAPTER] 0003 1260/4226 -> chapter_1260.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 221.23it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:14,  4.73s/it, est. speed input: 463.29 toks/s, output: 74.61 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.20s/it, est. speed input: 921.20 toks/s, output: 143.67 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.26s/it, est. speed input: 1321.53 toks/s, output: 215.04 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.26s/it, est. speed input: 1698.30 toks/s, output: 287.47 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.35s/it, est. speed input: 1698.30 toks/s, output: 287.47 toks/s]
+Adding requests:   0%|          | 0/39 [00:00<?, ?it/s]Adding requests: 100%|██████████| 39/39 [00:00<00:00, 617.93it/s]
+Processed prompts:   0%|          | 0/39 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/39 [00:00<00:30,  1.25it/s, est. speed input: 453.37 toks/s, output: 21.29 toks/s]Processed prompts:   8%|▊         | 3/39 [00:00<00:08,  4.07it/s, est. speed input: 1250.73 toks/s, output: 72.01 toks/s]Processed prompts:  51%|█████▏    | 20/39 [00:01<00:00, 32.89it/s, est. speed input: 7380.35 toks/s, output: 550.91 toks/s]Processed prompts:  85%|████████▍ | 33/39 [00:01<00:00, 45.75it/s, est. speed input: 10373.66 toks/s, output: 883.46 toks/s]Processed prompts: 100%|██████████| 39/39 [00:01<00:00, 45.75it/s, est. speed input: 11342.79 toks/s, output: 1051.27 toks/s]Processed prompts: 100%|██████████| 39/39 [00:01<00:00, 30.28it/s, est. speed input: 11342.79 toks/s, output: 1051.27 toks/s]
+[CHAPTER] 0003 1261/4226 -> chapter_1261.json
+[CHAPTER] 0003 1262/4226 -> chapter_1262.json
+[CHAPTER] 0003 1263/4226 -> chapter_1263.json
+[CHAPTER] 0003 1264/4226 -> chapter_1264.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 268.36it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.24s/it, est. speed input: 460.62 toks/s, output: 74.92 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.14s/it, est. speed input: 822.63 toks/s, output: 141.04 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.02s/it, est. speed input: 1422.64 toks/s, output: 268.55 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.02s/it, est. speed input: 1422.64 toks/s, output: 268.55 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.40s/it, est. speed input: 1422.64 toks/s, output: 268.55 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 910.84it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:23,  1.38it/s, est. speed input: 532.22 toks/s, output: 23.50 toks/s]Processed prompts:  18%|█▊        | 6/34 [00:00<00:03,  9.20it/s, est. speed input: 2480.03 toks/s, output: 156.56 toks/s]Processed prompts:  53%|█████▎    | 18/34 [00:00<00:00, 29.75it/s, est. speed input: 7029.74 toks/s, output: 501.89 toks/s]Processed prompts:  76%|███████▋  | 26/34 [00:01<00:00, 39.40it/s, est. speed input: 9116.47 toks/s, output: 729.56 toks/s]Processed prompts:  97%|█████████▋| 33/34 [00:01<00:00, 40.67it/s, est. speed input: 10120.45 toks/s, output: 902.86 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 40.67it/s, est. speed input: 9695.09 toks/s, output: 888.68 toks/s] Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 26.07it/s, est. speed input: 9695.09 toks/s, output: 888.68 toks/s]
+[CHAPTER] 0003 1265/4226 -> chapter_1265.json
+[CHAPTER] 0003 1266/4226 -> chapter_1266.json
+[CHAPTER] 0003 1267/4226 -> chapter_1267.json
+[CHAPTER] 0003 1268/4226 -> chapter_1268.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 113.41it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.93s/it, est. speed input: 495.05 toks/s, output: 74.61 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.89s/it, est. speed input: 885.18 toks/s, output: 142.51 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.18s/it, est. speed input: 1253.71 toks/s, output: 208.77 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.28it/s, est. speed input: 1620.53 toks/s, output: 278.54 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.28it/s, est. speed input: 1620.53 toks/s, output: 278.54 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.22s/it, est. speed input: 1620.53 toks/s, output: 278.54 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 1220.07it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:26,  1.26it/s, est. speed input: 472.74 toks/s, output: 26.40 toks/s]Processed prompts:  21%|██        | 7/34 [00:00<00:02, 10.03it/s, est. speed input: 2855.48 toks/s, output: 195.29 toks/s]Processed prompts:  71%|███████   | 24/34 [00:01<00:00, 37.32it/s, est. speed input: 8769.25 toks/s, output: 711.73 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 44.23it/s, est. speed input: 10642.86 toks/s, output: 971.59 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 44.23it/s, est. speed input: 10642.86 toks/s, output: 971.59 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 28.75it/s, est. speed input: 10642.86 toks/s, output: 971.59 toks/s]
+[CHAPTER] 0003 1269/4226 -> chapter_1269.json
+[CHAPTER] 0003 1270/4226 -> chapter_1270.json
+[CHAPTER] 0003 1271/4226 -> chapter_1271.json
+[CHAPTER] 0003 1272/4226 -> chapter_1272.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 230.21it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:10,  3.49s/it, est. speed input: 684.48 toks/s, output: 71.63 toks/s]Processed prompts:  50%|█████     | 2/4 [00:03<00:03,  1.71s/it, est. speed input: 1104.68 toks/s, output: 136.06 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.40s/it, est. speed input: 1286.53 toks/s, output: 183.33 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.45s/it, est. speed input: 1341.46 toks/s, output: 218.29 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.45s/it, est. speed input: 1341.46 toks/s, output: 218.29 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.63s/it, est. speed input: 1341.46 toks/s, output: 218.29 toks/s]
+Adding requests:   0%|          | 0/37 [00:00<?, ?it/s]Adding requests: 100%|██████████| 37/37 [00:00<00:00, 804.75it/s]
+Processed prompts:   0%|          | 0/37 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/37 [00:00<00:32,  1.10it/s, est. speed input: 432.65 toks/s, output: 27.45 toks/s]Processed prompts:  30%|██▉       | 11/37 [00:01<00:01, 14.46it/s, est. speed input: 4195.09 toks/s, output: 323.76 toks/s]Processed prompts:  65%|██████▍   | 24/37 [00:01<00:00, 32.98it/s, est. speed input: 8117.17 toks/s, output: 704.86 toks/s]Processed prompts:  89%|████████▉ | 33/37 [00:01<00:00, 39.38it/s, est. speed input: 9695.07 toks/s, output: 930.72 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 39.38it/s, est. speed input: 8144.01 toks/s, output: 854.60 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 21.68it/s, est. speed input: 8144.01 toks/s, output: 854.60 toks/s]
+[CHAPTER] 0003 1273/4226 -> chapter_1273.json
+[CHAPTER] 0003 1274/4226 -> chapter_1274.json
+[CHAPTER] 0003 1275/4226 -> chapter_1275.json
+[CHAPTER] 0003 1276/4226 -> chapter_1276.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 266.34it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.46s/it, est. speed input: 479.53 toks/s, output: 74.02 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.09s/it, est. speed input: 849.17 toks/s, output: 142.69 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.24s/it, est. speed input: 1208.86 toks/s, output: 211.75 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.22it/s, est. speed input: 1593.81 toks/s, output: 280.46 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.22it/s, est. speed input: 1593.81 toks/s, output: 280.46 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.32s/it, est. speed input: 1593.81 toks/s, output: 280.46 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 548.84it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:27,  1.22it/s, est. speed input: 474.41 toks/s, output: 28.12 toks/s]Processed prompts:  29%|██▊       | 10/35 [00:00<00:01, 14.24it/s, est. speed input: 4075.85 toks/s, output: 279.49 toks/s]Processed prompts:  49%|████▊     | 17/35 [00:01<00:00, 23.75it/s, est. speed input: 6316.71 toks/s, output: 485.22 toks/s]Processed prompts:  86%|████████▌ | 30/35 [00:01<00:00, 41.90it/s, est. speed input: 9721.32 toks/s, output: 896.39 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 41.90it/s, est. speed input: 9815.35 toks/s, output: 984.70 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 25.93it/s, est. speed input: 9815.35 toks/s, output: 984.70 toks/s]
+[CHAPTER] 0003 1277/4226 -> chapter_1277.json
+[CHAPTER] 0003 1278/4226 -> chapter_1278.json
+[CHAPTER] 0003 1279/4226 -> chapter_1279.json
+[CHAPTER] 0003 1280/4226 -> chapter_1280.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 220.72it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.20s/it, est. speed input: 481.56 toks/s, output: 73.11 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.81s/it, est. speed input: 957.87 toks/s, output: 144.36 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.07s/it, est. speed input: 1357.10 toks/s, output: 212.43 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.05it/s, est. speed input: 1649.73 toks/s, output: 257.03 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.05it/s, est. speed input: 1649.73 toks/s, output: 257.03 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.32s/it, est. speed input: 1649.73 toks/s, output: 257.03 toks/s]
+Adding requests:   0%|          | 0/37 [00:00<?, ?it/s]Adding requests: 100%|██████████| 37/37 [00:00<00:00, 1516.42it/s]
+Processed prompts:   0%|          | 0/37 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/37 [00:00<00:31,  1.15it/s, est. speed input: 231.63 toks/s, output: 25.35 toks/s]Processed prompts:  19%|█▉        | 7/37 [00:00<00:03,  9.44it/s, est. speed input: 2362.29 toks/s, output: 183.53 toks/s]Processed prompts:  70%|███████   | 26/37 [00:01<00:00, 39.43it/s, est. speed input: 8916.53 toks/s, output: 750.48 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 40.56it/s, est. speed input: 10396.43 toks/s, output: 985.39 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 40.56it/s, est. speed input: 10396.43 toks/s, output: 985.39 toks/s]Processed prompts: 100%|██████████| 37/37 [00:01<00:00, 27.73it/s, est. speed input: 10396.43 toks/s, output: 985.39 toks/s]
+[CHAPTER] 0003 1281/4226 -> chapter_1281.json
+[CHAPTER] 0003 1282/4226 -> chapter_1282.json
+[CHAPTER] 0003 1283/4226 -> chapter_1283.json
+[CHAPTER] 0003 1284/4226 -> chapter_1284.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 211.15it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.57s/it, est. speed input: 443.09 toks/s, output: 75.01 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.07it/s, est. speed input: 1700.77 toks/s, output: 289.55 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.07it/s, est. speed input: 1700.77 toks/s, output: 289.55 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.21s/it, est. speed input: 1700.77 toks/s, output: 289.55 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 1468.40it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:29,  1.16it/s, est. speed input: 471.78 toks/s, output: 27.82 toks/s]Processed prompts:  43%|████▎     | 15/35 [00:00<00:00, 20.59it/s, est. speed input: 5799.84 toks/s, output: 435.92 toks/s]Processed prompts:  80%|████████  | 28/35 [00:01<00:00, 37.25it/s, est. speed input: 9564.79 toks/s, output: 826.78 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 37.25it/s, est. speed input: 8957.23 toks/s, output: 868.80 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 24.01it/s, est. speed input: 8957.23 toks/s, output: 868.80 toks/s]
+[CHAPTER] 0003 1285/4226 -> chapter_1285.json
+[CHAPTER] 0003 1286/4226 -> chapter_1286.json
+[CHAPTER] 0003 1287/4226 -> chapter_1287.json
+[CHAPTER] 0003 1288/4226 -> chapter_1288.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 122.02it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.49s/it, est. speed input: 448.17 toks/s, output: 75.29 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.05s/it, est. speed input: 812.69 toks/s, output: 145.62 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.03it/s, est. speed input: 1446.97 toks/s, output: 271.40 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.03it/s, est. speed input: 1446.97 toks/s, output: 271.40 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.38s/it, est. speed input: 1446.97 toks/s, output: 271.40 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 526.11it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:24,  1.35it/s, est. speed input: 371.15 toks/s, output: 26.99 toks/s]Processed prompts:   9%|▉         | 3/34 [00:00<00:07,  4.36it/s, est. speed input: 1241.30 toks/s, output: 79.66 toks/s]Processed prompts:  50%|█████     | 17/34 [00:00<00:00, 29.46it/s, est. speed input: 6438.20 toks/s, output: 529.91 toks/s]Processed prompts:  71%|███████   | 24/34 [00:01<00:00, 37.78it/s, est. speed input: 8335.33 toks/s, output: 742.33 toks/s]Processed prompts:  94%|█████████▍| 32/34 [00:01<00:00, 46.87it/s, est. speed input: 10308.21 toks/s, output: 998.25 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 46.87it/s, est. speed input: 10407.29 toks/s, output: 1040.80 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 28.04it/s, est. speed input: 10407.29 toks/s, output: 1040.80 toks/s]
+[CHAPTER] 0003 1289/4226 -> chapter_1289.json
+[CHAPTER] 0003 1290/4226 -> chapter_1290.json
+[CHAPTER] 0003 1291/4226 -> chapter_1291.json
+[CHAPTER] 0003 1292/4226 -> chapter_1292.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 237.20it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.99s/it, est. speed input: 565.53 toks/s, output: 73.38 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.13s/it, est. speed input: 873.53 toks/s, output: 136.10 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.36s/it, est. speed input: 1171.10 toks/s, output: 200.50 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.10s/it, est. speed input: 1371.95 toks/s, output: 253.96 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.10s/it, est. speed input: 1371.95 toks/s, output: 253.96 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.49s/it, est. speed input: 1371.95 toks/s, output: 253.96 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 477.09it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.21it/s, est. speed input: 215.82 toks/s, output: 27.88 toks/s]Processed prompts:  41%|████      | 14/34 [00:00<00:01, 19.96it/s, est. speed input: 5567.05 toks/s, output: 416.52 toks/s]Processed prompts:  76%|███████▋  | 26/34 [00:01<00:00, 37.09it/s, est. speed input: 9443.11 toks/s, output: 786.11 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 37.09it/s, est. speed input: 8019.05 toks/s, output: 768.72 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 21.19it/s, est. speed input: 8019.05 toks/s, output: 768.72 toks/s]
+[CHAPTER] 0003 1293/4226 -> chapter_1293.json
+[CHAPTER] 0003 1294/4226 -> chapter_1294.json
+[CHAPTER] 0003 1295/4226 -> chapter_1295.json
+[CHAPTER] 0003 1296/4226 -> chapter_1296.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 98.34it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.94s/it, est. speed input: 559.26 toks/s, output: 73.65 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.98s/it, est. speed input: 935.15 toks/s, output: 138.69 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.12s/it, est. speed input: 1322.74 toks/s, output: 210.56 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.39it/s, est. speed input: 1723.52 toks/s, output: 281.22 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.39it/s, est. speed input: 1723.52 toks/s, output: 281.22 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.19s/it, est. speed input: 1723.52 toks/s, output: 281.22 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 962.54it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.18it/s, est. speed input: 417.31 toks/s, output: 28.29 toks/s]Processed prompts:  26%|██▋       | 9/34 [00:00<00:02, 12.38it/s, est. speed input: 3310.75 toks/s, output: 249.68 toks/s]Processed prompts:  62%|██████▏   | 21/34 [00:01<00:00, 30.37it/s, est. speed input: 7268.54 toks/s, output: 624.95 toks/s]Processed prompts:  97%|█████████▋| 33/34 [00:01<00:00, 43.24it/s, est. speed input: 10286.18 toks/s, output: 968.40 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 43.24it/s, est. speed input: 9198.40 toks/s, output: 889.83 toks/s] Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 24.31it/s, est. speed input: 9198.40 toks/s, output: 889.83 toks/s]
+[CHAPTER] 0003 1297/4226 -> chapter_1297.json
+[CHAPTER] 0003 1298/4226 -> chapter_1298.json
+[CHAPTER] 0003 1299/4226 -> chapter_1299.json
+[CHAPTER] 0003 1300/4226 -> chapter_1300.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 183.85it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.34s/it, est. speed input: 466.43 toks/s, output: 71.93 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.85s/it, est. speed input: 906.33 toks/s, output: 142.65 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.16s/it, est. speed input: 1528.34 toks/s, output: 205.75 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.14s/it, est. speed input: 1585.12 toks/s, output: 242.14 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.14s/it, est. speed input: 1585.12 toks/s, output: 242.14 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.47s/it, est. speed input: 1585.12 toks/s, output: 242.14 toks/s]
+Adding requests:   0%|          | 0/39 [00:00<?, ?it/s]Adding requests: 100%|██████████| 39/39 [00:00<00:00, 1137.81it/s]
+Processed prompts:   0%|          | 0/39 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/39 [00:00<00:33,  1.13it/s, est. speed input: 233.62 toks/s, output: 21.55 toks/s]Processed prompts:   8%|▊         | 3/39 [00:01<00:09,  3.66it/s, est. speed input: 871.12 toks/s, output: 71.84 toks/s]Processed prompts:  38%|███▊      | 15/39 [00:01<00:01, 22.13it/s, est. speed input: 4973.66 toks/s, output: 400.55 toks/s]Processed prompts:  77%|███████▋  | 30/39 [00:01<00:00, 45.71it/s, est. speed input: 9323.70 toks/s, output: 846.10 toks/s]Processed prompts: 100%|██████████| 39/39 [00:01<00:00, 45.71it/s, est. speed input: 9608.63 toks/s, output: 967.72 toks/s]Processed prompts: 100%|██████████| 39/39 [00:01<00:00, 25.31it/s, est. speed input: 9608.63 toks/s, output: 967.72 toks/s]
+[CHAPTER] 0003 1301/4226 -> chapter_1301.json
+[CHAPTER] 0003 1302/4226 -> chapter_1302.json
+[CHAPTER] 0003 1303/4226 -> chapter_1303.json
+[CHAPTER] 0003 1304/4226 -> chapter_1304.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 179.44it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.60s/it, est. speed input: 434.19 toks/s, output: 74.50 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.00s/it, est. speed input: 896.67 toks/s, output: 146.59 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.32s/it, est. speed input: 1201.35 toks/s, output: 208.26 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.11s/it, est. speed input: 1377.94 toks/s, output: 258.18 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.11s/it, est. speed input: 1377.94 toks/s, output: 258.18 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.52s/it, est. speed input: 1377.94 toks/s, output: 258.18 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 1267.93it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.18it/s, est. speed input: 431.35 toks/s, output: 25.93 toks/s]Processed prompts:  31%|███▏      | 11/35 [00:00<00:01, 15.16it/s, est. speed input: 4196.74 toks/s, output: 307.20 toks/s]Processed prompts:  60%|██████    | 21/35 [00:01<00:00, 29.21it/s, est. speed input: 7239.74 toks/s, output: 598.14 toks/s]Processed prompts:  86%|████████▌ | 30/35 [00:01<00:00, 40.12it/s, est. speed input: 9582.67 toks/s, output: 866.12 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 40.12it/s, est. speed input: 10045.64 toks/s, output: 978.62 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 26.61it/s, est. speed input: 10045.64 toks/s, output: 978.62 toks/s]
+[CHAPTER] 0003 1305/4226 -> chapter_1305.json
+[CHAPTER] 0003 1306/4226 -> chapter_1306.json
+[CHAPTER] 0003 1307/4226 -> chapter_1307.json
+[CHAPTER] 0003 1308/4226 -> chapter_1308.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 207.15it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.39s/it, est. speed input: 438.51 toks/s, output: 74.11 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.06s/it, est. speed input: 913.56 toks/s, output: 142.32 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.24s/it, est. speed input: 1239.52 toks/s, output: 210.03 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.05s/it, est. speed input: 1429.33 toks/s, output: 259.80 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.05s/it, est. speed input: 1429.33 toks/s, output: 259.80 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.46s/it, est. speed input: 1429.33 toks/s, output: 259.80 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 766.90it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.19it/s, est. speed input: 415.54 toks/s, output: 28.57 toks/s]Processed prompts:  29%|██▊       | 10/35 [00:00<00:01, 13.64it/s, est. speed input: 3793.77 toks/s, output: 277.29 toks/s]Processed prompts:  66%|██████▌   | 23/35 [00:01<00:00, 32.95it/s, est. speed input: 8035.42 toks/s, output: 673.58 toks/s]Processed prompts:  91%|█████████▏| 32/35 [00:01<00:00, 42.34it/s, est. speed input: 10143.10 toks/s, output: 929.83 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 42.34it/s, est. speed input: 10786.23 toks/s, output: 1029.67 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 28.69it/s, est. speed input: 10786.23 toks/s, output: 1029.67 toks/s]
+[CHAPTER] 0003 1309/4226 -> chapter_1309.json
+[CHAPTER] 0003 1310/4226 -> chapter_1310.json
+[CHAPTER] 0003 1311/4226 -> chapter_1311.json
+[CHAPTER] 0003 1312/4226 -> chapter_1312.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 231.12it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.65s/it, est. speed input: 409.06 toks/s, output: 73.90 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.34s/it, est. speed input: 730.00 toks/s, output: 139.20 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.46s/it, est. speed input: 1109.75 toks/s, output: 205.02 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.04it/s, est. speed input: 1436.37 toks/s, output: 274.94 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.04it/s, est. speed input: 1436.37 toks/s, output: 274.94 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.50s/it, est. speed input: 1436.37 toks/s, output: 274.94 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 639.58it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.21it/s, est. speed input: 460.27 toks/s, output: 24.22 toks/s]Processed prompts:  14%|█▍        | 5/35 [00:00<00:04,  6.91it/s, est. speed input: 2138.31 toks/s, output: 134.72 toks/s]Processed prompts:  57%|█████▋    | 20/35 [00:01<00:00, 31.40it/s, est. speed input: 7566.34 toks/s, output: 595.63 toks/s]Processed prompts:  83%|████████▎ | 29/35 [00:01<00:00, 40.13it/s, est. speed input: 9612.41 toks/s, output: 836.93 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 40.13it/s, est. speed input: 10159.75 toks/s, output: 978.03 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 26.49it/s, est. speed input: 10159.75 toks/s, output: 978.03 toks/s]
+[CHAPTER] 0003 1313/4226 -> chapter_1313.json
+[CHAPTER] 0003 1314/4226 -> chapter_1314.json
+[CHAPTER] 0003 1315/4226 -> chapter_1315.json
+[CHAPTER] 0003 1316/4226 -> chapter_1316.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 91.46it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:14,  4.74s/it, est. speed input: 402.28 toks/s, output: 75.39 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.15s/it, est. speed input: 778.93 toks/s, output: 146.02 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.02it/s, est. speed input: 1434.83 toks/s, output: 277.79 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.02it/s, est. speed input: 1434.83 toks/s, output: 277.79 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.41s/it, est. speed input: 1434.83 toks/s, output: 277.79 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 1306.28it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.20it/s, est. speed input: 240.58 toks/s, output: 26.33 toks/s]Processed prompts:  20%|██        | 7/35 [00:00<00:02,  9.59it/s, est. speed input: 2324.63 toks/s, output: 190.64 toks/s]Processed prompts:  63%|██████▎   | 22/35 [00:01<00:00, 33.32it/s, est. speed input: 7570.43 toks/s, output: 641.17 toks/s]Processed prompts:  89%|████████▊ | 31/35 [00:01<00:00, 39.78it/s, est. speed input: 9368.70 toks/s, output: 880.76 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 39.78it/s, est. speed input: 9492.49 toks/s, output: 953.79 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 25.71it/s, est. speed input: 9492.49 toks/s, output: 953.79 toks/s]
+[CHAPTER] 0003 1317/4226 -> chapter_1317.json
+[CHAPTER] 0003 1318/4226 -> chapter_1318.json
+[CHAPTER] 0003 1319/4226 -> chapter_1319.json
+[CHAPTER] 0003 1320/4226 -> chapter_1320.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 200.14it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:05<00:15,  5.06s/it, est. speed input: 376.07 toks/s, output: 74.94 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.44s/it, est. speed input: 1183.34 toks/s, output: 216.75 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.17s/it, est. speed input: 1367.90 toks/s, output: 269.98 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.17s/it, est. speed input: 1367.90 toks/s, output: 269.98 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.51s/it, est. speed input: 1367.90 toks/s, output: 269.98 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 1194.84it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:29,  1.12it/s, est. speed input: 393.52 toks/s, output: 28.11 toks/s]Processed prompts:  44%|████▍     | 15/34 [00:00<00:00, 20.11it/s, est. speed input: 5624.90 toks/s, output: 442.01 toks/s]Processed prompts:  82%|████████▏ | 28/34 [00:01<00:00, 37.33it/s, est. speed input: 9538.38 toks/s, output: 835.99 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 37.33it/s, est. speed input: 7463.55 toks/s, output: 734.34 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 19.59it/s, est. speed input: 7463.55 toks/s, output: 734.34 toks/s]
+[CHAPTER] 0003 1321/4226 -> chapter_1321.json
+[CHAPTER] 0003 1322/4226 -> chapter_1322.json
+[CHAPTER] 0003 1323/4226 -> chapter_1323.json
+[CHAPTER] 0003 1324/4226 -> chapter_1324.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 86.11it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.41s/it, est. speed input: 558.83 toks/s, output: 73.94 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.96s/it, est. speed input: 961.48 toks/s, output: 144.22 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.16s/it, est. speed input: 1373.40 toks/s, output: 212.86 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.26it/s, est. speed input: 1717.40 toks/s, output: 278.34 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.26it/s, est. speed input: 1717.40 toks/s, output: 278.34 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.27s/it, est. speed input: 1717.40 toks/s, output: 278.34 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 727.67it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:28,  1.22it/s, est. speed input: 475.08 toks/s, output: 23.20 toks/s]Processed prompts:  17%|█▋        | 6/36 [00:00<00:03,  8.45it/s, est. speed input: 2492.44 toks/s, output: 147.76 toks/s]Processed prompts:  42%|████▏     | 15/36 [00:01<00:00, 22.43it/s, est. speed input: 5357.30 toks/s, output: 387.45 toks/s]Processed prompts:  72%|███████▏  | 26/36 [00:01<00:00, 39.63it/s, est. speed input: 8670.71 toks/s, output: 712.21 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 49.73it/s, est. speed input: 10910.12 toks/s, output: 994.56 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 49.73it/s, est. speed input: 10910.12 toks/s, output: 994.56 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 28.62it/s, est. speed input: 10910.12 toks/s, output: 994.56 toks/s]
+[CHAPTER] 0003 1325/4226 -> chapter_1325.json
+[CHAPTER] 0003 1326/4226 -> chapter_1326.json
+[CHAPTER] 0003 1327/4226 -> chapter_1327.json
+[CHAPTER] 0003 1328/4226 -> chapter_1328.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 141.14it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.58s/it, est. speed input: 427.73 toks/s, output: 73.72 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.95s/it, est. speed input: 856.15 toks/s, output: 145.99 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.12it/s, est. speed input: 1636.55 toks/s, output: 273.72 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.12it/s, est. speed input: 1636.55 toks/s, output: 273.72 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.30s/it, est. speed input: 1636.55 toks/s, output: 273.72 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 560.63it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.18it/s, est. speed input: 309.47 toks/s, output: 25.89 toks/s]Processed prompts:  37%|███▋      | 13/35 [00:00<00:01, 17.95it/s, est. speed input: 5149.42 toks/s, output: 367.81 toks/s]Processed prompts:  71%|███████▏  | 25/35 [00:01<00:00, 34.86it/s, est. speed input: 9031.55 toks/s, output: 718.31 toks/s]Processed prompts:  97%|█████████▋| 34/35 [00:01<00:00, 43.87it/s, est. speed input: 10927.96 toks/s, output: 975.12 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 43.87it/s, est. speed input: 10638.59 toks/s, output: 963.94 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 27.88it/s, est. speed input: 10638.59 toks/s, output: 963.94 toks/s]
+[CHAPTER] 0003 1329/4226 -> chapter_1329.json
+[CHAPTER] 0003 1330/4226 -> chapter_1330.json
+[CHAPTER] 0003 1331/4226 -> chapter_1331.json
+[CHAPTER] 0003 1332/4226 -> chapter_1332.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 277.29it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:14,  4.69s/it, est. speed input: 429.21 toks/s, output: 74.59 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.10s/it, est. speed input: 819.20 toks/s, output: 145.40 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.12it/s, est. speed input: 1522.66 toks/s, output: 283.06 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.12it/s, est. speed input: 1522.66 toks/s, output: 283.06 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.33s/it, est. speed input: 1522.66 toks/s, output: 283.06 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 1020.10it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:28,  1.12it/s, est. speed input: 447.60 toks/s, output: 29.02 toks/s]Processed prompts:  39%|███▉      | 13/33 [00:01<00:01, 17.27it/s, est. speed input: 4818.86 toks/s, output: 396.41 toks/s]Processed prompts:  73%|███████▎  | 24/33 [00:01<00:00, 32.30it/s, est. speed input: 8178.46 toks/s, output: 738.30 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 28.90it/s, est. speed input: 8592.13 toks/s, output: 885.91 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 28.90it/s, est. speed input: 8592.13 toks/s, output: 885.91 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 22.48it/s, est. speed input: 8592.13 toks/s, output: 885.91 toks/s]
+[CHAPTER] 0003 1333/4226 -> chapter_1333.json
+[CHAPTER] 0003 1334/4226 -> chapter_1334.json
+[CHAPTER] 0003 1335/4226 -> chapter_1335.json
+[CHAPTER] 0003 1336/4226 -> chapter_1336.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 281.88it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.79s/it, est. speed input: 507.34 toks/s, output: 72.51 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.21s/it, est. speed input: 729.19 toks/s, output: 131.02 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.37s/it, est. speed input: 1090.79 toks/s, output: 197.39 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.37s/it, est. speed input: 1515.28 toks/s, output: 270.05 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.34s/it, est. speed input: 1515.28 toks/s, output: 270.05 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 469.64it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:24,  1.36it/s, est. speed input: 254.75 toks/s, output: 23.16 toks/s]Processed prompts:  12%|█▏        | 4/34 [00:00<00:04,  6.01it/s, est. speed input: 1628.01 toks/s, output: 101.75 toks/s]Processed prompts:  56%|█████▌    | 19/34 [00:00<00:00, 32.80it/s, est. speed input: 7492.71 toks/s, output: 538.74 toks/s]Processed prompts:  88%|████████▊ | 30/34 [00:01<00:00, 46.90it/s, est. speed input: 10508.43 toks/s, output: 856.24 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 46.90it/s, est. speed input: 9957.52 toks/s, output: 863.18 toks/s] Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 26.51it/s, est. speed input: 9957.52 toks/s, output: 863.18 toks/s]
+[CHAPTER] 0003 1337/4226 -> chapter_1337.json
+[CHAPTER] 0003 1338/4226 -> chapter_1338.json
+[CHAPTER] 0003 1339/4226 -> chapter_1339.json
+[CHAPTER] 0003 1340/4226 -> chapter_1340.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 270.58it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.29s/it, est. speed input: 471.24 toks/s, output: 73.25 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.85s/it, est. speed input: 906.59 toks/s, output: 144.44 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.08s/it, est. speed input: 1345.74 toks/s, output: 213.46 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.10s/it, est. speed input: 1463.99 toks/s, output: 247.67 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.10s/it, est. speed input: 1463.99 toks/s, output: 247.67 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.43s/it, est. speed input: 1463.99 toks/s, output: 247.67 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 452.08it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.20it/s, est. speed input: 473.53 toks/s, output: 28.70 toks/s]Processed prompts:  50%|█████     | 17/34 [00:00<00:00, 24.12it/s, est. speed input: 6694.07 toks/s, output: 485.55 toks/s]Processed prompts:  82%|████████▏ | 28/34 [00:01<00:00, 37.36it/s, est. speed input: 9978.38 toks/s, output: 789.86 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 37.36it/s, est. speed input: 11112.49 toks/s, output: 954.75 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 29.01it/s, est. speed input: 11112.49 toks/s, output: 954.75 toks/s]
+[CHAPTER] 0003 1341/4226 -> chapter_1341.json
+[CHAPTER] 0003 1342/4226 -> chapter_1342.json
+[CHAPTER] 0003 1343/4226 -> chapter_1343.json
+[CHAPTER] 0003 1344/4226 -> chapter_1344.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 270.58it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.52s/it, est. speed input: 469.20 toks/s, output: 74.36 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.37s/it, est. speed input: 764.51 toks/s, output: 138.17 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.48s/it, est. speed input: 1057.90 toks/s, output: 204.57 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.19s/it, est. speed input: 1229.11 toks/s, output: 258.18 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.19s/it, est. speed input: 1229.11 toks/s, output: 258.18 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.64s/it, est. speed input: 1229.11 toks/s, output: 258.18 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 1230.92it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:27,  1.17it/s, est. speed input: 441.72 toks/s, output: 26.81 toks/s]Processed prompts:  21%|██        | 7/33 [00:00<00:02,  9.46it/s, est. speed input: 2696.84 toks/s, output: 194.63 toks/s]Processed prompts:  76%|███████▌  | 25/33 [00:01<00:00, 37.89it/s, est. speed input: 8833.73 toks/s, output: 769.97 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 37.89it/s, est. speed input: 10806.62 toks/s, output: 993.41 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 28.37it/s, est. speed input: 10806.62 toks/s, output: 993.41 toks/s]
+[CHAPTER] 0003 1345/4226 -> chapter_1345.json
+[CHAPTER] 0003 1346/4226 -> chapter_1346.json
+[CHAPTER] 0003 1347/4226 -> chapter_1347.json
+[CHAPTER] 0003 1348/4226 -> chapter_1348.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 237.20it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.64s/it, est. speed input: 451.72 toks/s, output: 74.42 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.55s/it, est. speed input: 1132.69 toks/s, output: 200.87 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.11s/it, est. speed input: 1418.61 toks/s, output: 267.94 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.11s/it, est. speed input: 1418.61 toks/s, output: 267.94 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.47s/it, est. speed input: 1418.61 toks/s, output: 267.94 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 689.63it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.21it/s, est. speed input: 403.77 toks/s, output: 26.52 toks/s]Processed prompts:  35%|███▌      | 12/34 [00:00<00:01, 16.60it/s, est. speed input: 4652.71 toks/s, output: 330.31 toks/s]Processed prompts:  74%|███████▎  | 25/34 [00:01<00:00, 35.60it/s, est. speed input: 8916.62 toks/s, output: 719.04 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 40.16it/s, est. speed input: 10536.35 toks/s, output: 940.43 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 40.16it/s, est. speed input: 10536.35 toks/s, output: 940.43 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 27.58it/s, est. speed input: 10536.35 toks/s, output: 940.43 toks/s]
+[CHAPTER] 0003 1349/4226 -> chapter_1349.json
+[CHAPTER] 0003 1350/4226 -> chapter_1350.json
+[CHAPTER] 0003 1351/4226 -> chapter_1351.json
+[CHAPTER] 0003 1352/4226 -> chapter_1352.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 186.87it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.13s/it, est. speed input: 514.44 toks/s, output: 72.66 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.95s/it, est. speed input: 968.07 toks/s, output: 139.65 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.17s/it, est. speed input: 1327.42 toks/s, output: 206.88 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.17s/it, est. speed input: 1776.73 toks/s, output: 279.36 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.21s/it, est. speed input: 1776.73 toks/s, output: 279.36 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 1241.71it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.21it/s, est. speed input: 500.05 toks/s, output: 23.06 toks/s]Processed prompts:  18%|█▊        | 6/34 [00:00<00:03,  8.11it/s, est. speed input: 2486.07 toks/s, output: 152.68 toks/s]Processed prompts:  53%|█████▎    | 18/34 [00:01<00:00, 26.78it/s, est. speed input: 6644.27 toks/s, output: 502.34 toks/s]Processed prompts:  85%|████████▌ | 29/34 [00:01<00:00, 41.93it/s, est. speed input: 9669.80 toks/s, output: 829.10 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 41.93it/s, est. speed input: 10143.01 toks/s, output: 930.98 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 26.03it/s, est. speed input: 10143.01 toks/s, output: 930.98 toks/s]
+[CHAPTER] 0003 1353/4226 -> chapter_1353.json
+[CHAPTER] 0003 1354/4226 -> chapter_1354.json
+[CHAPTER] 0003 1355/4226 -> chapter_1355.json
+[CHAPTER] 0003 1356/4226 -> chapter_1356.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 275.52it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.25s/it, est. speed input: 481.02 toks/s, output: 73.50 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.81s/it, est. speed input: 926.33 toks/s, output: 145.43 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.40s/it, est. speed input: 1198.17 toks/s, output: 195.89 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.01s/it, est. speed input: 1465.71 toks/s, output: 257.68 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.01s/it, est. speed input: 1465.71 toks/s, output: 257.68 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.42s/it, est. speed input: 1465.71 toks/s, output: 257.68 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 1123.44it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:28,  1.22it/s, est. speed input: 487.36 toks/s, output: 23.21 toks/s]Processed prompts:  17%|█▋        | 6/36 [00:00<00:03,  8.44it/s, est. speed input: 2515.83 toks/s, output: 152.08 toks/s]Processed prompts:  56%|█████▌    | 20/36 [00:01<00:00, 31.11it/s, est. speed input: 7183.31 toks/s, output: 552.40 toks/s]Processed prompts:  97%|█████████▋| 35/36 [00:01<00:00, 52.63it/s, est. speed input: 11283.67 toks/s, output: 994.83 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 52.63it/s, est. speed input: 10640.11 toks/s, output: 955.63 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 28.81it/s, est. speed input: 10640.11 toks/s, output: 955.63 toks/s]
+[CHAPTER] 0003 1357/4226 -> chapter_1357.json
+[CHAPTER] 0003 1358/4226 -> chapter_1358.json
+[CHAPTER] 0003 1359/4226 -> chapter_1359.json
+[CHAPTER] 0003 1360/4226 -> chapter_1360.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 99.40it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:14,  4.78s/it, est. speed input: 444.62 toks/s, output: 74.73 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.35s/it, est. speed input: 782.89 toks/s, output: 141.56 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.40s/it, est. speed input: 1129.28 toks/s, output: 211.17 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.37s/it, est. speed input: 1198.17 toks/s, output: 249.33 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.37s/it, est. speed input: 1198.17 toks/s, output: 249.33 toks/s]Processed prompts: 100%|██████████| 4/4 [00:07<00:00,  1.76s/it, est. speed input: 1198.17 toks/s, output: 249.33 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 995.34it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:30,  1.14it/s, est. speed input: 462.39 toks/s, output: 26.19 toks/s]Processed prompts:  47%|████▋     | 17/36 [00:01<00:00, 22.21it/s, est. speed input: 6283.31 toks/s, output: 466.88 toks/s]Processed prompts:  72%|███████▏  | 26/36 [00:01<00:00, 32.32it/s, est. speed input: 8433.01 toks/s, output: 712.98 toks/s]Processed prompts:  94%|█████████▍| 34/36 [00:01<00:00, 34.68it/s, est. speed input: 9467.94 toks/s, output: 892.17 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 34.68it/s, est. speed input: 8989.52 toks/s, output: 886.60 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 24.14it/s, est. speed input: 8989.52 toks/s, output: 886.60 toks/s]
+[CHAPTER] 0003 1361/4226 -> chapter_1361.json
+[CHAPTER] 0003 1362/4226 -> chapter_1362.json
+[CHAPTER] 0003 1363/4226 -> chapter_1363.json
+[CHAPTER] 0003 1364/4226 -> chapter_1364.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 100.58it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.57s/it, est. speed input: 434.34 toks/s, output: 74.65 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.08s/it, est. speed input: 916.26 toks/s, output: 144.62 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.21s/it, est. speed input: 1264.81 toks/s, output: 214.90 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.21s/it, est. speed input: 1594.13 toks/s, output: 286.56 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.29s/it, est. speed input: 1594.13 toks/s, output: 286.56 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 1278.97it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:30,  1.16it/s, est. speed input: 431.02 toks/s, output: 25.63 toks/s]Processed prompts:  33%|███▎      | 12/36 [00:00<00:01, 16.10it/s, est. speed input: 4444.14 toks/s, output: 326.14 toks/s]Processed prompts:  67%|██████▋   | 24/36 [00:01<00:00, 33.01it/s, est. speed input: 8042.32 toks/s, output: 678.84 toks/s]Processed prompts:  92%|█████████▏| 33/36 [00:01<00:00, 43.13it/s, est. speed input: 10212.47 toks/s, output: 937.82 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 43.13it/s, est. speed input: 10456.25 toks/s, output: 1010.99 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 28.45it/s, est. speed input: 10456.25 toks/s, output: 1010.99 toks/s]
+[CHAPTER] 0003 1365/4226 -> chapter_1365.json
+[CHAPTER] 0003 1366/4226 -> chapter_1366.json
+[CHAPTER] 0003 1367/4226 -> chapter_1367.json
+[CHAPTER] 0003 1368/4226 -> chapter_1368.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 248.86it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.60s/it, est. speed input: 430.14 toks/s, output: 73.76 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.01s/it, est. speed input: 827.12 toks/s, output: 144.95 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.03it/s, est. speed input: 1559.69 toks/s, output: 267.75 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.03it/s, est. speed input: 1559.69 toks/s, output: 267.75 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.37s/it, est. speed input: 1559.69 toks/s, output: 267.75 toks/s]
+Adding requests:   0%|          | 0/35 [00:00<?, ?it/s]Adding requests: 100%|██████████| 35/35 [00:00<00:00, 717.29it/s]
+Processed prompts:   0%|          | 0/35 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/35 [00:00<00:28,  1.21it/s, est. speed input: 367.48 toks/s, output: 25.38 toks/s]Processed prompts:  26%|██▌       | 9/35 [00:00<00:02, 12.58it/s, est. speed input: 3442.66 toks/s, output: 239.44 toks/s]Processed prompts:  57%|█████▋    | 20/35 [00:01<00:00, 29.05it/s, est. speed input: 7252.36 toks/s, output: 567.07 toks/s]Processed prompts:  94%|█████████▍| 33/35 [00:01<00:00, 44.77it/s, est. speed input: 10587.90 toks/s, output: 954.02 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 44.77it/s, est. speed input: 10160.03 toks/s, output: 947.42 toks/s]Processed prompts: 100%|██████████| 35/35 [00:01<00:00, 26.56it/s, est. speed input: 10160.03 toks/s, output: 947.42 toks/s]
+[CHAPTER] 0003 1369/4226 -> chapter_1369.json
+[CHAPTER] 0003 1370/4226 -> chapter_1370.json
+[CHAPTER] 0003 1371/4226 -> chapter_1371.json
+[CHAPTER] 0003 1372/4226 -> chapter_1372.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 173.25it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.82s/it, est. speed input: 510.97 toks/s, output: 73.03 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.69s/it, est. speed input: 946.23 toks/s, output: 142.99 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.03s/it, est. speed input: 1346.55 toks/s, output: 209.12 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.11s/it, est. speed input: 1438.35 toks/s, output: 238.87 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.11s/it, est. speed input: 1438.35 toks/s, output: 238.87 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.38s/it, est. speed input: 1438.35 toks/s, output: 238.87 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 494.78it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:24,  1.32it/s, est. speed input: 493.51 toks/s, output: 26.46 toks/s]Processed prompts:  29%|██▉       | 10/34 [00:00<00:01, 15.15it/s, est. speed input: 4344.58 toks/s, output: 288.40 toks/s]Processed prompts:  76%|███████▋  | 26/34 [00:00<00:00, 39.64it/s, est. speed input: 9636.63 toks/s, output: 769.83 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 39.64it/s, est. speed input: 7610.94 toks/s, output: 708.55 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 20.55it/s, est. speed input: 7610.94 toks/s, output: 708.55 toks/s]
+[CHAPTER] 0003 1373/4226 -> chapter_1373.json
+[CHAPTER] 0003 1374/4226 -> chapter_1374.json
+[CHAPTER] 0003 1375/4226 -> chapter_1375.json
+[CHAPTER] 0003 1376/4226 -> chapter_1376.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 218.63it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.95s/it, est. speed input: 482.08 toks/s, output: 73.50 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.97s/it, est. speed input: 861.47 toks/s, output: 138.51 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.04s/it, est. speed input: 1442.88 toks/s, output: 252.88 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.04s/it, est. speed input: 1442.88 toks/s, output: 252.88 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.38s/it, est. speed input: 1442.88 toks/s, output: 252.88 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 705.29it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:26,  1.19it/s, est. speed input: 236.87 toks/s, output: 27.38 toks/s]Processed prompts:  24%|██▍       | 8/33 [00:00<00:02, 11.06it/s, est. speed input: 3076.12 toks/s, output: 235.16 toks/s]Processed prompts:  76%|███████▌  | 25/33 [00:01<00:00, 37.98it/s, est. speed input: 9010.82 toks/s, output: 779.68 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 37.98it/s, est. speed input: 10778.83 toks/s, output: 1011.22 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 28.51it/s, est. speed input: 10778.83 toks/s, output: 1011.22 toks/s]
+[CHAPTER] 0003 1377/4226 -> chapter_1377.json
+[CHAPTER] 0003 1378/4226 -> chapter_1378.json
+[CHAPTER] 0003 1379/4226 -> chapter_1379.json
+[CHAPTER] 0003 1380/4226 -> chapter_1380.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 275.40it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.64s/it, est. speed input: 425.51 toks/s, output: 74.33 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.04s/it, est. speed input: 849.01 toks/s, output: 146.00 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.18s/it, est. speed input: 1218.45 toks/s, output: 216.55 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.08it/s, est. speed input: 1472.26 toks/s, output: 271.63 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.08it/s, est. speed input: 1472.26 toks/s, output: 271.63 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.39s/it, est. speed input: 1472.26 toks/s, output: 271.63 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 902.62it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:27,  1.18it/s, est. speed input: 462.99 toks/s, output: 25.92 toks/s]Processed prompts:  33%|███▎      | 11/33 [00:00<00:01, 15.25it/s, est. speed input: 4496.92 toks/s, output: 306.34 toks/s]Processed prompts:  76%|███████▌  | 25/33 [00:01<00:00, 36.21it/s, est. speed input: 9103.50 toks/s, output: 735.87 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 36.21it/s, est. speed input: 7410.14 toks/s, output: 697.82 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 19.30it/s, est. speed input: 7410.14 toks/s, output: 697.82 toks/s]
+[NuExtract detailed_summary] structured extraction failed: NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "金色光芒扩散，触碰到建筑时，建筑如同积雪般融化，直徑百米大小的光球出现，照亮小半個熱都，光球持续五秒后，光芒不再耀眼，逐渐被夜色吞噬。最後一絲光芒褪去，方圓百米內的所有東西都消失，地面出现一道半圓形凹坑。远處一棟五層建築上，眼含淚水的莎
+Adding requests:   0%|          | 0/1 [00:00<?, ?it/s]Adding requests: 100%|██████████| 1/1 [00:00<00:00, 136.60it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s, est. speed input: 1282.54 toks/s, output: 80.15 toks/s]Processed prompts: 100%|██████████| 1/1 [00:00<00:00,  4.22it/s, est. speed input: 1282.54 toks/s, output: 80.15 toks/s]Processed prompts: 100%|██████████| 1/1 [00:00<00:00,  4.21it/s, est. speed input: 1282.54 toks/s, output: 80.15 toks/s]
+[CHAPTER] 0003 1381/4226 -> chapter_1381.json
+[CHAPTER] 0003 1382/4226 -> chapter_1382.json
+[CHAPTER] 0003 1383/4226 -> chapter_1383.json
+[CHAPTER] 0003 1384/4226 -> chapter_1384.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 161.99it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.32s/it, est. speed input: 561.85 toks/s, output: 72.86 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.18s/it, est. speed input: 1489.42 toks/s, output: 213.89 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.33s/it, est. speed input: 1483.56 toks/s, output: 233.35 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.33s/it, est. speed input: 1483.56 toks/s, output: 233.35 toks/s]Processed prompts: 100%|██████████| 4/4 [00:06<00:00,  1.52s/it, est. speed input: 1483.56 toks/s, output: 233.35 toks/s]
+Adding requests:   0%|          | 0/38 [00:00<?, ?it/s]Adding requests: 100%|██████████| 38/38 [00:00<00:00, 836.17it/s]
+Processed prompts:   0%|          | 0/38 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/38 [00:00<00:33,  1.10it/s, est. speed input: 439.06 toks/s, output: 24.15 toks/s]Processed prompts:  26%|██▋       | 10/38 [00:01<00:02, 13.10it/s, est. speed input: 3671.16 toks/s, output: 265.32 toks/s]Processed prompts:  50%|█████     | 19/38 [00:01<00:00, 25.33it/s, est. speed input: 6355.29 toks/s, output: 508.52 toks/s]Processed prompts:  84%|████████▍ | 32/38 [00:01<00:00, 42.90it/s, est. speed input: 9811.86 toks/s, output: 895.33 toks/s]Processed prompts: 100%|██████████| 38/38 [00:01<00:00, 42.90it/s, est. speed input: 9354.26 toks/s, output: 940.69 toks/s]Processed prompts: 100%|██████████| 38/38 [00:01<00:00, 24.79it/s, est. speed input: 9354.26 toks/s, output: 940.69 toks/s]
+[CHAPTER] 0003 1385/4226 -> chapter_1385.json
+[CHAPTER] 0003 1386/4226 -> chapter_1386.json
+[CHAPTER] 0003 1387/4226 -> chapter_1387.json
+[CHAPTER] 0003 1388/4226 -> chapter_1388.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 267.84it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.42s/it, est. speed input: 472.44 toks/s, output: 73.95 toks/s]Processed prompts:  50%|█████     | 2/4 [00:05<00:04,  2.30s/it, est. speed input: 796.23 toks/s, output: 137.88 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.43s/it, est. speed input: 1095.18 toks/s, output: 204.41 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.08it/s, est. speed input: 1391.63 toks/s, output: 275.59 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.08it/s, est. speed input: 1391.63 toks/s, output: 275.59 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.45s/it, est. speed input: 1391.63 toks/s, output: 275.59 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 1078.78it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.19it/s, est. speed input: 455.08 toks/s, output: 26.28 toks/s]Processed prompts:  32%|███▏      | 11/34 [00:00<00:01, 15.38it/s, est. speed input: 4371.50 toks/s, output: 305.23 toks/s]Processed prompts:  59%|█████▉    | 20/34 [00:01<00:00, 27.96it/s, est. speed input: 7123.96 toks/s, output: 558.25 toks/s]Processed prompts:  79%|███████▉  | 27/34 [00:01<00:00, 34.52it/s, est. speed input: 8633.86 toks/s, output: 753.82 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 29.14it/s, est. speed input: 8571.96 toks/s, output: 866.14 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 29.14it/s, est. speed input: 8571.96 toks/s, output: 866.14 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 22.91it/s, est. speed input: 8571.96 toks/s, output: 866.14 toks/s]
+[CHAPTER] 0003 1389/4226 -> chapter_1389.json
+[CHAPTER] 0003 1390/4226 -> chapter_1390.json
+[CHAPTER] 0003 1391/4226 -> chapter_1391.json
+[CHAPTER] 0003 1392/4226 -> chapter_1392.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 187.33it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:11,  3.95s/it, est. speed input: 539.76 toks/s, output: 72.91 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.80s/it, est. speed input: 967.84 toks/s, output: 141.49 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:01,  1.08s/it, est. speed input: 1363.69 toks/s, output: 209.06 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.29it/s, est. speed input: 1706.54 toks/s, output: 270.51 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.29it/s, est. speed input: 1706.54 toks/s, output: 270.51 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.19s/it, est. speed input: 1706.54 toks/s, output: 270.51 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 959.44it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:25,  1.26it/s, est. speed input: 490.16 toks/s, output: 25.27 toks/s]Processed prompts:  21%|██        | 7/33 [00:00<00:02, 10.12it/s, est. speed input: 3078.48 toks/s, output: 190.04 toks/s]Processed prompts:  58%|█████▊    | 19/33 [00:01<00:00, 29.45it/s, est. speed input: 7361.11 toks/s, output: 549.36 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 48.61it/s, est. speed input: 11137.43 toks/s, output: 981.85 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 48.61it/s, est. speed input: 11137.43 toks/s, output: 981.85 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 29.07it/s, est. speed input: 11137.43 toks/s, output: 981.85 toks/s]
+[CHAPTER] 0003 1393/4226 -> chapter_1393.json
+[CHAPTER] 0003 1394/4226 -> chapter_1394.json
+[CHAPTER] 0003 1395/4226 -> chapter_1395.json
+[CHAPTER] 0003 1396/4226 -> chapter_1396.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 103.12it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:03<00:10,  3.65s/it, est. speed input: 612.76 toks/s, output: 71.83 toks/s]Processed prompts:  50%|█████     | 2/4 [00:03<00:03,  1.71s/it, est. speed input: 1064.36 toks/s, output: 138.49 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:04<00:00,  1.02it/s, est. speed input: 1487.97 toks/s, output: 208.00 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.33it/s, est. speed input: 1895.88 toks/s, output: 263.62 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.33it/s, est. speed input: 1895.88 toks/s, output: 263.62 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.13s/it, est. speed input: 1895.88 toks/s, output: 263.62 toks/s]
+Adding requests:   0%|          | 0/36 [00:00<?, ?it/s]Adding requests: 100%|██████████| 36/36 [00:00<00:00, 755.45it/s]
+Processed prompts:   0%|          | 0/36 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/36 [00:00<00:28,  1.22it/s, est. speed input: 499.31 toks/s, output: 24.42 toks/s]Processed prompts:  11%|█         | 4/36 [00:00<00:05,  5.44it/s, est. speed input: 1493.57 toks/s, output: 100.51 toks/s]Processed prompts:  58%|█████▊    | 21/36 [00:01<00:00, 33.66it/s, est. speed input: 7604.32 toks/s, output: 604.93 toks/s]Processed prompts:  83%|████████▎ | 30/36 [00:01<00:00, 43.68it/s, est. speed input: 9893.40 toks/s, output: 854.78 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 43.68it/s, est. speed input: 10344.14 toks/s, output: 976.29 toks/s]Processed prompts: 100%|██████████| 36/36 [00:01<00:00, 27.52it/s, est. speed input: 10344.14 toks/s, output: 976.29 toks/s]
+[CHAPTER] 0003 1397/4226 -> chapter_1397.json
+[CHAPTER] 0003 1398/4226 -> chapter_1398.json
+[CHAPTER] 0003 1399/4226 -> chapter_1399.json
+[CHAPTER] 0003 1400/4226 -> chapter_1400.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 199.60it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.52s/it, est. speed input: 463.06 toks/s, output: 74.49 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:04,  2.07s/it, est. speed input: 860.01 toks/s, output: 144.05 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:05<00:01,  1.25s/it, est. speed input: 1176.75 toks/s, output: 212.20 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.06it/s, est. speed input: 1449.15 toks/s, output: 270.05 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.06it/s, est. speed input: 1449.15 toks/s, output: 270.05 toks/s]Processed prompts: 100%|██████████| 4/4 [00:05<00:00,  1.41s/it, est. speed input: 1449.15 toks/s, output: 270.05 toks/s]
+Adding requests:   0%|          | 0/33 [00:00<?, ?it/s]Adding requests: 100%|██████████| 33/33 [00:00<00:00, 806.23it/s]
+Processed prompts:   0%|          | 0/33 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/33 [00:00<00:25,  1.27it/s, est. speed input: 473.49 toks/s, output: 24.12 toks/s]Processed prompts:  33%|███▎      | 11/33 [00:00<00:01, 16.23it/s, est. speed input: 4452.57 toks/s, output: 289.24 toks/s]Processed prompts:  67%|██████▋   | 22/33 [00:00<00:00, 32.80it/s, est. speed input: 8392.28 toks/s, output: 601.37 toks/s]Processed prompts:  91%|█████████ | 30/33 [00:01<00:00, 41.48it/s, est. speed input: 10402.09 toks/s, output: 835.70 toks/s]Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 41.48it/s, est. speed input: 8648.01 toks/s, output: 751.54 toks/s] Processed prompts: 100%|██████████| 33/33 [00:01<00:00, 22.52it/s, est. speed input: 8648.01 toks/s, output: 751.54 toks/s]
+[CHAPTER] 0003 1401/4226 -> chapter_1401.json
+[CHAPTER] 0003 1402/4226 -> chapter_1402.json
+[CHAPTER] 0003 1403/4226 -> chapter_1403.json
+[CHAPTER] 0003 1404/4226 -> chapter_1404.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 252.06it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:12,  4.15s/it, est. speed input: 486.68 toks/s, output: 73.80 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.83s/it, est. speed input: 917.69 toks/s, output: 144.73 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.83s/it, est. speed input: 1797.73 toks/s, output: 289.85 toks/s]Processed prompts: 100%|██████████| 4/4 [00:04<00:00,  1.11s/it, est. speed input: 1797.73 toks/s, output: 289.85 toks/s]
+Adding requests:   0%|          | 0/34 [00:00<?, ?it/s]Adding requests: 100%|██████████| 34/34 [00:00<00:00, 1275.00it/s]
+Processed prompts:   0%|          | 0/34 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:   3%|▎         | 1/34 [00:00<00:27,  1.19it/s, est. speed input: 469.01 toks/s, output: 28.49 toks/s]Processed prompts:  44%|████▍     | 15/34 [00:00<00:00, 21.12it/s, est. speed input: 5787.18 toks/s, output: 426.92 toks/s]Processed prompts:  68%|██████▊   | 23/34 [00:01<00:00, 31.05it/s, est. speed input: 8156.94 toks/s, output: 653.01 toks/s]Processed prompts:  91%|█████████ | 31/34 [00:01<00:00, 38.10it/s, est. speed input: 9763.33 toks/s, output: 884.96 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 38.10it/s, est. speed input: 10202.43 toks/s, output: 972.73 toks/s]Processed prompts: 100%|██████████| 34/34 [00:01<00:00, 27.38it/s, est. speed input: 10202.43 toks/s, output: 972.73 toks/s]
+[CHAPTER] 0003 1405/4226 -> chapter_1405.json
+[CHAPTER] 0003 1406/4226 -> chapter_1406.json
+[CHAPTER] 0003 1407/4226 -> chapter_1407.json
+[CHAPTER] 0003 1408/4226 -> chapter_1408.json
+Adding requests:   0%|          | 0/4 [00:00<?, ?it/s]Adding requests: 100%|██████████| 4/4 [00:00<00:00, 205.62it/s]
+Processed prompts:   0%|          | 0/4 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts:  25%|██▌       | 1/4 [00:04<00:13,  4.47s/it, est. speed input: 465.23 toks/s, output: 74.00 toks/s]Processed prompts:  50%|█████     | 2/4 [00:04<00:03,  1.97s/it, est. speed input: 889.10 toks/s, output: 145.27 toks/s]Processed prompts:  75%|███████▌  | 3/4 [00:06<00:01,  1.73s/it, est. speed input: 981.28 toks/s, output: 187.90 toks/s]Processed prompts: 100%|██████████| 4/4 [00:09<00:00,  2.43s/it, est. speed input: 842.60 toks/s, output: 199.33 toks/s]Processed prompts: 100%|██████████| 4/4 [00:09<00:00,  2.43s/it, est. speed input: 842.60 toks/s, output: 199.33 toks/s]Processed prompts: 100%|██████████| 4/4 [00:09<00:00,  2.41s/it, est. speed input: 842.60 toks/s, output: 199.33 toks/s]
+[NuExtract batch] main extraction failed for item 2: NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "一顆閃爍著電光的子彈出膛，毫不費力地貫穿玻璃窗后，向花樹餐廳飛去。子彈后方拖出一條藍芒，穿透花樹餐廳的牆壁后，向任務目標杜波·依斯的頭部飛去。從布布汪引爆煉金炸彈，小助手製造混亂，直至子彈穿透牆壁，共用時2.53秒。19.67mm雷屬性子彈的飛行速度極快，宴會廳內僅有兩人做出反應，一個是巴克，第二個是名滿臉疤痕的女人。疤臉女縱身躍起，撲向杜波·依斯，從速度上來看，她明顯是慢了些。巴克右手中的短斧前斬，他腳下的地面寸寸崩裂。地面出現一道直徑三米左右的凹坑，凹坑中心處是一個深不見底的洞。鮮血噴濺在疤臉女臉上，這熟悉的血腥味，讓她的表情開始扭曲。疤臉女將杜波·依斯撲倒在地，或者說，她是將杜波·依斯的下半截身體撲倒在地，至於杜波·依斯的上身，已經成噴濺狀向周圍飛去。一槍，杜波·依斯的上半身直接被轟碎，巴克感知到了子彈，可惜雷屬性子彈的速度實在太快。砰、砰！又是兩槍，兩道黃色光芒飛入花樹餐廳內。黃色光芒就像是打樁錘，沒入地面前，發出一股震動，這是土屬性彈藥。整棟花樹餐廳的外牆上布滿裂痕，隨時可能倒塌。轟鳴聲過後，花樹餐廳內傳來尖叫聲，之前還風度翩翩的賓客們下意識向外涌，
+Adding requests:   0%|          | 0/1 [00:00<?, ?it/s]Adding requests: 100%|██████████| 1/1 [00:00<00:00, 222.67it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:08<00:00,  8.99s/it, est. speed input: 233.81 toks/s, output: 85.47 toks/s]Processed prompts: 100%|██████████| 1/1 [00:08<00:00,  8.99s/it, est. speed input: 233.81 toks/s, output: 85.47 toks/s]Processed prompts: 100%|██████████| 1/1 [00:08<00:00,  8.99s/it, est. speed input: 233.81 toks/s, output: 85.47 toks/s]
+[NuExtract] retry 1/3 failed: content_chars=2264 max_new_tokens=768 reason=NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "一顆閃爍著電光的子彈出膛，毫不費力地貫穿玻璃窗后，向花樹餐廳飛去。子彈后方拖出一條藍芒，穿透花樹餐廳的牆壁后，向任務目標杜波·依斯的頭部飛去。從布布汪引爆煉金炸彈，小助手製造混亂，直至子彈穿透牆壁，共用時2.53秒。19.67mm雷屬性子彈的飛行速度極快，宴會廳內僅有兩人做出反應，一個是巴克，第二個是名滿臉疤痕的女人。疤臉女縱身躍起，撲向杜波·依斯，從速度上來看，她明顯是慢了些。巴克右手中的短斧前斬，他腳下的地面寸寸崩裂。地面出現一道直徑三米左右的凹坑，凹坑中心處是一個深不見底的洞。鮮血噴濺在疤臉女臉上，這熟悉的血腥味，讓她的表情開始扭曲。疤臉女將杜波·依斯撲倒在地，或者說，她是將杜波·依斯的下半截身體撲倒在地，至於杜波·依斯的上身，已經成噴濺狀向周圍飛去。一槍，杜波·依斯的上半身直接被轟碎，巴克感知到了子彈，可惜雷屬性子彈的速度實在太快。砰、砰！又是兩槍，兩道黃色光芒飛入花樹餐廳內。黃色光芒就像是打樁錘，沒入地面前，發出一股震動，這是土屬性彈藥。整棟花樹餐廳的外牆上布滿裂痕，隨時可能倒塌。轟鳴聲過後，花樹餐廳內傳來尖叫聲，之前還風度翩翩的賓客們下意識向外涌，
+Adding requests:   0%|          | 0/1 [00:00<?, ?it/s]Adding requests: 100%|██████████| 1/1 [00:00<00:00, 126.36it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.99s/it, est. speed input: 175.21 toks/s, output: 85.39 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.99s/it, est. speed input: 175.21 toks/s, output: 85.39 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.99s/it, est. speed input: 175.21 toks/s, output: 85.39 toks/s]
+[NuExtract] retry 2/3 failed: content_chars=2264 max_new_tokens=1024 reason=NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "一顆閃爍著電光的子彈出膛，毫不費力地貫穿玻璃窗后，向花樹餐廳飛去。子彈后方拖出一條藍芒，穿透花樹餐廳的牆壁后，向任務目標杜波·依斯的頭部飛去。從布布汪引爆煉金炸彈，小助手製造混亂，直至子彈穿透牆壁，共用時2.53秒。19.67mm雷屬性子彈的飛行速度極快，宴會廳內僅有兩人做出反應，一個是巴克，第二個是名滿臉疤痕的女人。疤臉女縱身躍起，撲向杜波·依斯，從速度上來看，她明顯是慢了些。巴克右手中的短斧前斬，他腳下的地面寸寸崩裂。地面出現一道直徑三米左右的凹坑，凹坑中心處是一個深不見底的洞。鮮血噴濺在疤臉女臉上，這熟悉的血腥味，讓她的表情開始扭曲。疤臉女將杜波·依斯撲倒在地，或者說，她是將杜波·依斯的下半截身體撲倒在地，至於杜波·依斯的上身，已經成噴濺狀向周圍飛去。一槍，杜波·依斯的上半身直接被轟碎，巴克感知到了子彈，可惜雷屬性子彈的速度實在太快。砰、砰！又是兩槍，兩道黃色光芒飛入花樹餐廳內。黃色光芒就像是打樁錘，沒入地面前，發出一股震動，這是土屬性彈藥。整棟花樹餐廳的外牆上布滿裂痕，隨時可能倒塌。轟鳴聲過後，花樹餐廳內傳來尖叫聲，之前還風度翩翩的賓客們下意識向外涌，
+Adding requests:   0%|          | 0/1 [00:00<?, ?it/s]Adding requests: 100%|██████████| 1/1 [00:00<00:00, 267.29it/s]
+Processed prompts:   0%|          | 0/1 [00:00<?, ?it/s, est. speed input: 0.00 toks/s, output: 0.00 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.95s/it, est. speed input: 134.42 toks/s, output: 85.71 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.95s/it, est. speed input: 134.42 toks/s, output: 85.71 toks/s]Processed prompts: 100%|██████████| 1/1 [00:11<00:00, 11.95s/it, est. speed input: 134.42 toks/s, output: 85.71 toks/s]
+[NuExtract] retry 3/3 failed: content_chars=1698 max_new_tokens=1024 reason=NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "一顆閃爍著電光的子彈出膛，毫不費力的貫穿玻璃窗后，向花樹餐廳飛去。子彈後方拖出一條藍芒，穿透花樹餐廳的牆壁后，向任務目標杜波·依斯的頭部飛去。從布布汪引爆煉金炸彈，小助手製造混亂，直至子彈穿透牆壁，共用時2.53秒。19.67mm雷屬性子彈的飛行速度極快，宴會廳內僅有兩人做出反應，一個是巴克，第二個是名滿臉疤痕的女人。疤臉女縱身躍起，撲向杜波·依斯，從速度上來看，她明顯是慢了些。巴克右手中的短斧前斬，他腳下的地面寸寸崩裂。地面出現一道直徑三米左右的凹坑，凹坑中心處是一個深不見底的洞。鮮血噴濺在疤臉女脸上，這熟悉的血腥味，讓她的表情開始扭曲。疤臉女將杜波·依斯撲倒在地，或者說，她是將杜波·依斯的下半截身體撲倒在地，至於杜波·依斯的上身，已經成噴濺狀向周圍飛去。一槍，杜波·依斯的上半身直接被轟碎，巴克感知到了子彈，可惜雷屬性子彈的速度實在太快。砰、砰！又是兩槍，兩道黃色光芒飛入花樹餐廳內。黃色光芒就像是打樁錘，沒入地面前，發出一股震動，這是土屬性彈藥。整棟花樹餐廳的外牆上布滿裂痕，隨時可能倒塌。轟鳴聲過後，花樹餐廳內傳來尖叫聲，之前還風度翩翩的賓客們下意識向外涌，
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.10/runpy.py", line 196, in _run_module_as_main
+    return _run_code(code, main_globals, None,
+  File "/opt/conda/lib/python3.10/runpy.py", line 86, in _run_code
+    exec(code, run_globals)
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/__main__.py", line 5, in <module>
+    raise SystemExit(main())
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/scheduling.py", line 209, in main
+    output_dir = process_and_write_book_dir(
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/processor.py", line 382, in process_and_write_book_dir
+    flush_pending()
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/processor.py", line 281, in flush_pending
+    processed_batch = pipeline.process_chapters(
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/pipeline.py", line 64, in process_chapters
+    semantics = self.extract_semantic_features_batch(
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/pipeline.py", line 115, in extract_semantic_features_batch
+    return self.nuextract_extractor.extract_batch(chapters)
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/nuextract_extractor.py", line 184, in extract_batch
+    payloads[index] = self.extract(title=item["title"], content=item["content"]).to_dict()
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/nuextract_extractor.py", line 387, in extract
+    raise last_error
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/nuextract_extractor.py", line 368, in extract
+    return self._extract_with_vision2seq(
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/nuextract_extractor.py", line 572, in _extract_with_vision2seq
+    payload = self.parse_json_payload(generated_text)
+  File "/root/private_data/LiteraryGiant/Jormungandr/softmodel/nuextract_extractor.py", line 1151, in parse_json_payload
+    raise ValueError(f"NuExtract returned incomplete JSON (likely truncated). Raw output: {raw_text[:500]}")
+ValueError: NuExtract returned incomplete JSON (likely truncated). Raw output: {"summary": "一顆閃爍著電光的子彈出膛，毫不費力的貫穿玻璃窗后，向花樹餐廳飛去。子彈後方拖出一條藍芒，穿透花樹餐廳的牆壁后，向任務目標杜波·依斯的頭部飛去。從布布汪引爆煉金炸彈，小助手製造混亂，直至子彈穿透牆壁，共用時2.53秒。19.67mm雷屬性子彈的飛行速度極快，宴會廳內僅有兩人做出反應，一個是巴克，第二個是名滿臉疤痕的女人。疤臉女縱身躍起，撲向杜波·依斯，從速度上來看，她明顯是慢了些。巴克右手中的短斧前斬，他腳下的地面寸寸崩裂。地面出現一道直徑三米左右的凹坑，凹坑中心處是一個深不見底的洞。鮮血噴濺在疤臉女脸上，這熟悉的血腥味，讓她的表情開始扭曲。疤臉女將杜波·依斯撲倒在地，或者說，她是將杜波·依斯的下半截身體撲倒在地，至於杜波·依斯的上身，已經成噴濺狀向周圍飛去。一槍，杜波·依斯的上半身直接被轟碎，巴克感知到了子彈，可惜雷屬性子彈的速度實在太快。砰、砰！又是兩槍，兩道黃色光芒飛入花樹餐廳內。黃色光芒就像是打樁錘，沒入地面前，發出一股震動，這是土屬性彈藥。整棟花樹餐廳的外牆上布滿裂痕，隨時可能倒塌。轟鳴聲過後，花樹餐廳內傳來尖叫聲，之前還風度翩翩的賓客們下意識向外涌，
+[rank0]:[W614 18:34:01.160287957 ProcessGroupNCCL.cpp:1538] Warning: WARNING: destroy_process_group() was not called before program exit, which can leak resources. For more info, please see https://pytorch.org/docs/stable/distributed.html#shutdown (function operator())
+ERROR 06-14 18:34:01 [core_client.py:564] Engine core proc EngineCore_DP0 died unexpectedly, shutting down client.

@@ -25,6 +25,7 @@ ADAPTER_REGISTRY: dict[str, type[BaseAdapter]] = {
     "www.dingdian365.com": Dingdian365Adapter,
     "www.ibiquge.com": IbiqugeAdapter,
     "ixdzs.tw": IxdzsAdapter,
+    "ixdzs8.com": IxdzsAdapter,  # mirror, same structure
     "www.kanunu8.com": Kanunu8Adapter,
     "www.qushucheng.com": QushuchengAdapter,
     "www.sudugu.org": SuduguAdapter,
