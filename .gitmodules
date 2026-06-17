@@ -1,0 +1,4 @@
+[submodule "LiteraryAgent"]
+	path = LiteraryAgent
+	url = https://github.com/ZhiHaOuang/LiteraryAgent.git
+	branch = literary-agent
