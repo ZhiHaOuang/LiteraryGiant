@@ -22,7 +22,7 @@ def discover_processed_books(input_path: str | Path) -> list[Path]:
     if path.is_dir() and (path / "index.json").exists():
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a cleaned_chapters facts root or a processed book directory: {path}")
+        raise ValueError(f"Input path must be a TaciturnRaw novels_cleaned root or a processed book directory: {path}")
     books = sorted(item for item in path.iterdir() if item.is_dir() and (item / "index.json").exists())
     if not books:
         raise FileNotFoundError(f"No processed book directories found under {path}")
@@ -242,6 +242,7 @@ def process_book_dir(book_dir: str | Path, *, pipeline: ChapterFeaturePipeline) 
             "vllm_tensor_parallel_size": pipeline.nuextract_extractor.vllm_tensor_parallel_size,
             "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
             "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
+            "vllm_max_num_seqs": pipeline.nuextract_extractor.vllm_max_num_seqs,
             "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
         },
     }
@@ -258,6 +259,7 @@ def build_extractor_config(pipeline: ChapterFeaturePipeline) -> dict:
         "vllm_tensor_parallel_size": pipeline.nuextract_extractor.vllm_tensor_parallel_size,
         "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
         "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
+        "vllm_max_num_seqs": pipeline.nuextract_extractor.vllm_max_num_seqs,
         "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
     }
 

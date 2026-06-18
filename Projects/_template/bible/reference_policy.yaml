@@ -2,20 +2,27 @@ reference_policy:
   primary_indexes:
     - Library/indexes/reference_index.jsonl
   allowed_reference_roots:
-    - Library/reference/facts
-    - Library/reference/abstractions
-    - Library/ideas
+    - Library/TaciturnRaw
+    - Library/Bridges
+    - Library/AbstractLibrary
   allowed_reference_types:
-    - cleaned_chapter
-    - chapter_feature
-    - plot_segment
-    - plot_pattern
-    - trope
-    - style
-    - character_role
-    - setting_pattern
-  allow_fact_lookup: true
-  fact_lookup_requires_source_ref: true
-  allow_idea_lookup: true
+    - novels_raw
+    - stories_raw
+    - novels_cleaned
+    - stories_cleaned
+    - novels_chapter
+    - novels_plot
+    - stories_plot
+    - Worldview
+    - EventsLibrary
+    - CharacterArc
+    - EmotionRhythm
+    - Payoff_Angst
+    - Memes
+    - BookLogicGraph
+  allow_taciturn_raw_lookup: true
+  allow_bridge_lookup: true
+  bridge_lookup_requires_source_ref: true
+  allow_abstract_library_lookup: true
   forbid_verbatim_source_prose: true
   max_source_similarity: low

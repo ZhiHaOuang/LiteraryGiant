@@ -1,6 +1,4 @@
 Jormungandr
 fetcher
-generatemodel
-infermodel
 scripts
 shared

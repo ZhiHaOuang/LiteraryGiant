@@ -1,4 +1,4 @@
-name: literary-giant
+name: LitIsLand
 channels:
   - conda-forge
 dependencies:

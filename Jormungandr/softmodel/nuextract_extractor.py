@@ -110,6 +110,7 @@ class NuExtractExtractor:
         vllm_tensor_parallel_size: int = 1,
         vllm_gpu_memory_utilization: float = 0.85,
         vllm_max_model_len: int = 8192,
+        vllm_max_num_seqs: int | None = None,
         vllm_enforce_eager: bool = False,
     ) -> None:
         self.model_variant = model_variant.lower()
@@ -122,8 +123,9 @@ class NuExtractExtractor:
         self.device_map = device_map
         self.inference_backend = str(inference_backend or DEFAULT_INFERENCE_BACKEND).strip().lower()
         self.vllm_tensor_parallel_size = max(1, int(vllm_tensor_parallel_size))
-        self.vllm_gpu_memory_utilization = max(0.5, min(0.98, float(vllm_gpu_memory_utilization)))
+        self.vllm_gpu_memory_utilization = max(0.2, min(0.98, float(vllm_gpu_memory_utilization)))
         self.vllm_max_model_len = max(2048, int(vllm_max_model_len))
+        self.vllm_max_num_seqs = max(1, int(vllm_max_num_seqs)) if vllm_max_num_seqs else None
         self.vllm_enforce_eager = bool(vllm_enforce_eager)
         self._tokenizer = None
         self._model = None
@@ -1186,17 +1188,20 @@ class NuExtractExtractor:
             raise RuntimeError("vLLM is not installed, but inference_backend='vllm' was requested.") from exc
 
         os.environ.setdefault("VLLM_WORKER_MULTIPROC_METHOD", "spawn")
-        return LLM(
-            model=self.resolved_model_source,
-            tokenizer=self.resolved_model_source,
-            trust_remote_code=False,
-            tensor_parallel_size=self.vllm_tensor_parallel_size,
-            gpu_memory_utilization=self.vllm_gpu_memory_utilization,
-            max_model_len=min(self.resolve_tokenizer_max_length(), self.vllm_max_model_len),
-            max_seq_len_to_capture=min(8192, self.vllm_max_model_len),
-            enforce_eager=self.vllm_enforce_eager,
-            disable_log_stats=True,
-        )
+        kwargs = {
+            "model": self.resolved_model_source,
+            "tokenizer": self.resolved_model_source,
+            "trust_remote_code": False,
+            "tensor_parallel_size": self.vllm_tensor_parallel_size,
+            "gpu_memory_utilization": self.vllm_gpu_memory_utilization,
+            "max_model_len": min(self.resolve_tokenizer_max_length(), self.vllm_max_model_len),
+            "max_seq_len_to_capture": min(8192, self.vllm_max_model_len),
+            "enforce_eager": self.vllm_enforce_eager,
+            "disable_log_stats": True,
+        }
+        if self.vllm_max_num_seqs is not None:
+            kwargs["max_num_seqs"] = self.vllm_max_num_seqs
+        return LLM(**kwargs)
 
     def _render_prompt(self, prompt: str) -> str:
         if self._backend in {"vision2seq", "phi3v_custom"} and hasattr(self._tokenizer, "apply_chat_template"):

@@ -7,7 +7,14 @@ import json
 from pathlib import Path
 from typing import Any
 
-from shared import DATA_ROOT
+from shared import (
+    BRIDGE_NOVELS_PLOT_ROOT,
+    DATA_ROOT,
+    TACITURN_NOVELS_CHAPTER_ROOT,
+    TACITURN_NOVELS_CLEANED_ROOT,
+    TACITURN_NOVELS_RAW_ROOT,
+    TACITURN_STORIES_RAW_ROOT,
+)
 from shared.artifact_manifest import (
     ArtifactManifestError,
     load_chapters_from_manifest,
@@ -65,7 +72,7 @@ def collect_chapter_ids(book_dir: Path, stage_name: str, errors: list[str]) -> s
 
 
 def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -> None:
-    raw_root = data_root / "rawdata" / "novels"
+    raw_root = TACITURN_NOVELS_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_raw"
     for book_dir in iter_book_dirs(raw_root, book_id):
         source = book_dir / "source.txt"
         metadata = book_dir / "metadata.json"
@@ -73,9 +80,9 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
         chapter_files = sorted(book_dir.glob("chapter_*.txt"))
         if source.exists():
             if not metadata.exists() and not index.exists():
-                errors.append(f"rawdata: missing metadata.json or index.json in {book_dir}")
+                errors.append(f"novels_raw: missing metadata.json or index.json in {book_dir}")
                 continue
-            print(f"[OK] rawdata: {book_dir}")
+            print(f"[OK] novels_raw: {book_dir}")
             continue
         if index.exists() and chapter_files:
             try:
@@ -85,7 +92,7 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
                 continue
             manifest = payload.get("chapters") or []
             if not isinstance(manifest, list):
-                errors.append(f"rawdata: chapters must be a list in {index}")
+                errors.append(f"novels_raw: chapters must be a list in {index}")
                 continue
             indexed_files = {
                 as_text(entry.get("file_name"))
@@ -95,28 +102,28 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
             actual_files = {path.name for path in chapter_files}
             missing = sorted(indexed_files - actual_files)
             if missing:
-                errors.append(f"rawdata: {book_dir} misses indexed chapter files: {missing[:5]}")
+                errors.append(f"novels_raw: {book_dir} misses indexed chapter files: {missing[:5]}")
                 continue
             if not indexed_files:
-                errors.append(f"rawdata: no chapter files listed in {index}")
+                errors.append(f"novels_raw: no chapter files listed in {index}")
                 continue
-            print(f"[OK] rawdata: {book_dir} ({len(indexed_files)} indexed chapters)")
+            print(f"[OK] novels_raw: {book_dir} ({len(indexed_files)} indexed chapters)")
             continue
-        errors.append(f"rawdata: missing source.txt or indexed chapter_*.txt files in {book_dir}")
+        errors.append(f"novels_raw: missing source.txt or indexed chapter_*.txt files in {book_dir}")
 
 
 def validate_raw_stories(data_root: Path, errors: list[str]) -> None:
-    story_root = data_root / "rawdata" / "stories"
+    story_root = TACITURN_STORIES_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "stories_raw"
     for story_dir in iter_story_dirs(story_root):
         story = story_dir / "story.txt"
         index = story_dir / "index.json"
         if not story.exists():
-            errors.append(f"rawdata stories: missing story.txt in {story_dir}")
+            errors.append(f"stories_raw: missing story.txt in {story_dir}")
             continue
         if not index.exists():
-            errors.append(f"rawdata stories: missing index.json in {story_dir}")
+            errors.append(f"stories_raw: missing index.json in {story_dir}")
             continue
-        print(f"[OK] rawdata story: {story_dir}")
+        print(f"[OK] stories_raw: {story_dir}")
 
 
 def validate_plots(
@@ -125,11 +132,11 @@ def validate_plots(
     feature_ids_by_book: dict[str, set[str]],
     errors: list[str],
 ) -> None:
-    plots_root = data_root / "reference" / "facts" / "plot_segments"
+    plots_root = BRIDGE_NOVELS_PLOT_ROOT if data_root == DATA_ROOT else data_root / "Bridges" / "novels_plot"
     for book_dir in iter_book_dirs(plots_root, book_id):
         index_path = book_dir / "index.json"
         if not index_path.exists():
-            errors.append(f"plot_segments: missing index.json in {book_dir}")
+            errors.append(f"novels_plot: missing index.json in {book_dir}")
             continue
         index = read_json(index_path)
         metadata = index.get("book_metadata") if isinstance(index.get("book_metadata"), dict) else {}
@@ -137,27 +144,27 @@ def validate_plots(
         valid_chapter_ids = feature_ids_by_book.get(resolved_book_id, set())
         manifest = index.get("plot_manifest") or index.get("cluster_manifest") or []
         if not isinstance(manifest, list):
-            errors.append(f"plot_segments: plot_manifest must be a list in {book_dir}")
+            errors.append(f"novels_plot: plot_manifest must be a list in {book_dir}")
             continue
 
         seen_plot_ids: set[str] = set()
         checked = 0
         for entry_index, entry in enumerate(manifest, start=1):
             if not isinstance(entry, dict):
-                errors.append(f"plot_segments: manifest entry {entry_index} is not an object in {book_dir}")
+                errors.append(f"novels_plot: manifest entry {entry_index} is not an object in {book_dir}")
                 continue
             file_name = as_text(entry.get("file_name"))
             plot_id = as_text(entry.get("plot_id"))
             if not file_name:
-                errors.append(f"plot_segments: manifest entry {entry_index} has no file_name in {book_dir}")
+                errors.append(f"novels_plot: manifest entry {entry_index} has no file_name in {book_dir}")
                 continue
             if plot_id in seen_plot_ids:
-                errors.append(f"plot_segments: duplicate plot_id {plot_id} in {book_dir}")
+                errors.append(f"novels_plot: duplicate plot_id {plot_id} in {book_dir}")
             if plot_id:
                 seen_plot_ids.add(plot_id)
             plot_path = book_dir / file_name
             if not plot_path.exists():
-                errors.append(f"plot_segments: missing plot file listed in manifest: {plot_path}")
+                errors.append(f"novels_plot: missing plot file listed in manifest: {plot_path}")
                 continue
             payload = read_json(plot_path)
             if valid_chapter_ids:
@@ -171,7 +178,7 @@ def validate_plots(
                 except ArtifactManifestError as exc:
                     errors.append(str(exc))
             checked += 1
-        print(f"[OK] plot_segments: {book_dir} ({checked} plots)")
+        print(f"[OK] novels_plot: {book_dir} ({checked} plots)")
 
 
 def validate_layout(data_root: Path, book_id: str | None) -> int:
@@ -183,20 +190,22 @@ def validate_layout(data_root: Path, book_id: str | None) -> int:
         validate_raw_stories(data_root, errors)
 
     chapter_ids_by_book: dict[str, set[str]] = {}
-    for book_dir in iter_book_dirs(data_root / "reference" / "facts" / "cleaned_chapters", book_id):
-        ids = collect_chapter_ids(book_dir, "cleaned_chapters", errors)
+    cleaned_root = TACITURN_NOVELS_CLEANED_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_cleaned"
+    for book_dir in iter_book_dirs(cleaned_root, book_id):
+        ids = collect_chapter_ids(book_dir, "novels_cleaned", errors)
         if ids:
             chapter_ids_by_book[book_dir.name.removeprefix("book_")] = ids
 
     feature_ids_by_book: dict[str, set[str]] = {}
-    for book_dir in iter_book_dirs(data_root / "reference" / "facts" / "chapter_features", book_id):
-        ids = collect_chapter_ids(book_dir, "chapter_features", errors)
+    chapter_root = TACITURN_NOVELS_CHAPTER_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_chapter"
+    for book_dir in iter_book_dirs(chapter_root, book_id):
+        ids = collect_chapter_ids(book_dir, "novels_chapter", errors)
         resolved_book_id = book_dir.name.removeprefix("book_")
         feature_ids_by_book[resolved_book_id] = ids
         missing_features = sorted(chapter_ids_by_book.get(resolved_book_id, set()) - ids)
         if missing_features:
             warnings.append(
-                f"chapter_features: {book_dir} misses {len(missing_features)} chapter ids present in cleaned_chapters"
+                f"novels_chapter: {book_dir} misses {len(missing_features)} chapter ids present in novels_cleaned"
             )
 
     validate_plots(data_root, book_id, feature_ids_by_book, errors)

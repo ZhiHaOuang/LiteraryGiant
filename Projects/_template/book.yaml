@@ -9,8 +9,9 @@ target_length:
   words_per_chapter: null
 source_policy:
   default_reference_index: Library/indexes/reference_index.jsonl
-  allow_fact_lookup: true
-  allow_abstraction_lookup: true
+  allow_taciturn_raw_lookup: true
+  allow_bridge_lookup: true
+  allow_abstract_library_lookup: true
   require_abstraction_before_use: true
 current_pointers:
   active_outline: outlines/book_outline.md

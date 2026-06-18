@@ -35,7 +35,7 @@ from .processor import (
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="part2-run",
-        description="Run chapter-level feature extraction from cleaned chapter facts using NuExtract.",
+        description="Run chapter-level feature extraction from TaciturnRaw cleaned novels using NuExtract.",
     )
     parser.add_argument(
         "input",
@@ -104,6 +104,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="vLLM max model length used to size KV cache.",
     )
     parser.add_argument(
+        "--vllm-max-num-seqs",
+        type=int,
+        default=None,
+        help="Maximum number of concurrent vLLM sequences. Lower this when sharing a GPU.",
+    )
+    parser.add_argument(
         "--vllm-enforce-eager",
         action="store_true",
         help="Enable eager mode in vLLM to reduce compile overhead at the cost of some throughput.",
@@ -124,7 +130,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help=(
-            "Flush chapter_features/<book>/index.json every N chapter decisions. "
+            "Flush novels_chapter/<book>/index.json every N chapter decisions. "
             "Defaults to --chapter-batch-size, so completed batches are resumable."
         ),
     )
@@ -168,6 +174,7 @@ def main(argv: list[str] | None = None) -> int:
         vllm_tensor_parallel_size=args.vllm_tensor_parallel_size,
         vllm_gpu_memory_utilization=args.vllm_gpu_memory_utilization,
         vllm_max_model_len=args.vllm_max_model_len,
+        vllm_max_num_seqs=args.vllm_max_num_seqs,
         vllm_enforce_eager=args.vllm_enforce_eager,
     )
     pipeline = ChapterFeaturePipeline(
@@ -294,6 +301,7 @@ def main(argv: list[str] | None = None) -> int:
                             "vllm_tensor_parallel_size": nuextract_extractor.vllm_tensor_parallel_size,
                             "vllm_gpu_memory_utilization": nuextract_extractor.vllm_gpu_memory_utilization,
                             "vllm_max_model_len": nuextract_extractor.vllm_max_model_len,
+                            "vllm_max_num_seqs": nuextract_extractor.vllm_max_num_seqs,
                             "vllm_enforce_eager": nuextract_extractor.vllm_enforce_eager,
                             "device_map": nuextract_extractor.device_map,
                         },
@@ -326,6 +334,7 @@ def main(argv: list[str] | None = None) -> int:
                             "vllm_tensor_parallel_size": nuextract_extractor.vllm_tensor_parallel_size,
                             "vllm_gpu_memory_utilization": nuextract_extractor.vllm_gpu_memory_utilization,
                             "vllm_max_model_len": nuextract_extractor.vllm_max_model_len,
+                            "vllm_max_num_seqs": nuextract_extractor.vllm_max_num_seqs,
                             "vllm_enforce_eager": nuextract_extractor.vllm_enforce_eager,
                             "device_map": nuextract_extractor.device_map,
                         },

@@ -16,8 +16,8 @@ from shared import DATA_ROOT
 LAYOUT_VERSION = "novel-agent-data-v1"
 
 CHAPTER_STAGE_MAP = {
-    "chapters": ("ProcessData", Path("reference/facts/cleaned_chapters")),
-    "features": ("FeatureData", Path("reference/facts/chapter_features")),
+    "chapters": ("ProcessData", Path("TaciturnRaw/novels_cleaned")),
+    "features": ("FeatureData", Path("TaciturnRaw/novels_chapter")),
 }
 
 
@@ -69,7 +69,7 @@ def canonical_chapter_file(order: int) -> str:
 
 def copy_raw_text(project_root: Path, data_root: Path, book_id: str) -> dict[str, Any]:
     source = project_root / "RawData" / f"{book_id}.txt"
-    target_dir = data_root / "rawdata" / "novels" / book_slug(book_id)
+    target_dir = data_root / "TaciturnRaw" / "novels_raw" / book_slug(book_id)
     target = target_dir / "source.txt"
     if not source.exists():
         return {"stage": "rawdata", "status": "missing", "source": str(source)}
@@ -202,7 +202,7 @@ def canonical_plot_file(index: int) -> str:
 
 def copy_plots(project_root: Path, data_root: Path, book_id: str) -> dict[str, Any]:
     source_dir = project_root / "ClusterData" / book_id
-    target_dir = data_root / "reference" / "facts" / "plot_segments" / book_slug(book_id)
+    target_dir = data_root / "Bridges" / "novels_plot" / book_slug(book_id)
     if not source_dir.exists():
         return {"stage": "plots", "status": "missing", "source": str(source_dir)}
 
@@ -298,13 +298,13 @@ def update_books_index(data_root: Path, book_id: str, results: list[dict[str, An
             continue
         stage = result["stage"]
         if stage == "rawdata":
-            paths[stage] = f"rawdata/novels/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/novels_raw/{book_slug(book_id)}"
         elif stage == "chapters":
-            paths[stage] = f"reference/facts/cleaned_chapters/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/novels_cleaned/{book_slug(book_id)}"
         elif stage == "features":
-            paths[stage] = f"reference/facts/chapter_features/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/novels_chapter/{book_slug(book_id)}"
         elif stage == "plots":
-            paths[stage] = f"reference/facts/plot_segments/{book_slug(book_id)}"
+            paths[stage] = f"Bridges/novels_plot/{book_slug(book_id)}"
     write_json(path, index)
 
 

@@ -158,7 +158,7 @@ def build_parser() -> argparse.ArgumentParser:
         "raw_roots",
         nargs="*",
         default=[str(RAWDATA_ROOT)],
-        help="Raw library root(s) to scan. Default: Library/rawdata.",
+        help="Raw library root(s) to scan. Default: Library/TaciturnRaw.",
     )
     parser.add_argument(
         "--registry",

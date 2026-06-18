@@ -24,7 +24,7 @@ from Jormungandr.softmodel.processor import (
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description=(
-            "Recover softmodel chapter state from existing chapter_features files "
+            "Recover softmodel chapter state from existing novels_chapter files "
             "without loading NuExtract/vLLM."
         ),
     )
@@ -32,13 +32,13 @@ def build_parser() -> argparse.ArgumentParser:
         "inputs",
         nargs="*",
         default=[str(FACT_CLEANED_CHAPTERS_ROOT)],
-        help="Cleaned book dirs or cleaned_chapters root. Defaults to the full cleaned_chapters root.",
+        help="Cleaned book dirs or novels_cleaned root. Defaults to the full novels_cleaned root.",
     )
     parser.add_argument(
         "-o",
         "--output-root",
         default=str(FACT_CHAPTER_FEATURES_ROOT),
-        help="chapter_features root.",
+        help="novels_chapter root.",
     )
     parser.add_argument(
         "--state-root",

@@ -1,4 +1,4 @@
-"""Write cleaned hardmodel artifacts into the canonical facts layout."""
+"""Write cleaned hardmodel artifacts into the TaciturnRaw layout."""
 
 from __future__ import annotations
 

@@ -13,13 +13,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
-from shared.constants import INDEXES_ROOT, RAWDATA_NOVELS_ROOT, RAWDATA_STORIES_ROOT
+from shared.constants import (
+    INDEXES_ROOT,
+    TACITURN_NOVELS_RAW_ROOT,
+    TACITURN_STORIES_RAW_ROOT,
+)
 
 logger = logging.getLogger(__name__)
 
 REGISTRY_PATH = INDEXES_ROOT / "books.json"
 STORIES_PATH = INDEXES_ROOT / "stories.json"
-RAWDATA_BOOKS_ROOT = RAWDATA_NOVELS_ROOT
+RAWDATA_BOOKS_ROOT = TACITURN_NOVELS_RAW_ROOT
 
 def _registry_path(content_type: str = "book") -> Path:
     return STORIES_PATH if content_type == "story" else REGISTRY_PATH
@@ -164,9 +168,9 @@ class BookRegistry:
                 "updated_at": _utc_now(),
                 "paths": {
                     "rawdata": (
-                        f"rawdata/stories/{slug}"
+                        f"TaciturnRaw/stories_raw/{slug}"
                         if content_type == "story"
-                        else f"rawdata/novels/{slug}"
+                        else f"TaciturnRaw/novels_raw/{slug}"
                     ),
                 },
             }
@@ -342,7 +346,7 @@ class BookRegistry:
             "content_type",
             "story" if str(slug).startswith("story_") else "book",
         )
-        root = RAWDATA_STORIES_ROOT if content_type == "story" else RAWDATA_BOOKS_ROOT
+        root = TACITURN_STORIES_RAW_ROOT if content_type == "story" else RAWDATA_BOOKS_ROOT
         return root / slug
 
     # ------------------------------------------------------------------
@@ -358,7 +362,7 @@ class BookRegistry:
     ) -> str:
         """Import a whole-book ``.txt`` file into the canonical layout.
 
-        Creates ``Library/rawdata/novels/<book_slug>/source.txt`` and an
+        Creates ``Library/TaciturnRaw/novels_raw/<book_slug>/source.txt`` and an
         accompanying ``index.json`` manifest.
 
         Args:

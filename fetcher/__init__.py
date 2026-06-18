@@ -1,7 +1,7 @@
 """Web novel fetcher — crawl novels from supported sites.
 
 Chapters are staged to ``runs/fetch/<run_id>/`` and promoted to
-``Library/rawdata/novels/<book_id>/`` after validation.  All text
+``Library/TaciturnRaw/novels_raw/<book_id>/`` after validation.  All text
 cleaning is deferred to :mod:`Jormungandr.hardmodel`.
 
 Public API::

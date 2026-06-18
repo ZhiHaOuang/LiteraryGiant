@@ -11,7 +11,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Run softmodel extraction on one or more cleaned chapter JSON files and print the outputs.",
     )
-    parser.add_argument("chapters", nargs="+", help="Chapter JSON file(s) under cleaned_chapters.")
+    parser.add_argument("chapters", nargs="+", help="Chapter JSON file(s) under novels_cleaned.")
     parser.add_argument("--max-input-chars", type=int, default=6000)
     parser.add_argument("--max-new-tokens", type=int, default=768)
     return parser

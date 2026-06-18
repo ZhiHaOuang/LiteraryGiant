@@ -39,7 +39,7 @@ def build_parser() -> argparse.ArgumentParser:
         description=(
             "Site-agnostic web novel fetcher.  Adapters auto-detected from "
             "URL domain.  Chapters are staged in runs/fetch/<run_id>/ and "
-            "promoted to Library/rawdata/novels or Library/rawdata/stories after validation."
+            "promoted to Library/TaciturnRaw/novels_raw or Library/TaciturnRaw/stories_raw after validation."
         ),
     )
     parser.add_argument(
@@ -142,7 +142,7 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         metavar="FILE.txt",
         help="Import a whole-book .txt file into the canonical layout "
-             "(Library/rawdata/novels/<book_slug>/source.txt + index.json). "
+             "(Library/TaciturnRaw/novels_raw/<book_slug>/source.txt + index.json). "
              "Use --title to set the book name.",
     )
     parser.add_argument(
@@ -673,7 +673,7 @@ def _cmd_summary(args) -> int:
         if url:
             print(f"          url:    {url}")
         if not book.get("has_rawdata", book.get("has_raw_text")):
-            print(f"          no rawdata on disk")
+            print(f"          no TaciturnRaw source on disk")
         print()
 
     return 0

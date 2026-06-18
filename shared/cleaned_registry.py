@@ -80,8 +80,8 @@ class CleanedBookRegistry:
 
     Raw ``book_XXXX`` slugs are treated as permanent identities.  Cleaned
     artifacts therefore use the same numeric id/slug as their raw source, so
-    ``rawdata/novels/book_0027`` maps to
-    ``reference/facts/cleaned_chapters/book_0027``.
+    ``TaciturnRaw/novels_raw/book_0027`` maps to
+    ``TaciturnRaw/novels_cleaned/book_0027``.
     """
 
     def __init__(
@@ -486,19 +486,30 @@ class CleanedBookRegistry:
         return entry
 
     def _find_active_by_raw(self, raw: dict[str, Any]) -> dict[str, Any] | None:
-        identity_key = raw.get("identity_key")
         raw_path = raw.get("raw_path")
         raw_slug = raw.get("raw_book_slug")
+        if raw_slug:
+            expected_clean_id = self._clean_id_from_raw(raw)
+            for entry in self.payload.get("books", {}).values():
+                known = entry.get("raw", {})
+                if known.get("raw_book_slug") == raw_slug and entry.get("clean_id") == expected_clean_id:
+                    return entry
+            return None
+
+        if raw_path:
+            for entry in self.payload.get("books", {}).values():
+                known = entry.get("raw", {})
+                if known.get("raw_path") == raw_path:
+                    return entry
+            return None
+
+        identity_key = raw.get("identity_key")
         source_url = raw.get("source_url")
         for entry in self.payload.get("books", {}).values():
             known = entry.get("raw", {})
             if identity_key and known.get("identity_key") == identity_key:
                 return entry
             if source_url and known.get("source_url") == source_url:
-                return entry
-            if raw_path and known.get("raw_path") == raw_path:
-                return entry
-            if raw_slug and known.get("raw_book_slug") == raw_slug:
                 return entry
         return None
 

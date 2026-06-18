@@ -21,7 +21,25 @@ __pycache__/
 /Library/**
 !/Library/
 !/Library/**/
-!/Library/**/.gitkeep
+!/Library/.gitkeep
+!/Library/indexes/.gitkeep
+!/Library/TaciturnRaw/.gitkeep
+!/Library/TaciturnRaw/novels_raw/.gitkeep
+!/Library/TaciturnRaw/stories_raw/.gitkeep
+!/Library/TaciturnRaw/novels_cleaned/.gitkeep
+!/Library/TaciturnRaw/stories_cleaned/.gitkeep
+!/Library/TaciturnRaw/novels_chapter/.gitkeep
+!/Library/Bridges/.gitkeep
+!/Library/Bridges/novels_plot/.gitkeep
+!/Library/Bridges/stories_plot/.gitkeep
+!/Library/AbstractLibrary/.gitkeep
+!/Library/AbstractLibrary/Worldview/.gitkeep
+!/Library/AbstractLibrary/EventsLibrary/.gitkeep
+!/Library/AbstractLibrary/CharacterArc/.gitkeep
+!/Library/AbstractLibrary/EmotionRhythm/.gitkeep
+!/Library/AbstractLibrary/Payoff_Angst/.gitkeep
+!/Library/AbstractLibrary/Memes/.gitkeep
+!/Library/AbstractLibrary/BookLogicGraph/.gitkeep
 
 # Creative project workspaces. Track the reusable template, but keep actual
 # project drafts, generated outputs, and run products out of git.

@@ -99,7 +99,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help=(
             "Assign cleaned book ids through Library/indexes/cleaned_books.json "
-            "instead of reusing rawdata book ids."
+            "instead of reusing TaciturnRaw book ids."
         ),
     )
     parser.add_argument(

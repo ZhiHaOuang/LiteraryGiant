@@ -30,7 +30,7 @@ def _build_parser() -> argparse.ArgumentParser:
     delete_parser.add_argument(
         "--remove-artifacts",
         action="store_true",
-        help="Also remove the cleaned_chapters directory recorded in the registry.",
+        help="Also remove the novels_cleaned directory recorded in the registry.",
     )
     return parser
 
