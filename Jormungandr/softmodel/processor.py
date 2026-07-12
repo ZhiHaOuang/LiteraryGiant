@@ -13,6 +13,7 @@ from shared import (
 )
 
 from .pipeline import ChapterFeaturePipeline
+from .unitizer import UnitizerConfig, build_book_units
 
 
 def discover_processed_books(input_path: str | Path) -> list[Path]:
@@ -68,12 +69,30 @@ def _write_payload_atomic(path: Path, payload: dict, *, pretty: bool = True) -> 
 
 
 def _chapter_manifest_entry(chapter_payload: dict, chapter_path: Path) -> dict:
-    return {
+    entry = {
         "order": int(chapter_payload["order"]),
         "chapter_id": str(chapter_payload["chapter_id"]),
         "clean_title": chapter_payload.get("clean_title"),
         "file_name": chapter_path.name,
     }
+    for key in (
+        "unit_id",
+        "global_unit_order",
+        "unit_order_in_chapter",
+        "unit_count_in_chapter",
+        "source_chapter_id",
+        "source_chapter_order",
+        "source_chapter_title",
+        "source_chapter_char_count",
+        "source_char_start",
+        "source_char_end",
+        "split_reason",
+        "book_shape",
+        "unitizer_version",
+    ):
+        if key in chapter_payload:
+            entry[key] = chapter_payload.get(key)
+    return entry
 
 
 def _feature_chapter_matches(
@@ -141,6 +160,27 @@ def feature_book_index_complete(book_dir: str | Path, output_dir: str | Path) ->
     feature_manifest = feature_index.get("chapter_manifest") or []
     if not isinstance(source_manifest, list) or not isinstance(feature_manifest, list):
         return False
+    unitization = feature_metadata.get("unitization") if isinstance(feature_metadata.get("unitization"), dict) else {}
+    if not unitization.get("enabled") and _source_metadata_is_long_chapter_shape(source_metadata):
+        return False
+    if unitization.get("enabled") and int(feature_metadata.get("unit_count") or unitization.get("unit_count") or 0) > 0:
+        expected_count = int(feature_metadata.get("unit_count") or unitization.get("unit_count") or 0)
+        if len(feature_manifest) != expected_count:
+            return False
+        for expected_order, feature_entry in enumerate(feature_manifest, start=1):
+            if not isinstance(feature_entry, dict):
+                return False
+            try:
+                feature_order = int(feature_entry.get("order"))
+            except (TypeError, ValueError):
+                return False
+            if feature_order != expected_order:
+                return False
+            file_name = str(feature_entry.get("file_name") or chapter_feature_file_name(feature_order))
+            chapter_path = feature_dir / file_name
+            if not chapter_path.is_file() or chapter_path.stat().st_size <= 0:
+                return False
+        return True
     if len(source_manifest) == 0 or len(feature_manifest) != len(source_manifest):
         return False
 
@@ -162,6 +202,21 @@ def feature_book_index_complete(book_dir: str | Path, output_dir: str | Path) ->
             return False
 
     return True
+
+
+def _source_metadata_is_long_chapter_shape(source_metadata: dict) -> bool:
+    try:
+        total_chars = int(source_metadata.get("total_chars") or 0)
+        chapter_count = int(source_metadata.get("chapter_count") or 0)
+    except (TypeError, ValueError):
+        return False
+    if chapter_count <= 0:
+        return False
+    avg_chars = total_chars / chapter_count
+    config = UnitizerConfig()
+    if avg_chars > config.book_avg_chars_threshold:
+        return True
+    return chapter_count < config.book_short_chapter_count_threshold and total_chars >= config.book_high_total_chars_threshold
 
 
 def _load_existing_feature_manifest(output_dir: str | Path, *, book_id: str) -> list[dict]:
@@ -206,28 +261,64 @@ def _feature_index_entry_matches(
     return chapter_path.is_file() and chapter_path.stat().st_size > 0
 
 
-def process_book_dir(book_dir: str | Path, *, pipeline: ChapterFeaturePipeline) -> dict:
+def _unit_input_signature(chapter_file: Path, chapter_payload: dict, *, enabled: bool) -> str:
+    if not enabled:
+        return ""
+    source_signature = compute_path_signature(chapter_file)
+    return ":".join(
+        [
+            source_signature,
+            str(chapter_payload.get("unitizer_version") or ""),
+            str(chapter_payload.get("unit_id") or chapter_payload.get("chapter_id") or ""),
+            str(chapter_payload.get("source_char_start") or 0),
+            str(chapter_payload.get("source_char_end") or 0),
+            str(chapter_payload.get("char_count") or 0),
+        ]
+    )
+
+
+def build_feature_book_metadata(source_book_metadata: dict, *, unitization_report) -> dict:
+    metadata = dict(source_book_metadata)
+    source_chapter_count = int(source_book_metadata.get("chapter_count") or unitization_report.chapter_count or 0)
+    metadata.setdefault("source_chapter_count", source_chapter_count)
+    metadata["unit_count"] = unitization_report.unit_count
+    metadata["book_shape"] = unitization_report.book_shape
+    metadata["unitization"] = unitization_report.to_dict()
+    return metadata
+
+
+def process_book_dir(
+    book_dir: str | Path,
+    *,
+    pipeline: ChapterFeaturePipeline,
+    unitizer_config: UnitizerConfig | None = None,
+) -> dict:
     book_bundle = load_book_bundle(book_dir)
-    book_id = book_bundle["index"]["book_metadata"]["book_id"]
+    source_book_metadata = book_bundle["index"]["book_metadata"]
+    book_id = source_book_metadata["book_id"]
+    unit_items, unitization_report = build_book_units(
+        [(Path(chapter["source_file"]), chapter["payload"]) for chapter in book_bundle["chapters"]],
+        book_id=book_id,
+        config=unitizer_config,
+    )
     processed_chapters = []
-    for start in range(0, len(book_bundle["chapters"]), pipeline.chapter_batch_size):
-        batch = book_bundle["chapters"][start:start + pipeline.chapter_batch_size]
+    for start in range(0, len(unit_items), pipeline.chapter_batch_size):
+        batch = unit_items[start:start + pipeline.chapter_batch_size]
         processed_chapters.extend(
             pipeline.process_chapters(
-                [chapter["payload"] for chapter in batch],
-                source_files=[chapter["source_file"] for chapter in batch],
+                [chapter_payload for _chapter_file, chapter_payload in batch],
+                source_files=[str(chapter_file) for chapter_file, _chapter_payload in batch],
                 book_id=book_id,
             )
         )
+    book_metadata = build_feature_book_metadata(source_book_metadata, unitization_report=unitization_report)
     return {
-        "book_metadata": book_bundle["index"]["book_metadata"],
+        "book_metadata": book_metadata,
         "chapter_manifest": [
-            {
-                "order": chapter["chapter_context"]["order"],
-                "chapter_id": chapter["chapter_context"]["chapter_id"],
-                "clean_title": chapter["chapter_context"]["clean_title"],
-                "file_name": chapter_feature_file_name(chapter["chapter_context"]["order"]),
-            }
+            _chapter_manifest_entry(
+                chapter["chapter_context"],
+                Path(chapter_feature_file_name(chapter["chapter_context"]["order"])),
+            )
             for chapter in processed_chapters
         ],
         "chapters": processed_chapters,
@@ -243,7 +334,9 @@ def process_book_dir(book_dir: str | Path, *, pipeline: ChapterFeaturePipeline) 
             "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
             "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
             "vllm_max_num_seqs": pipeline.nuextract_extractor.vllm_max_num_seqs,
+            "vllm_generate_batch_size": pipeline.nuextract_extractor.vllm_generate_batch_size,
             "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
+            "unitizer": unitization_report.to_dict(),
         },
     }
 
@@ -260,6 +353,7 @@ def build_extractor_config(pipeline: ChapterFeaturePipeline) -> dict:
         "vllm_gpu_memory_utilization": pipeline.nuextract_extractor.vllm_gpu_memory_utilization,
         "vllm_max_model_len": pipeline.nuextract_extractor.vllm_max_model_len,
         "vllm_max_num_seqs": pipeline.nuextract_extractor.vllm_max_num_seqs,
+        "vllm_generate_batch_size": pipeline.nuextract_extractor.vllm_generate_batch_size,
         "vllm_enforce_eager": pipeline.nuextract_extractor.vllm_enforce_eager,
     }
 
@@ -316,6 +410,7 @@ def process_and_write_book_dir(
     book_record: dict | None = None,
     state_save_interval: int = 100,
     index_flush_interval: int | None = None,
+    unitizer_config: UnitizerConfig | None = None,
 ) -> Path:
     book_path = Path(book_dir)
     index_payload = load_json(book_path / "index.json")
@@ -326,20 +421,27 @@ def process_and_write_book_dir(
     output_dir = resolve_feature_output_dir(book_bundle, output_root=output_root)
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    book_metadata = index_payload["book_metadata"]
-    book_id = book_metadata["book_id"]
+    source_book_metadata = index_payload["book_metadata"]
+    book_id = source_book_metadata["book_id"]
     source_book_dir = str(book_path)
     extractor_config = build_extractor_config(pipeline)
     existing_feature_manifest = _load_existing_feature_manifest(output_dir, book_id=book_id)
     chapter_manifest: list[dict] = []
-    chapter_items = load_chapters_from_manifest(
+    source_chapter_items = load_chapters_from_manifest(
         book_path,
         index_payload,
         stage_name="chapters",
     )
+    unit_items, unitization_report = build_book_units(
+        source_chapter_items,
+        book_id=book_id,
+        config=unitizer_config,
+    )
+    book_metadata = build_feature_book_metadata(source_book_metadata, unitization_report=unitization_report)
+    extractor_config["unitizer"] = unitization_report.to_dict()
     valid_chapter_ids: set[str] = set()
 
-    total = len(chapter_items)
+    total = len(unit_items)
     pending_items: list[tuple[int, Path, dict, Path, dict | None, str, str]] = []
     since_state_save = 0
     since_index_flush = 0
@@ -404,11 +506,19 @@ def process_and_write_book_dir(
         pending_items.clear()
         write_checkpoint()
 
-    for index, (chapter_file, chapter_payload) in enumerate(chapter_items, start=1):
+    if unitization_report.split_chapter_count:
+        print(
+            f"[UNITIZER] {book_id} shape={unitization_report.book_shape} "
+            f"chapters={unitization_report.chapter_count} units={unitization_report.unit_count} "
+            f"split_chapters={unitization_report.split_chapter_count} "
+            f"avg={unitization_report.avg_chars_per_chapter} p90={unitization_report.p90_chapter_chars}"
+        )
+
+    for index, (chapter_file, chapter_payload) in enumerate(unit_items, start=1):
         order = int(chapter_payload["order"])
         chapter_id = str(chapter_payload["chapter_id"])
         chapter_path = output_dir / chapter_feature_file_name(order)
-        chapter_signature = compute_path_signature(chapter_file) if state is not None else ""
+        chapter_signature = _unit_input_signature(chapter_file, chapter_payload, enabled=state is not None)
         valid_chapter_ids.add(chapter_id)
         indexed_output_current = _feature_index_entry_matches(
             existing_feature_manifest,
@@ -438,6 +548,11 @@ def process_and_write_book_dir(
                     "char_count": chapter_payload.get("char_count", 0),
                     "paragraph_count": chapter_payload.get("paragraph_count", 0),
                     "dialogue_ratio": chapter_payload.get("dialogue_ratio"),
+                    "source_chapter_id": chapter_payload.get("source_chapter_id"),
+                    "source_chapter_order": chapter_payload.get("source_chapter_order"),
+                    "unit_order_in_chapter": chapter_payload.get("unit_order_in_chapter"),
+                    "unit_count_in_chapter": chapter_payload.get("unit_count_in_chapter"),
+                    "split_reason": chapter_payload.get("split_reason"),
                 },
             )
             state_skip = state.should_skip_chapter(

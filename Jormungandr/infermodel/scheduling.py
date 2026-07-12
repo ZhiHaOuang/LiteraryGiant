@@ -5,12 +5,19 @@ import os
 from pathlib import Path
 
 from shared import FACT_CHAPTER_FEATURES_ROOT, FACT_PLOT_SEGMENTS_ROOT, PipelineState, compute_path_signature, load_json
-from shared.stage_queue import mark_stage_done, registry_ordered_book_dirs, stage_is_done
+from shared.stage_queue import (
+    NEGATIVE_BOOKS_PATH,
+    load_curated_book_keys,
+    load_negative_book_keys,
+    mark_stage_done,
+    registry_ordered_book_dirs,
+    stage_is_done,
+)
 
 from .api_client import ApiConfig
 from .merger import PlotSegmentMerger
 from .pipeline import InferModelPipeline
-from .processor import discover_feature_books, load_feature_book_bundle, process_and_write_book_dir, resolve_cluster_output_dir
+from .processor import discover_feature_books, load_feature_book_bundle, order_feature_books_by_size, process_and_write_book_dir, resolve_cluster_output_dir
 from .summarizer import DEFAULT_API_MODEL, PlotWindowAnalyzer
 from .windowing import SlidingWindowPlanner
 
@@ -29,6 +36,48 @@ def build_parser() -> argparse.ArgumentParser:
         "--output",
         help=f"Output root directory. Defaults to {FACT_PLOT_SEGMENTS_ROOT}.",
     )
+    parser.add_argument(
+        "--priority-book",
+        action="append",
+        default=[],
+        help=(
+            "Book key to run before size-sorted auto queue. May be repeated. "
+            "Accepted keys include clean slug/book_XXXX, clean id, title, raw slug, identity key, or source URL."
+        ),
+    )
+    parser.add_argument(
+        "--priority-file",
+        help=(
+            "Optional priority book list. Defaults to Library/indexes/priority_books.txt. "
+            "Use an empty/nonexistent path to rely only on --priority-book."
+        ),
+    )
+    parser.add_argument(
+        "--negative-book",
+        action="append",
+        default=[],
+        help=(
+            "Book key to skip for this infermodel run. May be repeated. "
+            "Accepted keys match --priority-book."
+        ),
+    )
+    parser.add_argument(
+        "--negative-file",
+        default=str(NEGATIVE_BOOKS_PATH),
+        help="Optional negative book list. Defaults to Library/indexes/negative_books.txt.",
+    )
+    parser.add_argument(
+        "--min-auto-chapters",
+        type=int,
+        default=21,
+        help="Minimum chapter count for the automatic size-sorted infermodel queue. Explicit priority books bypass this.",
+    )
+    parser.add_argument(
+        "--max-auto-chapters",
+        type=int,
+        default=1500,
+        help="Maximum chapter count for the automatic size-sorted infermodel queue. Explicit priority books bypass this.",
+    )
 
     # -- windowing ---------------------------------------------------------------
     parser.add_argument("--window-size", type=int, default=20,
@@ -39,14 +88,16 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Minimum tail window size.")
 
     # -- API config ---------------------------------------------------------------
-    parser.add_argument("--api-key", default=os.environ.get("MIMO_API_KEY", ""),
-                        help="API key. Defaults to MIMO_API_KEY env var.")
-    parser.add_argument("--api-base-url", default="https://token-plan-cn.xiaomimimo.com/anthropic",
+    parser.add_argument("--api-key", default=os.environ.get("INFERMODEL_API_KEY") or os.environ.get("MIMO_API_KEY", ""),
+                        help="API key. Defaults to INFERMODEL_API_KEY, then MIMO_API_KEY.")
+    parser.add_argument("--api-base-url", default=os.environ.get("INFERMODEL_API_BASE_URL", "https://token-plan-cn.xiaomimimo.com/anthropic"),
                         help="API base URL, e.g. MiMO /anthropic or OpenAI-compatible /v1.")
-    parser.add_argument("--api-model", default="mimo-v2.5-pro",
+    parser.add_argument("--api-model", default=os.environ.get("INFERMODEL_API_MODEL", "mimo-v2.5-pro"),
                         help="Model name sent to the API.")
-    parser.add_argument("--api-provider", choices=("auto", "anthropic", "openai"), default="auto",
+    parser.add_argument("--api-provider", choices=("auto", "anthropic", "openai"), default=os.environ.get("INFERMODEL_API_PROVIDER", "auto"),
                         help="API protocol. auto selects Anthropic for /anthropic bases and OpenAI for /v1 bases.")
+    parser.add_argument("--api-user-id", default=os.environ.get("INFERMODEL_API_USER_ID", ""),
+                        help="Optional provider user_id for DeepSeek KVCache/scheduling/content-safety isolation.")
 
     # -- prompt limits ------------------------------------------------------------
     parser.add_argument("--window-max-input-chars", type=int, default=14000,
@@ -57,8 +108,16 @@ def build_parser() -> argparse.ArgumentParser:
                         help="Maximum new tokens per API call.")
     parser.add_argument("--api-timeout", type=float, default=90.0,
                         help="HTTP timeout in seconds per API call before falling back.")
+    parser.add_argument("--api-retries", type=int, default=2,
+                        help="Maximum HTTP attempts per API call before using deterministic fallback.")
     parser.add_argument("--max-workers", type=int, default=6,
                         help="Maximum parallel API calls for window analysis, boundary validation, and plot fusion.")
+    parser.add_argument(
+        "--max-books",
+        type=int,
+        default=0,
+        help="Maximum number of queued books to process in this run. 0 means no limit.",
+    )
 
     # -- merger thresholds --------------------------------------------------------
     parser.add_argument("--boundary-vote-threshold", type=float, default=0.45,
@@ -67,12 +126,23 @@ def build_parser() -> argparse.ArgumentParser:
                         help="High-confidence boundary support threshold.")
     parser.add_argument("--min-boundary-votes", type=int, default=1,
                         help="Minimum positive boundary votes before a cut point.")
+    parser.add_argument(
+        "--boundary-validation-mode",
+        choices=("off", "gray", "full"),
+        default="off",
+        help=(
+            "How often to call the LLM for boundary validation. "
+            "off trusts window votes, gray validates only ambiguous boundaries, full validates broadly."
+        ),
+    )
 
     # -- refinement ---------------------------------------------------------------
     parser.add_argument("--max-plot-chapters", type=int, default=24,
                         help="Plots longer than this trigger refinement.")
     parser.add_argument("--max-refinement-rounds", type=int, default=2,
                         help="Maximum recursive refinement rounds.")
+    parser.add_argument("--fallback-retry-rounds", type=int, default=1,
+                        help="Retry window checkpoints whose analysis_status is fallback before merging. 0 reuses fallback checkpoints.")
     parser.add_argument("--refinement-window-size", type=int, default=32)
     parser.add_argument("--refinement-window-overlap", type=int, default=12)
     parser.add_argument("--refinement-min-window-size", type=int, default=10)
@@ -93,6 +163,19 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_false",
         help="Do not write infermodel progress into runs/pipeline_state/state.json for this run. This is the default.",
     )
+    parser.add_argument(
+        "--checkpoint",
+        dest="checkpoint",
+        action="store_true",
+        default=True,
+        help="Write and reuse per-window/per-plot checkpoints under each output book directory. Enabled by default.",
+    )
+    parser.add_argument(
+        "--no-checkpoint",
+        dest="checkpoint",
+        action="store_false",
+        help="Disable infermodel checkpoint/resume files for this run.",
+    )
     return parser
 
 
@@ -102,8 +185,8 @@ def main(argv: list[str] | None = None) -> int:
 
     if not args.api_key:
         parser.error(
-            "No API key provided.  Set MIMO_API_KEY environment variable "
-            "or pass --api-key."
+            "No API key provided.  Set INFERMODEL_API_KEY or MIMO_API_KEY "
+            "environment variable, or pass --api-key."
         )
 
     api_config = ApiConfig(
@@ -113,6 +196,8 @@ def main(argv: list[str] | None = None) -> int:
         provider=args.api_provider,
         max_tokens=args.max_new_tokens,
         timeout=args.api_timeout,
+        max_retries=args.api_retries,
+        user_id=args.api_user_id,
     )
 
     window_planner = SlidingWindowPlanner(
@@ -130,6 +215,7 @@ def main(argv: list[str] | None = None) -> int:
         boundary_vote_threshold=args.boundary_vote_threshold,
         strong_boundary_threshold=args.strong_boundary_threshold,
         min_boundary_votes=args.min_boundary_votes,
+        boundary_validation_mode=args.boundary_validation_mode,
     )
     refinement_window_planner = SlidingWindowPlanner(
         window_size=args.refinement_window_size,
@@ -144,6 +230,7 @@ def main(argv: list[str] | None = None) -> int:
         max_plot_chapters=args.max_plot_chapters,
         max_refinement_rounds=args.max_refinement_rounds,
         max_workers=args.max_workers,
+        fallback_retry_rounds=args.fallback_retry_rounds,
     )
 
     pretty = not args.compact
@@ -152,17 +239,44 @@ def main(argv: list[str] | None = None) -> int:
         source_stage="chapter_features",
         output_root=args.output or FACT_PLOT_SEGMENTS_ROOT,
         output_stage="infermodel",
+        priority_path=args.priority_file,
+        priority_keys=args.priority_book,
+        negative_path=args.negative_file,
+        negative_keys=args.negative_book,
+        min_auto_chapters=args.min_auto_chapters,
+        max_auto_chapters=args.max_auto_chapters,
     )
     if queue_result is None:
-        books = discover_feature_books(args.input)
+        fallback_priority_keys = (
+            load_curated_book_keys(args.priority_file, extra_keys=args.priority_book)
+            if args.priority_file is not None
+            else load_curated_book_keys(extra_keys=args.priority_book)
+        )
+        fallback_negative_keys = (
+            load_negative_book_keys(args.negative_file, extra_keys=args.negative_book)
+            if args.negative_file is not None
+            else load_negative_book_keys(extra_keys=args.negative_book)
+        )
+        books = order_feature_books_by_size(
+            discover_feature_books(args.input),
+            priority_keys=fallback_priority_keys,
+            negative_keys=fallback_negative_keys,
+            min_auto_chapters=args.min_auto_chapters,
+            max_auto_chapters=args.max_auto_chapters,
+        )
     else:
         books, queue_stats = queue_result
         print(
             f"[QUEUE] registry={queue_stats.source} queued={queue_stats.queued} "
             f"curated={queue_stats.curated} done={queue_stats.skipped_done} "
             f"missing_source={queue_stats.skipped_missing_source} "
-            f"incomplete={queue_stats.skipped_incomplete}"
+            f"incomplete={queue_stats.skipped_incomplete} "
+            f"negative={queue_stats.skipped_negative} "
+            f"chapter_range={queue_stats.skipped_chapter_range}"
         )
+    if args.max_books > 0 and len(books) > args.max_books:
+        print(f"[QUEUE] limiting run to first {args.max_books} of {len(books)} queued book(s)")
+        books = books[:args.max_books]
     written_dirs: list[Path] = []
     local_stats = {"processed": 0, "skipped": 0, "failed": 0}
     state = PipelineState() if args.sync_state else None
@@ -223,6 +337,7 @@ def main(argv: list[str] | None = None) -> int:
                     pretty=pretty,
                     state=state,
                     book_record=book_record,
+                    checkpoint_enabled=args.checkpoint,
                 )
                 written_dirs.append(output_dir)
                 mark_stage_done(
@@ -249,15 +364,24 @@ def main(argv: list[str] | None = None) -> int:
                             "fusion_max_input_chars": args.fusion_max_input_chars,
                             "max_new_tokens": args.max_new_tokens,
                             "api_timeout": args.api_timeout,
+                            "api_retries": args.api_retries,
                             "max_workers": args.max_workers,
+                            "max_books": args.max_books,
                             "boundary_vote_threshold": args.boundary_vote_threshold,
                             "strong_boundary_threshold": args.strong_boundary_threshold,
                             "min_boundary_votes": args.min_boundary_votes,
+                            "boundary_validation_mode": args.boundary_validation_mode,
                             "max_plot_chapters": args.max_plot_chapters,
                             "max_refinement_rounds": args.max_refinement_rounds,
+                            "fallback_retry_rounds": args.fallback_retry_rounds,
                             "refinement_window_size": args.refinement_window_size,
                             "refinement_window_overlap": args.refinement_window_overlap,
                             "refinement_min_window_size": args.refinement_min_window_size,
+                            "checkpoint": args.checkpoint,
+                            "negative_file": args.negative_file,
+                            "negative_books": args.negative_book,
+                            "min_auto_chapters": args.min_auto_chapters,
+                            "max_auto_chapters": args.max_auto_chapters,
                         },
                         metadata={
                             "book_index": book_record["index"],
@@ -288,6 +412,8 @@ def main(argv: list[str] | None = None) -> int:
                             "fusion_max_input_chars": args.fusion_max_input_chars,
                             "max_new_tokens": args.max_new_tokens,
                             "api_timeout": args.api_timeout,
+                            "api_retries": args.api_retries,
+                            "boundary_validation_mode": args.boundary_validation_mode,
                         },
                         metadata={"book_index": book_record["index"]},
                         error=str(exc),

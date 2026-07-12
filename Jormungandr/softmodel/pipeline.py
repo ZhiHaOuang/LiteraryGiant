@@ -90,7 +90,7 @@ class ChapterFeaturePipeline:
 
     @staticmethod
     def build_chapter_context(*, chapter_payload: dict, source_file: str, book_id: str) -> dict:
-        return {
+        context = {
             "book_id": book_id,
             "chapter_id": chapter_payload.get("chapter_id"),
             "order": chapter_payload.get("order"),
@@ -104,6 +104,24 @@ class ChapterFeaturePipeline:
             "dialogue_ratio": chapter_payload.get("dialogue_ratio"),
             "source_file": source_file,
         }
+        for key in (
+            "unit_id",
+            "global_unit_order",
+            "unit_order_in_chapter",
+            "unit_count_in_chapter",
+            "source_chapter_id",
+            "source_chapter_order",
+            "source_chapter_title",
+            "source_chapter_char_count",
+            "source_char_start",
+            "source_char_end",
+            "split_reason",
+            "book_shape",
+            "unitizer_version",
+        ):
+            if key in chapter_payload:
+                context[key] = chapter_payload.get(key)
+        return context
 
     def extract_semantic_features(self, *, title: str, content: str):
         return self.nuextract_extractor.extract(

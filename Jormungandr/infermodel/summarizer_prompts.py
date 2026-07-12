@@ -92,7 +92,7 @@ def build_window_prompt(
         "- 如果边界不确定，请在 `uncertain_boundary_before` 或 `uncertain_boundary_after` 标记，并把原因写进 `uncertainty_notes`。\n"
         "- `uncertain_boundaries` 只列出窗口中你觉得最不稳定的边界。\n"
         "- 先在脑中判断每一章是否属于同一连续阶段，再输出 JSON；不要仅因为人物相同或世界观相同就把不同阶段合并。\n\n"
-        f"窗口范围：第 {window.start_order} 章 到第 {window.end_order} 章\n"
+        f"窗口范围：单元 {window.start_order} 到单元 {window.end_order}\n"
         f"章节列表：{window.chapter_orders}\n\n"
         f"JSON Schema:\n{schema}\n\n"
         f"窗口章节摘要：\n{chapter_text}\n\n"
@@ -109,8 +109,11 @@ def build_fusion_prompt(
     """Build the prompt for fusing per-segment summaries into a plot-level summary."""
     chapter_lines = []
     for chapter in chapters:
+        source_label = f"第{chapter.source_chapter_order or chapter.order}章"
+        if chapter.unit_count_in_chapter > 1:
+            source_label = f"{source_label} / 单元{chapter.unit_order_in_chapter}/{chapter.unit_count_in_chapter}"
         chapter_lines.append(
-            f"第{chapter.order}章 {chapter.title or '未知标题'}\n"
+            f"单元{chapter.order}（{source_label}） {chapter.title or '未知标题'}\n"
             f"- summary: {chapter.summary or '无'}\n"
             f"- detailed_summary: {chapter.detailed_summary or '无'}"
         )

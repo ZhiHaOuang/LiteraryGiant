@@ -12,6 +12,7 @@ from shared import (
     serialize_payload,
 )
 
+from .checkpoint import InferModelCheckpoint
 from .pipeline import InferModelPipeline
 
 
@@ -35,6 +36,110 @@ def discover_feature_books(input_path: str | Path) -> list[Path]:
     if not books:
         raise FileNotFoundError(f"No feature book directories found under {path}")
     return books
+
+
+def feature_book_priority_keys(book_dir: str | Path) -> set[str]:
+    book_path = Path(book_dir)
+    keys = {book_path.name}
+    index_path = book_path / "index.json"
+    if not index_path.exists():
+        return {key for key in keys if key}
+    try:
+        index = load_json(index_path)
+    except Exception:
+        return {key for key in keys if key}
+    metadata = index.get("book_metadata") if isinstance(index, dict) else {}
+    lineage = (metadata or {}).get("source_lineage") if isinstance(metadata, dict) else {}
+    for value in [
+        (metadata or {}).get("book_id") if isinstance(metadata, dict) else "",
+        (metadata or {}).get("title") if isinstance(metadata, dict) else "",
+        ((metadata or {}).get("clean_registry") or {}).get("clean_id") if isinstance((metadata or {}).get("clean_registry"), dict) else "",
+        ((metadata or {}).get("clean_registry") or {}).get("clean_slug") if isinstance((metadata or {}).get("clean_registry"), dict) else "",
+        (lineage or {}).get("raw_book_id") if isinstance(lineage, dict) else "",
+        (lineage or {}).get("raw_book_slug") if isinstance(lineage, dict) else "",
+        (lineage or {}).get("identity_key") if isinstance(lineage, dict) else "",
+        (lineage or {}).get("source_url") if isinstance(lineage, dict) else "",
+    ]:
+        text = str(value or "").strip()
+        if text:
+            keys.add(text)
+    return keys
+
+
+def estimate_feature_book_size(book_dir: str | Path) -> tuple[int, int]:
+    book_path = Path(book_dir)
+    index_path = book_path / "index.json"
+    if index_path.exists():
+        try:
+            index = load_json(index_path)
+            metadata = index.get("book_metadata") if isinstance(index, dict) else {}
+            total_chars = int((metadata or {}).get("total_chars") or 0)
+            chapter_count = int(
+                (metadata or {}).get("unit_count")
+                or len(index.get("chapter_manifest") or [])
+                or (metadata or {}).get("chapter_count")
+                or 0
+            )
+            if total_chars > 0:
+                return total_chars, chapter_count
+        except Exception:
+            pass
+
+    total_chars = 0
+    chapter_count = 0
+    for chapter_file in sorted(book_path.glob("chapter_*.json")):
+        try:
+            payload = load_json(chapter_file)
+        except Exception:
+            continue
+        context = payload.get("chapter_context") if isinstance(payload, dict) else {}
+        total_chars += int((context or {}).get("char_count") or payload.get("char_count") or 0)
+        chapter_count += 1
+    return total_chars, chapter_count
+
+
+def order_feature_books_by_size(
+    books: list[Path],
+    *,
+    priority_keys: list[str] | None = None,
+    negative_keys: list[str] | None = None,
+    min_auto_chapters: int | None = None,
+    max_auto_chapters: int | None = None,
+) -> list[Path]:
+    priority_rank = {
+        key: index
+        for index, key in enumerate(str(item).strip() for item in priority_keys or [])
+        if key
+    }
+    negative_set = {
+        str(item).strip()
+        for item in negative_keys or []
+        if str(item).strip()
+    }
+
+    def sort_key(book_dir: Path) -> tuple[int, int, int, str]:
+        keys = feature_book_priority_keys(book_dir)
+        ranks = [priority_rank[key] for key in keys if key in priority_rank]
+        total_chars, chapter_count = estimate_feature_book_size(book_dir)
+        if ranks:
+            return 0, min(ranks), total_chars, book_dir.name
+        return 1, total_chars, chapter_count, book_dir.name
+
+    filtered_books: list[Path] = []
+    for book_dir in books:
+        keys = feature_book_priority_keys(book_dir)
+        if keys & negative_set:
+            continue
+        priority_match = any(key in priority_rank for key in keys)
+        _total_chars, chapter_count = estimate_feature_book_size(book_dir)
+        if not priority_match:
+            if min_auto_chapters is not None and chapter_count < min_auto_chapters:
+                continue
+            if max_auto_chapters is not None and chapter_count > max_auto_chapters:
+                continue
+        filtered_books.append(book_dir)
+
+    return sorted(filtered_books, key=sort_key)
 
 
 def load_feature_book_bundle(book_dir: str | Path) -> dict:
@@ -106,6 +211,13 @@ def process_feature_book_dir(book_dir: str | Path, *, pipeline: InferModelPipeli
     return pipeline.process_book(feature_book)
 
 
+def _write_payload_atomic(path: Path, payload: dict, *, pretty: bool = True) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = path.with_name(f".{path.name}.tmp")
+    tmp_path.write_text(serialize_payload(payload, pretty=pretty), encoding="utf-8")
+    tmp_path.replace(path)
+
+
 def write_cluster_book(output_dir: str | Path, processed_book: dict, *, pretty: bool = True) -> Path:
     book_dir = Path(output_dir)
     book_dir.mkdir(parents=True, exist_ok=True)
@@ -119,20 +231,23 @@ def write_cluster_book(output_dir: str | Path, processed_book: dict, *, pretty: 
         "chapter_manifest": processed_book["chapter_manifest"],
         "window_manifest": processed_book.get("window_manifest", []),
         "plot_manifest": plot_manifest,
+        "inference_metadata": processed_book.get("inference_metadata", {}),
         "plot_extraction_config": plot_config,
         "cluster_manifest": plot_manifest,
         "cluster_config": plot_config,
     }
-    (book_dir / "index.json").write_text(serialize_payload(index_payload, pretty=pretty), encoding="utf-8")
     if "window_results" in processed_book:
-        (book_dir / "window_results.json").write_text(
-            serialize_payload({"window_results": processed_book["window_results"]}, pretty=pretty),
-            encoding="utf-8",
+        _write_payload_atomic(
+            book_dir / "window_results.json",
+            {"window_results": processed_book["window_results"]},
+            pretty=pretty,
         )
 
     for plot in processed_book["plots"]:
         plot_path = book_dir / f"{plot['plot_id']}.json"
-        plot_path.write_text(serialize_payload(plot, pretty=pretty), encoding="utf-8")
+        _write_payload_atomic(plot_path, plot, pretty=pretty)
+
+    _write_payload_atomic(book_dir / "index.json", index_payload, pretty=pretty)
 
     return book_dir
 
@@ -149,12 +264,24 @@ def process_and_write_book_dir(
     pretty: bool = True,
     state: PipelineState | None = None,
     book_record: dict | None = None,
+    checkpoint_enabled: bool = True,
 ) -> Path:
     book_path = Path(book_dir)
     feature_book = load_feature_book_bundle(book_path)
-    processed_book = pipeline.process_book(feature_book)
-    output_dir = resolve_cluster_output_dir(processed_book, output_root=output_root)
+    output_dir = resolve_cluster_output_dir(feature_book, output_root=output_root)
+    checkpoint = InferModelCheckpoint(output_dir, pretty=pretty) if checkpoint_enabled else None
+    if checkpoint is not None:
+        checkpoint.update_state(status="starting", source_feature_dir=str(book_path), output_dir=str(output_dir))
+    processed_book = pipeline.process_book(feature_book, checkpoint=checkpoint)
     written_dir = write_cluster_book(output_dir, processed_book, pretty=pretty)
+    if checkpoint is not None:
+        checkpoint.update_state(
+            status="complete",
+            stage="complete",
+            output_dir=str(written_dir),
+            plot_count=len(processed_book.get("plots") or []),
+            window_count=len(processed_book.get("window_results") or []),
+        )
 
     if state is not None and book_record is not None:
         chapter_manifest = processed_book.get("chapter_manifest") or []

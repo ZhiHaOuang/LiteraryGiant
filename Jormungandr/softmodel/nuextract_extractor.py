@@ -111,6 +111,7 @@ class NuExtractExtractor:
         vllm_gpu_memory_utilization: float = 0.85,
         vllm_max_model_len: int = 8192,
         vllm_max_num_seqs: int | None = None,
+        vllm_generate_batch_size: int | None = 16,
         vllm_enforce_eager: bool = False,
     ) -> None:
         self.model_variant = model_variant.lower()
@@ -126,6 +127,7 @@ class NuExtractExtractor:
         self.vllm_gpu_memory_utilization = max(0.2, min(0.98, float(vllm_gpu_memory_utilization)))
         self.vllm_max_model_len = max(2048, int(vllm_max_model_len))
         self.vllm_max_num_seqs = max(1, int(vllm_max_num_seqs)) if vllm_max_num_seqs else None
+        self.vllm_generate_batch_size = max(1, int(vllm_generate_batch_size)) if vllm_generate_batch_size else None
         self.vllm_enforce_eager = bool(vllm_enforce_eager)
         self._tokenizer = None
         self._model = None
@@ -1240,13 +1242,17 @@ class NuExtractExtractor:
         return outputs[0].outputs[0].text
 
     def _generate_vllm_batch_from_rendered_prompts(self, prompts: list[str], *, max_new_tokens: int) -> list[str]:
-        outputs = self._model.generate(prompts, sampling_params=self._build_sampling_params(max_new_tokens=max_new_tokens))
+        batch_size = self.vllm_generate_batch_size or len(prompts)
         generated_texts: list[str] = []
-        for output in outputs:
-            if not output.outputs:
-                generated_texts.append("")
-                continue
-            generated_texts.append(output.outputs[0].text)
+        sampling_params = self._build_sampling_params(max_new_tokens=max_new_tokens)
+        for start in range(0, len(prompts), batch_size):
+            batch_prompts = prompts[start:start + batch_size]
+            outputs = self._model.generate(batch_prompts, sampling_params=sampling_params)
+            for output in outputs:
+                if not output.outputs:
+                    generated_texts.append("")
+                    continue
+                generated_texts.append(output.outputs[0].text)
         return generated_texts
 
     def resolve_tokenizer_max_length(self) -> int:

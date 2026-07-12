@@ -341,7 +341,8 @@
 fetcher-run <url>
 hardmodel-run Library/TaciturnRaw/novels_raw --use-clean-registry
 softmodel-run Library/TaciturnRaw/novels_cleaned
-infermodel-run Library/TaciturnRaw/novels_chapter --api-key "$MIMO_API_KEY"
+export MIMO_API_KEY="..."
+infermodel-run Library/TaciturnRaw/novels_chapter
 ```
 
 ### 更推荐的理解方式

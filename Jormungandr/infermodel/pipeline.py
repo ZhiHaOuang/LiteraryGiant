@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime, timezone
 from typing import Callable, TypeVar
 
@@ -24,6 +24,7 @@ class InferModelPipeline:
         max_plot_chapters: int = 24,
         max_refinement_rounds: int = 2,
         max_workers: int = 6,
+        fallback_retry_rounds: int = 1,
     ) -> None:
         self.window_planner = window_planner or SlidingWindowPlanner()
         self.window_analyzer = window_analyzer or PlotWindowAnalyzer()
@@ -36,24 +37,48 @@ class InferModelPipeline:
         self.max_plot_chapters = max(12, int(max_plot_chapters))
         self.max_refinement_rounds = max(1, int(max_refinement_rounds))
         self.max_workers = max(1, int(max_workers))
+        self.fallback_retry_rounds = max(0, int(fallback_retry_rounds))
 
-    def process_book(self, feature_book: dict) -> dict:
+    def process_book(self, feature_book: dict, *, checkpoint=None) -> dict:
         book_index = feature_book.get("index") or {}
         chapter_payloads = feature_book.get("chapters") or []
         chapters = [ChapterSynopsis.from_feature_payload(chapter_payload) for chapter_payload in chapter_payloads]
         chapters = sorted(chapters, key=lambda item: item.order)
         order_to_chapter = {chapter.order: chapter for chapter in chapters}
+        inference_metadata = self._inference_metadata()
+        if checkpoint is not None:
+            checkpoint.configure(self._checkpoint_context(feature_book, chapters, inference_metadata))
+            checkpoint.update_state(status="started", stage="window_analysis")
         windows = self.window_planner.build_windows(chapters)
-        window_results = self._analyze_windows(windows, mode="initial")
+        window_results = self._analyze_windows(windows, mode="initial", checkpoint=checkpoint)
+        if checkpoint is not None:
+            checkpoint.update_state(
+                status="running",
+                stage="plot_merge",
+                window_count=len(windows),
+                completed_windows=len(window_results),
+            )
         plots, boundary_debug = self.merger.merge(
             chapters,
             window_results,
             analyzer=self.window_analyzer,
             max_workers=self.max_workers,
+            checkpoint=checkpoint,
         )
-        plots, refinement_debug = self._refine_long_plots(plots, order_to_chapter)
+        plots, refinement_debug = self._refine_long_plots(plots, order_to_chapter, checkpoint=checkpoint)
         self._renumber_plots(plots)
         self._annotate_plot_quality(plots, order_to_chapter)
+        for plot in plots:
+            plot.inference_metadata = dict(inference_metadata)
+            if checkpoint is not None:
+                checkpoint.write_plot_for_orders(plot)
+        if checkpoint is not None:
+            checkpoint.update_state(
+                status="running",
+                stage="finalize",
+                plot_count=len(plots),
+                completed_plots=len(plots),
+            )
 
         plot_manifest = [
             {
@@ -61,6 +86,8 @@ class InferModelPipeline:
                 "plot_index": plot.plot_index,
                 "start_order": plot.start_order,
                 "end_order": plot.end_order,
+                "start_ref": dict(plot.start_ref),
+                "end_ref": dict(plot.end_ref),
                 "chapter_count": len(plot.chapter_orders),
                 "cluster_id": plot.plot_id,
                 "chapter_orders": list(plot.chapter_orders),
@@ -69,6 +96,8 @@ class InferModelPipeline:
                 "chapter_ids": plot.chapter_ids,
                 "chapter_titles": plot.chapter_titles,
                 "source_window_ids": plot.source_window_ids,
+                "inference_model": inference_metadata["model_name"],
+                "inference_provider": inference_metadata["provider"],
                 "file_name": f"{plot.plot_id}.json",
             }
             for plot in plots
@@ -92,7 +121,9 @@ class InferModelPipeline:
             "plot_manifest": plot_manifest,
             "plots": [plot.to_dict() for plot in plots],
             "cluster_manifest": plot_manifest,
+            "inference_metadata": inference_metadata,
             "plot_extraction_config": {
+                "inference_metadata": inference_metadata,
                 "strategy": "overlapping sliding windows + LLM API segmentation + boundary voting merge",
                 "window_size": self.window_planner.window_size,
                 "window_overlap": self.window_planner.window_overlap,
@@ -105,17 +136,21 @@ class InferModelPipeline:
                 "boundary_vote_threshold": self.merger.boundary_vote_threshold,
                 "strong_boundary_threshold": self.merger.strong_boundary_threshold,
                 "min_boundary_votes": self.merger.min_boundary_votes,
+                "boundary_validation_mode": self.merger.boundary_validation_mode,
                 "max_plot_chapters": self.max_plot_chapters,
                 "max_refinement_rounds": self.max_refinement_rounds,
                 "max_workers": self.max_workers,
+                "fallback_retry_rounds": self.fallback_retry_rounds,
                 "refinement_window_size": self.refinement_window_planner.window_size,
                 "refinement_window_overlap": self.refinement_window_planner.window_overlap,
                 "refinement_min_window_size": self.refinement_window_planner.min_window_size,
                 "boundary_debug": boundary_debug,
                 "refinement_debug": refinement_debug,
                 "generated_at": datetime.now(timezone.utc).isoformat(),
+                "checkpoint": self._checkpoint_metadata(checkpoint),
             },
             "cluster_config": {
+                "inference_metadata": inference_metadata,
                 "strategy": "overlapping sliding windows + LLM API segmentation + boundary voting merge",
                 "window_size": self.window_planner.window_size,
                 "window_overlap": self.window_planner.window_overlap,
@@ -128,19 +163,79 @@ class InferModelPipeline:
                 "boundary_vote_threshold": self.merger.boundary_vote_threshold,
                 "strong_boundary_threshold": self.merger.strong_boundary_threshold,
                 "min_boundary_votes": self.merger.min_boundary_votes,
+                "boundary_validation_mode": self.merger.boundary_validation_mode,
                 "max_plot_chapters": self.max_plot_chapters,
                 "max_refinement_rounds": self.max_refinement_rounds,
                 "max_workers": self.max_workers,
+                "fallback_retry_rounds": self.fallback_retry_rounds,
                 "refinement_window_size": self.refinement_window_planner.window_size,
                 "refinement_window_overlap": self.refinement_window_planner.window_overlap,
                 "refinement_min_window_size": self.refinement_window_planner.min_window_size,
                 "boundary_debug": boundary_debug,
                 "refinement_debug": refinement_debug,
                 "generated_at": datetime.now(timezone.utc).isoformat(),
+                "checkpoint": self._checkpoint_metadata(checkpoint),
             },
         }
 
-    def _refine_long_plots(self, plots, order_to_chapter: dict[int, ChapterSynopsis], *, depth: int = 1):
+    def _inference_metadata(self) -> dict:
+        return {
+            "stage": "infermodel",
+            "model_name": self.window_analyzer.model_name,
+            "provider": self.window_analyzer.resolved_provider,
+            "requested_provider": self.window_analyzer.requested_provider,
+            "base_url": self.window_analyzer.resolved_model_source,
+            "max_new_tokens": self.window_analyzer.max_new_tokens,
+            "temperature": self.window_analyzer.temperature,
+            "api_timeout": self.window_analyzer.api_timeout,
+            "api_max_retries": self.window_analyzer.api_max_retries,
+            "api_user_id": self.window_analyzer.api_user_id,
+            "prompt_profile": "plot_segments_v2_structured_json_only",
+            "schema_version": "plot_segments.v2",
+        }
+
+    def _checkpoint_context(self, feature_book: dict, chapters: list[ChapterSynopsis], inference_metadata: dict) -> dict:
+        book_index = feature_book.get("index") or {}
+        book_metadata = book_index.get("book_metadata") or {}
+        chapter_orders = [chapter.order for chapter in chapters]
+        checkpoint_inference_metadata = dict(inference_metadata)
+        checkpoint_inference_metadata.pop("api_max_retries", None)
+        checkpoint_inference_metadata.pop("api_user_id", None)
+        return {
+            "stage": "infermodel",
+            "schema_version": "plot_segments.v2",
+            "source_feature_dir": feature_book.get("book_dir", ""),
+            "book_id": book_metadata.get("book_id", ""),
+            "chapter_count": len(chapters),
+            "first_order": chapter_orders[0] if chapter_orders else 0,
+            "last_order": chapter_orders[-1] if chapter_orders else 0,
+            "inference_metadata": checkpoint_inference_metadata,
+            "window_size": self.window_planner.window_size,
+            "window_overlap": self.window_planner.window_overlap,
+            "min_window_size": self.window_planner.min_window_size,
+            "max_window_input_chars": self.window_analyzer.max_window_input_chars,
+            "max_fusion_input_chars": self.window_analyzer.max_fusion_input_chars,
+            "boundary_vote_threshold": self.merger.boundary_vote_threshold,
+            "strong_boundary_threshold": self.merger.strong_boundary_threshold,
+            "min_boundary_votes": self.merger.min_boundary_votes,
+            "max_plot_chapters": self.max_plot_chapters,
+            "max_refinement_rounds": self.max_refinement_rounds,
+            "refinement_window_size": self.refinement_window_planner.window_size,
+            "refinement_window_overlap": self.refinement_window_planner.window_overlap,
+            "refinement_min_window_size": self.refinement_window_planner.min_window_size,
+        }
+
+    @staticmethod
+    def _checkpoint_metadata(checkpoint) -> dict:
+        if checkpoint is None:
+            return {"enabled": False}
+        return {
+            "enabled": True,
+            "path": str(checkpoint.root),
+            "context_hash": checkpoint.context_hash,
+        }
+
+    def _refine_long_plots(self, plots, order_to_chapter: dict[int, ChapterSynopsis], *, depth: int = 1, checkpoint=None):
         if depth > self.max_refinement_rounds:
             return plots, []
 
@@ -156,12 +251,13 @@ class InferModelPipeline:
 
             plot_chapters = [order_to_chapter[order] for order in plot.chapter_orders if order in order_to_chapter]
             refinement_windows = self.refinement_window_planner.build_windows(plot_chapters)
-            refinement_results = self._analyze_windows(refinement_windows, mode="refine")
+            refinement_results = self._analyze_windows(refinement_windows, mode="refine", checkpoint=checkpoint)
             candidate_plots, candidate_boundary_debug = self.merger.merge(
                 plot_chapters,
                 refinement_results,
                 analyzer=self.window_analyzer,
                 max_workers=self.max_workers,
+                checkpoint=checkpoint,
             )
 
             if len(candidate_plots) <= 1:
@@ -170,6 +266,7 @@ class InferModelPipeline:
                     plot_chapters,
                     refinement_results,
                     candidate_boundary_debug,
+                    checkpoint=checkpoint,
                 )
                 if len(forced_plots) > 1:
                     changed = True
@@ -223,7 +320,7 @@ class InferModelPipeline:
             )
 
         if changed and depth < self.max_refinement_rounds:
-            nested_plots, nested_debug = self._refine_long_plots(refined_plots, order_to_chapter, depth=depth + 1)
+            nested_plots, nested_debug = self._refine_long_plots(refined_plots, order_to_chapter, depth=depth + 1, checkpoint=checkpoint)
             return nested_plots, refinement_debug + nested_debug
         return refined_plots, refinement_debug
 
@@ -233,6 +330,8 @@ class InferModelPipeline:
         plot_chapters: list[ChapterSynopsis],
         refinement_results,
         candidate_boundary_debug: dict[int, dict[str, float]],
+        *,
+        checkpoint=None,
     ):
         if len(plot_chapters) <= self.max_plot_chapters:
             return [plot], {"reason": "plot_not_oversized"}
@@ -256,7 +355,15 @@ class InferModelPipeline:
                 boundary_order = chapter_orders[boundary_index]
                 left_slice = plot_chapters[max(start_index, boundary_index - 3):boundary_index + 1]
                 right_slice = plot_chapters[boundary_index + 1:min(len(plot_chapters), boundary_index + 5)]
-                assessment = self.window_analyzer.assess_boundary(left_slice, right_slice)
+                left_orders = [chapter.order for chapter in left_slice]
+                right_orders = [chapter.order for chapter in right_slice]
+                assessment = None
+                if checkpoint is not None:
+                    assessment = checkpoint.load_boundary_assessment(left_orders, right_orders)
+                if assessment is None:
+                    assessment = self.window_analyzer.assess_boundary(left_slice, right_slice)
+                    if checkpoint is not None:
+                        checkpoint.write_boundary_assessment(left_orders, right_orders, assessment)
                 debug_info = candidate_boundary_debug.get(boundary_order) or {}
                 support = float(debug_info.get("support", 0.0) or 0.0)
                 hard_votes = int(debug_info.get("hard_votes", 0) or 0)
@@ -311,14 +418,24 @@ class InferModelPipeline:
 
         def build_forced_plot(item: tuple[int, list[int]]):
             plot_index, orders = item
-            return self.merger._build_plot(
+            if checkpoint is not None:
+                cached_plot = checkpoint.load_plot_for_orders(orders)
+                if cached_plot is not None:
+                    cached_plot.plot_index = plot_index
+                    cached_plot.plot_id = f"plot{plot_index}"
+                    return cached_plot
+            built_plot = self.merger._build_plot(
                 plot_index,
                 orders,
                 order_to_chapter,
                 boundary_stats,
                 refinement_results,
+                None,
                 self.window_analyzer,
             )
+            if checkpoint is not None:
+                checkpoint.write_plot_for_orders(built_plot)
+            return built_plot
 
         forced_plots = self._parallel_map(
             build_forced_plot,
@@ -330,11 +447,102 @@ class InferModelPipeline:
             "candidate_checks": boundary_details,
         }
 
-    def _analyze_windows(self, windows, *, mode: str):
-        return self._parallel_map(
-            lambda window: self.window_analyzer.analyze_window(window, mode=mode),
-            windows,
-        )
+    def _analyze_windows(self, windows, *, mode: str, checkpoint=None):
+        results = [None] * len(windows)
+        pending = []
+        for index, window in enumerate(windows):
+            cached_result = checkpoint.load_window(window, mode=mode) if checkpoint is not None else None
+            if cached_result is not None:
+                results[index] = cached_result
+            else:
+                pending.append((index, window))
+
+        def analyze(item):
+            index, window = item
+            return index, self.window_analyzer.analyze_window(window, mode=mode)
+
+        completed = len(windows) - len(pending)
+        if checkpoint is not None:
+            checkpoint.update_state(
+                status="running",
+                stage=f"{mode}_window_analysis",
+                completed_windows=completed,
+                total_windows=len(windows),
+            )
+
+        if self.max_workers <= 1 or len(pending) <= 1:
+            for item in pending:
+                index, result = analyze(item)
+                results[index] = result
+                if checkpoint is not None:
+                    checkpoint.write_window(result, mode=mode)
+                    completed += 1
+                    checkpoint.update_state(completed_windows=completed, total_windows=len(windows))
+        elif pending:
+            with ThreadPoolExecutor(max_workers=min(self.max_workers, len(pending))) as executor:
+                future_to_item = {executor.submit(analyze, item): item for item in pending}
+                for future in as_completed(future_to_item):
+                    index, result = future.result()
+                    results[index] = result
+                    if checkpoint is not None:
+                        checkpoint.write_window(result, mode=mode)
+                        completed += 1
+                        checkpoint.update_state(completed_windows=completed, total_windows=len(windows))
+
+        self._retry_fallback_windows(windows, results, mode=mode, checkpoint=checkpoint)
+        return [result for result in results if result is not None]
+
+    def _retry_fallback_windows(self, windows, results, *, mode: str, checkpoint=None) -> None:
+        if self.fallback_retry_rounds <= 0:
+            return
+
+        def retry(item):
+            index, window = item
+            return index, self.window_analyzer.analyze_window(window, mode=mode)
+
+        for retry_round in range(1, self.fallback_retry_rounds + 1):
+            fallback_items = [
+                (index, windows[index])
+                for index, result in enumerate(results)
+                if result is not None and getattr(result, "analysis_status", "") == "fallback"
+            ]
+            if not fallback_items:
+                return
+            if checkpoint is not None:
+                checkpoint.update_state(
+                    status="running",
+                    stage=f"{mode}_fallback_retry",
+                    fallback_retry_round=retry_round,
+                    fallback_retry_rounds=self.fallback_retry_rounds,
+                    fallback_windows=len(fallback_items),
+                    completed_fallback_retries=0,
+                )
+
+            completed_retries = 0
+            if self.max_workers <= 1 or len(fallback_items) <= 1:
+                for item in fallback_items:
+                    index, result = retry(item)
+                    results[index] = result
+                    if checkpoint is not None:
+                        checkpoint.write_window(result, mode=mode)
+                        completed_retries += 1
+                        checkpoint.update_state(
+                            completed_fallback_retries=completed_retries,
+                            fallback_windows=len(fallback_items),
+                        )
+            else:
+                with ThreadPoolExecutor(max_workers=min(self.max_workers, len(fallback_items))) as executor:
+                    future_to_item = {executor.submit(retry, item): item for item in fallback_items}
+                    for future in as_completed(future_to_item):
+                        index, result = future.result()
+                        results[index] = result
+                        if checkpoint is not None:
+                            checkpoint.write_window(result, mode=mode)
+                            completed_retries += 1
+                            checkpoint.update_state(
+                                completed_fallback_retries=completed_retries,
+                                fallback_windows=len(fallback_items),
+                            )
 
     def _parallel_map(self, func: Callable[[T], R], items: list[T]) -> list[R]:
         if self.max_workers <= 1 or len(items) <= 1:

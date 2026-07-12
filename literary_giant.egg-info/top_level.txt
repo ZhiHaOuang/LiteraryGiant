@@ -1,4 +1,0 @@
-Jormungandr
-fetcher
-scripts
-shared

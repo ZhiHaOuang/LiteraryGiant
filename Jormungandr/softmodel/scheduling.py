@@ -11,6 +11,7 @@ from shared import (
     detect_default_weights_root,
 )
 from shared.stage_queue import (
+    NEGATIVE_BOOKS_PATH,
     mark_stage_done,
     registry_ordered_book_dirs,
     stage_is_done,
@@ -30,6 +31,7 @@ from .processor import (
     process_and_write_book_dir,
     resolve_feature_output_dir,
 )
+from .unitizer import UnitizerConfig
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -45,6 +47,36 @@ def build_parser() -> argparse.ArgumentParser:
         "-o",
         "--output",
         help=f"Output root directory. Defaults to {FACT_CHAPTER_FEATURES_ROOT}.",
+    )
+    parser.add_argument(
+        "--priority-book",
+        action="append",
+        default=[],
+        help=(
+            "Book key to run before the size-sorted auto queue. May be repeated. "
+            "Accepted keys include clean slug/book_XXXX, clean id, title, raw slug, identity key, or source URL."
+        ),
+    )
+    parser.add_argument(
+        "--priority-file",
+        help=(
+            "Optional priority book list. Defaults to Library/indexes/priority_books.txt. "
+            "Use an empty/nonexistent path to rely only on --priority-book."
+        ),
+    )
+    parser.add_argument(
+        "--negative-book",
+        action="append",
+        default=[],
+        help=(
+            "Book key to skip for this softmodel run. May be repeated. "
+            "Accepted keys match --priority-book."
+        ),
+    )
+    parser.add_argument(
+        "--negative-file",
+        default=str(NEGATIVE_BOOKS_PATH),
+        help="Optional negative book list. Defaults to Library/indexes/negative_books.txt.",
     )
     parser.add_argument(
         "--weights-root",
@@ -110,6 +142,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="Maximum number of concurrent vLLM sequences. Lower this when sharing a GPU.",
     )
     parser.add_argument(
+        "--vllm-generate-batch-size",
+        type=int,
+        default=16,
+        help="Maximum prompts sent to one vLLM generate() call. Use 0 to disable chunking.",
+    )
+    parser.add_argument(
         "--vllm-enforce-eager",
         action="store_true",
         help="Enable eager mode in vLLM to reduce compile overhead at the cost of some throughput.",
@@ -124,6 +162,49 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=DEFAULT_CHAPTER_BATCH_SIZE,
         help=f"How many chapters to batch together per vLLM extraction step. Default: {DEFAULT_CHAPTER_BATCH_SIZE}.",
+    )
+    parser.add_argument(
+        "--unitize-long-chapters",
+        dest="unitize_long_chapters",
+        action="store_true",
+        default=True,
+        help="Split long chapters into narrative units before softmodel feature extraction. Enabled by default.",
+    )
+    parser.add_argument(
+        "--no-unitize-long-chapters",
+        dest="unitize_long_chapters",
+        action="store_false",
+        help="Disable long-chapter narrative unit splitting.",
+    )
+    parser.add_argument(
+        "--unitizer-target-chars",
+        type=int,
+        default=6500,
+        help="Target narrative unit size in Chinese characters.",
+    )
+    parser.add_argument(
+        "--unitizer-hard-max-chars",
+        type=int,
+        default=10000,
+        help="Hard maximum narrative unit size before forced punctuation splitting.",
+    )
+    parser.add_argument(
+        "--unitizer-suggest-chars",
+        type=int,
+        default=8000,
+        help="Chapter size above which splitting is suggested.",
+    )
+    parser.add_argument(
+        "--unitizer-required-chars",
+        type=int,
+        default=12000,
+        help="Chapter size above which splitting is required.",
+    )
+    parser.add_argument(
+        "--unitizer-force-multi-chars",
+        type=int,
+        default=20000,
+        help="Chapter size above which multiple units are strongly forced.",
     )
     parser.add_argument(
         "--index-flush-interval",
@@ -175,11 +256,20 @@ def main(argv: list[str] | None = None) -> int:
         vllm_gpu_memory_utilization=args.vllm_gpu_memory_utilization,
         vllm_max_model_len=args.vllm_max_model_len,
         vllm_max_num_seqs=args.vllm_max_num_seqs,
+        vllm_generate_batch_size=args.vllm_generate_batch_size,
         vllm_enforce_eager=args.vllm_enforce_eager,
     )
     pipeline = ChapterFeaturePipeline(
         nuextract_extractor=nuextract_extractor,
         chapter_batch_size=args.chapter_batch_size,
+    )
+    unitizer_config = UnitizerConfig(
+        enabled=args.unitize_long_chapters,
+        chapter_split_suggest_chars=args.unitizer_suggest_chars,
+        chapter_split_required_chars=args.unitizer_required_chars,
+        chapter_force_multi_chars=args.unitizer_force_multi_chars,
+        target_unit_chars=args.unitizer_target_chars,
+        hard_max_unit_chars=args.unitizer_hard_max_chars,
     )
 
     pretty = not args.compact
@@ -188,6 +278,10 @@ def main(argv: list[str] | None = None) -> int:
         source_stage="cleaned_chapters",
         output_root=args.output or FACT_CHAPTER_FEATURES_ROOT,
         output_stage="softmodel",
+        priority_path=args.priority_file,
+        priority_keys=args.priority_book,
+        negative_path=args.negative_file,
+        negative_keys=args.negative_book,
     )
     if queue_result is None:
         books = discover_processed_books(args.input)
@@ -197,7 +291,9 @@ def main(argv: list[str] | None = None) -> int:
             f"[QUEUE] registry={queue_stats.source} queued={queue_stats.queued} "
             f"curated={queue_stats.curated} done={queue_stats.skipped_done} "
             f"missing_source={queue_stats.skipped_missing_source} "
-            f"incomplete={queue_stats.skipped_incomplete}"
+            f"incomplete={queue_stats.skipped_incomplete} "
+            f"negative={queue_stats.skipped_negative} "
+            f"chapter_range={queue_stats.skipped_chapter_range}"
         )
     written_dirs: list[Path] = []
     local_stats = {"processed": 0, "skipped": 0, "failed": 0}
@@ -268,13 +364,14 @@ def main(argv: list[str] | None = None) -> int:
                 output_dir = process_and_write_book_dir(
                     book_dir,
                     pipeline=pipeline,
-                    output_root=args.output,
-                    pretty=pretty,
-                    state=state,
-                    book_record=book_record,
-                    state_save_interval=args.state_save_interval,
-                    index_flush_interval=args.index_flush_interval,
-                )
+                output_root=args.output,
+                pretty=pretty,
+                state=state,
+                book_record=book_record,
+                state_save_interval=args.state_save_interval,
+                index_flush_interval=args.index_flush_interval,
+                unitizer_config=unitizer_config,
+            )
                 written_dirs.append(output_dir)
                 mark_stage_done(
                     output_dir,
@@ -302,6 +399,7 @@ def main(argv: list[str] | None = None) -> int:
                             "vllm_gpu_memory_utilization": nuextract_extractor.vllm_gpu_memory_utilization,
                             "vllm_max_model_len": nuextract_extractor.vllm_max_model_len,
                             "vllm_max_num_seqs": nuextract_extractor.vllm_max_num_seqs,
+                            "vllm_generate_batch_size": nuextract_extractor.vllm_generate_batch_size,
                             "vllm_enforce_eager": nuextract_extractor.vllm_enforce_eager,
                             "device_map": nuextract_extractor.device_map,
                         },
@@ -335,6 +433,7 @@ def main(argv: list[str] | None = None) -> int:
                             "vllm_gpu_memory_utilization": nuextract_extractor.vllm_gpu_memory_utilization,
                             "vllm_max_model_len": nuextract_extractor.vllm_max_model_len,
                             "vllm_max_num_seqs": nuextract_extractor.vllm_max_num_seqs,
+                            "vllm_generate_batch_size": nuextract_extractor.vllm_generate_batch_size,
                             "vllm_enforce_eager": nuextract_extractor.vllm_enforce_eager,
                             "device_map": nuextract_extractor.device_map,
                         },

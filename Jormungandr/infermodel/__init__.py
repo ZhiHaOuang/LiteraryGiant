@@ -1,4 +1,5 @@
 from .api_client import ApiConfig
+from .checkpoint import InferModelCheckpoint
 from .merger import PlotSegmentMerger
 from .pipeline import InferModelPipeline
 from .processor import (
@@ -19,6 +20,7 @@ __all__ = [
     "ChapterSynopsis",
     "DEFAULT_API_MODEL",
     "GlobalPlot",
+    "InferModelCheckpoint",
     "InferModelPipeline",
     "LocalPlotSegment",
     "PlotSegmentMerger",

@@ -16,30 +16,9 @@ __pycache__/
 /.claude/agent-memory-local/*
 !/.claude/agent-memory-local/.gitkeep
 
-# Canonical Library layout. Track directory structure only; keep real source
-# texts, extracted facts, indexes, ideas, and reference artifacts out of git.
-/Library/**
-!/Library/
-!/Library/**/
-!/Library/.gitkeep
-!/Library/indexes/.gitkeep
-!/Library/TaciturnRaw/.gitkeep
-!/Library/TaciturnRaw/novels_raw/.gitkeep
-!/Library/TaciturnRaw/stories_raw/.gitkeep
-!/Library/TaciturnRaw/novels_cleaned/.gitkeep
-!/Library/TaciturnRaw/stories_cleaned/.gitkeep
-!/Library/TaciturnRaw/novels_chapter/.gitkeep
-!/Library/Bridges/.gitkeep
-!/Library/Bridges/novels_plot/.gitkeep
-!/Library/Bridges/stories_plot/.gitkeep
-!/Library/AbstractLibrary/.gitkeep
-!/Library/AbstractLibrary/Worldview/.gitkeep
-!/Library/AbstractLibrary/EventsLibrary/.gitkeep
-!/Library/AbstractLibrary/CharacterArc/.gitkeep
-!/Library/AbstractLibrary/EmotionRhythm/.gitkeep
-!/Library/AbstractLibrary/Payoff_Angst/.gitkeep
-!/Library/AbstractLibrary/Memes/.gitkeep
-!/Library/AbstractLibrary/BookLogicGraph/.gitkeep
+# Canonical Library data is intentionally local-only and too large for watchers.
+# Keep existing tracked .gitkeep files, but do not traverse the tree for new files.
+/Library/
 
 # Creative project workspaces. Track the reusable template, but keep actual
 # project drafts, generated outputs, and run products out of git.
@@ -90,3 +69,4 @@ test_fetch*.py
 *secret*
 *token*
 *key*
+scripts/api_env.sh

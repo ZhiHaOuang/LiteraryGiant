@@ -366,6 +366,30 @@ class PlotWindowAnalyzer:
     def resolved_model_source(self) -> str:
         return self._config.base_url
 
+    @property
+    def requested_provider(self) -> str:
+        return self._config.provider
+
+    @property
+    def resolved_provider(self) -> str:
+        return self._api.provider
+
+    @property
+    def api_timeout(self) -> float:
+        return self._api.timeout
+
+    @property
+    def api_max_retries(self) -> int:
+        return max(1, int(self._config.max_retries))
+
+    @property
+    def api_user_id(self) -> str:
+        return self._api.user_id
+
+    @property
+    def temperature(self) -> float:
+        return float(self._config.temperature)
+
     # -- small utilities -------------------------------------------------------
 
     @staticmethod
