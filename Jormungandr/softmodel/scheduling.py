@@ -211,7 +211,7 @@ def build_parser() -> argparse.ArgumentParser:
         type=int,
         default=None,
         help=(
-            "Flush novels_chapter/<book>/index.json every N chapter decisions. "
+            "Flush 03_ChapterAnalysis/<id>/index.json every N chapter decisions. "
             "Defaults to --chapter-batch-size, so completed batches are resumable."
         ),
     )

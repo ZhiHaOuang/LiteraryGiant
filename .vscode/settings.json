@@ -1,0 +1,47 @@
+{
+  "chatgpt.commentCodeLensEnabled": false,
+  "chatgpt.openOnStartup": false,
+  "files.watcherExclude": {
+    "**/models/**": true,
+    "**/.literarygiant/**": true,
+    "Library/**": true,
+    "**/Library/**": true,
+    "**/library/**": true,
+    "**/runs/**": true,
+    "**/logs/**": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/*.egg-info/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  "search.exclude": {
+    "**/models/**": true,
+    "**/.literarygiant/**": true,
+    "Library/**": true,
+    "**/Library/**": true,
+    "**/library/**": true,
+    "**/runs/**": true,
+    "**/logs/**": true,
+    "**/__pycache__/**": true,
+    "**/.pytest_cache/**": true,
+    "**/*.egg-info/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true
+  },
+  "files.exclude": {
+    "**/runs/**": true,
+    "**/logs/**": true
+  },
+  "explorer.excludeGitIgnore": false,
+  "search.useIgnoreFiles": true,
+  "search.useGlobalIgnoreFiles": true,
+  "search.useParentIgnoreFiles": true,
+  "search.followSymlinks": false,
+  "git.enabled": true,
+  "git.autorefresh": true,
+  "git.decorations.enabled": true,
+  "git.autoRepositoryDetection": "openEditors",
+  "git.untrackedChanges": "hidden",
+  "git.repositoryScanMaxDepth": 1
+}

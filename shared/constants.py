@@ -4,14 +4,38 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 LIBRARY_ROOT = PROJECT_ROOT / "Library"
+# Large, uncurated local TXT imports are isolated under Library/Noise. They
+# must pass the organizer's review/dedup gates before promotion to TaciturnRaw.
+NOVEL_NOISE_ROOT = LIBRARY_ROOT / "Noise"
+# Compatibility name used by the local organizer's first implementation.
+NOVEL_IMPORTS_ROOT = NOVEL_NOISE_ROOT
 PROJECTS_ROOT = PROJECT_ROOT / "Projects"
 INDEXES_ROOT = LIBRARY_ROOT / "indexes"
 TACITURN_RAW_ROOT = LIBRARY_ROOT / "TaciturnRaw"
-TACITURN_NOVELS_RAW_ROOT = TACITURN_RAW_ROOT / "novels_raw"
-TACITURN_STORIES_RAW_ROOT = TACITURN_RAW_ROOT / "stories_raw"
-TACITURN_NOVELS_CLEANED_ROOT = TACITURN_RAW_ROOT / "novels_cleaned"
+# Physical v2 layout.  Keep the older public constant names as aliases so
+# callers do not need a flag day when the on-disk names change.
+TACITURN_STORIES_ROOT = TACITURN_RAW_ROOT / "00_Stories"
+TACITURN_RAW_DATA_ROOT = TACITURN_RAW_ROOT / "01_RawData"
+TACITURN_CLEANED_DATA_ROOT = TACITURN_RAW_ROOT / "02_CleanedData"
+TACITURN_CHAPTER_ANALYSIS_ROOT = TACITURN_RAW_ROOT / "03_ChapterAnalysis"
+
+TACITURN_NOVELS_RAW_ROOT = TACITURN_RAW_DATA_ROOT
+TACITURN_STORIES_RAW_ROOT = TACITURN_STORIES_ROOT
+TACITURN_NOVELS_CLEANED_ROOT = TACITURN_CLEANED_DATA_ROOT
+TACITURN_NOVELS_CHAPTER_ROOT = TACITURN_CHAPTER_ANALYSIS_ROOT
+
+# There is no stories-cleaned stage in the v2 layout.  The compatibility
+# constant deliberately points at the retired legacy location so old readers
+# tolerate an absent directory without accidentally treating 00_Stories as
+# cleaned output.
 TACITURN_STORIES_CLEANED_ROOT = TACITURN_RAW_ROOT / "stories_cleaned"
-TACITURN_NOVELS_CHAPTER_ROOT = TACITURN_RAW_ROOT / "novels_chapter"
+
+# Read-only names used solely by the one-time source migration.  Runtime code
+# must use the v2 constants above and never consult an old->new ID map.
+TACITURN_LEGACY_STORIES_RAW_ROOT = TACITURN_RAW_ROOT / "stories_raw"
+TACITURN_LEGACY_NOVELS_RAW_ROOT = TACITURN_RAW_ROOT / "novels_raw"
+TACITURN_LEGACY_NOVELS_CLEANED_ROOT = TACITURN_RAW_ROOT / "novels_cleaned"
+TACITURN_LEGACY_NOVELS_CHAPTER_ROOT = TACITURN_RAW_ROOT / "novels_chapter"
 BRIDGES_ROOT = LIBRARY_ROOT / "Bridges"
 BRIDGE_NOVELS_PLOT_ROOT = BRIDGES_ROOT / "novels_plot"
 BRIDGE_STORIES_PLOT_ROOT = BRIDGES_ROOT / "stories_plot"

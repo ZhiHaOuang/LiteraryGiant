@@ -111,7 +111,7 @@ def build_parser() -> argparse.ArgumentParser:
         "--clean-registry-replace",
         default="",
         help=(
-            "Replace the raw source mapped to an existing cleaned slug, e.g. book_0005. "
+            "Replace the raw source mapped to an existing cleaned ID, e.g. id000005. "
             "Only valid when the input resolves to one book."
         ),
     )
@@ -275,9 +275,10 @@ def _looks_like_book_dir(path: Path) -> bool:
 def _raw_slug_from_dir(path: Path) -> str:
     payload = _load_json_object(path / "index.json")
     return str(
-        payload.get("book_slug")
-        or payload.get("story_slug")
+        payload.get("content_id")
         or payload.get("book_id")
+        or payload.get("story_slug")
+        or payload.get("book_slug")
         or path.name
     )
 
@@ -434,7 +435,7 @@ def _resolve_pending_fetch_sources(
     for entry in _load_fetch_run_entries(fetch_index):
         if entry.get("status") != "ok":
             continue
-        if entry.get("content_type", "book") != "book":
+        if entry.get("content_type", "book") not in {"book", "content"}:
             continue
         if run_filter and entry.get("run_id") not in run_filter:
             continue
@@ -448,7 +449,12 @@ def _resolve_pending_fetch_sources(
             continue
         if input_path.exists() and input_path.is_dir() and not _path_is_under(path, input_root):
             continue
-        slug = str(entry.get("book_slug") or path.name)
+        slug = str(
+            entry.get("content_id")
+            or entry.get("book_slug")
+            or entry.get("story_slug")
+            or path.name
+        )
         if clean_registry is not None and not force:
             clean_entry = raw_to_clean.get(slug)
             if clean_entry is not None and _clean_entry_count_current(

@@ -23,7 +23,7 @@ def discover_processed_books(input_path: str | Path) -> list[Path]:
     if path.is_dir() and (path / "index.json").exists():
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a TaciturnRaw novels_cleaned root or a processed book directory: {path}")
+        raise ValueError(f"Input path must be TaciturnRaw/02_CleanedData or one processed directory: {path}")
     books = sorted(item for item in path.iterdir() if item.is_dir() and (item / "index.json").exists())
     if not books:
         raise FileNotFoundError(f"No processed book directories found under {path}")

@@ -2,6 +2,18 @@
 __pycache__/
 *.py[cod]
 .venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+/build/
+/dist/
+.coverage
+htmlcov/
+
+# Local runtime state and logs (already tracked logs remain tracked).
+/.literarygiant/
+/logs/
 
 # IDE files
 .idea/
@@ -40,16 +52,11 @@ __pycache__/
 /data/**
 
 # Canonical model layout. Weight snapshots stay outside git.
-/models/**
-!/models/
-!/models/**/
-!/models/**/.gitkeep
+# Existing tracked placeholders remain tracked without traversing this tree.
+/models/
 
 # Reproducible run outputs and metrics.
-/runs/**
-!/runs/
-!/runs/**/
-!/runs/**/.gitkeep
+/runs/
 
 # Backup of Library directory
 /backup/

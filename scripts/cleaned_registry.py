@@ -23,14 +23,14 @@ def _build_parser() -> argparse.ArgumentParser:
 
     delete_parser = subparsers.add_parser(
         "delete",
-        help="Mark a cleaned book as deleted and free its numeric slot.",
+        help="Retire a cleaned resource while permanently reserving its ID.",
     )
-    delete_parser.add_argument("clean_slug", help="Cleaned slug, e.g. book_0005.")
+    delete_parser.add_argument("clean_slug", help="Canonical content ID, e.g. id000005.")
     delete_parser.add_argument("--reason", default="", help="Optional delete reason.")
     delete_parser.add_argument(
         "--remove-artifacts",
         action="store_true",
-        help="Also remove the novels_cleaned directory recorded in the registry.",
+        help="Also remove the 02_CleanedData directory recorded in the registry.",
     )
     return parser
 
@@ -65,7 +65,7 @@ def _cmd_delete(
             target = LIBRARY_ROOT / target
         if target.exists():
             shutil.rmtree(target)
-    print(f"Deleted {snapshot.get('clean_slug', clean_slug)}; slot can be reused.")
+    print(f"Retired {snapshot.get('clean_slug', clean_slug)}; ID remains permanently reserved.")
     return 0
 
 

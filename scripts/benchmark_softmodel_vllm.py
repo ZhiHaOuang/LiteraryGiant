@@ -16,7 +16,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "book_dir",
-        help="Book directory under novels_cleaned, e.g. Library/TaciturnRaw/novels_cleaned/book_0003",
+        help="Book directory under 02_CleanedData, e.g. Library/TaciturnRaw/02_CleanedData/id000003",
     )
     parser.add_argument(
         "--limit",

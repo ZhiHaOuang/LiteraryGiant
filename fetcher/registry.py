@@ -9,21 +9,26 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import urlparse
 
 from shared.constants import (
     INDEXES_ROOT,
+    TACITURN_NOVELS_CLEANED_ROOT,
     TACITURN_NOVELS_RAW_ROOT,
     TACITURN_STORIES_RAW_ROOT,
 )
+from shared.utils import canonical_content_id, content_id_number
 
 logger = logging.getLogger(__name__)
 
 REGISTRY_PATH = INDEXES_ROOT / "books.json"
 STORIES_PATH = INDEXES_ROOT / "stories.json"
 RAWDATA_BOOKS_ROOT = TACITURN_NOVELS_RAW_ROOT
+CONTENT_IDS_FILENAME = "content_ids.json"
+DEFAULT_NOVEL_CATEGORY_DIR = "20_qita"
 
 def _registry_path(content_type: str = "book") -> Path:
     return STORIES_PATH if content_type == "story" else REGISTRY_PATH
@@ -61,17 +66,26 @@ def normalize_title(title: str) -> str:
 
 
 class BookRegistry:
-    """Persistent registry that maps ``book_XXXX`` IDs to book metadata.
+    """Persistent registry that maps unified ``idNNNNNN`` IDs to metadata.
 
     Backed by ``Library/indexes/books.json``.
     """
 
     def __init__(self, path: str | Path = REGISTRY_PATH) -> None:
         self.path = Path(path)
-        self._stories_path = STORIES_PATH
+        self._stories_path = self.path.parent / "stories.json"
+        self._content_ids_path = self.path.parent / CONTENT_IDS_FILENAME
         self._failed_path = self.path.parent / "failed_urls.json"
         self.payload: dict = self._load()
         self._failed_urls: set[str] = self._load_failed()
+        # A complete registry/on-disk scan is needed to recover safely from
+        # legacy ``last_id`` values that lag behind existing content, but doing
+        # that for every registration makes a bulk import quadratic.  Cache the
+        # recovered high-water mark independently for books and stories.  The
+        # registry file is still reloaded while holding its lock in
+        # :meth:`register`, so later allocations also observe IDs issued by
+        # other processes.
+        self._id_high_watermarks: dict[str, int] = {}
 
     def _path_for(self, content_type: str = "book") -> Path:
         """Return the registry file path for *content_type*."""
@@ -88,13 +102,16 @@ class BookRegistry:
         source_url: str = "",
         adapter_domain: str = "",
         content_type: str = "book",
+        dedupe_by_title: bool = True,
+        fail_if_exists: bool = False,
     ) -> str:
         """Register a new book or story and return its ID.
 
-        Returns ``book_XXXX`` for novels, ``story_XXXX`` for short stories.
+        Returns one type-neutral ``idNNNNNN`` for novels and short stories.
 
         If *source_url* (canonicalised) matches an existing entry, its
-        existing ID is returned.
+        existing ID is returned unless ``fail_if_exists`` is enabled. Local
+        file import uses that stricter mode to avoid concurrent overwrites.
         """
         from .utils import FileLock
 
@@ -121,6 +138,10 @@ class BookRegistry:
                     content_type=content_type,
                 )
                 if existing_id is not None:
+                    if fail_if_exists:
+                        raise FileExistsError(
+                            f"Source URL is already registered as {existing_id}: {source_url}"
+                        )
                     logger.info("Book already registered: %s → %s", source_url, existing_id)
                     self._touch(existing_id, persist=False)
                     self._write_payload_unlocked(path)
@@ -128,20 +149,29 @@ class BookRegistry:
 
             for bid, info in self.payload.get("books", {}).items():
                 if (
-                    info.get("content_type", "book") == content_type
+                    dedupe_by_title
+                    and info.get("content_type", "book") == content_type
                     and info.get("title") == title
                     and info.get("source_url") == canonical_url
                 ):
                     slug = info.get("story_slug") or info.get("book_slug", bid)
+                    if fail_if_exists:
+                        raise FileExistsError(f"Book is already registered as {slug}: {title}")
                     logger.info("Book already registered by title+url: %s → %s", title, slug)
                     self._touch(slug, persist=False)
                     self._write_payload_unlocked(path)
                     return slug
 
             # Cross-site dedup: same title from different URL → skip, log source
-            existing = self._lookup_by_title(title, content_type=content_type)
+            existing = (
+                self._lookup_by_title(title, content_type=content_type)
+                if dedupe_by_title
+                else None
+            )
             if existing is not None:
                 slug = existing.get("story_slug") or existing.get("book_slug", "")
+                if fail_if_exists:
+                    raise FileExistsError(f"Book title is already registered as {slug}: {title}")
                 logger.info(
                     "Duplicate title — skipping: %r already registered as %s (%s)",
                     title, slug, existing.get("source_url", "?"),
@@ -153,13 +183,13 @@ class BookRegistry:
                 self._write_payload_unlocked(path)
                 return slug
 
-            content_id = self._next_id()
-            prefix = "story" if content_type == "story" else "book"
-            slug = f"{prefix}_{int(content_id):04d}"
+            slug = self._next_id(content_type=content_type)
+            content_number = content_id_number(slug)
 
             entry = {
-                "book_id": content_id,
+                "book_id": slug,
                 "book_slug": slug,
+                "content_id": slug,
                 "content_type": content_type,
                 "title": title,
                 "source_url": canonical_url,
@@ -168,16 +198,16 @@ class BookRegistry:
                 "updated_at": _utc_now(),
                 "paths": {
                     "rawdata": (
-                        f"TaciturnRaw/stories_raw/{slug}"
+                        f"TaciturnRaw/00_Stories/{slug}"
                         if content_type == "story"
-                        else f"TaciturnRaw/novels_raw/{slug}"
+                        else f"TaciturnRaw/01_RawData/{DEFAULT_NOVEL_CATEGORY_DIR}/{slug}"
                     ),
                 },
             }
             if content_type == "story":
                 entry["story_slug"] = slug
-            self.payload.setdefault("books", {})[content_id] = entry
-            self.payload["last_id"] = int(content_id)
+            self.payload.setdefault("books", {})[slug] = entry
+            self.payload["last_id"] = content_number
             self._write_payload_unlocked(path)
             logger.info("Registered %s → %s (%s)", slug, title, canonical_url)
             return slug
@@ -284,8 +314,8 @@ class BookRegistry:
     def deregister(self, book_id: str) -> None:
         """Remove a book/story entry from the registry.
 
-        Used to clean up after a failed download so the slot can be reused
-        by the next successful registration.
+        Used to clean up after a failed download.  The global numeric ID stays
+        reserved and the next successful registration advances beyond it.
         """
         from .utils import FileLock
 
@@ -346,8 +376,13 @@ class BookRegistry:
             "content_type",
             "story" if str(slug).startswith("story_") else "book",
         )
-        root = TACITURN_STORIES_RAW_ROOT if content_type == "story" else RAWDATA_BOOKS_ROOT
-        return root / slug
+        rawdata = str((info or {}).get("paths", {}).get("rawdata") or "").strip()
+        if rawdata:
+            path = Path(rawdata)
+            return path if path.is_absolute() else INDEXES_ROOT.parent / path
+        if content_type == "story":
+            return TACITURN_STORIES_RAW_ROOT / slug
+        return RAWDATA_BOOKS_ROOT / DEFAULT_NOVEL_CATEGORY_DIR / slug
 
     # ------------------------------------------------------------------
     # Import — normalise a whole-book txt into canonical structure
@@ -362,7 +397,7 @@ class BookRegistry:
     ) -> str:
         """Import a whole-book ``.txt`` file into the canonical layout.
 
-        Creates ``Library/TaciturnRaw/novels_raw/<book_slug>/source.txt`` and an
+        Creates ``Library/TaciturnRaw/01_RawData/20_qita/<content_id>/source.txt`` and an
         accompanying ``index.json`` manifest.
 
         Args:
@@ -371,44 +406,101 @@ class BookRegistry:
             source_url: Optional URL the book was obtained from.
 
         Returns:
-            The ``book_slug`` (e.g. ``book_0001``).
+            The unified content ID (e.g. ``id000001``).
         """
+        import hashlib
         import shutil
+        import uuid
 
         txt_path = Path(txt_path).resolve()
         if not txt_path.exists():
             raise FileNotFoundError(f"Source file not found: {txt_path}")
 
-        book_slug = self.register(title, source_url=source_url)
-        canonical_dir = self.source_dir(book_slug)
-        canonical_dir.mkdir(parents=True, exist_ok=True)
+        def sha256_file(path: Path) -> str:
+            digest = hashlib.sha256()
+            with path.open("rb") as handle:
+                while True:
+                    chunk = handle.read(1024 * 1024)
+                    if not chunk:
+                        break
+                    digest.update(chunk)
+            return digest.hexdigest()
 
-        # Copy the source.txt
-        dest = canonical_dir / "source.txt"
-        shutil.copy2(txt_path, dest)
-
-        # Build index.json
-        stat = dest.stat()
-        index = {
-            "title": title,
-            "book_slug": book_slug,
-            "source_url": source_url,
-            "source_type": "whole_book",
-            "imported_at": _utc_now(),
-            "source_file": txt_path.name,
-            "file_size": stat.st_size,
-        }
-        index_path = canonical_dir / "index.json"
-        index_path.write_text(
-            json.dumps(index, ensure_ascii=False, indent=2),
-            encoding="utf-8",
+        source_hash = sha256_file(txt_path)
+        preexisting_slug = (
+            self.lookup_by_url(source_url, content_type="book") if source_url else None
         )
+        if preexisting_slug:
+            existing_source = self.source_dir(preexisting_slug) / "source.txt"
+            if existing_source.exists() and sha256_file(existing_source) == source_hash:
+                logger.info("Whole-book import already present: %s", preexisting_slug)
+                return preexisting_slug
+            raise FileExistsError(
+                f"Source URL is already registered as {preexisting_slug}; refusing to overwrite it"
+            )
 
-        self.update(book_slug, last_imported={
-            "source_file": str(txt_path),
-            "file_size": stat.st_size,
-            "at": _utc_now(),
-        })
+        # Local imports must not merge on title: two unrelated works can share
+        # a name. Bulk imports use the content-first Library/Noise pipeline.
+        book_slug = self.register(
+            title,
+            source_url=source_url,
+            dedupe_by_title=False,
+            fail_if_exists=True,
+        )
+        canonical_dir = self.source_dir(book_slug)
+        if canonical_dir.exists():
+            self.deregister(book_slug)
+            raise FileExistsError(f"Allocated destination already exists: {canonical_dir}")
+
+        canonical_dir.parent.mkdir(parents=True, exist_ok=True)
+        staging_dir = canonical_dir.parent / f".{book_slug}.import-{uuid.uuid4().hex}.tmp"
+        promoted = False
+        try:
+            staging_dir.mkdir(parents=False, exist_ok=False)
+            dest = staging_dir / "source.txt"
+            shutil.copy2(txt_path, dest)
+            if sha256_file(dest) != source_hash:
+                raise RuntimeError(f"Hash mismatch after copying {txt_path}")
+
+            stat = dest.stat()
+            index = {
+                "title": title,
+                "canonical_id": book_slug,
+                "content_id": book_slug,
+                "book_slug": book_slug,
+                "content_type": "book",
+                "processing_profile": "longform_book",
+                "structure_type": "whole",
+                "source_url": source_url,
+                "source_type": "whole_book",
+                "imported_at": _utc_now(),
+                "source_file": txt_path.name,
+                "file_size": stat.st_size,
+                "raw_sha256": source_hash,
+            }
+            (staging_dir / "index.json").write_text(
+                json.dumps(index, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            staging_dir.rename(canonical_dir)
+            promoted = True
+            self.update(
+                book_slug,
+                raw_sha256=source_hash,
+                last_imported={
+                    "source_file": str(txt_path),
+                    "file_size": stat.st_size,
+                    "at": _utc_now(),
+                },
+            )
+        except Exception:
+            shutil.rmtree(staging_dir, ignore_errors=True)
+            # Once promoted, preserve the verified content and its base
+            # registration even if a later metadata update fails. Removing a
+            # canonical directory here could destroy another process's work.
+            if not promoted:
+                self.deregister(book_slug)
+            raise
 
         logger.info("Imported %s → %s/source.txt  (%d bytes)", title, canonical_dir, stat.st_size)
         return book_slug
@@ -497,9 +589,195 @@ class BookRegistry:
     # Internal
     # ------------------------------------------------------------------
 
-    def _next_id(self) -> str:
-        last = self.payload.get("last_id", 0)
-        return str(last + 1)
+    def _next_id(self, *, content_type: str = "book") -> str:
+        """Allocate one monotonic ID shared by books and stories.
+
+        ``content_ids.json`` is the only allocation high-water mark.  It stores
+        no old->new mapping and is advanced atomically before an ID is exposed,
+        so failed imports leave harmless gaps instead of reusing identities.
+        """
+        from .utils import FileLock
+
+        lock_path = str(self._content_ids_path) + ".lock"
+        with FileLock(lock_path):
+            state = self._load_path(self._content_ids_path)
+            try:
+                persisted = int(state.get("last_id", 0))
+            except (TypeError, ValueError):
+                persisted = 0
+            cached = self._id_high_watermarks.get("global")
+            if cached is None:
+                cached = self._initial_global_id_high_watermark()
+            registry_high = 0
+            for registry_path in (self.path, self._stories_path):
+                try:
+                    registry_high = max(
+                        registry_high,
+                        int(self._load_path(registry_path).get("last_id", 0)),
+                    )
+                except (TypeError, ValueError):
+                    pass
+            candidate = max(persisted, cached, registry_high) + 1
+            while self._global_id_candidate_exists(candidate):
+                candidate += 1
+            canonical = canonical_content_id(candidate)
+            state = {
+                "layout_version": "literary-giant-content-id-high-watermark-v1",
+                "id_format": "idNNNNNN",
+                "last_id": candidate,
+                "updated_at": _utc_now(),
+                "source": "BookRegistry",
+            }
+            temporary = Path(str(self._content_ids_path) + ".tmp")
+            temporary.write_text(
+                json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8"
+            )
+            os.replace(temporary, self._content_ids_path)
+            self._id_high_watermarks["global"] = candidate
+            return canonical
+
+    def _initial_global_id_high_watermark(self) -> int:
+        occupied: set[int] = set()
+        for path in (self.path, self._stories_path, self._content_ids_path):
+            payload = self._load_path(path)
+            try:
+                occupied.add(int(payload.get("last_id", 0)))
+            except (TypeError, ValueError):
+                pass
+            for key, entry in payload.get("books", {}).items():
+                for value in (
+                    key,
+                    entry.get("content_id"),
+                    entry.get("book_id"),
+                    entry.get("book_slug"),
+                    entry.get("story_slug"),
+                ):
+                    try:
+                        occupied.add(content_id_number(str(value or "")))
+                    except ValueError:
+                        continue
+        # The migration publishes this file, so the large raw index is only a
+        # compatibility fallback for a workspace that has not yet created it.
+        raw_index = TACITURN_NOVELS_RAW_ROOT / "index.jsonl"
+        if not self._content_ids_path.exists() and raw_index.is_file():
+            pattern = re.compile(r'"(?:canonical_id|content_id)"\s*:\s*"id(\d{6})"')
+            with raw_index.open("r", encoding="utf-8") as handle:
+                for line in handle:
+                    match = pattern.search(line)
+                    if match:
+                        occupied.add(int(match.group(1)))
+        if not self._content_ids_path.exists():
+            # Legacy-safe fallback.  It is used only before the v2 migration
+            # creates content_ids.json; normal allocations never rescan the
+            # collection.
+            for root in (
+                TACITURN_NOVELS_RAW_ROOT,
+                TACITURN_NOVELS_CLEANED_ROOT,
+                TACITURN_STORIES_RAW_ROOT,
+            ):
+                if not root.is_dir():
+                    continue
+                for path in root.iterdir():
+                    if not path.is_dir():
+                        continue
+                    try:
+                        occupied.add(content_id_number(path.name))
+                    except ValueError:
+                        continue
+        return max(occupied, default=0)
+
+    def _global_id_candidate_exists(self, candidate: int) -> bool:
+        canonical = canonical_content_id(candidate)
+        for registry_path in (self.path, self._stories_path):
+            payload = self._load_path(registry_path)
+            if canonical in payload.get("books", {}):
+                return True
+            for key, entry in payload.get("books", {}).items():
+                values = {
+                    str(key),
+                    str(entry.get("content_id") or ""),
+                    str(entry.get("book_id") or ""),
+                    str(entry.get("book_slug") or ""),
+                    str(entry.get("story_slug") or ""),
+                }
+                if canonical in values:
+                    return True
+        if any(
+            (root / canonical).exists()
+            for root in (
+                TACITURN_NOVELS_RAW_ROOT,
+                TACITURN_NOVELS_CLEANED_ROOT,
+                TACITURN_STORIES_RAW_ROOT,
+            )
+        ):
+            return True
+        raw_root = TACITURN_NOVELS_RAW_ROOT
+        if raw_root.is_dir():
+            for category in raw_root.iterdir():
+                if category.is_dir() and (category / canonical).exists():
+                    return True
+        return False
+
+    def _initial_id_high_watermark(
+        self,
+        *,
+        content_type: str,
+        roots: tuple[Path, Path],
+        prefix: str,
+    ) -> int:
+        """Return the legacy-safe registry/disk high-water mark.
+
+        This deliberately performs the expensive scan only when the matching
+        entry in ``_id_high_watermarks`` is absent.
+        """
+
+        occupied: set[int] = set()
+        try:
+            occupied.add(int(self.payload.get("last_id", 0)))
+        except (TypeError, ValueError):
+            pass
+        for key, info in self.payload.get("books", {}).items():
+            if info.get("content_type", "book") != content_type:
+                continue
+            candidates = (
+                key,
+                info.get("book_id"),
+                info.get("story_slug"),
+                info.get("book_slug"),
+            )
+            for candidate in candidates:
+                match = re.search(r"(?:^|_)(\d+)$", str(candidate or ""))
+                if match:
+                    occupied.add(int(match.group(1)))
+
+        for root in roots:
+            if not root.exists():
+                continue
+            for path in root.glob(f"{prefix}*"):
+                if not path.is_dir():
+                    continue
+                suffix = path.name.removeprefix(prefix)
+                if suffix.isdigit():
+                    occupied.add(int(suffix))
+        return max(occupied, default=0)
+
+    @staticmethod
+    def _id_candidate_exists(
+        candidate: int,
+        *,
+        prefix: str,
+        roots: tuple[Path, Path],
+        books: dict,
+    ) -> bool:
+        """Check a candidate with O(1) registry/path lookups."""
+
+        if str(candidate) in books:
+            return True
+
+        # Canonical IDs are zero-padded to four places, but also protect old
+        # unpadded directories that may be created after the initial scan.
+        directory_names = {f"{prefix}{candidate:04d}", f"{prefix}{candidate}"}
+        return any((root / name).exists() for root in roots for name in directory_names)
 
     def _touch(self, book_id: str, *, persist: bool = True) -> None:
         info = self.lookup(book_id)

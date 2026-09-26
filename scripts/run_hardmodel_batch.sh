@@ -8,7 +8,7 @@ TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
 echo "=== Batch started at $TIMESTAMP ===" | tee -a "$LOG_FILE"
 
 NO_PROXY=127.0.0.1,localhost no_proxy=127.0.0.1,localhost \
-python -u -m Jormungandr.hardmodel /root/private_data/LiteraryGiant/Library/TaciturnRaw/novels_raw \
+python -u -m Jormungandr.hardmodel /root/private_data/LiteraryGiant/Library/TaciturnRaw/01_RawData \
   --compact \
   --use-clean-registry \
   --pending-fetches \

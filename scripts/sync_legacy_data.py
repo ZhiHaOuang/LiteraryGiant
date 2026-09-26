@@ -1,4 +1,10 @@
-"""Copy legacy project artifacts into the canonical Library layout."""
+"""Copy legacy project artifacts into a pre-v2 development layout.
+
+This historical command cannot safely allocate a global v2 content ID or
+update the classified raw catalog.  It therefore refuses to mutate a live
+``01_RawData/index.jsonl`` corpus; use ``processed-corpus-migrate`` followed by
+``taciturn-layout-migrate`` for authoritative imports.
+"""
 
 from __future__ import annotations
 
@@ -16,8 +22,8 @@ from shared import DATA_ROOT
 LAYOUT_VERSION = "novel-agent-data-v1"
 
 CHAPTER_STAGE_MAP = {
-    "chapters": ("ProcessData", Path("TaciturnRaw/novels_cleaned")),
-    "features": ("FeatureData", Path("TaciturnRaw/novels_chapter")),
+    "chapters": ("ProcessData", Path("TaciturnRaw/02_CleanedData")),
+    "features": ("FeatureData", Path("TaciturnRaw/03_ChapterAnalysis")),
 }
 
 
@@ -69,7 +75,7 @@ def canonical_chapter_file(order: int) -> str:
 
 def copy_raw_text(project_root: Path, data_root: Path, book_id: str) -> dict[str, Any]:
     source = project_root / "RawData" / f"{book_id}.txt"
-    target_dir = data_root / "TaciturnRaw" / "novels_raw" / book_slug(book_id)
+    target_dir = data_root / "TaciturnRaw" / "01_RawData" / "20_qita" / book_slug(book_id)
     target = target_dir / "source.txt"
     if not source.exists():
         return {"stage": "rawdata", "status": "missing", "source": str(source)}
@@ -298,11 +304,11 @@ def update_books_index(data_root: Path, book_id: str, results: list[dict[str, An
             continue
         stage = result["stage"]
         if stage == "rawdata":
-            paths[stage] = f"TaciturnRaw/novels_raw/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/01_RawData/20_qita/{book_slug(book_id)}"
         elif stage == "chapters":
-            paths[stage] = f"TaciturnRaw/novels_cleaned/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/02_CleanedData/{book_slug(book_id)}"
         elif stage == "features":
-            paths[stage] = f"TaciturnRaw/novels_chapter/{book_slug(book_id)}"
+            paths[stage] = f"TaciturnRaw/03_ChapterAnalysis/{book_slug(book_id)}"
         elif stage == "plots":
             paths[stage] = f"Bridges/novels_plot/{book_slug(book_id)}"
     write_json(path, index)
@@ -325,6 +331,12 @@ def main(argv: list[str] | None = None) -> int:
     if not data_root.is_absolute():
         data_root = project_root / data_root
     data_root = data_root.resolve()
+    canonical_raw_index = data_root / "TaciturnRaw/01_RawData/index.jsonl"
+    if canonical_raw_index.is_file():
+        raise RuntimeError(
+            "data-sync-legacy refuses to write book_* resources into a live v2 corpus; "
+            "use processed-corpus-migrate and the canonical ID migration workflow"
+        )
     book_id = str(args.book_id).strip()
 
     results = [

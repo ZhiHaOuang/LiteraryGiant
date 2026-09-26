@@ -10,7 +10,12 @@ import logging
 import json
 from pathlib import Path
 
-from shared import PipelineState, compute_path_signature, compute_source_fingerprint
+from shared import (
+    PipelineState,
+    chapter_id_for,
+    compute_path_signature,
+    compute_source_fingerprint,
+)
 
 from .chapter_cleaner import RawNovelBook
 from .manifest_writer import (
@@ -38,6 +43,7 @@ def discover_and_process(
     chunk_overlap: int = 200,
     state: PipelineState | None = None,
     noise_classifier=None,
+    noise_classifier_min_windows: int = 1,
 ) -> list[dict]:
     """Discover book(s) at *input_path* and process each one.
 
@@ -54,6 +60,7 @@ def discover_and_process(
             chunk_overlap=chunk_overlap,
             state=state,
             noise_classifier=noise_classifier,
+            noise_classifier_min_windows=noise_classifier_min_windows,
         )
         results.append(result)
     return results
@@ -68,6 +75,7 @@ def process_book_source(
     chunk_overlap: int = 200,
     state: PipelineState | None = None,
     noise_classifier=None,
+    noise_classifier_min_windows: int = 1,
     book_id_override: str | None = None,
     metadata_overrides: dict | None = None,
     source_signature: str | None = None,
@@ -81,6 +89,7 @@ def process_book_source(
         chunk_size=chunk_size,
         chunk_overlap=chunk_overlap,
         noise_classifier=noise_classifier,
+        noise_classifier_min_windows=noise_classifier_min_windows,
     )
 
     if source.mode == "per_chapter":
@@ -202,7 +211,7 @@ def _process_per_chapter_incremental(
             ch_signature = compute_path_signature(ch_src.source_path)
             chapter_record, _ = state.get_or_create_chapter(
                 book_record,
-                chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
+                chapter_id=chapter_id_for(effective_book_id, ch_src.order),
                 order=ch_src.order,
                 clean_title=ch_src.title,
                 source_path=ch_src.source_path,
@@ -240,7 +249,7 @@ def _process_per_chapter_incremental(
             if state is not None and book_record is not None:
                 chapter_record, _ = state.get_or_create_chapter(
                     book_record,
-                    chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
+                    chapter_id=chapter_id_for(effective_book_id, ch_src.order),
                     order=ch_src.order,
                     clean_title=ch_src.title,
                     source_path=ch_src.source_path,
@@ -298,7 +307,7 @@ def _process_per_chapter_incremental(
             if state is not None and book_record is not None:
                 chapter_record, _ = state.get_or_create_chapter(
                     book_record,
-                    chapter_id=f"{effective_book_id}C{ch_src.order:04d}",
+                    chapter_id=chapter_id_for(effective_book_id, ch_src.order),
                     order=ch_src.order,
                     clean_title=ch_src.title,
                     source_path=ch_src.source_path,
@@ -412,6 +421,12 @@ def _apply_book_level_weak_noise(book: RawNovelBook, prepared_items: list[dict])
             next_candidate_id += 1
 
     if not global_candidates:
+        return
+
+    if len(global_candidates) < book.noise_classifier_min_windows:
+        book.cleaning_stats["weak_classifier_skipped_below_threshold"] += len(
+            global_candidates
+        )
         return
 
     book.cleaning_stats["weak_classifier_calls"] += 1

@@ -23,6 +23,8 @@ from .constants import (
     LEGACY_WEIGHTS_ROOT,
     LIBRARY_ROOT,
     MODELS_ROOT,
+    NOVEL_IMPORTS_ROOT,
+    NOVEL_NOISE_ROOT,
     PROJECT_ROOT,
     PROJECTS_ROOT,
     RAWDATA_NOVELS_ROOT,
@@ -34,6 +36,10 @@ from .constants import (
     TACITURN_NOVELS_CHAPTER_ROOT,
     TACITURN_NOVELS_CLEANED_ROOT,
     TACITURN_NOVELS_RAW_ROOT,
+    TACITURN_CHAPTER_ANALYSIS_ROOT,
+    TACITURN_CLEANED_DATA_ROOT,
+    TACITURN_RAW_DATA_ROOT,
+    TACITURN_STORIES_ROOT,
     TACITURN_RAW_ROOT,
     TACITURN_STORIES_CLEANED_ROOT,
     TACITURN_STORIES_RAW_ROOT,
@@ -72,7 +78,16 @@ from .type_helpers import (
     dedupe_items,
     EMPTY_LIKE_STRINGS,
 )
-from .utils import canonical_book_slug, load_json, normalize_fs_name, serialize_payload
+from .utils import (
+    canonical_book_slug,
+    canonical_content_id,
+    chapter_id_for,
+    content_id_number,
+    is_unified_content_id,
+    load_json,
+    normalize_fs_name,
+    serialize_payload,
+)
 
 # Legacy underscore-prefixed aliases — kept so existing modules that use
 # ``from shared import _as_text`` (etc.) continue to work without changes.
@@ -112,6 +127,8 @@ __all__ = [
     "LEGACY_WEIGHTS_ROOT",
     "LIBRARY_ROOT",
     "MODELS_ROOT",
+    "NOVEL_IMPORTS_ROOT",
+    "NOVEL_NOISE_ROOT",
     "PROJECT_ROOT",
     "PROJECTS_ROOT",
     "RAWDATA_NOVELS_ROOT",
@@ -123,6 +140,10 @@ __all__ = [
     "TACITURN_NOVELS_CHAPTER_ROOT",
     "TACITURN_NOVELS_CLEANED_ROOT",
     "TACITURN_NOVELS_RAW_ROOT",
+    "TACITURN_CHAPTER_ANALYSIS_ROOT",
+    "TACITURN_CLEANED_DATA_ROOT",
+    "TACITURN_RAW_DATA_ROOT",
+    "TACITURN_STORIES_ROOT",
     "TACITURN_RAW_ROOT",
     "TACITURN_STORIES_CLEANED_ROOT",
     "TACITURN_STORIES_RAW_ROOT",
@@ -136,6 +157,10 @@ __all__ = [
     # --- utils ---
     "load_json",
     "canonical_book_slug",
+    "canonical_content_id",
+    "chapter_id_for",
+    "content_id_number",
+    "is_unified_content_id",
     "normalize_fs_name",
     "serialize_payload",
     # --- text utils ---

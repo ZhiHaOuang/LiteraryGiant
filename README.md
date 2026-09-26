@@ -25,7 +25,7 @@
 - 解析目录页、自动翻页、发现章节链接
 - 并发抓取章节内容
 - 在 `runs/fetch/<run_id>/` 下先做 staging
-- 校验后再提升到 `Library/TaciturnRaw/novels_raw/` 或 `Library/TaciturnRaw/stories_raw/`
+- 校验后再提升到 `Library/TaciturnRaw/01_RawData/` 或 `Library/TaciturnRaw/00_Stories/`
 - 同步登记 `Library/indexes/books.json`
 
 这一层解决的问题是：把离散、站点差异很大的网页内容，统一变成项目内部可消费的原始文本资产。
@@ -43,10 +43,14 @@
 
 输出：
 
-- `Library/TaciturnRaw/novels_raw/book_xxxx/`
-- `Library/TaciturnRaw/stories_raw/story_xxxx/`
+- `Library/TaciturnRaw/01_RawData/<category>/idNNNNNN/`
+- `Library/TaciturnRaw/00_Stories/idNNNNNN/`
 - `runs/fetch/run_index.json`
 - `Library/indexes/books.json`
+
+### 1b. 本地杂乱 TXT：清单、分类与内容去重
+
+对于仍在传输的本地整书 TXT，使用 `novel-organize`。它先在隔离区 `Library/Noise/` 建立 SQLite 清单和可审计计划，按正文指纹识别“异名同内容”和不同完整度版本；不会仅凭同名合并，也不会把一批整书误当成一本书的章节。完整操作与安全门禁见 [本地 TXT 小说整理流水线](docs/local_novel_import.md)。
 
 ### 2. Hardmodel：清洗、去噪、章节标准化
 
@@ -60,7 +64,7 @@
 - 识别输入来源是单文件、单书目录还是批量目录
 - 对原始章节做规则去噪、章节标题识别、内容规整
 - 可选接入弱噪声 LLM 分类器，处理规则难以判断的噪声行
-- 将清洗结果写入 `Library/TaciturnRaw/novels_cleaned/`
+- 将清洗结果写入 `Library/TaciturnRaw/02_CleanedData/`
 - 使用 `cleaned_books.json` 建立 raw -> clean 的稳定映射
 - 支持增量跳过、断点续跑、仅处理新抓取结果
 
@@ -76,11 +80,11 @@
 
 输入：
 
-- `Library/TaciturnRaw/novels_raw/...`
+- `Library/TaciturnRaw/01_RawData/...`
 
 输出：
 
-- `Library/TaciturnRaw/novels_cleaned/book_xxxx/`
+- `Library/TaciturnRaw/02_CleanedData/idNNNNNN/`
 - `Library/indexes/cleaned_books.json`
 - `runs/pipeline_state/state.json`
 
@@ -110,11 +114,11 @@
 
 输入：
 
-- `Library/TaciturnRaw/novels_cleaned/book_xxxx/`
+- `Library/TaciturnRaw/02_CleanedData/idNNNNNN/`
 
 输出：
 
-- `Library/TaciturnRaw/novels_chapter/book_xxxx/`
+- `Library/TaciturnRaw/03_ChapterAnalysis/idNNNNNN/`
 - `.softmodel.done`
 
 ### 4. Infermodel：全书情节分段与窗口融合
@@ -144,11 +148,11 @@
 
 输入：
 
-- `Library/TaciturnRaw/novels_chapter/book_xxxx/`
+- `Library/TaciturnRaw/03_ChapterAnalysis/idNNNNNN/`
 
 输出：
 
-- `Library/Bridges/novels_plot/book_xxxx/`
+- `Library/Bridges/novels_plot/idNNNNNN/`
 - `.infermodel.done`
 
 ### 5. Generatemodel：从情节库生成新书
@@ -174,8 +178,8 @@
 
 输入：
 
-- `Library/Bridges/novels_plot/book_xxxx/`
-- 可选 `Library/TaciturnRaw/novels_chapter/`
+- `Library/Bridges/novels_plot/idNNNNNN/`
+- 可选 `Library/TaciturnRaw/03_ChapterAnalysis/`
 
 输出：
 
@@ -213,15 +217,15 @@
 
 如果从“资产流转”而不是“脚本调用”来看，整个项目的逻辑更清楚：
 
-1. 外部网页内容先进入 `TaciturnRaw/novels_raw` 或 `TaciturnRaw/stories_raw`
-2. `novels_raw` 被 hardmodel 变成规范章节事实 `TaciturnRaw/novels_cleaned`
-3. `novels_cleaned` 被 softmodel 变成章节语义事实 `TaciturnRaw/novels_chapter`
-4. `novels_chapter` 被 infermodel 变成全书剧情桥接结构 `Bridges/novels_plot`
+1. 外部网页内容先进入 `TaciturnRaw/01_RawData` 或 `TaciturnRaw/00_Stories`
+2. `01_RawData` 被 hardmodel 变成规范章节事实 `TaciturnRaw/02_CleanedData`
+3. `02_CleanedData` 被 softmodel 变成章节语义事实 `TaciturnRaw/03_ChapterAnalysis`
+4. `03_ChapterAnalysis` 被 infermodel 变成全书剧情桥接结构 `Bridges/novels_plot`
 5. `novels_plot` 被 generatemodel 重新组合，生成新的书籍草案
 
 也就是说，项目的主干数据对象依次是：
 
-`novels_raw -> novels_cleaned -> novels_chapter -> novels_plot -> 生成草案`
+`01_RawData -> 02_CleanedData -> 03_ChapterAnalysis -> novels_plot -> 生成草案`
 
 ## 当前项目的优势
 
@@ -339,10 +343,10 @@
 
 ```bash
 fetcher-run <url>
-hardmodel-run Library/TaciturnRaw/novels_raw --use-clean-registry
-softmodel-run Library/TaciturnRaw/novels_cleaned
+hardmodel-run Library/TaciturnRaw/01_RawData --use-clean-registry
+softmodel-run Library/TaciturnRaw/02_CleanedData
 export MIMO_API_KEY="..."
-infermodel-run Library/TaciturnRaw/novels_chapter
+infermodel-run Library/TaciturnRaw/03_ChapterAnalysis
 ```
 
 ### 更推荐的理解方式

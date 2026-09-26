@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+from shared import chapter_id_for, is_unified_content_id
+
 
 class HardmodelValidationError(ValueError):
     """Raised when a cleaned hardmodel artifact is not internally consistent."""
@@ -48,6 +50,13 @@ def validate_processed_book_result(result: dict[str, Any]) -> None:
         if chapter_id in seen_chapter_ids:
             raise HardmodelValidationError(f"duplicate chapter_id: {chapter_id}")
         seen_chapter_ids.add(chapter_id)
+        if is_unified_content_id(book_id):
+            expected_chapter_id = chapter_id_for(book_id, order)
+            if chapter_id != expected_chapter_id:
+                raise HardmodelValidationError(
+                    f"chapter[{index}].chapter_id must be {expected_chapter_id!r} "
+                    f"for canonical book {book_id!r}, got {chapter_id!r}"
+                )
 
         if not str(chapter.get("clean_title") or chapter.get("raw_title") or "").strip():
             raise HardmodelValidationError(f"chapter[{index}] must have a title")

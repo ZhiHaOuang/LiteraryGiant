@@ -106,7 +106,7 @@ def _book_sort_values(entry: dict[str, Any]) -> tuple[int, int]:
 def _is_complete_cleaned_entry(entry: dict[str, Any]) -> bool:
     if entry.get("status") != "active":
         return False
-    if entry.get("content_type") not in ("book", "", None):
+    if entry.get("content_type") not in ("book", "content", "", None):
         return False
     raw = entry.get("raw") if isinstance(entry.get("raw"), dict) else {}
     last_cleaned = entry.get("last_cleaned") if isinstance(entry.get("last_cleaned"), dict) else {}

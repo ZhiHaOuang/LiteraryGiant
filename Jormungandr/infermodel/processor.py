@@ -31,7 +31,7 @@ def discover_feature_books(input_path: str | Path) -> list[Path]:
     if _looks_like_feature_book_dir(path):
         return [path]
     if not path.is_dir():
-        raise ValueError(f"Input path must be a TaciturnRaw novels_chapter root or one feature book directory: {path}")
+        raise ValueError(f"Input path must be TaciturnRaw/03_ChapterAnalysis or one feature directory: {path}")
     books = sorted(item for item in path.iterdir() if _looks_like_feature_book_dir(item))
     if not books:
         raise FileNotFoundError(f"No feature book directories found under {path}")

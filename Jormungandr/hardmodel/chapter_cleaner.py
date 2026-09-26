@@ -7,6 +7,7 @@ from typing import Any, Callable, Iterable
 
 from shared.text_utils import normalize_line as _shared_normalize_line
 from shared.text_utils import normalize_text as _shared_normalize_text
+from shared.utils import chapter_id_for
 
 from .chapter_detector import CHAPTER_PATTERN, VOLUME_PATTERN, clean_title
 from .chunking import ChunkRecord, build_chunks, split_paragraphs, take_overlap
@@ -119,6 +120,7 @@ class RawNovelBook:
         content_type: str = "book",
         processing_profile: str = "longform_book",
         noise_classifier: NoiseClassifier | None = None,
+        noise_classifier_min_windows: int = 1,
     ) -> None:
         self.source_path = Path(source_path)
         self._book_id = book_id
@@ -133,6 +135,7 @@ class RawNovelBook:
         self.content_type = content_type
         self.processing_profile = processing_profile
         self.noise_classifier = noise_classifier
+        self.noise_classifier_min_windows = max(1, int(noise_classifier_min_windows))
 
         self.raw_text = ""
         self.normalized_text = ""
@@ -154,6 +157,7 @@ class RawNovelBook:
             "llm_trimmed": 0,
             "weak_classifier_calls": 0,
             "weak_classifier_windows": 0,
+            "weak_classifier_skipped_below_threshold": 0,
             "weak_classifier_failures": 0,
             "weak_llm_drop_rejected": 0,
         }
@@ -583,6 +587,14 @@ class RawNovelBook:
         """Resolve one draft's weak windows with a classifier, keeping on failure."""
         if not draft.uncertain_windows or noise_classifier is None:
             return
+        if len(draft.uncertain_windows) < self.noise_classifier_min_windows:
+            # Keep small ambiguous sets conservatively.  This is intentional:
+            # a model is a fallback for genuinely difficult books, not a
+            # per-book dependency for one isolated weak line.
+            self.cleaning_stats["weak_classifier_skipped_below_threshold"] += len(
+                draft.uncertain_windows
+            )
+            return
         self.cleaning_stats["weak_classifier_calls"] += 1
         self.cleaning_stats["weak_classifier_windows"] += len(draft.uncertain_windows)
         try:
@@ -819,22 +831,80 @@ class RawNovelBook:
             return False
         normalized = self.normalize_line(line)
         prose_score = int(candidate.get("prose_score") or 0)
-        if prose_score >= 4:
+
+        # Chapter labels often contain reader-facing suffixes such as
+        # ``（3/3求订阅）``.  They are still structural data and must never be
+        # deleted by the fallback model.
+        if self.parse_chapter_line(normalized) or re.match(
+            r"^\s*[0-9０-９]{1,7}\s*章(?:\s|$)",
+            normalized,
+        ):
             return False
+
+        explicit_site_noise = bool(
+            re.search(
+                r"(?:https?://|www\.|[A-Za-z0-9-]+\.(?:com|cn|net|org|cc)\b|"
+                r"最快更新|更新最快|最新网址|最新章节阅读请访问|"
+                r"正在手打中|刷新页面|收集并整理.{0,12}版权归|"
+                r"本书由.{0,20}(?:首发|请勿转载|勿转载)|"
+                r"仅供读者预览|下载.{0,8}24小时内删除)",
+                normalized,
+                re.IGNORECASE,
+            )
+        )
+        explicit_author_note = bool(
+            re.match(r"^\s*(?:ps|PS|题外话|作者有话|作家的话)[：:\s－－—_-]*", normalized)
+        )
+        explicit_group_notice = bool(
+            re.search(
+                r"(?:欢迎.{0,30}(?:书友群|读者群|小说群|QQ群|微信群)|"
+                r"(?:书友群|读者群|QQ群|微信群|群号).{0,20}(?:加入|加群|[0-9]{5,}))",
+                normalized,
+            )
+        )
+        explicit_reader_meta = self._has_soft_meta_noise_signal(normalized) or bool(
+            re.search(
+                r"(?:"
+                r"(?:记得|拜托|赶紧|有票的).{0,24}(?:收藏|订阅|月票|推荐票|投票|打赏|支持正版)|"
+                r"(?:月票|推荐票).{0,12}(?:刷新|加更)|"
+                r"(?:加更|欠更).{0,20}(?:月票|推荐票|章|更)|"
+                r"新文.{0,30}(?:推荐票|收藏|订阅)"
+                r")",
+                normalized,
+            )
+        )
+
+        # Quoted speech can naturally mention votes, advertisements, QR codes,
+        # subscriptions, or support.  Keep it unless the same line also carries
+        # an unmistakable external-site payload.
+        if re.match(r"^\s*[“「『\"']", normalized) and not explicit_site_noise:
+            return False
+
+        # A prose-like line needs an explicit site/author/reader-facing signal;
+        # a bare occurrence of words such as “广告” or “推广” is not permission
+        # to delete story narration.
+        if prose_score >= 2 and not (
+            explicit_site_noise
+            or explicit_author_note
+            or explicit_group_notice
+            or explicit_reader_meta
+        ):
+            return False
+
         frequency_score = int(candidate.get("pattern_frequency_score") or 0)
         if self._is_repeated_boilerplate_noise(normalized, frequency_score):
             return True
-        if self._looks_like_trim_noise(normalized):
-            return True
-        if self._has_soft_meta_noise_signal(normalized):
-            return True
-        if re.search(
-            r"(?:催更|求票|月票|推荐票|收藏|订阅|打赏|书友群|读者群|QQ群|微信群|群号|"
-            r"作者有话|题外话|作家的话|本章完|未完待续|最新网址|最新章节|首发地址|请记住本站)",
-            normalized,
+        if (
+            explicit_site_noise
+            or explicit_author_note
+            or explicit_group_notice
+            or explicit_reader_meta
         ):
             return True
-        return False
+        # For non-prose fragments, the older weak-pattern guard is still a
+        # useful last line of defence.  It is deliberately unavailable to
+        # prose-scored narration.
+        return prose_score == 0 and self._looks_like_trim_noise(normalized)
 
     def _looks_like_trim_noise(self, text: str) -> bool:
         probe = text.strip()
@@ -1217,7 +1287,12 @@ class RawNovelBook:
                 self.cleaning_stats["frequency_promoted"] += 1
             return (True, False, details)
 
-        if noise_score >= 3 and prose_score <= 3:
+        # Position and repetition are supporting evidence, not noise signals.
+        # Without this guard, an ordinary prose line repeated by a malformed
+        # scraper near a chapter boundary reaches the LLM merely because
+        # ``position_score + pattern_frequency_score >= 3``.  Only promote a
+        # line that already matched at least one weak-noise signal.
+        if is_weak and noise_score >= 3 and prose_score <= 3:
             if pattern_frequency_score:
                 self.cleaning_stats["frequency_promoted"] += 1
             details["weak_reason"] = "scored_noise_candidate"
@@ -1242,13 +1317,36 @@ class RawNovelBook:
         buffer: list[str] = []
         order = 1
 
-        for raw_line in text.splitlines():
-            line = raw_line.strip()
-            if not line:
+        lines = [raw_line.strip() for raw_line in text.splitlines() if raw_line.strip()]
+
+        # A table of contents embedded in prose often looks like consecutive
+        # ``第一节 / 第二节 / 第三节`` lines.  ``节`` is a valid but weaker
+        # chapter marker, so splitting all of them creates empty synthetic
+        # chapters and separates the surrounding real chapter.  A run of two
+        # or more adjacent section markers is therefore retained as prose.
+        inline_section_positions: set[int] = set()
+        position = 0
+        while position < len(lines):
+            parsed = self.parse_chapter_line(lines[position])
+            if not parsed or parsed.get("marker") != "节":
+                position += 1
                 continue
+            end = position + 1
+            while end < len(lines):
+                next_parsed = self.parse_chapter_line(lines[end])
+                if not next_parsed or next_parsed.get("marker") != "节":
+                    break
+                end += 1
+            if end - position >= 2:
+                inline_section_positions.update(range(position, end))
+            position = end
+
+        for position, line in enumerate(lines):
 
             volume_match = self.parse_volume_line(line)
-            chapter_match = self.parse_chapter_line(line)
+            chapter_match = (
+                None if position in inline_section_positions else self.parse_chapter_line(line)
+            )
 
             if volume_match and not chapter_match:
                 current_volume_title = volume_match["volume_title"]
@@ -1256,6 +1354,33 @@ class RawNovelBook:
                 continue
 
             if chapter_match:
+                # Scraped whole-book files sometimes repeat the same heading
+                # twice with only whitespace/formatting differences, e.g.
+                # ``第4章 标题`` followed immediately by ``第4章标题``.  Treat
+                # that pair as one boundary; otherwise the first heading
+                # becomes a synthetic empty chapter and shifts every following
+                # chapter ID.
+                if current_title is not None and not buffer:
+                    current_match = self.parse_chapter_line(current_title)
+                    current_no = current_match.get("chapter_no") if current_match else None
+                    incoming_no = chapter_match.get("chapter_no")
+                    current_key = re.sub(r"[\s:：.\-_]+", "", current_title)
+                    incoming_key = re.sub(r"[\s:：.\-_]+", "", chapter_match["raw_title"])
+                    same_number = (
+                        current_no is not None
+                        and incoming_no is not None
+                        and current_no == incoming_no
+                    )
+                    if same_number or current_key == incoming_key:
+                        # Prefer the more descriptive spelling while keeping
+                        # the original order and current volume context.
+                        if len(chapter_match["raw_title"].strip()) > len(current_title.strip()):
+                            current_title = chapter_match["raw_title"]
+                        if chapter_match["volume_title"]:
+                            current_volume_title = chapter_match["volume_title"]
+                        if chapter_match["volume_no"] is not None:
+                            current_volume_no = chapter_match["volume_no"]
+                        continue
                 if current_title is not None or buffer:
                     chapters.append(
                         self.build_chapter_record(
@@ -1342,6 +1467,7 @@ class RawNovelBook:
             "raw_title": raw_title,
             "clean_title": resolved_clean_title,
             "chapter_no": self.parse_number(number_text) if number_text else None,
+            "marker": marker,
             "volume_title": volume_title,
             "volume_no": volume_no,
         }
@@ -1359,7 +1485,7 @@ class RawNovelBook:
         paragraphs = [line.strip() for line in content_lines if line.strip()]
         content = "\n".join(paragraphs).strip()
         return ChapterRecord(
-            chapter_id=f"{self.book_id}C{order:04d}",
+            chapter_id=chapter_id_for(self.book_id, order),
             order=order,
             raw_title=raw_title,
             clean_title=chapter_meta.get("clean_title") or clean_title(raw_title),

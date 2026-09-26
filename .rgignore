@@ -1,0 +1,13 @@
+# Local data trees: keep them out of ripgrep scans.
+/Library/
+Library/
+**/Library/**
+**/library/**
+
+# Model weights and generated runtime artifacts are not source code.
+/models/
+/runs/
+/logs/
+/.literarygiant/
+**/__pycache__/
+**/*.egg-info/

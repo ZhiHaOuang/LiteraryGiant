@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from .constants import FACT_CLEANED_CHAPTERS_ROOT, INDEXES_ROOT, LIBRARY_ROOT
-from .utils import canonical_book_slug
+from .utils import canonical_book_slug, canonical_content_id, content_id_number
 
 
 CLEANED_BOOKS_REGISTRY_PATH = INDEXES_ROOT / "cleaned_books.json"
-LAYOUT_VERSION = "novel-agent-cleaned-registry-v1"
+LAYOUT_VERSION = "novel-agent-cleaned-registry-v2"
 
 
 def _utc_now() -> str:
@@ -40,12 +40,13 @@ def _load_json(path: Path) -> dict[str, Any]:
 
 
 def _id_from_slug(value: str, *, width: int = 4) -> str:
-    raw = str(value).strip()
-    if raw.startswith(("book_", "story_")):
-        raw = raw.split("_", 1)[1]
-    if raw.isdigit():
-        return f"{int(raw):0{width}d}"
-    raise ValueError(f"Cleaned registry ids must be numeric: {value!r}")
+    del width  # Retained for API compatibility; the unified width is global.
+    try:
+        return canonical_book_slug(str(value).strip())
+    except ValueError as exc:
+        raise ValueError(
+            f"Cleaned registry id must resolve to idNNNNNN: {value!r}"
+        ) from exc
 
 
 def compute_source_fingerprint(source: Any) -> str:
@@ -78,10 +79,10 @@ def _locked_file(path: Path):
 class CleanedBookRegistry:
     """Persistent mapping from raw sources to curated cleaned artifacts.
 
-    Raw ``book_XXXX`` slugs are treated as permanent identities.  Cleaned
-    artifacts therefore use the same numeric id/slug as their raw source, so
-    ``TaciturnRaw/novels_raw/book_0027`` maps to
-    ``TaciturnRaw/novels_cleaned/book_0027``.
+    Unified ``idNNNNNN`` values are permanent identities. Cleaned artifacts
+    use the same ID as their classified raw source, so
+    ``TaciturnRaw/01_RawData/<category>/id000027`` maps to
+    ``TaciturnRaw/02_CleanedData/id000027``.
     """
 
     def __init__(
@@ -143,7 +144,9 @@ class CleanedBookRegistry:
             self._assert_clean_slot_available_unlocked(clean_id, raw)
             entry = self._new_entry(clean_id, raw, output_root=output_root)
             self.payload.setdefault("books", {})[clean_id] = entry
-            self.payload["last_id"] = max(int(self.payload.get("last_id", 0)), int(clean_id))
+            self.payload["last_id"] = max(
+                int(self.payload.get("last_id", 0)), content_id_number(clean_id)
+            )
             self._append_event("register", entry)
             self._write_unlocked()
             return copy.deepcopy(entry)
@@ -170,7 +173,7 @@ class CleanedBookRegistry:
             return copy.deepcopy(entry)
 
     def mark_deleted(self, clean_slug: str, *, reason: str = "") -> dict[str, Any]:
-        """Remove an active cleaned id and make its numeric slot reusable."""
+        """Retire an active cleaned ID without ever releasing its numeric slot."""
         clean_id = _id_from_slug(clean_slug, width=self.width)
         with _locked_file(self.path):
             self.payload = self._load()
@@ -296,7 +299,9 @@ class CleanedBookRegistry:
         books = self.payload.get("books", {})
         return [
             copy.deepcopy(entry)
-            for _, entry in sorted(books.items(), key=lambda item: int(item[0]))
+            for _, entry in sorted(
+                books.items(), key=lambda item: (content_id_number(item[0]), item[0])
+            )
         ]
 
     def active_entries_by_raw_slug(self) -> dict[str, dict[str, Any]]:
@@ -327,8 +332,9 @@ class CleanedBookRegistry:
 
     def raw_reference(self, source: Any, *, source_signature: str) -> dict[str, Any]:
         index_payload = _load_json(Path(source.source_dir) / "index.json")
-        raw_slug = (
-            index_payload.get("book_slug")
+        raw_slug = canonical_book_slug(
+            index_payload.get("content_id")
+            or index_payload.get("book_slug")
             or index_payload.get("story_slug")
             or canonical_book_slug(source.book_id)
         )
@@ -339,7 +345,8 @@ class CleanedBookRegistry:
         index_path = Path(source.source_dir) / "index.json"
 
         raw: dict[str, Any] = {
-            "raw_book_id": str(source.book_id),
+            "content_id": raw_slug,
+            "raw_book_id": raw_slug,
             "raw_book_slug": str(raw_slug),
             "raw_path": raw_path,
             "raw_primary_source": primary_source,
@@ -399,8 +406,32 @@ class CleanedBookRegistry:
         return _id_from_slug(raw_slug, width=self.width)
 
     def _assert_clean_slot_available_unlocked(self, clean_id: str, raw: dict[str, Any]) -> None:
-        existing = self.payload.get("books", {}).get(clean_id)
+        books = self.payload.get("books", {})
+        existing = books.get(clean_id)
         if existing is None:
+            target_number = content_id_number(clean_id)
+            equivalent_keys = {
+                str(target_number),
+                f"{target_number:0{self.width}d}",
+            }
+            try:
+                equivalent_keys.add(canonical_content_id(target_number))
+            except ValueError:
+                pass
+            equivalent_keys.discard(clean_id)
+            conflicting_keys = sorted(
+                equivalent_keys.intersection(books)
+                | equivalent_keys.intersection(self.payload.get("deleted", {}))
+            )
+            if clean_id in self.payload.get("deleted", {}):
+                conflicting_keys.insert(0, clean_id)
+            if conflicting_keys:
+                raise ValueError(
+                    "Cleaned registry logical id collision: "
+                    f"clean_id={clean_id!r} shares numeric id {target_number} with "
+                    f"legacy slot(s) {conflicting_keys!r}; "
+                    "apply an explicit legacy-to-canonical reindex before registering it."
+                )
             return
         existing_raw = existing.get("raw", {})
         existing_slug = existing_raw.get("raw_book_slug")
@@ -454,6 +485,7 @@ class CleanedBookRegistry:
         books = self.payload.setdefault("books", {})
         entry = books.get(clean_id)
         if entry is None:
+            self._assert_clean_slot_available_unlocked(clean_id, raw)
             entry = self._new_entry(
                 clean_id,
                 raw,
@@ -461,7 +493,9 @@ class CleanedBookRegistry:
                 clean_slug=clean_slug,
             )
             books[clean_id] = entry
-            self.payload["last_id"] = max(int(self.payload.get("last_id", 0)), int(clean_id))
+            self.payload["last_id"] = max(
+                int(self.payload.get("last_id", 0)), content_id_number(clean_id)
+            )
             self._append_event("replace-create", entry)
             return entry
 

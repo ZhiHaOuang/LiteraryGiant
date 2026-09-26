@@ -6,7 +6,7 @@ hardmodel accepts two input layouts::
         TextM/平行万宙.txt              ← one file, all chapters
 
     Whole-book mode (canonical)
-        Library/TaciturnRaw/novels_raw/book_0001/
+        Library/TaciturnRaw/01_RawData/20_qita/id000001/
             source.txt                  ← one file, all chapters
 
     Per-chapter mode (new)
@@ -17,7 +17,7 @@ hardmodel accepts two input layouts::
             ...
 
     Per-chapter mode (canonical)
-        Library/TaciturnRaw/novels_raw/book_0001/
+        Library/TaciturnRaw/01_RawData/20_qita/id000001/
             chapters/
                 index.json               ← chapter manifest (optional)
                 chapter_0001.txt
@@ -36,7 +36,12 @@ import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from shared import normalize_fs_name
+from shared import (
+    canonical_book_slug,
+    canonical_content_id,
+    is_unified_content_id,
+    normalize_fs_name,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -74,9 +79,14 @@ class BookSource:
     @property
     def book_id(self) -> str:
         normalized = normalize_fs_name(self.book_id_hint or self.title)
-        if normalized.startswith("book_") and len(normalized) > 5:
-            return normalized[5:]
-        return normalized
+        try:
+            return canonical_book_slug(normalized)
+        except ValueError as exc:
+            raise ValueError(
+                "Hardmodel input has no canonical content ID; register it in "
+                "01_RawData before inference: "
+                f"{self.source_dir}"
+            ) from exc
 
     @property
     def has_chapters(self) -> bool:
@@ -116,17 +126,53 @@ def resolve_input(input_path: str | Path) -> list[BookSource]:
         raise ValueError(f"Unsupported file type: {path.suffix}")
 
     # It's a directory — look inside
-    return _resolve_directory(path)
+    sources = _resolve_directory(path)
+    _assert_unique_unified_ids(sources, input_path=path)
+    return sources
 
 
 def _resolve_whole_book(txt_path: Path) -> BookSource:
-    title = txt_path.stem
+    stem = txt_path.stem
+    archive_match = _UNIFIED_ARCHIVE_NAME_RE.match(stem)
+    title = _archive_title_from_stem(stem, archive_match) if archive_match else stem
     return BookSource(
         mode="whole",
         title=title,
         source_dir=txt_path.parent,
+        book_id_hint=(archive_match.group("content_id").lower() if archive_match else None),
         chapters=[ChapterSource(source_path=txt_path, order=1, title=title)],
+        content_type="content" if archive_match else "book",
     )
+
+
+def _resolve_flat_archive_files(txt_files: list[Path]) -> list[BookSource] | None:
+    """Resolve canonical ``CC_idNNNNNN_...txt`` files as separate works.
+
+    Historically a directory containing many TXT files was interpreted as one
+    per-chapter book.  Category directories in the unified archive contain one
+    whole book per TXT, so their explicit identifier prefix is the safe signal
+    that lets hardmodel consume a category (or a complete archive root)
+    without merging unrelated works.
+    """
+
+    if not txt_files:
+        return None
+    archive_files = [
+        path for path in txt_files if _UNIFIED_ARCHIVE_NAME_RE.match(path.stem)
+    ]
+    if not archive_files:
+        return None
+    archive_file_set = set(archive_files)
+    if len(archive_files) != len(txt_files):
+        unexpected = sorted(
+            path.name for path in txt_files if path not in archive_file_set
+        )
+        preview = ", ".join(unexpected[:5])
+        raise ValueError(
+            "Refusing to interpret a mixed unified-archive directory as one "
+            f"per-chapter book; non-canonical TXT: {preview}"
+        )
+    return [_resolve_whole_book(path) for path in sorted(txt_files, key=lambda item: item.name)]
 
 
 def _resolve_canonical_whole_book(dir_path: Path, txt_path: Path) -> BookSource:
@@ -139,7 +185,7 @@ def _resolve_canonical_whole_book(dir_path: Path, txt_path: Path) -> BookSource:
         source_dir=dir_path,
         book_id_hint=book_id_hint,
         chapters=[ChapterSource(source_path=txt_path, order=1, title=title)],
-        content_type=str(payload.get("content_type") or "book"),
+        content_type=str(payload.get("content_type") or "content"),
         processing_profile=str(payload.get("processing_profile") or "longform_book"),
     )
 
@@ -147,7 +193,12 @@ def _resolve_canonical_whole_book(dir_path: Path, txt_path: Path) -> BookSource:
 def _resolve_canonical_story(dir_path: Path, txt_path: Path) -> BookSource:
     payload = _index_payload(dir_path)
     title = str(payload.get("title") or dir_path.name)
-    story_slug = str(payload.get("story_slug") or payload.get("book_slug") or dir_path.name)
+    story_slug = str(
+        payload.get("content_id")
+        or payload.get("story_slug")
+        or payload.get("book_slug")
+        or dir_path.name
+    )
     return BookSource(
         mode="whole",
         title=title,
@@ -178,7 +229,8 @@ def _resolve_per_chapter_dir(dir_path: Path, *, title: str | None = None) -> Boo
             payload = json.loads(index_path.read_text(encoding="utf-8"))
             book_title = payload.get("title", book_title)
             book_id_hint = str(
-                payload.get("book_id")
+                payload.get("content_id")
+                or payload.get("book_id")
                 or payload.get("story_slug")
                 or payload.get("book_slug")
                 or book_id_hint
@@ -198,6 +250,12 @@ def _resolve_per_chapter_dir(dir_path: Path, *, title: str | None = None) -> Boo
                     logger.warning("Skipping chapter entry %s without file_name in %s", entry_index, index_path)
         except json.JSONDecodeError as exc:
             raise ValueError(f"Could not parse index.json in {dir_path}") from exc
+
+    try:
+        canonical_id = canonical_book_slug(book_id_hint)
+    except ValueError:
+        canonical_id = ""
+    default_content_type = "content" if canonical_id else "book"
 
     # Discover .txt files
     txt_files = sorted(
@@ -268,7 +326,9 @@ def _resolve_per_chapter_dir(dir_path: Path, *, title: str | None = None) -> Boo
         source_dir=dir_path,
         chapters=chapters,
         book_id_hint=book_id_hint,
-        content_type=str(_index_payload(dir_path).get("content_type") or "book"),
+        content_type=str(
+            _index_payload(dir_path).get("content_type") or default_content_type
+        ),
         processing_profile=str(_index_payload(dir_path).get("processing_profile") or "longform_book"),
     )
 
@@ -280,8 +340,17 @@ def _resolve_directory(dir_path: Path) -> list[BookSource]:
         return [_resolve_canonical_story(dir_path, canonical_story)]
 
     # Check if dir has .txt files directly → per-chapter mode, single book
-    direct_txts = list(dir_path.glob("*.txt"))
+    # Human-readable corpus catalogues intentionally live next to category
+    # trees but are metadata, never chapters or whole books.
+    direct_txts = [
+        path
+        for path in dir_path.glob("*.txt")
+        if path.name not in {"目录.txt", "总目录.txt"}
+    ]
     if direct_txts:
+        archive_books = _resolve_flat_archive_files(direct_txts)
+        if archive_books is not None:
+            return archive_books
         canonical_source = dir_path / "source.txt"
         if canonical_source.exists() and len(direct_txts) == 1:
             return [_resolve_canonical_whole_book(dir_path, canonical_source)]
@@ -292,12 +361,30 @@ def _resolve_directory(dir_path: Path) -> list[BookSource]:
         return [_resolve_per_chapter_dir(canonical_chapter_dir, title=dir_path.name)]
 
     # Check for subdirectories → each is a book
-    subdirs = sorted(d for d in dir_path.iterdir() if d.is_dir() and not d.name.startswith("."))
+    subdirs = sorted(
+        d
+        for d in dir_path.iterdir()
+        if d.is_dir()
+        and not d.name.startswith(".")
+        and d.name not in {"_migration", "_catalogs", "_plan"}
+    )
     if subdirs:
         books: list[BookSource] = []
         for subdir in subdirs:
             try:
-                books.append(_resolve_directory_entry(subdir))
+                direct_children = [
+                    path
+                    for path in subdir.glob("*.txt")
+                    if path.name not in {"目录.txt", "总目录.txt"}
+                ]
+                flat_books = _resolve_flat_archive_files(direct_children)
+                if flat_books is not None:
+                    books.extend(flat_books)
+                else:
+                    # Category containers add one stable machine-label level
+                    # above idNNNNNN. Recursing also preserves all legacy
+                    # one-directory-per-book layouts.
+                    books.extend(_resolve_directory(subdir))
             except FileNotFoundError:
                 logger.warning("Skipping empty or unrecognised directory: %s", subdir)
         if not books:
@@ -341,7 +428,12 @@ def _title_from_index(dir_path: Path) -> str | None:
 def _book_id_from_index(dir_path: Path) -> str | None:
     """Try to read the canonical book id/slug from ``index.json`` in *dir_path*."""
     payload = _index_payload(dir_path)
-    value = payload.get("book_id") or payload.get("story_slug") or payload.get("book_slug")
+    value = (
+        payload.get("content_id")
+        or payload.get("book_id")
+        or payload.get("story_slug")
+        or payload.get("book_slug")
+    )
     return str(value) if value else None
 
 
@@ -364,6 +456,41 @@ def _index_payload(dir_path: Path) -> dict:
 _CHAPTER_NO_RE = re.compile(r"第\s*([0-9零一二三四五六七八九十百千万]+)\s*[章节回]")
 _ORDER_RE = re.compile(r"chapter[_-]?(\d+)", re.IGNORECASE)
 _STRIP_SUFFIX_RE = re.compile(r"\.(txt|json)$", re.IGNORECASE)
+_UNIFIED_ARCHIVE_NAME_RE = re.compile(
+    r"^(?P<category>\d{2})_(?P<content_id>id\d{6})(?:_(?P<label>.+))?$",
+    re.IGNORECASE,
+)
+
+
+def _archive_title_from_stem(stem: str, match: re.Match[str]) -> str:
+    """Best-effort title extraction from ``CC_idNNNNNN_书名_作者[_vN]``."""
+
+    label = str(match.group("label") or "").strip("_")
+    label = re.sub(r"_v\d+$", "", label, flags=re.IGNORECASE)
+    title, separator, _author = label.rpartition("_")
+    return (title if separator and title else label) or stem
+
+
+def _assert_unique_unified_ids(
+    sources: list[BookSource],
+    *,
+    input_path: Path,
+) -> None:
+    """Fail before processing if two source files target one canonical output."""
+
+    by_id: dict[str, Path] = {}
+    for source in sources:
+        content_id = source.book_id
+        if not is_unified_content_id(content_id):
+            continue
+        canonical = canonical_content_id(content_id)
+        previous = by_id.get(canonical)
+        if previous is not None and previous != source.primary_source:
+            raise ValueError(
+                f"Duplicate unified content id {canonical} under {input_path}: "
+                f"{previous} and {source.primary_source}"
+            )
+        by_id[canonical] = source.primary_source
 
 
 def _title_from_filename(path: Path) -> str:

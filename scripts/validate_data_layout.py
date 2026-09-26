@@ -14,6 +14,8 @@ from shared import (
     TACITURN_NOVELS_CLEANED_ROOT,
     TACITURN_NOVELS_RAW_ROOT,
     TACITURN_STORIES_RAW_ROOT,
+    canonical_book_slug,
+    is_unified_content_id,
 )
 from shared.artifact_manifest import (
     ArtifactManifestError,
@@ -32,21 +34,36 @@ def read_json(path: Path) -> dict[str, Any]:
 
 
 def book_slug(book_id: str) -> str:
-    value = str(book_id).strip()
-    if value.startswith("book_"):
-        return value
-    return f"book_{value}"
+    return canonical_book_slug(str(book_id).strip())
+
+
+def _derived_content_id(directory_name: str) -> str:
+    return canonical_book_slug(directory_name)
 
 
 def iter_book_dirs(root: Path, book_id: str | None) -> list[Path]:
     if book_id:
         target = root / book_slug(book_id)
         return [target] if target.exists() else []
-    return sorted(path for path in root.glob("book_*") if path.is_dir())
+    if not root.is_dir():
+        return []
+    return sorted(
+        path
+        for path in root.iterdir()
+        if path.is_dir()
+        and is_unified_content_id(path.name)
+    )
 
 
 def iter_story_dirs(root: Path) -> list[Path]:
-    return sorted(path for path in root.glob("story_*") if path.is_dir())
+    if not root.is_dir():
+        return []
+    return sorted(
+        path
+        for path in root.iterdir()
+        if path.is_dir()
+        and is_unified_content_id(path.name)
+    )
 
 
 def collect_chapter_ids(book_dir: Path, stage_name: str, errors: list[str]) -> set[str]:
@@ -72,7 +89,7 @@ def collect_chapter_ids(book_dir: Path, stage_name: str, errors: list[str]) -> s
 
 
 def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -> None:
-    raw_root = TACITURN_NOVELS_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_raw"
+    raw_root = TACITURN_NOVELS_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "01_RawData"
     for book_dir in iter_book_dirs(raw_root, book_id):
         source = book_dir / "source.txt"
         metadata = book_dir / "metadata.json"
@@ -80,9 +97,9 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
         chapter_files = sorted(book_dir.glob("chapter_*.txt"))
         if source.exists():
             if not metadata.exists() and not index.exists():
-                errors.append(f"novels_raw: missing metadata.json or index.json in {book_dir}")
+                errors.append(f"01_RawData: missing metadata.json or index.json in {book_dir}")
                 continue
-            print(f"[OK] novels_raw: {book_dir}")
+            print(f"[OK] 01_RawData: {book_dir}")
             continue
         if index.exists() and chapter_files:
             try:
@@ -92,7 +109,7 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
                 continue
             manifest = payload.get("chapters") or []
             if not isinstance(manifest, list):
-                errors.append(f"novels_raw: chapters must be a list in {index}")
+                errors.append(f"01_RawData: chapters must be a list in {index}")
                 continue
             indexed_files = {
                 as_text(entry.get("file_name"))
@@ -102,28 +119,28 @@ def validate_raw_text(data_root: Path, book_id: str | None, errors: list[str]) -
             actual_files = {path.name for path in chapter_files}
             missing = sorted(indexed_files - actual_files)
             if missing:
-                errors.append(f"novels_raw: {book_dir} misses indexed chapter files: {missing[:5]}")
+                errors.append(f"01_RawData: {book_dir} misses indexed chapter files: {missing[:5]}")
                 continue
             if not indexed_files:
-                errors.append(f"novels_raw: no chapter files listed in {index}")
+                errors.append(f"01_RawData: no chapter files listed in {index}")
                 continue
-            print(f"[OK] novels_raw: {book_dir} ({len(indexed_files)} indexed chapters)")
+            print(f"[OK] 01_RawData: {book_dir} ({len(indexed_files)} indexed chapters)")
             continue
-        errors.append(f"novels_raw: missing source.txt or indexed chapter_*.txt files in {book_dir}")
+        errors.append(f"01_RawData: missing source.txt or indexed chapter_*.txt files in {book_dir}")
 
 
 def validate_raw_stories(data_root: Path, errors: list[str]) -> None:
-    story_root = TACITURN_STORIES_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "stories_raw"
+    story_root = TACITURN_STORIES_RAW_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "00_Stories"
     for story_dir in iter_story_dirs(story_root):
         story = story_dir / "story.txt"
         index = story_dir / "index.json"
         if not story.exists():
-            errors.append(f"stories_raw: missing story.txt in {story_dir}")
+            errors.append(f"00_Stories: missing story.txt in {story_dir}")
             continue
         if not index.exists():
-            errors.append(f"stories_raw: missing index.json in {story_dir}")
+            errors.append(f"00_Stories: missing index.json in {story_dir}")
             continue
-        print(f"[OK] stories_raw: {story_dir}")
+        print(f"[OK] 00_Stories: {story_dir}")
 
 
 def validate_plots(
@@ -140,7 +157,7 @@ def validate_plots(
             continue
         index = read_json(index_path)
         metadata = index.get("book_metadata") if isinstance(index.get("book_metadata"), dict) else {}
-        resolved_book_id = as_text(metadata.get("book_id")) or book_dir.name.removeprefix("book_")
+        resolved_book_id = as_text(metadata.get("book_id")) or _derived_content_id(book_dir.name)
         valid_chapter_ids = feature_ids_by_book.get(resolved_book_id, set())
         manifest = index.get("plot_manifest") or index.get("cluster_manifest") or []
         if not isinstance(manifest, list):
@@ -190,22 +207,22 @@ def validate_layout(data_root: Path, book_id: str | None) -> int:
         validate_raw_stories(data_root, errors)
 
     chapter_ids_by_book: dict[str, set[str]] = {}
-    cleaned_root = TACITURN_NOVELS_CLEANED_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_cleaned"
+    cleaned_root = TACITURN_NOVELS_CLEANED_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "02_CleanedData"
     for book_dir in iter_book_dirs(cleaned_root, book_id):
-        ids = collect_chapter_ids(book_dir, "novels_cleaned", errors)
+        ids = collect_chapter_ids(book_dir, "02_CleanedData", errors)
         if ids:
-            chapter_ids_by_book[book_dir.name.removeprefix("book_")] = ids
+            chapter_ids_by_book[_derived_content_id(book_dir.name)] = ids
 
     feature_ids_by_book: dict[str, set[str]] = {}
-    chapter_root = TACITURN_NOVELS_CHAPTER_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "novels_chapter"
+    chapter_root = TACITURN_NOVELS_CHAPTER_ROOT if data_root == DATA_ROOT else data_root / "TaciturnRaw" / "03_ChapterAnalysis"
     for book_dir in iter_book_dirs(chapter_root, book_id):
-        ids = collect_chapter_ids(book_dir, "novels_chapter", errors)
-        resolved_book_id = book_dir.name.removeprefix("book_")
+        ids = collect_chapter_ids(book_dir, "03_ChapterAnalysis", errors)
+        resolved_book_id = _derived_content_id(book_dir.name)
         feature_ids_by_book[resolved_book_id] = ids
         missing_features = sorted(chapter_ids_by_book.get(resolved_book_id, set()) - ids)
         if missing_features:
             warnings.append(
-                f"novels_chapter: {book_dir} misses {len(missing_features)} chapter ids present in novels_cleaned"
+                f"03_ChapterAnalysis: {book_dir} misses {len(missing_features)} chapter ids present in 02_CleanedData"
             )
 
     validate_plots(data_root, book_id, feature_ids_by_book, errors)
