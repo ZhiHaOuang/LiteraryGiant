@@ -43,5 +43,9 @@
   "git.decorations.enabled": true,
   "git.autoRepositoryDetection": "openEditors",
   "git.untrackedChanges": "hidden",
-  "git.repositoryScanMaxDepth": 1
+  "git.repositoryScanMaxDepth": 1,
+  "literarygiant.backend": "codex",
+  "literarygiant.pythonPath": "/opt/conda/envs/LitIsLand/bin/python",
+  "literarygiant.runtimeManifest": "/opt/conda/envs/LitIsLand/lg-runtime/rust-v0.154.0/runtime.json",
+  "literarygiant.bookPath": "Projects/BeyondTheTide"
 }
