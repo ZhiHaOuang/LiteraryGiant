@@ -1,0 +1,4 @@
+# Run from the repository root. Constraints record the tested Python 3.12 baseline.
+-c requirements/constraints-python312.txt
+-e .[human-export]
+-e ./LiteraryAgent/lg-cli

@@ -1,0 +1,202 @@
+{
+  "date": "2026-10-18",
+  "platform": "Linux x86_64",
+  "python": "3.12.13",
+  "node": "20.18.1",
+  "npm": "10.8.2",
+  "environment": "LitIsLand isolated source snapshot and fresh Python venv without system site packages",
+  "installation": {
+    "fresh_requirements_install": "passed",
+    "pip_check": "passed",
+    "runtime_constraints": 45,
+    "gpu_packages_installed": false
+  },
+  "checks": [
+    {
+      "name": "parent-python",
+      "kind": "python",
+      "exit_code": 0,
+      "tests": 222,
+      "skipped": 0,
+      "seconds": 13.929
+    },
+    {
+      "name": "agent-python-1",
+      "kind": "python",
+      "exit_code": 0,
+      "tests": 205,
+      "skipped": 0,
+      "seconds": 121.709
+    },
+    {
+      "name": "agent-python-2",
+      "kind": "python",
+      "exit_code": 0,
+      "tests": 279,
+      "skipped": 0,
+      "seconds": 235.654
+    },
+    {
+      "name": "agent-python-3",
+      "kind": "python",
+      "exit_code": 0,
+      "tests": 251,
+      "skipped": 0,
+      "seconds": 317.575
+    },
+    {
+      "name": "agent-python-4",
+      "kind": "python",
+      "exit_code": 0,
+      "tests": 247,
+      "skipped": 0,
+      "seconds": 305.155
+    },
+    {
+      "name": "npm-install",
+      "kind": "install",
+      "exit_code": 0,
+      "seconds": 183.044
+    },
+    {
+      "name": "typecheck",
+      "kind": "typecheck",
+      "exit_code": 0,
+      "seconds": 37.434
+    },
+    {
+      "name": "extension-unit",
+      "kind": "node",
+      "exit_code": 0,
+      "tests": 55,
+      "skipped": 0,
+      "pass": 55,
+      "fail": 0,
+      "seconds": 22.366
+    },
+    {
+      "name": "extension-build",
+      "kind": "build",
+      "exit_code": 0,
+      "seconds": 4.475
+    },
+    {
+      "name": "extension-integration",
+      "kind": "node",
+      "exit_code": 0,
+      "tests": 14,
+      "skipped": 0,
+      "pass": 14,
+      "fail": 0,
+      "seconds": 300.484
+    },
+    {
+      "name": "project-cli",
+      "kind": "smoke",
+      "exit_code": 0,
+      "seconds": 1.038
+    },
+    {
+      "name": "project-data-cli",
+      "kind": "smoke",
+      "exit_code": 0,
+      "seconds": 0.252
+    },
+    {
+      "name": "project-core-pin",
+      "kind": "identity",
+      "exit_code": 0,
+      "seconds": 0.504
+    }
+  ],
+  "python_test_coverage": {
+    "parent": 222,
+    "agent": 982,
+    "agent_module_groups": 4,
+    "group_overlap": false
+  },
+  "initial_failure": {
+    "check": "agent-python-2",
+    "test": "test_native_scoped_run_uses_real_mcp_and_separate_creative_approval",
+    "reproduction": "reproduced alone; run still active before approval on cold MCP startup",
+    "fix": "test-only monotonic approval wait up to 10 seconds instead of about 1 second",
+    "regression": "all 8 module tests and affected group rerun; original failure logs retained privately",
+    "same_issue_second_module": "test_narrative_knowledge_tools approval wait; complete module rerun after same test-only fix"
+  },
+  "memory_guard_history": {
+    "interrupted": "agent group 3 before completion; no assertion failure",
+    "recovery": "remaining groups rerun with one Python process per module; clean unmapped file cache accounted separately",
+    "partial_run_counted_as_success": false
+  },
+  "runtime": {
+    "tag": "rust-v0.154.0",
+    "commit": "6b9826e3aa83b1a5947db50f4332cb9c65f1b340",
+    "kind": "upstream-unpatched",
+    "manifest_schema": 1,
+    "binary_sha256": "3188814c35471432d4123203e0eb38e5bddc60226e3d7ddf0e59e649ea140022"
+  },
+  "data": {
+    "sqlite_backups": 10,
+    "sqlite_integrity_checks": "passed",
+    "conversation_sessions": 67,
+    "visible_text_messages": 9242,
+    "credential_pattern_redactions": 13,
+    "private_payload_uploaded_to_github": false,
+    "book_runtime_visible_sessions": 1,
+    "current_web_chat_user_excerpts": 4
+  },
+  "limits": [
+    "macOS ARM64 hardware/runtime not executed here",
+    "CUDA/vLLM and weights not installed or tested",
+    "nvidia-smi returned No devices were found; legacy base GPU packages only inventoried",
+    "real external model quality and long-form literary quality not evaluated",
+    "browser/VS Code desktop acceptance not rerun",
+    "Conda solver not executed; pip requirements tested",
+    "only readable project-visible text conversations exported; current web chat has no matching local session"
+  ],
+  "standalone_app_server_sha256": "f54a718e89a051d5ce1503cf5e4010a5ef8cb0e96065741d398f9b81416e02c3",
+  "cgroup": {
+    "limit_bytes": 2147483648,
+    "oom_events": 0,
+    "oom_kills": 0
+  },
+  "nonsemantic_cleanup": {
+    "file": "LiteraryAgent/lg-cli/lg_cli/codex_events.py",
+    "change": "remove redundant EOF newline",
+    "verification": "AST identical including source location attributes"
+  },
+  "patch_whitespace_exception": "Preserve required unified-diff context spaces in core/patches/0001-cargo-workspace-release-versions.patch; patch parsed successfully with git apply --stat.",
+  "actual_project_validation": {
+    "requirements_install": "passed",
+    "pip_check": "passed",
+    "checks": [
+      {
+        "name": "project-cli",
+        "kind": "smoke",
+        "exit_code": 0,
+        "seconds": 2.514
+      },
+      {
+        "name": "project-data-cli",
+        "kind": "smoke",
+        "exit_code": 0,
+        "seconds": 0.505
+      },
+      {
+        "name": "project-core-pin",
+        "kind": "identity",
+        "exit_code": 0,
+        "seconds": 1.007
+      },
+      {
+        "name": "targeted-python",
+        "kind": "python",
+        "exit_code": 0,
+        "tests": 16,
+        "skipped": 0,
+        "seconds": 23.608
+      }
+    ],
+    "regression_tests_are_subset_of_agent_coverage": true
+  }
+}

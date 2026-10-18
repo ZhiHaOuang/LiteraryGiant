@@ -77,3 +77,14 @@ test_fetch*.py
 *token*
 *key*
 scripts/api_env.sh
+
+# Machine settings and private handoff artifacts stay outside public Git.
+/.vscode/settings.json
+/ReferenceLibrary/
+/handoff-private/
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
