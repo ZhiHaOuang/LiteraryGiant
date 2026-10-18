@@ -42,7 +42,9 @@ GitHub 保存代码、测试、配置模板、脱敏说明和原有占位文件�
 
 ## 私有迁移包
 
-持久化交接目录：`/root/private_data/LiteraryGiant-handoff-20261018/`。最终 `private-migration.tar.gz` 包含作品/状态快照、SQLite 一致性备份、可访问的 Codex 可见消息导出、机器路径清单及私有恢复说明。它不包含认证缓存、API 密钥、模型权重或 Library 语料。`MANIFEST.json` 记录导出范围、校验、排除项与最终提交；同目录 SHA-256 文件用于下载核对。
+持久化交接目录：`/root/private_data/LiteraryGiant/handoff-private/20261018/`，位于当前项目内，由 `.gitignore` 排除。最终 `private-migration.tar.gz` 包含作品/状态快照、SQLite 一致性备份、可访问的 Codex 可见消息导出、机器路径清单及私有恢复说明。它不包含认证缓存、API 密钥、模型权重或 Library 语料。`MANIFEST.json` 记录导出范围、校验、排除项与最终提交；同目录 SHA-256 文件用于下载核对。
+
+其中 67 份历史日志来自工作目录属于本项目的历次 Codex 会话，范围超过本次聊天；导出只保留可见消息。本次网页聊天没有对应本地完整日志，仅保存交接摘要和可见用户原话摘录。这些历史供按需查阅，无需全部加载到新会话。
 
 另外保留交接前的源码包、两个 Git bundle 和工作树补丁，以便恢复未提交基线。它们留在服务器，不随代码上传。
 

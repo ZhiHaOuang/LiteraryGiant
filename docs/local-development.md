@@ -108,8 +108,8 @@ python -m scripts.validate_data_layout --help
 在 Mac 上，使用你已经配置好的 SSH 地址替换下面的 `SERVER`；无需把地址或私钥写入仓库：
 
 ```bash
-scp SERVER:/root/private_data/LiteraryGiant-handoff-20261018/private-migration.tar.gz ~/Downloads/
-scp SERVER:/root/private_data/LiteraryGiant-handoff-20261018/SHA256SUMS ~/Downloads/
+scp SERVER:/root/private_data/LiteraryGiant/handoff-private/20261018/private-migration.tar.gz ~/Downloads/
+scp SERVER:/root/private_data/LiteraryGiant/handoff-private/20261018/SHA256SUMS ~/Downloads/
 ```
 
 同目录也可单独下载 `MANIFEST.json`。在下载目录校验迁移包，并解压到新建空目录：
