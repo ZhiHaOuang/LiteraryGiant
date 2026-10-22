@@ -3,21 +3,21 @@
   "date": "2026-10-22",
   "branch": "review-delivery-20261022",
   "parentBase": "a9a84393d99041ddd95979d78dd00f893607dfcc",
-  "productCommit": "5fcb8d786901b68d0cf6f54b2204ca424d04ce26",
-  "productTag": "lg-extension-trim-20261022",
+  "productCommit": "627c5ffd2db5c54fd5995cc7e58ddfdd110bc8ba",
+  "productTag": "lg-zhipu-first-round-20261022",
   "packageVersion": "0.3.0",
   "remotePublished": true,
   "remoteFailure": null,
   "productBundle": {
-    "name": "LiteraryAgent-reviewed-20261022.bundle",
-    "sha256": "652dac4eb61fc28026ac6a5c0c43b79dfc523009b45647c60ff42fc2d3af696e",
+    "name": "LiteraryAgent-quality-20261022.bundle",
+    "sha256": "00dbff9df1a043f802bc12440e44e4ed0048088ac82d23a91d68f21735a010db",
     "prerequisite": "6b22bc47c87aecac99593ca61a1341f1c7e0c720",
     "verified": true
   },
   "productValidation": "../LiteraryAgent/docs/validation-20261022.json",
   "rootTestsRerun": false,
   "rootChangeScope": "documentation and gitlink only",
-  "paidModelCalls": 0,
+  "paidModelCalls": 19,
   "productBaselineCommit": "8b1db9e64dc962ad21fd57018d2bc74d79fd113c",
   "remotePublicationScope": "product review branch and all three tags verified; parent publication verified separately after final commit",
   "historicalRemoteFailure": "Initial HTTPS403 from a different logged-in account; resolved using existing author SSH identity without credential changes",
@@ -36,13 +36,20 @@
       "commit": "5fcb8d786901b68d0cf6f54b2204ca424d04ce26",
       "tag": "lg-extension-trim-20261022",
       "validation": "../LiteraryAgent/docs/validation-20261022-trim.json"
+    },
+    {
+      "commit": "627c5ffd2db5c54fd5995cc7e58ddfdd110bc8ba",
+      "tag": "lg-zhipu-first-round-20261022",
+      "validation": "../LiteraryAgent/docs/evaluations/zhipu-first-round-20261022.json"
     }
   ],
   "latestPython": {
     "passed": 1033,
     "skipped": 43,
     "failed": 0,
-    "evidence": "isolated full 128-module execution"
+    "evidence": "isolated full 128-module execution",
+    "bindingCommit": "a33f4a58fe6ac37ab05a5d88a8c0889bbe434ac9",
+    "coversCurrentQualityHarness": false
   },
   "actualProject": {
     "pythonTargeted": 87,
@@ -64,13 +71,49 @@
   },
   "qualityExperiment": {
     "provider": "Zhipu",
-    "candidateModel": "glm-5.3",
-    "modelAvailabilityProbed": false,
-    "paidModelCalls": 0,
-    "suggestedBudgetCNY": 5,
-    "budgetApproved": false,
-    "generations": 8,
-    "maximumAdditionalProtocolProbes": 2,
+    "models": [
+      "glm-4.5-air",
+      "glm-4.6v"
+    ],
+    "defaultModel": "glm-4.5-air",
+    "profilesConfigured": true,
+    "budgetApprovedCNY": 5,
+    "modelCalls": 19,
+    "comparisonAttempts": 16,
+    "probeCalls": 3,
+    "usableCandidates": 12,
+    "hostSchemaRejected": 4,
+    "reportedInputTokens": 19300,
+    "reportedOutputTokens": 21405,
+    "catalogueEstimateCNY": "0.0972110",
+    "conservativeHeldCNY": "1.9966408",
+    "actualCashDebitCNY": null,
+    "resourceRedemptionVerified": false,
+    "authorReview": "pending",
+    "formalBooksChanged": false,
     "plan": "quality-experiment-20261022.md"
+  },
+  "previousProductCommit": "5fcb8d786901b68d0cf6f54b2204ca424d04ce26",
+  "priorProductBundle": {
+    "name": "LiteraryAgent-reviewed-20261022.bundle",
+    "sha256": "652dac4eb61fc28026ac6a5c0c43b79dfc523009b45647c60ff42fc2d3af696e",
+    "prerequisite": "6b22bc47c87aecac99593ca61a1341f1c7e0c720",
+    "verified": true
+  },
+  "modelCallsBeforeQualityExperiment": 0,
+  "qualityHarnessValidation": {
+    "initial": {
+      "commit": "8a636d004b4704fafea18a5add70c28c3babfade",
+      "isolatedTestsPassed": 29,
+      "actualProjectTestsPassed": 29
+    },
+    "accountingCorrection": {
+      "commit": "9643fa10e25df82c0ce7c084a5efd169b70d62e2",
+      "isolatedTestsPassed": 9,
+      "actualProjectTestsPassed": 9,
+      "overlapsInitial": true,
+      "realLocalhostHTTP": true,
+      "caseRuntimeSchemasPromptsUnchanged": true
+    }
   }
 }

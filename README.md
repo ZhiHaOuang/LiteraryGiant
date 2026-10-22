@@ -5,7 +5,7 @@
 ## 从这里接手（2026-10-22）
 
 - [2026-10-22 产品交付与复现](docs/delivery-20261022.md)：已推送的产品版本、R5验收、认知证据校验、连接器精简及本地bundle。
-- [同模型质量实验与预算](docs/quality-experiment-20261022.md)：智谱候选型号、首轮5元建议、配置方式与尚未执行的边界。
+- [同模型质量实验与预算](docs/quality-experiment-20261022.md)：智谱一次密钥配置、已执行的19次调用、费用估算与待作者审读的边界。
 - [完整交接与当前进度](docs/handoff.md)：已完成能力、待办、数据边界和接手顺序。
 - [Mac 开发与服务器更新](docs/local-development.md)：安装、验证、递归 clone、部署和恢复。
 - [需求与对话决策摘要](docs/conversation-context.md)：供本地 Codex 读取的脱敏上下文。
