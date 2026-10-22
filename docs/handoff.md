@@ -55,3 +55,9 @@ Claude Code 与 Codex 分开：`conversations/claude-code/` 保存 1 份可读�
 ## 给下一位 Codex 的第一条消息
 
 > 请先读取 AGENTS.md、README.md、docs/handoff.md、docs/conversation-context.md、docs/local-development.md，再读取 LiteraryAgent/AGENTS.md、docs/architecture.md 和 docs/roadmap.md。报告当前分支、父/子仓库提交、工作树状态和依赖检查结果。Mac 用于开发，服务器用于正式运行；Library/作品/凭据不在公开 GitHub 中。先确认我本次要做的任务，不自动推进所有路线图，不初始化或覆盖已有作品，不升级固定 Core。私有迁移包可在我指定的位置按需读取。
+
+## 2026-10-22 产品增量交付
+
+产品已在本地提交为 `8b1db9e64dc962ad21fd57018d2bc74d79fd113c`，标签 `lg-r5-bounded-20261022`，包版本仍为0.3.0。原43文件改动已保存，另补仓库内复现脚本与脱敏版本记录。父仓库在本地交付分支固定该产品提交。GitHub推送被403拒绝，未发布父引用；bundle与复核方式见 [本批交付](delivery-20261022.md)。后续远程同步必须先成功发布子仓库，再发布父仓库。
+
+R5选区与分歧章已用合成HTTP和真实产品入口复验；完整输入隔离、独立Kernel/Runtime发布、独立UI、真实文学质量尚未完成。旧Core基线、兼容入口、正式作品和凭据保持原边界。

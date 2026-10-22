@@ -2,12 +2,13 @@
 
 中文长篇小说的数据处理流水线与 LG 写作 Agent 工作台。当前采用 **Mac 本地开发、Linux 服务器运行** 的工作方式。
 
-## 从这里接手（2026-10-18）
+## 从这里接手（2026-10-22）
 
+- [2026-10-22 产品交付与复现](docs/delivery-20261022.md)：固定产品版本、R5验收及本地bundle；远程发布因403待处理。
 - [完整交接与当前进度](docs/handoff.md)：已完成能力、待办、数据边界和接手顺序。
 - [Mac 开发与服务器更新](docs/local-development.md)：安装、验证、递归 clone、部署和恢复。
 - [需求与对话决策摘要](docs/conversation-context.md)：供本地 Codex 读取的脱敏上下文。
-- [本次验证记录](docs/validation-20261018.json)：本次实际执行结果；历史验收见子仓库路线图。
+- [2026-10-18验证记录](docs/validation-20261018.json)：本次实际执行结果；历史验收见子仓库路线图。
 - [Codex 工作规则](AGENTS.md)：先读此文件，再读修改目录下的更具体规则。
 
 本仓库包含两个 Git 仓库：父仓库承载数据流水线；`LiteraryAgent/` 是固定提交的独立子模块，承载写作 Agent、Python CLI 与 VS Code 扩展。不要只下载 GitHub ZIP。

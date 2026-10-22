@@ -1,0 +1,21 @@
+{
+  "schema": "lg.parent-delivery.v1",
+  "date": "2026-10-22",
+  "branch": "review-delivery-20261022",
+  "parentBase": "a9a84393d99041ddd95979d78dd00f893607dfcc",
+  "productCommit": "8b1db9e64dc962ad21fd57018d2bc74d79fd113c",
+  "productTag": "lg-r5-bounded-20261022",
+  "packageVersion": "0.3.0",
+  "remotePublished": false,
+  "remoteFailure": "HTTP403: configured GitHub identity lacks repository write access",
+  "productBundle": {
+    "name": "LiteraryAgent-r5-bounded-20261022.bundle",
+    "sha256": "db5b02e32d236daee8e679ea8aae856cc518ad588203c306d0ec52cdf5f03526",
+    "prerequisite": "6b22bc47c87aecac99593ca61a1341f1c7e0c720",
+    "verified": true
+  },
+  "productValidation": "../LiteraryAgent/docs/validation-20261022.json",
+  "rootTestsRerun": false,
+  "rootChangeScope": "documentation and gitlink only",
+  "paidModelCalls": 0
+}
