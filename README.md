@@ -4,7 +4,8 @@
 
 ## 从这里接手（2026-10-22）
 
-- [2026-10-22 产品交付与复现](docs/delivery-20261022.md)：固定产品版本、R5验收及本地bundle；远程发布因403待处理。
+- [2026-10-22 产品交付与复现](docs/delivery-20261022.md)：已推送的产品版本、R5验收、认知证据校验、连接器精简及本地bundle。
+- [同模型质量实验与预算](docs/quality-experiment-20261022.md)：智谱候选型号、首轮5元建议、配置方式与尚未执行的边界。
 - [完整交接与当前进度](docs/handoff.md)：已完成能力、待办、数据边界和接手顺序。
 - [Mac 开发与服务器更新](docs/local-development.md)：安装、验证、递归 clone、部署和恢复。
 - [需求与对话决策摘要](docs/conversation-context.md)：供本地 Codex 读取的脱敏上下文。
@@ -52,6 +53,8 @@ npm run build
 ```
 
 Python 3.12、Node 20.18.1 / npm 10.8.2 是当前 Linux 验证基线。npm 使用已有 `package-lock.json`；依赖升级应独立验证。原生 macOS 实机与 ARM64 Runtime 尚未在本次 Linux 交接中验证。扩展使用方式、打包、集成测试及 Remote SSH 边界见 [开发说明](docs/local-development.md) 和 [扩展 README](LiteraryAgent/lg-vscode/README.md)。
+
+2026-10-22已补Mac上的Python／Extension／Native合成HTTP验证；固定ARM64 Core的完整依赖元数据仍受原始Cargo.lock阻断，尚未编译。当前证据与历史Linux交接分开见 [产品交付](docs/delivery-20261022.md)。
 
 ## 数据流水线
 

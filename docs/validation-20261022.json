@@ -3,19 +3,74 @@
   "date": "2026-10-22",
   "branch": "review-delivery-20261022",
   "parentBase": "a9a84393d99041ddd95979d78dd00f893607dfcc",
-  "productCommit": "8b1db9e64dc962ad21fd57018d2bc74d79fd113c",
-  "productTag": "lg-r5-bounded-20261022",
+  "productCommit": "5fcb8d786901b68d0cf6f54b2204ca424d04ce26",
+  "productTag": "lg-extension-trim-20261022",
   "packageVersion": "0.3.0",
-  "remotePublished": false,
-  "remoteFailure": "HTTP403: configured GitHub identity lacks repository write access",
+  "remotePublished": true,
+  "remoteFailure": null,
   "productBundle": {
-    "name": "LiteraryAgent-r5-bounded-20261022.bundle",
-    "sha256": "db5b02e32d236daee8e679ea8aae856cc518ad588203c306d0ec52cdf5f03526",
+    "name": "LiteraryAgent-reviewed-20261022.bundle",
+    "sha256": "652dac4eb61fc28026ac6a5c0c43b79dfc523009b45647c60ff42fc2d3af696e",
     "prerequisite": "6b22bc47c87aecac99593ca61a1341f1c7e0c720",
     "verified": true
   },
   "productValidation": "../LiteraryAgent/docs/validation-20261022.json",
   "rootTestsRerun": false,
   "rootChangeScope": "documentation and gitlink only",
-  "paidModelCalls": 0
+  "paidModelCalls": 0,
+  "productBaselineCommit": "8b1db9e64dc962ad21fd57018d2bc74d79fd113c",
+  "remotePublicationScope": "product review branch and all three tags verified; parent publication verified separately after final commit",
+  "historicalRemoteFailure": "Initial HTTPS403 from a different logged-in account; resolved using existing author SSH identity without credential changes",
+  "increments": [
+    {
+      "commit": "8b1db9e64dc962ad21fd57018d2bc74d79fd113c",
+      "tag": "lg-r5-bounded-20261022",
+      "validation": "../LiteraryAgent/docs/validation-20261022.json"
+    },
+    {
+      "commit": "a33f4a58fe6ac37ab05a5d88a8c0889bbe434ac9",
+      "tag": "lg-narrative-evidence-20261022",
+      "validation": "../LiteraryAgent/docs/validation-20261022-cognition.json"
+    },
+    {
+      "commit": "5fcb8d786901b68d0cf6f54b2204ca424d04ce26",
+      "tag": "lg-extension-trim-20261022",
+      "validation": "../LiteraryAgent/docs/validation-20261022-trim.json"
+    }
+  ],
+  "latestPython": {
+    "passed": 1033,
+    "skipped": 43,
+    "failed": 0,
+    "evidence": "isolated full 128-module execution"
+  },
+  "actualProject": {
+    "pythonTargeted": 87,
+    "frontendUnit": 57,
+    "nativeTaskPresentationIntegration": 8,
+    "coreIntegrationSkipped": 1,
+    "typecheck": true,
+    "build": true,
+    "productionArtifactsUnchangedByTrim": true
+  },
+  "rustBaseline": {
+    "pin": "6b9826e3aa83b1a5947db50f4332cb9c65f1b340",
+    "target": "aarch64-apple-darwin",
+    "fullLockedMetadataExitCode": 101,
+    "compileAttempted": false,
+    "lockChanged": false,
+    "coreChanged": false,
+    "rootCause": "unknown; original lock needs update"
+  },
+  "qualityExperiment": {
+    "provider": "Zhipu",
+    "candidateModel": "glm-5.3",
+    "modelAvailabilityProbed": false,
+    "paidModelCalls": 0,
+    "suggestedBudgetCNY": 5,
+    "budgetApproved": false,
+    "generations": 8,
+    "maximumAdditionalProtocolProbes": 2,
+    "plan": "quality-experiment-20261022.md"
+  }
 }
