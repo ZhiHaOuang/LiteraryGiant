@@ -1,0 +1,40 @@
+{
+  "schema": "lg.parent-simplification-delivery.v1",
+  "baselineParentCommit": "5c03827c00c123e91b09e24b71810a9c8247e99c",
+  "baselineProductCommit": "627c5ffd2db5c54fd5995cc7e58ddfdd110bc8ba",
+  "productFinalCommit": "5344030c4249e3a0f310fd72aa1d55bc61c9fe91",
+  "productCodeCommits": [
+    "1e3bd9b7b398eaa95a952676b75b3bcd20d30d7c",
+    "d1e768cd1c03dd2283db15333a2a58a2e5d4007c"
+  ],
+  "branch": "codex/simplify-polish-20261022",
+  "productTag": "lg-polish-simplify-20261022",
+  "parentTag": "lg-simplify-20261022",
+  "fileDeletions": [],
+  "actualPython": {
+    "passed": 178,
+    "skipped": 3,
+    "reason": "Pinned Core runtime manifest unavailable"
+  },
+  "actualExtension": {
+    "unitPassed": 57,
+    "realBackendNativeIntegrationPassed": 1,
+    "typecheck": true,
+    "build": true
+  },
+  "comparison": {
+    "requests": 8,
+    "budgetCNY": "5",
+    "catalogueEstimateCNY": "0.0399860",
+    "heldCNY": "1.1765160",
+    "cashDebitCNY": null,
+    "humanQuality": "pending; explicit P1 after constraint failure recorded"
+  },
+  "evidence": [
+    "LiteraryAgent/docs/path-inventory-20261022.json",
+    "LiteraryAgent/docs/validation-20261022-simplify.json",
+    "LiteraryAgent/docs/evaluations/polish-simplification-20261022.json"
+  ],
+  "noServerOrDesktopDeployment": true,
+  "coreModified": false
+}

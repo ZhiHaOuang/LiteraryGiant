@@ -25,3 +25,12 @@ literary auth use zhipu-vision
 ```
 
 这两条是互斥的手动切换示例，不必依次执行；默认已是Air。4.6V完整受控任务应先补契约兼容验证。初次配置或新机器操作见产品记录中的`configure_zhipu.py`，已有同名profile会拒绝覆盖。新模型实验需要新的明确样本与预算，不自动扩大本轮规模。
+
+
+## 后续：原LG与轻量LG的固定源码对照
+
+作者另行批准本轮5元；现有配置直接复用，额外密钥输入为零。两型号各P1／P2、before／after共8次真实请求，无探测、重试、付费裁判或正式采用。Air输入8534→3956 token，目录价估算0.0129712→0.0080068元；两组均2／2结构化候选且选区外逐字保持。Vision两组均0／2，尚未验收受控R5。
+
+全部8次输入18208／输出6261 token，目录价估算0.039986元，失败保留预留后总占用1.176516元，低于5元；现金、缓存和赠送包扣减仍未知。官方价格于2026-10-22重新核对。轻量P1有违反“不写抒情比喻”的明确反例，作者质量评分与返修量／时间待评，不能宣布文学质量改善。
+
+[本批交付与版本](delivery-20261022.md)、[完整实验说明](../LiteraryAgent/docs/evaluations/zhipu-first-round-20261022.md)、[逐请求结果](../LiteraryAgent/docs/evaluations/polish-simplification-20261022.json)。本机新证据在`/Users/zh/.codex/reports/LiteraryGiant-simplify-20261022/`，匿名材料为`model-run/blind-review.md`，作者表为`model-run/author-review.csv`。原首轮19次记录保留，各批不混用样本或预算。
