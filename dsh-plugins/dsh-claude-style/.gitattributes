@@ -1,0 +1,4 @@
+* text=auto eol=lf
+
+# Fonts are binary; line-ending policy and any diff rendering must not touch them.
+fonts/*.ttf binary

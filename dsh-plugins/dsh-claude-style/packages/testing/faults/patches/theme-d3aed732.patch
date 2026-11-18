@@ -1,0 +1,30 @@
+diff --git a/packages/client/src/shared/segment-control.css b/packages/client/src/shared/segment-control.css
+index 9ce0db4..15fe450 100644
+--- a/packages/client/src/shared/segment-control.css
++++ b/packages/client/src/shared/segment-control.css
+@@ -44,7 +44,10 @@ body[data-dsh-claude-style] .dsh-claude-segment:hover:not([data-active]) {
+ 
+ body[data-dsh-claude-style] .dsh-claude-segment[data-active] {
+   color: var(--dsw-alias-label-primary);
+-  background: var(--dsw-alias-bg-layer-3);
++  /* Dark lifts by white alpha: in both dark palettes the lightest layer token
++     and the group's own plate token resolve to one grey, so a layer fill would
++     paint the plate again. */
++  background: rgba(255, 255, 255, 0.14);
+ }
+ 
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-segment[data-active] {
+@@ -55,10 +58,11 @@ body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-segment[data-a
+ /* The group's sliding pill: the box the active segment wore above, which the
+    segment gives up while the pill is there. Its place and size come from the
+    item's measured box (shared/sliding-pill.css), so a wrapped group's pill
+-   covers its segment on its own line. */
++   covers its segment on its own line; its dark fill is the white alpha the
++   small variant's pill takes. */
+ body[data-dsh-claude-style] .dsh-claude-segments[data-dsh-claude-pill]::before {
+   border-radius: 7px;
+-  background: var(--dsw-alias-bg-layer-3);
++  background: rgba(255, 255, 255, 0.14);
+ }
+ 
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-segments[data-dsh-claude-pill]::before {

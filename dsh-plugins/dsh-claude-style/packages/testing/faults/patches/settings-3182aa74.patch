@@ -1,0 +1,14 @@
+diff --git a/packages/client/src/features/settings/settings.css b/packages/client/src/features/settings/settings.css
+index 385282a..afc6ca5 100644
+--- a/packages/client/src/features/settings/settings.css
++++ b/packages/client/src/features/settings/settings.css
+@@ -323,6 +323,9 @@ body[data-dsh-claude-style] .dsh-claude-settings-switch {
+   padding: 2px;
+   box-sizing: border-box;
+   border-radius: 10px;
++  /* A strict capsule: the page inherits superellipse corners from <html>, which
++     squarish the track's caps away from the knob's true circle. */
++  corner-shape: round;
+   background: var(--dsw-specific-selector);
+   transition: background-color var(--dsh-claude-timing-feedback);
+ }

@@ -1,0 +1,551 @@
+#!/usr/bin/env node
+/**
+ * verify.mjs — the one entry a test run goes through (D77).
+ *
+ * Parallel sessions share this working tree, and each of them reaching for a
+ * runner of its own is what made the machine run the same build and the same
+ * browser several times over. This file is the only place the gates are
+ * started; a session asks it and reads its answer. Development asks it for
+ * nothing: a change is carried by the build, and the gates are run together
+ * before a release (D77).
+ *
+ *   one entry  the checks, the build, the logic and mechanism specs, the
+ *              smoke, the behaviour specs and the end-to-end lane, from one
+ *              command.
+ *   staged     a gate starts as soon as what it reads exists: the checks, the
+ *              build and the spec lane answer about the sources and run
+ *              together, and the browser lanes read the build's output and
+ *              run together once it is written. What the run costs is the
+ *              slowest gate of each stage rather than their sum.
+ *   serial     `.debug/verify.lock/` holds one run at a time. A request that
+ *              arrives during a run waits for it rather than starting a second
+ *              browser, and asks for its own key again when the lock is free.
+ *              Every gate carries the cloud step's own deadline; a gate past
+ *              it has hung, and is taken down with its browsers so the lock
+ *              goes free.
+ *   reuse      a run records its verdict under the hash of the tree it read and
+ *              the gates it ran. A later request for the same pair reads that
+ *              record instead of starting anything, and says it did.
+ *   honest     the build output the browser gates read is hashed when the build
+ *              gate ends and again when the run ends: a build outside the run
+ *              takes no lock, so it can swap the page under the gates, and a
+ *              run that saw two different outputs files no verdict.
+ *   unjudged   a gate that gave no verdict answers UNJUDGED: a deadline this
+ *              file enforced, a process the system ended, a browser that would
+ *              not start, a spec suite that did not load. Such a run files no
+ *              verdict, so the next request runs it again (D77); a failed
+ *              assertion is a verdict and is filed like a pass.
+ *
+ * A verdict in the cache is one a run produced. A request whose gates were
+ * never run — another tier, a narrower selection, one file changed — is another
+ * key and runs; `--force` re-runs a key that has an answer.
+ *
+ * Usage: node scripts/verify.mjs [--quick] [--e2e] [--scenario <name>[,<name>…]]
+ *        [--case <name>[,<name>…]] [--feature <dir>[,<dir>…]] [--full]
+ *        [--no-e2e] [--force] [--help]
+ *        A bare run is the iteration tier: the checks, the build and the tests
+ *        the working tree's change reaches, at once, and nothing that starts a
+ *        browser. --quick adds the smoke's quick tier (its motion cases left
+ *        out) and every behaviour spec, --case and --feature name the smoke's
+ *        cases as they do on its own command line (naming them runs the motion
+ *        cases too) and --feature the behaviour specs of those directories,
+ *        --full walks the whole smoke and every behaviour spec, and --e2e and
+ *        --scenario add the end-to-end lane.
+ *        --no-e2e leaves the lane out of either. A request for the whole smoke
+ *        and the lane's default table together prints `请确认你正处于发布流程。`
+ *        before its gates start: that pair is the cloud's release gate.
+ *        --help prints this block and stops.
+ */
+import { execFileSync, spawn } from 'node:child_process'
+import crypto from 'node:crypto'
+import fs from 'node:fs'
+import { createRequire } from 'node:module'
+import { availableParallelism } from 'node:os'
+import path from 'node:path'
+import { filesUnder } from './shared/file-walk.mjs'
+import { changedPaths } from './shared/changed-paths.mjs'
+import { SKIPPED, TREES, treeHash } from './shared/tree-hash.mjs'
+import { HELD, LOCK, takeLock } from './shared/verify-lock.mjs'
+
+const require = createRequire(import.meta.url)
+const { UNJUDGED_EXIT } = require('../packages/testing/host-version.mjs')
+const ROOT = path.resolve(import.meta.dirname, '..')
+const CACHE = path.join(ROOT, '.debug', 'verify-cache')
+/**
+ * Vitest's own entry, resolved from the installed package: a nested copy of
+ * vitest answers the same way the hoisted one does.
+ */
+const VITEST = path.join(path.dirname(require.resolve('vitest/package.json')), 'vitest.mjs')
+/** Bumped when a recorded verdict stops meaning what this file reads it as. */
+const FORMAT = 2
+/**
+ * Where the spec lane writes its structured report, and the behaviour lane's
+ * own; both sit under `.debug/` and are read only after their gate ends.
+ */
+const UNIT_REPORT = path.join(ROOT, '.debug', 'verify', 'unit.json')
+const BEHAVIOUR_REPORT = path.join(ROOT, '.debug', 'behaviour', 'report.json')
+/**
+ * How many pages and scenarios the browser gates drive at once, as one budget
+ * for the gates sharing a stage. It follows the machine's cores and never its
+ * load, and the split it hands each gate is part of the gates' arguments, so a
+ * verdict is filed under the same key on the same machine.
+ */
+const BROWSER_JOBS = Math.max(2, Math.min(8, Math.floor(availableParallelism() / 2)))
+/** The flags a request may carry, without their dashes; the three name-taking ones carry values. */
+const FLAGS = new Set(['quick', 'full', 'e2e', 'no-e2e', 'force', 'case', 'feature', 'scenario'])
+
+/** The gates in flight, so an interrupt can take them down with this process. */
+const running = new Set()
+/** The release of the lock this process holds, or null while it holds none. */
+let holding = null
+
+const seconds = (ms) => `${(ms / 1000).toFixed(1)} s`
+const say = (line) => process.stdout.write(`${line}\n`)
+
+/** End the run over a request that cannot be honoured, before any gate starts. */
+function bad(message) {
+  console.error(`verify: ${message}`)
+  process.exit(2)
+}
+
+/** The directories the spec lane reads: what a change under them can reach a spec through. */
+const UNIT_SOURCES = ['packages/client/src', 'packages/contracts/src', 'packages/engine/src', 'packages/testing/specs']
+
+/**
+ * The spec lane's structured report: Vitest keeps its terminal reporter and
+ * writes the same run as JSON beside it, which is what tells a failed assertion
+ * from a suite that never loaded.
+ */
+const UNIT_REPORT_ARGS = ['--reporter=default', '--reporter=json', `--outputFile.json=${path.relative(ROOT, UNIT_REPORT).replace(/\\/g, '/')}`]
+
+/**
+ * The spec gate of a request (the logic and mechanism layers, D77): the whole
+ * lane, or — for the iteration tier — the specs the working tree's change reaches, which is what makes that tier answer
+ * in seconds while a session is editing. A tree with no change under the
+ * sources runs the lane whole: a bare request on a still tree still answers for
+ * every test.
+ */
+function unitGate(iteration) {
+  const changed = iteration ? changedPaths(...UNIT_SOURCES) : []
+  const run = changed.length === 0 ? ['run'] : ['related', ...changed]
+  return { id: 'unit', minutes: 15, script: VITEST, args: [...run, ...UNIT_REPORT_ARGS], report: UNIT_REPORT }
+}
+
+/**
+ * The bytes of the build output the browser gates read, or null before the
+ * build has written any. A build outside the run takes no lock, so this is
+ * what tells a run whether the page it drove is still the page its build
+ * produced.
+ */
+function libHash() {
+  const digest = crypto.createHash('sha256')
+  const lib = path.join(ROOT, 'lib')
+  // An empty extension matches every name, which is what hashing the output wants.
+  const files = filesUnder(lib, [''], SKIPPED).map((file) => path.relative(lib, file).replace(/\\/g, '/')).sort()
+  if (files.length === 0) return null
+  for (const file of files) {
+    digest.update(file)
+    digest.update('\0')
+    digest.update(crypto.createHash('sha256').update(fs.readFileSync(path.join(lib, file))).digest())
+  }
+  return digest.digest('hex')
+}
+
+/**
+ * The usage text, read off this file's own header: everything from the `Usage:`
+ * line on, so the header stays its one home.
+ */
+function usage() {
+  const header = fs.readFileSync(new URL(import.meta.url), 'utf8').match(/\/\*\*([\s\S]*?)\*\//)[1]
+  const lines = header.split('\n').map((line) => line.replace(/^\s*\*?\s?/, ''))
+  return lines.slice(lines.findIndex((line) => line.startsWith('Usage:'))).join('\n').trimEnd()
+}
+
+/** One request's own flags, read off this process's command line. */
+function parseRequest() {
+  const args = process.argv.slice(2)
+  if (args.includes('--help')) {
+    say(usage())
+    process.exit(0)
+  }
+  const values = { case: [], feature: [], scenario: [] }
+  for (let at = 0; at < args.length; at += 1) {
+    const arg = args[at]
+    const split = arg.indexOf('=')
+    const flag = (split === -1 ? arg : arg.slice(0, split)).replace(/^--/, '')
+    if (!arg.startsWith('--') || !FLAGS.has(flag)) bad(`unknown argument "${arg}"`)
+    if (values[flag] === undefined) {
+      if (split !== -1) bad(`--${flag} takes no value`)
+      continue
+    }
+    let value
+    if (split === -1) {
+      at += 1
+      value = args[at]
+    } else {
+      value = arg.slice(split + 1)
+    }
+    if (value === undefined || value.trim() === '' || value.startsWith('--')) bad(`--${flag} needs a name`)
+    values[flag].push(...value.split(',').map((name) => name.trim()).filter(Boolean))
+  }
+  const sorted = (names) => [...new Set(names)].sort()
+  const cases = sorted(values.case)
+  const features = sorted(values.feature)
+  const scenarios = sorted(values.scenario)
+  const full = args.includes('--full')
+  const askLane = args.includes('--e2e')
+  const noLane = args.includes('--no-e2e')
+  const named = cases.length + features.length + scenarios.length > 0
+  // The two ways to spend minutes are named and never inherited: a bare request
+  // is the quick answer about a change, and each of these is asked for by name.
+  if (full && named) bad('--full walks the whole smoke and the lane\'s every scenario; drop the names')
+  if (askLane && noLane) bad('--e2e and --no-e2e say opposite things; keep one')
+  if (args.includes('--quick') && (full || askLane || scenarios.length > 0)) {
+    bad('--quick is the smoke\'s quick tier on its own; --e2e, --scenario and --full name the longer walks')
+  }
+  // The iteration tier is the bare request: the checks, the build and the tests
+  // the change reaches, with no browser at all. Everything else runs the smoke,
+  // and the whole walk is asked for by name.
+  const iteration = !full && !args.includes('--quick') && !askLane && !noLane
+    && cases.length === 0 && features.length === 0 && scenarios.length === 0
+  return {
+    // The smoke's walk: the whole walk under --full, the named cases or features
+    // when the request names them, the quick tier otherwise.
+    smoke: iteration ? null
+      : full ? []
+        : cases.length + features.length > 0
+          ? [...(cases.length > 0 ? ['--case', cases.join(',')] : []), ...(features.length > 0 ? ['--feature', features.join(',')] : [])]
+          : ['--quick'],
+    iteration,
+    force: args.includes('--force'),
+    cases,
+    features,
+    scenarios,
+    // The lane is named: `--full` is the whole smoke walk, and the release gate
+    // is that walk with the lane beside it (`--full --e2e`).
+    e2e: !noLane && (askLane || scenarios.length > 0),
+  }
+}
+
+/**
+ * Whether a request walks everything the tool holds: the whole smoke and the
+ * end-to-end lane's default table. That pair is the cloud's release gate, so a
+ * request for it is asked to say what it is before the minutes start.
+ */
+function walksEverything(request) {
+  return request.smoke !== null && request.smoke.length === 0
+    && request.e2e
+    && request.scenarios.length === 0
+}
+
+/**
+ * How many page loads each browser gate drives beside its stage's other gates.
+ * The budget follows the machine's cores, never its load, so the same tree on
+ * the same machine files under the same key; the behaviour lane takes at most
+ * two, leaving room for the Vitest browser that waits on frames beside it, and
+ * smoke leaves room for the end-to-end lane.
+ */
+function browserJobs(request) {
+  const behaviour = Math.max(1, Math.min(2, Math.floor(BROWSER_JOBS / 2)))
+  if (!request.e2e) return { smoke: BROWSER_JOBS, e2e: 0, behaviour }
+  const smoke = Math.max(1, Math.ceil(BROWSER_JOBS / 2))
+  return { smoke, e2e: Math.max(1, BROWSER_JOBS - smoke), behaviour }
+}
+
+function gatesFor(request) {
+  const jobs = browserJobs(request)
+  const gates = [
+    // The cloud's fast tier starts with the checks that need no build, so the
+    // same set answers here and a document mistake fails in seconds.
+    { id: 'lint', minutes: 5, script: 'scripts/lint.mjs', args: [] },
+    { id: 'docs', minutes: 5, script: 'scripts/decisions-index.mjs', args: ['--check'] },
+    { id: 'changelog', minutes: 5, script: 'scripts/changelog.mjs', args: ['--check'] },
+    { id: 'agents', minutes: 5, script: 'scripts/agents-commands.mjs', args: ['--check'] },
+    { id: 'numbers', minutes: 5, script: 'packages/testing/check-numbers.mjs', args: ['--check'] },
+    // The rule that the appearance snapshot only moves with what draws or reads
+    // the pages (D77), and the records that only shrink, against HEAD.
+    { id: 'scope', minutes: 5, script: 'scripts/ci-scope.mjs', args: ['--appearance', '--ledgers', '--tree'] },
+    { id: 'build', minutes: 15, script: 'scripts/build.mjs', args: [] },
+    unitGate(request.iteration),
+  ]
+  if (request.smoke !== null) gates.push({ id: 'smoke', minutes: 30, script: 'packages/testing/smoke.mjs', args: [...request.smoke, '--jobs', String(jobs.smoke)] })
+  // The behaviour specs ride with the smoke: they read the same build and the
+  // same stand-in host. A request naming smoke cases alone names no spec.
+  if (request.smoke !== null && !(request.cases.length > 0 && request.features.length === 0)) {
+    const selection = request.features.length > 0 ? ['--feature', request.features.join(',')] : []
+    gates.push({ id: 'behaviour', minutes: 15, script: 'packages/testing/behaviour.mjs', args: [...selection, '--jobs', String(jobs.behaviour)] })
+  }
+  if (request.e2e) {
+    gates.push({
+      id: 'e2e',
+      minutes: 40,
+      script: 'packages/testing/e2e.mjs',
+      args: [...(request.scenarios.length > 0 ? ['--scenario', request.scenarios.join(',')] : []), '--jobs', String(jobs.e2e)],
+    })
+  }
+  return gates
+}
+
+/**
+ * Those gates grouped by what waits for what. The checks and the build stand
+ * first: the build writes what the browser lanes read, and the checks answer in
+ * moments. The spec lane answers about the sources and waits for nothing, so it
+ * runs beside the behaviour specs; the smoke and the end-to-end lane come last,
+ * on their own, because their checks that watch frames and passes are what a
+ * loaded machine disturbs, and the behaviour specs' pages beside them load it.
+ * Each stage costs its slowest gate instead of the sum of its gates.
+ */
+function stagesFor(request) {
+  const gates = gatesFor(request)
+  const framed = gates.filter((gate) => gate.id === 'smoke' || gate.id === 'e2e')
+  const before = gates.filter((gate) => gate.id === 'unit' || gate.id === 'behaviour')
+  if (framed.length === 0 && !before.some((gate) => gate.id === 'behaviour')) return [gates]
+  const first = gates.filter((gate) => framed.indexOf(gate) === -1 && before.indexOf(gate) === -1)
+  return [first, before, framed].filter((stage) => stage.length > 0)
+}
+
+/** The key a verdict is filed under: this tree, these gates. */
+function keyOf(tree, request) {
+  const gates = gatesFor(request).map((gate) => `${gate.id} ${gate.args.join(' ')}`)
+  return crypto.createHash('sha256').update(JSON.stringify({ format: FORMAT, tree, gates })).digest('hex')
+}
+
+/** The verdict filed under a key, or null where none is. */
+function cached(key) {
+  const file = path.join(CACHE, `${key}.json`)
+  if (!fs.existsSync(file)) return null
+  const record = JSON.parse(fs.readFileSync(file, 'utf8'))
+  return record.format === FORMAT ? record : null
+}
+
+/** The exit code a gate that outran its deadline answers with. */
+const TIMED_OUT_EXIT = 124
+
+/** What a nonzero spec run's report says: a failed assertion, or a suite that never loaded. */
+function unitOutcome(gate) {
+  let report
+  try {
+    report = JSON.parse(fs.readFileSync(gate.report, 'utf8'))
+  } catch {
+    return { outcome: 'unjudged', reason: 'wrote no readable JSON report' }
+  }
+  const failed = Number(report.numFailedTests ?? 0)
+  const suites = Number(report.numFailedTestSuites ?? 0)
+  if (failed > 0) return { outcome: 'fail', reason: `${failed} assertion${failed === 1 ? '' : 's'} failed` }
+  if (suites > 0) return { outcome: 'unjudged', reason: `${suites} test suite${suites === 1 ? '' : 's'} did not load` }
+  return { outcome: 'unjudged', reason: 'ended nonzero without a failed assertion' }
+}
+
+/**
+ * What a nonzero behaviour run says. Its report is written once the walk
+ * reaches its end; a report older than this gate is the only one a run that
+ * never started leaves behind, and either way there is no test verdict to file.
+ */
+function behaviourOutcome(startedAt) {
+  let report
+  try {
+    report = JSON.parse(fs.readFileSync(BEHAVIOUR_REPORT, 'utf8'))
+  } catch {
+    return { outcome: 'unjudged', reason: 'wrote no report' }
+  }
+  const at = Date.parse(report.at ?? '')
+  if (!Number.isFinite(at) || at < startedAt) return { outcome: 'unjudged', reason: 'left no report from this run' }
+  const blocking = Array.isArray(report.results) ? report.results.filter((result) => result.blocking).length : 0
+  if (blocking > 0) return { outcome: 'fail', reason: `${blocking} test${blocking === 1 ? '' : 's'} failed` }
+  return { outcome: 'unjudged', reason: 'ended nonzero without a blocking failure' }
+}
+
+/**
+ * What one gate's ending says. Only a gate that names a failed assertion is a
+ * verdict; everything the system ended, or that never reached a test, is a
+ * gate the next request has to run again. A deadline is the one this file
+ * enforced, not an exit code the gate itself chose.
+ */
+function classifyGate(gate, code, signal, timedOut, startedAt) {
+  if (timedOut) return { outcome: 'unjudged', reason: `passed its ${gate.minutes} min deadline` }
+  if (signal !== null) return { outcome: 'unjudged', reason: `stopped by ${signal}` }
+  if (code === null) return { outcome: 'unjudged', reason: 'ended without an exit code' }
+  if (code === 0) return { outcome: 'ok', reason: 'passed' }
+  if (code === UNJUDGED_EXIT && (gate.id === 'smoke' || gate.id === 'e2e')) {
+    const reason = gate.id === 'smoke' ? 'the browser half gave no verdict' : 'the lane gave no verdict on this host'
+    return { outcome: 'unjudged', reason }
+  }
+  if (code < 0 || code > 255) return { outcome: 'unjudged', reason: `ended with an abnormal exit code ${code}` }
+  if (gate.id === 'unit') return unitOutcome(gate)
+  if (gate.id === 'behaviour') return behaviourOutcome(startedAt)
+  return { outcome: 'fail', reason: `exit ${code}` }
+}
+
+/** How one gate's outcome and reason read in the run's lines. */
+function gateWord(outcome, reason) {
+  if (outcome === 'ok') return 'ok'
+  return `${outcome === 'fail' ? 'failed' : 'gave no verdict'} — ${reason}`
+}
+
+/**
+ * Take a gate down with every process under it: a lane's browsers are its
+ * grandchildren, and a hung one left behind keeps the lock this run holds.
+ */
+function killTree(child) {
+  if (process.platform === 'win32') {
+    execFileSync('taskkill', ['/pid', String(child.pid), '/T', '/F'], { stdio: 'ignore' })
+    return
+  }
+  child.kill('SIGKILL')
+}
+
+/**
+ * Run one gate with its output on this terminal, and answer with how it ended.
+ * A gate past its deadline — the cloud step's own `timeout-minutes` — is a gate
+ * that hung: it is taken down and answers TIMED_OUT_EXIT, so the run ends and
+ * the lock goes free. A gate that writes a report starts with none beside it.
+ */
+function runGate(gate) {
+  return new Promise((resolve, reject) => {
+    if (gate.report !== undefined) {
+      fs.mkdirSync(path.dirname(gate.report), { recursive: true })
+      fs.rmSync(gate.report, { force: true })
+    }
+    const child = spawn(process.execPath, [gate.script, ...gate.args], { cwd: ROOT, stdio: 'inherit' })
+    running.add(child)
+    let timedOut = false
+    const deadline = setTimeout(() => {
+      timedOut = true
+      say(`verify: ${gate.id} passed its ${gate.minutes} min deadline; taking it down`)
+      killTree(child)
+    }, gate.minutes * 60_000)
+    child.on('error', reject)
+    child.on('close', (code, signal) => {
+      clearTimeout(deadline)
+      running.delete(child)
+      resolve({ code: timedOut ? TIMED_OUT_EXIT : code, signal: timedOut ? null : signal, timedOut })
+    })
+  })
+}
+
+/**
+ * Run the gates of one stage beside each other. The gates of a stage read what
+ * the stages before them wrote and nothing the stage itself produces, so what
+ * the stage costs is its slowest gate.
+ */
+async function runStage(stage) {
+  say(`\nverify: ${stage.length === 1 ? stage[0].id : `${stage.map((gate) => gate.id).join(', ')} together`}`)
+  for (const gate of stage) say(`verify:   ${gate.id} — node ${gate.script}${gate.args.length === 0 ? '' : ` ${gate.args.join(' ')}`}`)
+  return Promise.all(stage.map(async (gate) => {
+    const startedAt = Date.now()
+    const { code, signal, timedOut } = await runGate(gate)
+    const ms = Date.now() - startedAt
+    const { outcome, reason } = classifyGate(gate, code, signal, timedOut, startedAt)
+    say(`verify: ${gate.id} ${gateWord(outcome, reason)} (${seconds(ms)})`)
+    return { id: gate.id, code, ms, outcome, reason }
+  }))
+}
+
+/** Run every gate of this request, file the verdict, and return the record. */
+async function runAll(request, tree, key) {
+  const runId = `${new Date().toISOString().replace(/[:.]/g, '-')}-${process.pid}`
+  say(`verify: run ${runId}`)
+  const started = Date.now()
+  const gates = []
+  /** The build output the build gate left behind; null before that gate runs. */
+  let built = null
+  for (const stage of stagesFor(request)) {
+    gates.push(...await runStage(stage))
+    if (stage.some((gate) => gate.id === 'build')) built = libHash()
+    if (gates.some((gate) => gate.outcome !== 'ok')) {
+      // A gate that is not ok ends the run before the next stage: the lanes above
+      // it read what it produces, and the fix comes before their minutes are
+      // spent. A gate that gave no verdict is not a failure and not a pass, so the
+      // run answers "unjudged" unless another gate failed.
+      break
+    }
+  }
+  const failed = gates.some((gate) => gate.outcome === 'fail')
+  const unjudged = gates.some((gate) => gate.outcome === 'unjudged')
+  const exitCode = failed ? 1 : unjudged ? UNJUDGED_EXIT : 0
+  const swapped = exitCode === 0 && libHash() !== built
+  const record = {
+    format: FORMAT,
+    key,
+    tree: tree.hash,
+    files: tree.files,
+    request,
+    runId,
+    at: new Date().toISOString(),
+    ms: Date.now() - started,
+    exitCode: swapped ? 1 : exitCode,
+    // A run that left a gate unjudged answers nothing a later request could reuse.
+    filed: !swapped && !unjudged,
+    gates,
+  }
+  if (swapped) {
+    say('verify: the build output changed while the gates ran — a rebuild behind `npm run dev` takes no lock; no verdict filed, re-run over a still tree')
+    return record
+  }
+  if (!record.filed) return record
+  fs.mkdirSync(CACHE, { recursive: true })
+  fs.writeFileSync(path.join(CACHE, `${key}.json`), `${JSON.stringify(record, null, 2)}\n`)
+  return record
+}
+
+/** What this request's answer was, and where it came from. */
+function report(record, source) {
+  const gates = record.gates.map((gate) => `${gate.id} ${gate.outcome}`).join(', ')
+  if (source === 'cache') {
+    say(`verify: reused — the same tree and the same gates ${record.exitCode === 0 ? 'passed' : 'failed'} at ${record.at} (run ${record.runId}, ${seconds(record.ms)}); --force re-runs them`)
+    say(`verify: ${record.exitCode === 0 ? 'PASS' : 'FAIL'} — ${gates}`)
+  } else {
+    const filed = record.filed === false ? '; no verdict filed' : `; verdict filed as ${record.key.slice(0, 12)}`
+    const word = record.exitCode === 0 ? 'PASS' : record.exitCode === UNJUDGED_EXIT ? 'UNJUDGED' : 'FAIL'
+    say(`\nverify: ${word} — ${gates} (${seconds(record.ms)})${filed}`)
+  }
+  for (const gate of record.gates) {
+    if (gate.outcome !== 'ok') say(`verify:   ${gate.id} ${gate.outcome} — ${gate.reason}`)
+  }
+}
+
+async function main() {
+  const request = parseRequest()
+  const tree = treeHash(ROOT)
+  const key = keyOf(tree.hash, request)
+  say(`verify: tree ${tree.hash.slice(0, 12)} (${tree.files} files under ${TREES.join(', ')} and the root), gates ${gatesFor(request).map((gate) => gate.id).join(', ')}`)
+  const before = request.force ? null : cached(key)
+  if (before !== null) {
+    report(before, 'cache')
+    process.exit(before.exitCode)
+  }
+  // A verdict already filed answers in a moment and says nothing; a run that is
+  // about to spend the release gate's minutes asks before it starts.
+  if (walksEverything(request)) say('verify: warning — 请确认你正处于发布流程。')
+  const release = await takeLock('verify', key.slice(0, 12))
+  holding = release
+  // The gates run under this lock: they must not ask for it again.
+  process.env[HELD] = LOCK
+  let record
+  try {
+    // The run this request waited for may have answered this very key.
+    record = (request.force ? null : cached(key)) ?? await runAll(request, tree, key)
+  } finally {
+    release()
+    holding = null
+    delete process.env[HELD]
+  }
+  report(record, 'run')
+  process.exit(record.exitCode)
+}
+
+for (const signal of ['SIGINT', 'SIGTERM']) {
+  process.on(signal, () => {
+    for (const child of running) child.kill(signal)
+    // Only the lock this process holds is released: a request still waiting for
+    // the lock must leave the run it is waiting for alone.
+    if (holding !== null) holding()
+    say(`verify: interrupted (${signal})`)
+    process.exit(signal === 'SIGINT' ? 130 : 143)
+  })
+}
+
+main().catch((error) => {
+  console.error(error)
+  process.exit(1)
+})

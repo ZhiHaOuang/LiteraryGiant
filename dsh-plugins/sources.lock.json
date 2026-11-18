@@ -1,0 +1,104 @@
+{
+  "format": 1,
+  "date": "2026-11-18",
+  "mode": "vendored source snapshots, no nested git repositories",
+  "digestAlgorithm": "sha256 of sorted path NUL executable-bits-or-link NUL raw-sha256(content)",
+  "sources": [
+    {
+      "path": "dsh",
+      "repository": "https://github.com/deepseek-ai/deepseek-harness",
+      "commit": "fcc0ad462172522aaf5c93a7b2e01f6b9f0b0159",
+      "version": "0.2.2-rc.1",
+      "files": 20666,
+      "sourceSha256": "d82b8a3eecb106a52d976fb35c8b25b6940f64e1b22509858105ae70f3069a3e",
+      "omittedDemoVideos": []
+    },
+    {
+      "path": "dsh-plugins/dsh-ascii-sharks",
+      "repository": "https://github.com/OGHong/dsh-ascii-sharks",
+      "commit": "7df298f2f22a56f440f7203063cffe19421ac790",
+      "version": "0.1.0",
+      "files": 32,
+      "sourceSha256": "7cd40fe56dd42a55fc6949382211036aa6b60eac8f2216ecd7bb787658e00330",
+      "omittedDemoVideos": []
+    },
+    {
+      "path": "dsh-plugins/dsh-better-sidebar",
+      "repository": "https://github.com/omdsh-dev/DSH-better-sidebar",
+      "commit": "0b6293f05145d6852428a05035d5ea0f370992be",
+      "version": "0.30.1",
+      "files": 674,
+      "sourceSha256": "abf464b8bfada5509ff080177fb59f880a59fe534b62099723b344a5473bee27",
+      "omittedDemoVideos": [],
+      "npmVersion": "0.30.1",
+      "dist": {
+        "tarball": "https://registry.npmjs.org/dsh-better-sidebar/-/dsh-better-sidebar-0.30.1.tgz",
+        "integrity": "sha512-f+DlDz9yYQUXbAAus3e8tSKykVd2uuDxiPvw375+lKfDG1wQDFzzuM4mOCrev+3AVCzkoYueqe4UKf03R1t7mA=="
+      }
+    },
+    {
+      "path": "dsh-plugins/dsh-claude-style",
+      "repository": "https://github.com/Nwflower/dsh-claude-style",
+      "commit": "bb36248fdc748bb522bd561b50c06608c9146391",
+      "version": "0.19.9",
+      "files": 1037,
+      "sourceSha256": "eff6758091234b5107e8b09b247597a86db9ad0a530a939e7d33f278d19d4164",
+      "omittedDemoVideos": [],
+      "npmVersion": "0.19.9",
+      "dist": {
+        "tarball": "https://registry.npmjs.org/dsh-claude-style/-/dsh-claude-style-0.19.9.tgz",
+        "integrity": "sha512-evBuCvgN5zspQ4aZ4TkPZPQc8b2LZiXWSj2T6GWV4JXYUxPPWYAGLuJ0LPy4Smu+hfXAlaRnstnlG96LuMiQDg=="
+      },
+      "sourceSelection": "npm provenance commit; tag points to generated dist commit"
+    },
+    {
+      "path": "dsh-plugins/dsh-context",
+      "repository": "https://github.com/bowenliang123/dsh-context",
+      "commit": "b53e60444cd07f58dd2e5722124ce779a339c9a6",
+      "version": "0.82.1",
+      "files": 489,
+      "sourceSha256": "fdc59a233b3e8d466c49f060c1380cef4a7a198796dd316aeea470267c17759e",
+      "omittedDemoVideos": [
+        "docs/video/dsh-context-demo-video.mp4"
+      ],
+      "npmVersion": "0.82.1",
+      "dist": {
+        "tarball": "https://registry.npmjs.org/dsh-context/-/dsh-context-0.82.1.tgz",
+        "integrity": "sha512-wbM+NHW+0vvCU/dm9Hm5mgp9vL7xzCXHuka7k2eASrvVWIODXY7Mv4NAcL+VeZ3eIHUT4TzCwt8VFp1Bz6cB3g=="
+      }
+    },
+    {
+      "path": "dsh-plugins/dsh-ops",
+      "repository": "https://github.com/T-Auto/dsh-ops",
+      "commit": "904b4faa2afab722699cba31f2aa92c5d4d0dcbe",
+      "version": "0.5.0",
+      "files": 878,
+      "sourceSha256": "8006408986d44c7a0c9fd47e947c09a8e257fd11493e935c25d0335176152a19",
+      "omittedDemoVideos": [],
+      "npmVersion": "0.5.0",
+      "dist": {
+        "tarball": "https://registry.npmjs.org/dsh-ops/-/dsh-ops-0.5.0.tgz",
+        "integrity": "sha512-c8NtQq0bJQ9nAvOd03X38aRcZMSzzvApuVPRs+6X0KqOwYpSfbES2zoEnl2jTgqoxLrd2hVqOiitF9E9Mp8omQ=="
+      }
+    },
+    {
+      "path": "dsh-plugins/dsh-ai4scholar",
+      "repository": "https://github.com/literaf/dsh-ai4scholar",
+      "commit": "c285ce961cb18b3fd619cc33fc28b3dd2a1ad995",
+      "version": "0.6.6",
+      "files": 107,
+      "sourceSha256": "c8c997200264eba05256b6fc62c01fa3665ab34fc219616ab9410f1fc5d461c7",
+      "omittedDemoVideos": []
+    },
+    {
+      "path": "dsh-plugins/dsh-reading-workbench",
+      "repository": "https://github.com/keyboard-leo/dsh-reading-workbench",
+      "commit": "0780abab8201c1b1dd7297dbbdc4cbc15248a92a",
+      "version": "0.2.0",
+      "files": 100,
+      "sourceSha256": "7bd4b3b09ebfd330dce51df0d87c855872b291f3cf6ed38a15d62bb89e34aeb9",
+      "omittedDemoVideos": [],
+      "sourceSelection": "v0.2.0 with LG data-root binding in cordis.patch.yml"
+    }
+  ]
+}

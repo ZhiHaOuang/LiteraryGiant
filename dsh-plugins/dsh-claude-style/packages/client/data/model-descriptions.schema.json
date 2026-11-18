@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "dsh-claude-style model copy",
+  "description": "The shape of packages/client/data/model-descriptions.json. References across the document and to the vendored lockups are checked by scripts/build.mjs.",
+  "type": "object",
+  "required": ["fallback", "families", "brands"],
+  "properties": {
+    "version": { "type": "integer" },
+    "fallback": { "description": "The locale id read when the shell language has no line.", "type": "string", "minLength": 1 },
+    "families": { "type": "array", "items": { "$ref": "#/$defs/copyRule" } },
+    "tiers": { "type": "array", "items": { "$ref": "#/$defs/copyRule" } },
+    "brands": {
+      "type": "object",
+      "required": ["models"],
+      "properties": {
+        "note": { "type": "string" },
+        "providers": {
+          "description": "Provider id to brand id.",
+          "type": "object",
+          "additionalProperties": { "$ref": "#/$defs/brandId" }
+        },
+        "models": {
+          "description": "An ordered, anchored rule list; each rule is tried against the model's id, then the display name beside it (D79).",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["match", "brand"],
+            "properties": {
+              "match": { "$ref": "#/$defs/pattern" },
+              "brand": { "$ref": "#/$defs/brandId" },
+              "note": { "type": "string" }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "localized": {
+      "description": "Locale id to a line of copy.",
+      "type": "object",
+      "additionalProperties": { "type": "string", "pattern": "\\S" }
+    },
+    "localizedTable": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/localized" }
+    },
+    "pattern": { "type": "string", "format": "regex" },
+    "brandId": { "type": "string", "minLength": 1 },
+    "copyRule": {
+      "description": "A pattern tried against a model's id and then the display name beside it (D79), and the line every row it claims reads.",
+      "type": "object",
+      "required": ["match", "text"],
+      "properties": {
+        "match": { "$ref": "#/$defs/pattern" },
+        "text": { "$ref": "#/$defs/localized" },
+        "note": { "type": "string" }
+      }
+    }
+  }
+}

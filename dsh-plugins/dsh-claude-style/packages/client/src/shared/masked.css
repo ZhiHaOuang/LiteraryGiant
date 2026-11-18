@@ -1,0 +1,29 @@
+/* ---------- Masked brand marks ---------- */
+/* A Claude brand mark drawn as an alpha mask over the element's own ink: the
+   mask value is stated once here, and the classes carry it for the skin's own
+   elements. A host pseudo-element cannot take a class, so the sidebar and the
+   settings tab icon read the same value on their ::before rules
+   (theme/sidebar.css, features/settings/settings.css); in both shapes the rule
+   that seats the mark carries the ink (background-color) and the box. */
+body[data-dsh-claude-style] {
+  --dsh-claude-mask-claude-mark: var(--dsh-claude-image-claude-mark) center / contain no-repeat;
+  --dsh-claude-mask-claude-word: var(--dsh-claude-image-claude-word) center / contain no-repeat;
+}
+body[data-dsh-claude-style] .dsh-claude-masked-mark {
+  -webkit-mask: var(--dsh-claude-mask-claude-mark);
+  mask: var(--dsh-claude-mask-claude-mark);
+}
+body[data-dsh-claude-style] .dsh-claude-masked-word {
+  -webkit-mask: var(--dsh-claude-mask-claude-word);
+  mask: var(--dsh-claude-mask-claude-word);
+}
+
+/* A host mark the skin paints on the host's own pseudo-element cannot take a
+   class, so the box every such mark draws is stated once here; the theme sheets
+   add only the size and the ink their mark needs (theme/hero.css for the hero's
+   mark, theme/sidebar.css for the wordmark). */
+body[data-dsh-claude-style] :is([data-dsh-claude-part~="hero-mark"], [data-dsh-claude-part~="brand-name"])::before {
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}

@@ -1,0 +1,326 @@
+/* ---------- webfonts ---------- */
+/* The code font ships in the package and the host half serves it, so 'JetBrains
+   Mono' resolves on systems that never installed it. When the route is missing the
+   fetch 404s and the stacks' system fallbacks take over. */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/dsh-claude-style/fonts/JetBrainsMonoVariable.ttf') format('truetype-variations');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/dsh-claude-style/fonts/JetBrainsMonoItalicVariable.ttf') format('truetype-variations');
+  font-weight: 100 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* The Anthropic faces are not in the npm package, so these registrations resolve
+   only when the user dropped the files into `$DSH_HOME/dsh-claude-style/fonts/`;
+   otherwise the stacks fall back to a system-installed copy. All three are static
+   Regular cuts, so one 400 declaration covers them and the browser synthesizes
+   the heavier weights. */
+@font-face {
+  font-family: 'Anthropic Sans Web Text';
+  src: url('/dsh-claude-style/fonts/AnthropicSansWebText.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Anthropic Serif Web Text';
+  src: url('/dsh-claude-style/fonts/AnthropicSerifWebText.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Anthropic Mono Web';
+  src: url('/dsh-claude-style/fonts/AnthropicMonoWeb.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* The look-alikes the stacks name after the Anthropic faces, for an install with
+   neither the files nor a system copy. They ship in the package (SIL OFL 1.1), cut
+   to the coverage of the Anthropic faces and matched to them in x-height, cap
+   height and lowercase width, so switching between a face and its look-alike does
+   not rewrap text. The family names are the skin's own: a plugin asking for 'Inter'
+   or 'Noto Serif' still gets its own copy. */
+@font-face {
+  font-family: 'Claude Style Inter';
+  src: url('/dsh-claude-style/fonts/InterVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Claude Style Noto Serif';
+  src: url('/dsh-claude-style/fonts/NotoSerifVariable.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ---------- typography: serif display + sans UI + mono code ---------- */
+body[data-dsh-claude-style] {
+  font-family: var(--dsw-font-family);
+  color: var(--dsw-alias-label-primary);
+}
+
+/* The body's own canvas; a wallpaper plugin showing one keeps it unpainted
+   (theme/wallpaper.css). */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"]:not([data-we-wallpaper]) {
+  background-color: var(--dsh-claude-canvas);
+}
+
+body[data-dsh-claude-style] :is(h1, h2, h3, h4, [data-dsh-claude-part~="text-headline"], [data-dsh-claude-part~="text-title"]) {
+  font-family: var(--dsh-claude-font-serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+/* Display headings sit at 500 with tighter tracking */
+body[data-dsh-claude-style] :is(h1, [data-dsh-claude-part~="text-headline"]) {
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+/* ---------- markdown document prose ---------- */
+/* Conversation prose — body and headings alike — takes the serif face and lets
+   Chinese fall through to a sans CJK; the display rule above stays for headlines. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] {
+  font-family: var(--dsh-claude-font-prose);
+  line-height: calc(23px + var(--dsh-content-font-delta, 0px));
+}
+
+/* Claude keeps 12px between blocks, not the host's 16px; first/last-child zeroing
+   stays with the host's !important rules. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] p {
+  margin: 12px 0;
+}
+
+/* A thinking row reads as the host's compact markdown, whose paragraphs sit 4px
+   apart; the 12px above belongs to the conversation's prose. */
+body[data-dsh-claude-style] [data-variant="think"] [data-dsh-claude-part~="markdown"] p,
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"][data-markdown-variant="compact"] p {
+  margin: 4px 0;
+}
+
+/* The host gives its markdown elements their own `font:` shorthand, so the family
+   has to be re-stated wherever those shorthands land; the heading shorthand is
+   re-asserted so the host's weight, size and line-height survive the display rule. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] h1 { font: var(--dsw-font-markdown-h1); font-family: var(--dsh-claude-font-prose); }
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] h2 { font: var(--dsw-font-markdown-h2); font-family: var(--dsh-claude-font-prose); }
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] h3 { font: var(--dsw-font-markdown-h3); font-family: var(--dsh-claude-font-prose); }
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] h4 { font: var(--dsw-font-markdown-h4); font-family: var(--dsh-claude-font-prose); }
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] :is(th, td) {
+  font-family: var(--dsh-claude-font-prose);
+  /* One type step up from the host's 13px table size. */
+  font-size: var(--dsh-content-font-size, 14px);
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] thead th,
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] thead td {
+  background: var(--dsh-claude-table-head, #f0f0ef) !important;
+}
+
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="table-scroll"] thead th,
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="table-scroll"] thead td {
+  background: var(--dsh-claude-table-head) !important;
+}
+
+/* Table frame: the host's 0.5px row-separator line, rounded like the code block. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] {
+  border: 0.5px solid var(--dsw-alias-border-l2);
+  border-radius: 12px;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background-clip: padding-box;
+  /* Narrow tables stretch to the prose block; wide ones keep max-content and
+     scroll inside this wrapper. */
+  width: 100% !important;
+  max-width: var(--dsh-chat-content-width, 100%) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] table {
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  border-spacing: 0 !important;
+  border-collapse: collapse !important;
+  width: max-content !important;
+  min-width: 100% !important;
+  max-width: max-content !important;
+}
+
+/* Every first/last cell, whatever element the renderer used. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] tr > :first-child {
+  padding-left: 16px !important;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="table-scroll"] tr > :last-child {
+  padding-right: 16px !important;
+}
+
+/* Heading rhythm: the host's 32px top margin stacks on the previous heading's
+   bottom margin, which opens ~36px where Claude keeps ~12px; a heading directly
+   after another tightens further so a run reads as one block. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] :is(h1, h2, h3) {
+  margin-top: 24px;
+  margin-bottom: 12px;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] :is(h1, h2, h3) + :is(h1, h2, h3) {
+  margin-top: 8px;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] :is(h4, h5, h6) {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+body[data-dsh-claude-style] :is(pre, code, kbd, samp, [data-dsh-claude-part~="text-mono"], [data-dsh-claude-part~="text-code"], [data-dsh-claude-part~="text-code"]) {
+  font-family: var(--dsh-claude-font-code);
+}
+
+/* editorial captions */
+body[data-dsh-claude-style] :is([data-dsh-claude-part~="text-caption"], [data-dsh-claude-part~="section-label"]) {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* ---------- editorial markdown ---------- */
+/* The quote keeps the prose face upright on a neutral bar and wash; links, chips
+   and file mentions keep their own material inside it — a quote is a container,
+   not a link, so it never borrows the link colour. */
+body[data-dsh-claude-style] blockquote {
+  font-family: var(--dsh-claude-font-prose);
+  font-style: normal;
+  color: var(--dsw-alias-label-secondary);
+  border-left: 2px solid var(--dsw-alias-label-caption);
+  background: rgba(250, 249, 245, 0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 0.6em 1em;
+}
+
+/* The fill rides the host's --dsw-alias-markdown-code-block token, because the host
+   pins `pre.shiki` with !important and a `background` here would never apply. The
+   frame lives on the wrapper, so the banner and the code share one rounded outline. */
+body[data-dsh-claude-style] .md-code-block {
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 12px;
+}
+
+/* The same outer rhythm as body paragraphs, against the host's 16px/19px. */
+body[data-dsh-claude-style] .md-code-block {
+  margin: 12px 0;
+}
+
+body[data-dsh-claude-style] .md-code-block pre,
+body[data-dsh-claude-style] .md-code-block pre code {
+  line-height: calc(23px + var(--dsh-content-font-delta, 0px)) !important;
+  font-weight: 500 !important;
+}
+
+/* One pixel below the surrounding copy; the inner <code> inherits rather than
+   compounding the calc(). */
+body[data-dsh-claude-style] pre {
+  font-size: calc(1em - 1px) !important;
+  font-weight: 500 !important;
+}
+
+body[data-dsh-claude-style] pre code {
+  font-size: inherit !important;
+  font-weight: 500 !important;
+}
+
+/* The inline-code chip: the host makes it an inline-flex box inheriting the prose
+   line box, which left empty wash above and below the glyphs; line-height 1.2
+   collapses it onto them, and lower values start clipping descenders. */
+body[data-dsh-claude-style] code:not(pre code) {
+  font-family: var(--dsh-claude-font-code);
+  background: var(--dsh-claude-inline-code-bg);
+  color: var(--dsh-claude-inline-code-fg);
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 4px;
+  padding: 1px;
+  font-size: calc(1em - 1px) !important;
+  line-height: 1.2;
+}
+
+/* Claude's links: blue, underlined at rest, without the host's link-category glyph. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="link-icon"] {
+  display: none;
+}
+
+/* File references are links, not code: the host resolves a path to a button — a
+   markdown link outside code, or a mention inside an inline code span. The
+   generic chip is more specific than the host's class, so the text would
+   otherwise keep the chip's warm red while real links are blue. The chip keeps
+   its own wash and hairline. The hover rule touches the colour only: the
+   `text-decoration` shorthand would reset the thickness to `auto` mid-hover. */
+body[data-dsh-claude-style] :is(code:not(pre code) > [data-dsh-claude-part~="file-mention"], code:not(pre code) > a),
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] :is(a, a:focus),
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] [data-dsh-claude-part~="file-link"] {
+  color: var(--dsh-claude-link);
+  text-decoration: underline;
+  text-decoration-color: var(--dsh-claude-link-underline);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 2px;
+}
+
+body[data-dsh-claude-style] :is(code:not(pre code) > [data-dsh-claude-part~="file-mention"], code:not(pre code) > a) {
+  font-weight: 500;
+}
+
+body[data-dsh-claude-style] :is(code:not(pre code) > [data-dsh-claude-part~="file-mention"], code:not(pre code) > a):hover,
+body[data-dsh-claude-style] :is(code:not(pre code) > [data-dsh-claude-part~="file-mention"], code:not(pre code) > a):focus-visible {
+  text-decoration-color: var(--dsh-claude-link);
+}
+
+/* A markdown link keeps the blue it states at rest under the pointer. The generic
+   anchor hover in theme/chrome.css repaints a link with the accent ink, and that
+   stylesheet ranks after this one, so the `link-button` guard gives this selector
+   the edge over it. A file link is the renderer's button, which that rule never
+   reaches, so it joins the group and keeps the same blue. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] a:not([data-dsh-claude-part~="link-button"]):hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] a:not([data-dsh-claude-part~="link-button"]):focus-visible,
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] [data-dsh-claude-part~="file-link"]:hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="markdown"] [data-dsh-claude-part~="file-link"]:focus-visible {
+  color: var(--dsh-claude-link);
+  text-decoration-color: var(--dsh-claude-link);
+}
+
+body[data-dsh-claude-style] hr {
+  border: none;
+  border-top: 0.5px solid var(--dsh-claude-divider, var(--dsw-alias-border-l1, #e9e9e9));
+  margin: 1.6em 0;
+}
+
+
+/* tabs: subtle editorial weighting */
+body[data-dsh-claude-style] [role="tab"] {
+  font-weight: 500;
+}
+
+/* technical meta (model selector, triggers) read as mono labels */
+body[data-dsh-claude-style] [data-dsh-claude-part~="trigger-label"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="text-select-label"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="text-mono-label"] {
+  font-family: var(--dsh-claude-font-code);
+  font-size: 12px;
+  letter-spacing: 0;
+}

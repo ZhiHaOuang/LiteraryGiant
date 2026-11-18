@@ -1,0 +1,168 @@
+/* ---------- process column: an open process group as one card ---------- */
+/* Every rule here paints the host's own process group under the column layout
+   (process-column.ts writes the attribute) and, beside it, the settings card
+   that shows that layout, so the card is the effect itself. The flat card is the
+   host's own list redrawn small. Nothing of the host moves: the body becomes the
+   card, its rows stand one under another with a separator between them, and
+   each row keeps its own disclosure. The body keeps the host's own window — the
+   min(400px, 50vh) cap and scrollbar where the host caps a group, no height
+   where its tier lifts the cap — so a long group scrolls inside the card rather
+   than growing the transcript. The shape takes the ladder's 8px radius and the
+   1px card border, the separators the 0.5px divider (docs/STYLE.md). */
+
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process] > [data-step-process-body]:not([hidden]),
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-body {
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 8px;
+  /* The host reserves a stable gutter for the group's scrollbar. In the framed
+     card that strip would stand inside the border as an empty column beside
+     every short group, so the gutter is reserved only while the card scrolls. */
+  scrollbar-gutter: auto;
+}
+
+/* The host spaces its rows with a top margin; in the card the separator and the
+   row's own height do that. The inset is the card's, so an opened row's details
+   line up with its words. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] > [data-chat-flow-kind],
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-row {
+  margin-top: 0;
+  padding-inline: 12px;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] > [data-chat-flow-kind] + [data-chat-flow-kind],
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-row + .dsh-claude-process-sample-row {
+  border-top: 0.5px solid var(--dsh-claude-divider);
+}
+
+/* A row of the model's own words has no disclosure to give it height. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] > [data-chat-group-part="response"] {
+  padding-block: 8px;
+}
+
+/* A trailing thought needs room below its own line or expanded text: the
+   group's border is the card's bottom edge, not the thought's. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] > [data-chat-group-part="reasoning"]:last-child {
+  padding-bottom: 6px;
+}
+
+/* The whole line is the press: the disclosure row takes the row's height. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] [data-disclosure-row] {
+  min-height: 36px;
+  box-sizing: border-box;
+  padding-block: 6px;
+}
+
+/* A folded thought is a fixed box the host sizes to its own 24px line under
+   `contain: size`, so the row's height is restated on that box. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] [data-variant="think"]:not([data-expanded]) {
+  height: calc(36px + var(--dsh-content-font-delta, 0px));
+}
+
+/* An opened row's details close inside the row, above the next separator. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] :is([data-disclosure-header], [data-disclosure-row]) + * {
+  padding-bottom: 10px;
+}
+
+/* No icon leads a row; the chevron the icon's seat shows on hover goes with it,
+   and the row's own chevron trails its words instead. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] [data-disclosure-row] > [data-dsh-claude-part~="row-leading"],
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-icon {
+  display: none;
+}
+
+/* A thought reads as the thought, and a generic call as its tool and what it
+   does: the kind word and its separator step aside where a description
+   follows them. A named call keeps its verb, which is what makes its target
+   read (查找文件 · *.md). A thought shows its description only where the host
+   marks it a preview. */
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] :is([data-variant="think"][data-preview], [data-variant="others"]) [data-disclosure-row][data-dsh-claude-holds~="row-summary"] :is([data-dsh-claude-part~="text-title"], [data-shimmer-decoration]),
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-row[data-kind="thought"] :is(.dsh-claude-process-sample-title, .dsh-claude-process-sample-sep) {
+  display: none;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] [data-disclosure-row][data-expandable="true"]::after,
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-row::after {
+  content: "";
+  flex: none;
+  width: 12px;
+  height: 12px;
+  margin-inline-start: 6px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4l4 4-4 4'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 4l4 4-4 4'/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--dsh-claude-timing-feedback);
+}
+
+body[data-dsh-claude-style][data-dsh-claude-process-column] [data-step-process-content] [data-disclosure-row][data-expandable="true"][aria-expanded="true"]::after {
+  transform: rotate(90deg);
+}
+
+/* ---------- the settings card's sample ---------- */
+/* A process group in miniature: the header's counted line, then three rows —
+   a thought, a call, a thought — in the host's flat list or in the card. */
+body[data-dsh-claude-style] .dsh-claude-process-card {
+  padding: 12px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 11px;
+  line-height: 16px;
+  text-align: start;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-body {
+  gap: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample-row {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample[data-layout="column"] .dsh-claude-process-sample-row {
+  min-height: 24px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample-icon {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  margin-inline-end: 6px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample-title {
+  flex: none;
+}
+
+/* The host's separator is a 2px dot between the kind word and the description. */
+body[data-dsh-claude-style] .dsh-claude-process-sample-sep {
+  flex: none;
+  width: 2px;
+  height: 2px;
+  margin-inline: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+body[data-dsh-claude-style] .dsh-claude-process-sample-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

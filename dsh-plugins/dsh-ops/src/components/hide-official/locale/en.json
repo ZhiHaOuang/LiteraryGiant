@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Official tool replacements",
+    "description": "Select read, glob or grep to use its reviewed OPS alternative. Empty by default; unselected tools stay visible. Missing selected counterparts block only the affected scope."
+  }
+}

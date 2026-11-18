@@ -1,0 +1,219 @@
+/* ---------- the usage panel's Models tab ---------- */
+/* Claude Code's own shape: a per-day stacked chart over a ranked list. A model's
+   rank in the list is its colour in the chart, so both read from `data-rank`. */
+
+/* The tick labels live in the gutter this variable reserves, outside the plot. */
+body[data-dsh-claude-style] .dsh-claude-home-chart {
+  --dsh-home-axis: 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-plot {
+  position: relative;
+  height: 152px;
+  margin-left: var(--dsh-home-axis);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-tick {
+  position: absolute;
+  left: calc(-1 * var(--dsh-home-axis));
+  width: calc(var(--dsh-home-axis) - 6px);
+  transform: translateY(50%);
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 11px;
+  line-height: 14px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* One column per day, stacked from the axis up: the column owns the rounding so
+   the top of the stack is what curves, exactly like Claude's bars. */
+body[data-dsh-claude-style] .dsh-claude-home-chart-bars {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-col {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 0;
+  border-radius: 2px;
+  overflow: hidden;
+  /* A bar enters by growing off the axis it is stacked from. The window's own
+     key (models.ts) remounts the bars when another range arrives, so a new set
+     grows and a refresh of the same set stays still. */
+  transform-origin: 50% 100%;
+  animation: dsh-claude-home-chart-grow var(--dsh-claude-duration-enter) var(--dsh-claude-ease-out) both;
+}
+
+@keyframes dsh-claude-home-chart-grow {
+  from { transform: scaleY(0); }
+  to { transform: scaleY(1); }
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg {
+  display: block;
+  width: 100%;
+}
+
+/* The date axis is placed by chart-axis.ts: a label's own width decides where
+   the edges stop and how many days may sit between two labels. */
+body[data-dsh-claude-style] .dsh-claude-home-chart-axis {
+  position: relative;
+  height: 14px;
+  margin-left: var(--dsh-home-axis);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-label {
+  position: absolute;
+  top: 0;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 11px;
+  line-height: 14px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The empty label chart-axis.ts measures every date on; it takes no room and
+   takes no pointer. */
+body[data-dsh-claude-style] .dsh-claude-home-chart-label-sample {
+  left: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* The ramp: the biggest spender is the darkest data blue, and the walk down fades
+   toward the card's own fill, ending in the warm grey that stands for every model
+   past the list. Every step is the one data ink at its own opacity, so the chart
+   and the heat grid read off one colour and either card's fill shows through. */
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="0"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="0"] {
+  background: var(--dsh-claude-data-ink);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="1"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="1"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 80%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="2"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="2"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 66%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="3"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="3"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 54%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="4"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="4"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 44%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="5"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="5"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 34%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="6"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="6"] {
+  background: color-mix(in srgb, var(--dsh-claude-data-ink) 24%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-chart-seg[data-rank="7"],
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch[data-rank="7"] {
+  background: #b9b5ac;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-models {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-model {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-model-swatch {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-model-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--dsw-alias-label-primary, #161616);
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Claude's row reads name, then the input/output split, then the share: the
+   split floats right against the fixed share column so the numbers line up. */
+body[data-dsh-claude-style] .dsh-claude-home-model-split {
+  margin-left: auto;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 12px;
+  line-height: 18px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-model-share {
+  flex: none;
+  width: 48px;
+  color: var(--dsw-alias-label-primary, #161616);
+  font-size: 12px;
+  line-height: 18px;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-models-more {
+  align-self: flex-start;
+  padding: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-models-more:hover {
+  color: var(--dsw-alias-label-primary, #161616);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-models-empty {
+  padding: 18px 0;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 12px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* A skeleton row is one stand-in bar: the name, the split and the share are
+   placeholders of their own height, so the list keeps its rhythm. */
+body[data-dsh-claude-style] .dsh-claude-home-models[data-skeleton] .dsh-claude-home-model-name,
+body[data-dsh-claude-style] .dsh-claude-home-models[data-skeleton] .dsh-claude-home-model-split,
+body[data-dsh-claude-style] .dsh-claude-home-models[data-skeleton] .dsh-claude-home-model-share {
+  display: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-models[data-skeleton] .dsh-claude-home-model-swatch {
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 9%, transparent);
+}

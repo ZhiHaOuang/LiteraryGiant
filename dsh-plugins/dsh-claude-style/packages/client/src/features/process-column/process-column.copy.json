@@ -1,0 +1,11 @@
+{
+  "processRowsTitle": { "zh": "过程行", "en": "Process rows" },
+  "processRowsFlat": { "zh": "平铺", "en": "Flat" },
+  "processRowsColumn": { "zh": "单列", "en": "Column" },
+  "processRowsSampleHead": { "zh": "执行 2 次思考，调用 1 次工具", "en": "2 thoughts, 1 tool call" },
+  "processRowsSampleThought": { "zh": "思考", "en": "Thought" },
+  "processRowsSampleThoughtFirst": { "zh": "先看清工作区里有哪些文件", "en": "First see what the workspace holds" },
+  "processRowsSampleTool": { "zh": "查找文件", "en": "Find files" },
+  "processRowsSampleToolTarget": { "zh": "*.md", "en": "*.md" },
+  "processRowsSampleThoughtSecond": { "zh": "找到一份说明，读一下再动手", "en": "Found a note, read it before acting" }
+}

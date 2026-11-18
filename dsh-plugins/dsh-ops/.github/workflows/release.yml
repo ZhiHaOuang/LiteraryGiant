@@ -1,0 +1,307 @@
+name: Release
+
+# Release assembly is opt-in only: a `v*` tag push, or an explicit manual dispatch.
+# Nothing here runs on a branch push or on a pull request, so an ordinary merge can
+# never publish.
+#
+# This workflow is currently `disabled_manually` at the repository level (Actions are
+# off for it), left over from the releases that were published from a maintainer
+# machine. While it is disabled, pushing a `v*` tag starts nothing, and this file must
+# not be read as evidence that a tag produces a release. Enabling it is an admin step,
+# and the first run must be a dispatch on `main` — see docs/release-process.md.
+#
+# WHAT IT PUBLISHES: the GitHub Release for the tag — title, generated notes, the installable
+# tarballs and `SHA256SUMS`. npm is a separate channel and is deliberately
+# NOT published here: `npm publish` needs an `NPM_TOKEN` secret that this repository
+# does not grant to Actions, and docs/PROVENANCE.md records that GitHub publication
+# does not automatically publish npm. Adding npm publication later needs an admin to
+# store the secret plus a new job that names `secrets.NPM_TOKEN` explicitly; it is left
+# out rather than half-wired behind a secret that may not exist.
+#
+# PROVENANCE: every runtime target is staged with its own `provenance.json` receipt
+# (version, target, executable name, sha256), and the assembled publish directory
+# carries the release-wide `provenance.json` and `SHA256SUMS` that
+# `scripts/build-platform-packages.mjs` writes from those bytes. No sigstore/SLSA
+# attestation is produced: the recorded repository convention is the receipts plus the
+# checksum manifest (docs/PROVENANCE.md), not a second, unmaintained mechanism, and an
+# attestation would need `id-token: write` / `attestations: write` on the repository.
+#
+# SCOPE: exactly the four declared targets in lib/ptc/runtime.js — win32-x64,
+# linux-x64, darwin-arm64 and darwin-x64. Windows arm64 and Linux arm64 are outside the
+# matrix; `bin/native-runtime.mjs` refuses them, and `bin/check-release.mjs` fails the
+# run if any other target appears under `runtime/`.
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+# Read-only by default. The single job that writes is `publish`, which raises this to
+# `contents: write` for the Release it creates.
+permissions:
+  contents: read
+
+concurrency:
+  # One release per ref, and never cancelled: a queued run waits for the one in flight,
+  # because a half-published release is worse than a late one.
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  native:
+    name: Build native runtime (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-latest, target: win32-x64, triple: x86_64-pc-windows-msvc }
+          - { runner: ubuntu-24.04, target: linux-x64, triple: x86_64-unknown-linux-musl }
+          - { runner: macos-latest, target: darwin-arm64, triple: aarch64-apple-darwin }
+          - { runner: macos-15-intel, target: darwin-x64, triple: x86_64-apple-darwin }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    env:
+      CARGO_BUILD_JOBS: '3'
+    steps:
+      # Every action major in this workflow matches the actively-running ci.yml, so
+      # both files share one upgrade path instead of drifting apart.
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      # Deliberately no `actions/cache` restore here, unlike ci.yml: a release binary
+      # is built from the tag's own source in a cold target directory, so nothing that
+      # ships can be a restored artifact from an earlier run.
+      - name: Set up pinned Rust
+        shell: bash
+        run: rustup toolchain install 1.97.1 --profile minimal && rustup default 1.97.1
+
+      - name: Add the release target
+        shell: bash
+        run: rustup target add ${{ matrix.triple }}
+
+      - name: Install locked dependencies
+        # Every target builds the host JS consumed by the runtime staging CLI.
+        # Windows also needs the pinned shell payload for its IPC proxies.
+        run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
+
+      - name: Build the plugin
+        run: npm run build
+
+      - name: Build the native worker
+        shell: bash
+        run: cargo build --release --locked --manifest-path native/Cargo.toml --target ${{ matrix.triple }}
+
+      - name: Stage the runtime with its provenance receipt
+        # Fails on a missing or non-regular target binary, and writes
+        # runtime/<target>/provenance.json carrying the executable's sha256.
+        shell: bash
+        run: node bin/native-runtime.mjs stage --platform ${{ matrix.target }} --input native/target/${{ matrix.triple }}/release
+
+      - name: Verify the Linux worker is statically linked
+        # The Linux x64 worker ships as a musl static-pie binary and must not
+        # inherit a GLIBC_* dependency from the build runner (ubuntu-24.04 is
+        # glibc 2.39, which older hosts cannot satisfy). A regression to the gnu
+        # triple fails here instead of on a user's glibc 2.28 host.
+        if: matrix.target == 'linux-x64'
+        shell: bash
+        run: file runtime/linux-x64/dsh-ops-worker | grep -Eq 'statically linked|static-pie linked'
+
+      - name: Acquire explicit legacy Bash fixture and build IPC
+        if: matrix.target == 'win32-x64'
+        shell: pwsh
+        run: |
+          $fixture = Join-Path $env:RUNNER_TEMP 'ops-release-legacy-bash'
+          $env:DSH_HOME = $fixture
+          New-Item -ItemType Directory -Path $fixture -Force | Out-Null
+          node --input-type=module -e "import fs from 'node:fs'; import { SHELL_UPSTREAM_PINS } from './lib/shells/pins.js'; fs.writeFileSync(process.env.DSH_HOME + '/pins.json', JSON.stringify(SHELL_UPSTREAM_PINS.filter(pin => pin.name === 'bash')))"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node bin/dsh-ops.mjs provision-shells --bash --pin "$fixture/pins.json"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $env:DSH_OPS_TEST_BASH = node --input-type=module -e "import { pinnedBashExecutable } from './lib/shells/pinned.js'; console.log(pinnedBashExecutable())"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          npm run build:bash-ipc
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+
+      - name: Stage complete frozen Niubash payload
+        if: matrix.target == 'win32-x64'
+        run: npm run stage:niubash
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: native-${{ matrix.target }}
+          # Download each artifact into its own runtime/<target>/ directory.
+          path: runtime/${{ matrix.target }}/
+          if-no-files-found: error
+          retention-days: 7
+
+  gate:
+    name: Verify the release closure and assemble the publish directory
+    needs: native
+    # Windows validates the IPC payload while checking every target artifact.
+    runs-on: windows-latest
+    timeout-minutes: 45
+    env:
+      DIST: dist-release
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Included benchmark tests verify the pinned historical baseline.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts --registry=https://registry.npmjs.org
+
+      - name: Check the tag against the package version
+        # A tag that disagrees with package.json is refused before anything is built
+        # into a publish directory. Reads the name from the environment rather than
+        # interpolating it into the script.
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:GITHUB_REF_NAME) {
+            throw "tag $env:GITHUB_REF_NAME does not match the package version v$version"
+          }
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-win32-x64
+          path: runtime/win32-x64
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-linux-x64
+          path: runtime/linux-x64
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-darwin-arm64
+          path: runtime/darwin-arm64
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: native-darwin-x64
+          path: runtime/darwin-x64
+
+      - name: Prepare the host worker for functional suites
+        # Boundary suites intentionally resolve their checkout-local host build.
+        # This build is test-only; the staged release runtimes remain the cold matrix artifacts.
+        shell: bash
+        run: |
+          rustup toolchain install 1.97.1 --profile minimal
+          rustup default 1.97.1
+          cargo build --release --locked --manifest-path native/Cargo.toml
+
+      - name: Build plugin and acquire explicit legacy Bash fixture
+        shell: pwsh
+        run: |
+          npm run build
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $fixture = Join-Path $env:RUNNER_TEMP 'ops-release-gate-legacy-bash'
+          $env:DSH_HOME = $fixture
+          New-Item -ItemType Directory -Path $fixture -Force | Out-Null
+          node --input-type=module -e "import fs from 'node:fs'; import { SHELL_UPSTREAM_PINS } from './lib/shells/pins.js'; fs.writeFileSync(process.env.DSH_HOME + '/pins.json', JSON.stringify(SHELL_UPSTREAM_PINS.filter(pin => pin.name === 'bash')))"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          node bin/dsh-ops.mjs provision-shells --bash --pin "$fixture/pins.json"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          $bash = node --input-type=module -e "import { pinnedBashExecutable } from './lib/shells/pinned.js'; console.log(pinnedBashExecutable())"
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          "DSH_OPS_TEST_BASH=$bash" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "DSH_OPS_TEST_NIUBASH=$env:GITHUB_WORKSPACE/runtime/win32-x64/niubash/niu.exe" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+
+      - name: Release gate (manifest, suites, runtime closure)
+        # Publishing must not start before this step is green — it is the only reason
+        # the `publish` job sits behind `needs`. `verify:release` is
+        # `validate-manifest` + the full repository suite + `bin/check-release.mjs`,
+        # which demands all four declared targets, matches every receipt hash against
+        # the staged bytes, and re-checks the Windows IPC binary and source digests.
+        # A partial download, a foreign-architecture binary, a stale receipt or a
+        # manifest/target disagreement fails here instead of shipping.
+        run: npm run verify:release
+
+      - name: Assemble and pack the publish directory
+        # Packs the main plugin and the pinned Windows bash payload package, and writes
+        # provenance.json + SHA256SUMS under
+        # $env:DIST. A non-zero exit fails the run; nothing is published from here.
+        run: node scripts/build-platform-packages.mjs --dist "$env:DIST"
+
+      - name: Check the assembled artifacts
+        # Re-reads every digest the assembly recorded; downloads and builds nothing, so
+        # a mismatch between the plan, the tarballs and SHA256SUMS fails here.
+        run: node scripts/build-platform-packages.mjs check --dist "$env:DIST"
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: release-dist
+          path: dist-release/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish the GitHub Release
+    needs: gate
+    # A manual dispatch on a branch (main, say) is a dry run: it builds, gates and
+    # packs, uploads the artifact, and stops here — no write permission is ever
+    # granted and no Release is touched. A tag, pushed or selected when dispatching,
+    # publishes.
+    if: github.ref_type == 'tag'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    steps:
+      # gh infers the repository from the working directory; without a checkout the
+      # release step failed with "fatal: not a git repository".
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 1
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-dist
+          path: dist-release
+
+      - name: Create or refresh the GitHub Release and attach the assets
+        # Idempotent, so an interrupted release is finished rather than restarted: an
+        # existing Release gets its assets replaced (`--clobber`), a missing one is
+        # created against the tag that already exists (`--verify-tag`). Every `gh`
+        # failure is a failed step, never a green run with a missing asset.
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          assets=(dist-release/*.tgz)
+          if [ ${#assets[@]} -eq 0 ]; then
+            echo "no tarballs under dist-release/: refusing to publish an empty Release" >&2
+            exit 1
+          fi
+          assets+=(dist-release/SHA256SUMS)
+          for asset in "${assets[@]}"; do
+            [ -f "$asset" ] || { echo "missing release asset: $asset" >&2; exit 1; }
+          done
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" "${assets[@]}" --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" "${assets[@]}" \
+              --title "$GITHUB_REF_NAME" --generate-notes --verify-tag
+          fi
+
+      - name: Record the published digests in the run summary
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo "## ${GITHUB_REF_NAME} release assets"
+            echo
+            echo '```'
+            cat dist-release/SHA256SUMS
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"

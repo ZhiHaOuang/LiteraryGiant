@@ -1,0 +1,32 @@
+diff --git a/packages/client/src/theme/sidebar.css b/packages/client/src/theme/sidebar.css
+index eabadbb..38dd66f 100644
+--- a/packages/client/src/theme/sidebar.css
++++ b/packages/client/src/theme/sidebar.css
+@@ -233,10 +233,19 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="section-label"] {
+ }
+ 
+ /* Compact scale: shrunken heights, margins and paddings */
++/* The host indents rows through `--dsh-workspace-indent`, written inline on each
++   group container as `depth * 12px`; the shipped row rule carries
++   `padding-inline-start: calc(8px + var(--dsh-workspace-indent, 0px))`. This
++   rule's specificity is (0,2,1) where that rule's is (0,1,0), so the shorthand
++   below decides the whole padding family and the tree would draw every level at
++   the same x. The second declaration restores the indentation on the skin's own
++   6px base. The variable is unset in the flat list and `0px` in the
++   group-by-workspace list, so both keep the 6px row they have today. */
+ body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] {
+   height: 28px;
+   min-height: 28px;
+   padding: 0 6px;
++  padding-inline-start: calc(6px + var(--dsh-workspace-indent, 0px));
+   gap: 4px;
+   border-radius: 6px;
+ }
+@@ -244,6 +253,7 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] {
+   height: 28px;
+   min-height: 28px;
+   padding: 0 6px;
++  padding-inline-start: calc(6px + var(--dsh-workspace-indent, 0px));
+   gap: 0;
+   border-radius: 6px;
+ }

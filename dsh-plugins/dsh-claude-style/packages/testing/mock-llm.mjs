@@ -1,0 +1,459 @@
+#!/usr/bin/env node
+/**
+ * mock-llm.mjs — the scripted model service the end-to-end lane runs against (D77).
+ *
+ * The lane needs a conversation of a known shape — a thought, an answer that
+ * arrives in pieces, a tool call and its result — and it needs the same one every
+ * run. This server answers the host's DeepSeek route: the route speaks the
+ * Messages protocol, so each request gets the event sequence the official API
+ * sends, `message_start` through `message_stop`, with the script's pieces in
+ * between. Every request it receives is written to a log beside the tool, so a
+ * lane that wonders what the host sent can read it.
+ *
+ * Only the model is scripted; everything downstream — the agent loop, the
+ * session, the client's stores and every component that renders them — is the
+ * shipping host (D77). Point the route at this server with a `--patch` overlay:
+ *
+ *   - id: llm-deepseek
+ *     config:
+ *       baseURL: http://127.0.0.1:<port>
+ *       apiKeyEnv: DSH_E2E_MOCK_KEY
+ *
+ * Usage: node packages/testing/mock-llm.mjs [--port <n>] [--log <dir>] [--script <name>]
+ *        (module use: `const mock = await startMockLlm()` → `{ url, stop, requests }`)
+ */
+import fs from 'node:fs'
+import http from 'node:http'
+import path from 'node:path'
+import { argOf } from './cli-args.mjs'
+
+const ROOT = path.resolve(import.meta.dirname, '..', '..')
+const DEFAULT_LOG = path.join(ROOT, '.debug', 'e2e', 'mock')
+const MODEL = 'deepseek-flash'
+const MESSAGES_PATH = '/v1/messages'
+
+/**
+ * The scripts the lane can ask for. A script holds one reply per conversation
+ * request, in order, and its answer to the shell's auxiliary requests.
+ *
+ * A reply's pieces become streamed deltas: `thinking` first, then `text`, then
+ * the one `tool` call when it has one — a reply with a call settles as
+ * `tool_use`, and the host then runs that tool and asks again. `holdMs` keeps
+ * the reply silent that long before its first event. The script starts over
+ * once it runs out, so a turn that keeps asking still gets an answer.
+ */
+
+/** A long answer, in a few pieces: enough lines that the column outgrows the viewport. */
+const LONG_LINES = Array.from({ length: 40 }, (_, index) => `- line ${index + 1}: the tail stays in view\n`)
+const LONG_PIECES = []
+for (let at = 0; at < LONG_LINES.length; at += 5) LONG_PIECES.push(LONG_LINES.slice(at, at + 5).join(''))
+
+const SCRIPTS = {
+  /** The lane's default: a thought, then markdown in a few pieces. */
+  greeting: {
+    conversation: [
+      {
+        thinking: [
+          'The reader said hello. ',
+          'A short answer with a heading and a list shows the renderer most of what it does.',
+        ],
+        text: [
+          '# Hello\n\n',
+          'This answer was **scripted** by the end-to-end lane.\n\n',
+          '- first point\n- second point\n\n',
+          'A short final line.',
+        ],
+      },
+    ],
+    auxiliary: { text: ['Scripted greeting'] },
+  },
+  /** A read-only call whose result the lane can watch arrive. */
+  inspect: {
+    conversation: [
+      {
+        thinking: ['Look at the workspace before answering.'],
+        tool: { name: 'glob', input: { pattern: '*.json' } },
+      },
+      {
+        thinking: ['The listing came back; describe it.'],
+        text: ['The workspace holds these files:\n\n', '- one\n- two\n'],
+      },
+    ],
+    auxiliary: { text: ['Scripted inspection'] },
+  },
+  /**
+   * Several rounds in one turn, after the model keeps the reader waiting past
+   * the point the waiting line calls overtime: a thought and a tool, a thought
+   * and a note with another tool, then the answer. The process groups on both
+   * sides of the intermediate note carry thinking and a tool call each.
+   */
+  process: {
+    conversation: [
+      { holdMs: 11500, thinking: ['先看清工作区再动手。'], tool: { name: 'glob', input: { pattern: '*.json' } } },
+      { thinking: ['列举结果回来了，先记一句中间结论。'], text: ['先记一句中间结论。\n\n'], tool: { name: 'glob', input: { pattern: '*.md' } } },
+      { thinking: ['信息够了，可以收尾。'], text: ['这是最终答案。\n\n', '- 第一点\n', '- 第二点\n'] },
+    ],
+    auxiliary: { text: ['Scripted process'] },
+  },
+  /**
+   * A long reasoning, delivered a couple of steps at a time: the thinking row's
+   * window grows with it and steps it up once it fills the height reasoning may
+   * reach (packages/client/src/features/chat-fold/reasoning-stream.ts), and the
+   * reader never loses its last line. Each step is long enough to fill more than
+   * a couple of lines even where the host's body renders the whole reasoning as
+   * one wrapped paragraph, and the whole script runs well past the host's cap on
+   * that body — the lane's own scenario reads the window on both sides of it.
+   */
+  think: {
+    conversation: [
+      {
+        thinking: [
+          '先把这个问题拆成几步：这一步要先看清工作区里到底有什么文件，再把与问题相关的几个挑出来，顺序上先宽后窄，避免一上来就钻进细节里出不来。\n\n',
+          '接下来确认这些文件彼此的依赖关系，谁引用了谁、谁的改动会波及到入口，这一步要顺着引用链看两跳，只看到一跳容易漏掉间接的调用方，而间接的调用方恰恰是最容易在改动之后才炸出来的那一批。\n\n',
+          '然后检查测试覆盖到哪里，哪些行为有测试守着、哪些只能靠手工核对，手工核对的部分要记下来留给读者判断，核对过的东西也要写清楚看到的是哪一版，免得后面换了版本还拿旧结论说话。\n\n',
+          '再估计改动的规模，把文件按大小和风险排一下，先动那些改起来最小、验证最快的地方，把大的留到后面，大改动排在前面会把整条链路都拖进未完成的状态里，回滚起来也麻烦。\n\n',
+          '中间要记下需要向读者确认的地方，比如名称怎么取、默认值取哪一个、要不要同时改文档，这些都不该自己拍板，一次问清楚比来回猜三次省时间，也让读者知道自己的判断被用在了哪里。\n\n',
+          '还要想清楚哪些东西这次不动，范围划得住才算改得完，边界外的文件只读不改，遇到顺手能修的小毛病也先记下来，不混进这一次的改动里，免得审阅的人分不清主次。\n\n',
+          '剩下的是收尾的顺序：先改实现，再补测试，最后同步文档，文档里凡是写死了数量、路径和默认值的地方都要跟着改，改完再通读一遍，看有没有前后矛盾的地方。\n\n',
+          '另外要留意兼容：旧版本存下来的值仍然要能读，新加的字段要有默认值，读不到就按默认走，不抛错也不静默改写读者已经存过的选择，这一条在任何一次改动里都成立。\n\n',
+          '性能上也要过一遍：新增的监听与测量都挂在需要的节点上，能合成每帧一次的就不要每次变动都读布局，读者看不见的东西不做，做完这一步再看一遍有没有白花的计算。\n\n',
+          '最后回头看一遍有没有漏掉的约束，把要改的文件按顺序排好，把结论整理成一句话，再开始动手，动手之前把要跑的命令和要看的页面也一并列出来。\n\n',
+          '再补一句自己的判断：这一版先照最小可用的改法走，把能验证的部分验证到位，剩下的等读者看过之后再说，不把没有把握的东西写成已经确定的样子。\n\n',
+          '想到这里可以先停一下，把上面这些整理成一份清单，按文件分组，每组写清楚改什么、为什么改、改完怎么验证，清单本身就是这一轮的答案。\n\n',
+          '清单之外还要留一段给不确定的地方：哪些结论是看代码得出的、哪些是猜的、哪些需要跑一遍才知道，三种分开写，读者才知道该信到哪一步。\n\n',
+          '再看一遍命名：新增的东西按它做的事取名，缩写一律不用，与仓库里已有的叫法保持一致，改完名字之后再全文搜一次，别留下半新半旧的两套写法。\n\n',
+          '接口的边界也要写清楚：谁调用谁、传什么、返回什么、失败的时候是什么样子，错误就地抛出还是往上交，看这一层有没有能力处理它再决定。\n\n',
+          '测试要挑有信息量的例子：边界值、空输入、两个东西同时变化的情形，能说明行为的那几个先写，重复验证同一件事的例子再多也不增加把握。\n\n',
+          '跑完测试还要真的用一遍：把页面打开，按读者的顺序走一遍，看动效有没有卡顿、文字有没有跳动、开合之后高度有没有对齐，量到的数字要记下来。\n\n',
+          '如果哪一步的结果与预期不一样，先弄清楚是预期错了还是实现错了，两个方向都要查，改完之后把结论写进提交说明里，不留没解释的差异。\n\n',
+          '收尾时把临时的脚本、截图与调试用的标记清干净，仓库里只留该留下的东西，确认没有把本机的路径与个人信息带进去，再请读者过目。\n\n',
+        ],
+        text: ['理清楚了，可以回答。\n'],
+      },
+    ],
+    auxiliary: { text: ['Scripted reasoning'] },
+  },
+  /** Enough streamed lines to push the column past the viewport edge. */
+  long: {
+    conversation: [
+      {
+        thinking: ['A long answer shows the tail staying in view while the column grows.'],
+        text: ['# Long answer\n\n', ...LONG_PIECES, '\nLast line.'],
+      },
+    ],
+    auxiliary: { text: ['Scripted long answer'] },
+  },
+  /**
+   * One burst: the whole answer in a single flush, longer than the stretch a
+   * stream slide carries. A provider that batches its output sends a response
+   * this way, and the column grows by every line between two frames.
+   *
+   * The lines are short on purpose: an answer whose lines wrap to two or three
+   * lines of their own grows taller in the frame that lays them out than
+   * between two frames once they are, so it is never paced.
+   */
+  burst: {
+    conversation: [
+      {
+        thinking: ['The whole answer in one flush.'],
+        text: [`# Burst answer\n\n- held: the burst scripted for the lane's own pace\n${Array.from({ length: 90 }, (_, index) => `- ${index + 1}: held\n`).join('')}`],
+        pieceDelayMs: 0,
+      },
+    ],
+    auxiliary: { text: ['Scripted burst answer'] },
+  },
+  /**
+   * A screenful of answer, then a process group that reasons at the tail: the
+   * first reply fills the column past the viewport and calls a tool, and the
+   * second reasons in pieces long enough to add a line or two each, for a few
+   * seconds, inside the group the tool call opened. The reasoning keeps the turn
+   * streaming while the lane rolls a door over that group.
+   */
+  tailReasoning: {
+    conversation: [
+      {
+        thinking: ['Fill the screen before the work starts.'],
+        text: ['# Long answer\n\n', ...LONG_PIECES],
+        tool: { name: 'glob', input: { pattern: '*.json' } },
+      },
+      {
+        thinking: [
+          '列举的结果回来了，先看清这些文件各自管什么，再决定从哪一个开始读，顺序上先宽后窄。\n\n',
+          '入口文件引用了两个模块，其中一个只在启动时读一次配置，另一个在每次请求里都会被调用。\n\n',
+          '每次请求都调用的那个更值得先看，它的改动会直接落到读者能看到的地方，风险也更高。\n\n',
+          '配置那一边只要确认默认值和旧版本存下来的值都还能读，就可以先放一放，留到最后一起核对。\n\n',
+          '接下来把要改的地方按文件排好，每个文件写清楚改什么、为什么改、改完之后用什么办法验证。\n\n',
+          '验证要挑有信息量的例子：空输入、边界值、两个东西同时变化的情形，重复验证同一件事的不算。\n\n',
+          '跑完测试还要在页面上按读者的顺序走一遍，看文字有没有跳动、开合之后高度有没有变化。\n\n',
+          '最后把临时的脚本和调试用的标记清干净，再把结论整理成一句话写在答案的开头。\n\n',
+          '想到这里已经够了，可以开始回答。\n\n',
+          '回答之前再确认一遍文件名都写对了。\n\n',
+        ],
+        tool: { name: 'glob', input: { pattern: '*.md' } },
+      },
+      { thinking: ['Both listings are in.'], text: ['The files are listed above.\n'] },
+    ],
+    auxiliary: { text: ['Scripted tail reasoning'] },
+  },
+  /**
+   * One `run_code` program touching four files, for the file rows: `app.js` is
+   * read, changed four times and read again; `notes.md` is written and then
+   * read; `only.md` is written once; `plain.md` is read twice and never
+   * changed. Every call is dispatched from the one program, which is the shape
+   * the rows are read together in: the host keeps one row per call, and a
+   * program's calls are the ones that stand side by side under the program's
+   * own row. `app.js` is read before it is edited — the host refuses an edit of
+   * a file it has not seen — and every replacement chains onto the one before
+   * it. `{{workspace}}` is filled in by the lane, which is the side that knows
+   * the scratch home, and `{{workspaceCode}}` is the same path with its
+   * backslashes doubled: inside a program's own source a single backslash is an
+   * escape.
+   */
+  fileEdits: {
+    conversation: [
+      {
+        thinking: ['一个程序里改这个文件、读它、再碰另外三个文件。'],
+        tool: {
+          name: 'run_code',
+          input: {
+            description: 'Read, change and read one file, and touch three others',
+            code: [
+              "const { setTimeout: delay } = await import('node:timers/promises')",
+              "await tools.read({ file_path: '{{workspaceCode}}/app.js' })",
+              "await tools.edit({ file_path: '{{workspaceCode}}/app.js', old_string: 'const first = 1', new_string: 'const first = 2' })",
+              "await delay(300)",
+              "await tools.edit({ file_path: '{{workspaceCode}}/app.js', old_string: 'const second = 1', new_string: 'const second = 2' })",
+              "await delay(300)",
+              "await tools.edit({ file_path: '{{workspaceCode}}/app.js', old_string: 'const third = 1', new_string: 'const third = 2' })",
+              "await delay(300)",
+              "await tools.edit({ file_path: '{{workspaceCode}}/app.js', old_string: 'const fourth = 1', new_string: 'const fourth = 2' })",
+              "await tools.read({ file_path: '{{workspaceCode}}/app.js' })",
+              "await tools.write({ file_path: '{{workspaceCode}}/notes.md', content: '# Notes\\n\\n- one\\n- two\\n' })",
+              "await tools.read({ file_path: '{{workspaceCode}}/notes.md' })",
+              "await tools.write({ file_path: '{{workspaceCode}}/only.md', content: '# Only\\n' })",
+              "await tools.read({ file_path: '{{workspaceCode}}/plain.md' })",
+              "await delay(200)",
+              "await tools.read({ file_path: '{{workspaceCode}}/plain.md' })",
+              "return 'four changes to app.js, a write and a read of notes.md, one write to only.md, two reads of plain.md'",
+            ].join('\n'),
+          },
+        },
+      },
+      { thinking: ['做完了，说明一下。'], text: ['四个文件的调用都落好了。\n'] },
+    ],
+    auxiliary: { text: ['Scripted file edits'] },
+  },
+  /**
+   * The waiting line's own words: the model reasons in an English clause it is
+   * on ("I am checking the file is true"), then in a sentence carrying no clause
+   * at all, then in a second clause, and then reads a file. The line has to say
+   * the model's clause while it reasons and the file's name while the call runs,
+   * and the sentence between the two clauses must not put the waiting word back:
+   * the clause stands until the next intent arrives. Each piece is short and the
+   * pause between them is the lane's own, so every state stands long enough for
+   * the scenario to sample it.
+   */
+  waitLine: {
+    conversation: [
+      {
+        thinking: ['Let me look at the file. ', 'I am checking the file is true. ', 'The user asked about the row. ', 'I am reading the row model. '],
+        tool: { name: 'read', input: { file_path: '{{workspaceCode}}/app.js' } },
+      },
+      { thinking: ['The read came back, so I can answer. '], text: ['看过了，答案如下。\n'] },
+    ],
+    auxiliary: { text: ['Scripted waiting line'] },
+  },
+}
+
+/** The `{{name}}` slots of a scripted value, filled from the lane's own values. */
+function fillVars(value, vars) {
+  if (typeof value === 'string') return value.replace(/\{\{(\w+)\}\}/g, (match, name) => vars[name] ?? match)
+  if (Array.isArray(value)) return value.map((item) => fillVars(item, vars))
+  if (value !== null && typeof value === 'object') {
+    const out = {}
+    for (const [key, item] of Object.entries(value)) out[key] = fillVars(item, vars)
+    return out
+  }
+  return value
+}
+
+/** One SSE frame; the event name repeats the payload's own `type`, as the route checks both. */
+function send(res, event) {
+  res.write(`event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`)
+}
+
+/** Wait between pieces, so the reader watches the answer arrive rather than appear. */
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
+/** A plausible token count for scripted text, so the meter shows numbers instead of zero. */
+const tokensOf = (text) => Math.max(1, Math.round(text.length / 4))
+
+/**
+ * The pause a reply's piece gets: the lane's own delay, or the reply's
+ * `pieceDelayMs` where it carries one. A reply that arrives as one burst asks
+ * for 0, which puts every piece of it into a single flush.
+ */
+const pauseFor = (reply, delayMs) => pause(reply.pieceDelayMs ?? delayMs)
+
+/**
+ * Stream one reply as Messages events.
+ *
+ * @param res - the response.
+ * @param reply - one script reply (SCRIPTS).
+ * @param delayMs - the pause between pieces.
+ * @param vars - the values a script's `{{name}}` slots are filled from.
+ */
+async function streamReply(res, reply, delayMs, vars) {
+  // A reply that hesitates keeps the model silent before its first event, the
+  // stretch the host shows as waiting for the model.
+  if (reply.holdMs !== undefined) await pause(reply.holdMs)
+  res.writeHead(200, {
+    'content-type': 'text/event-stream; charset=utf-8',
+    'cache-control': 'no-cache',
+    connection: 'keep-alive',
+  })
+  let outputTokens = 0
+  send(res, {
+    type: 'message_start',
+    message: {
+      id: `msg_mock_${Date.now()}`,
+      type: 'message',
+      role: 'assistant',
+      model: MODEL,
+      content: [],
+      stop_reason: null,
+      stop_sequence: null,
+      usage: { input_tokens: 1024, output_tokens: 0 },
+    },
+  })
+  let index = 0
+  if (reply.thinking !== undefined) {
+    send(res, { type: 'content_block_start', index, content_block: { type: 'thinking', thinking: '' } })
+    for (const piece of reply.thinking) {
+      send(res, { type: 'content_block_delta', index, delta: { type: 'thinking_delta', thinking: piece } })
+      outputTokens += tokensOf(piece)
+      await pauseFor(reply, delayMs)
+    }
+    // The route keeps a thinking signature for replay; a scripted one keeps that path exercised.
+    send(res, { type: 'content_block_delta', index, delta: { type: 'signature_delta', signature: 'mock-signature' } })
+    send(res, { type: 'content_block_stop', index })
+    index += 1
+  }
+  if (reply.text !== undefined) {
+    send(res, { type: 'content_block_start', index, content_block: { type: 'text', text: '' } })
+    for (const piece of reply.text) {
+      send(res, { type: 'content_block_delta', index, delta: { type: 'text_delta', text: piece } })
+      outputTokens += tokensOf(piece)
+      await pauseFor(reply, delayMs)
+    }
+    send(res, { type: 'content_block_stop', index })
+    index += 1
+  }
+  if (reply.tool !== undefined) {
+    const id = `toolu_mock_${index}`
+    send(res, { type: 'content_block_start', index, content_block: { type: 'tool_use', id, name: reply.tool.name, input: {} } })
+    await pauseFor(reply, delayMs)
+    // The real API opens a call with empty input and streams the arguments as JSON text.
+    const json = JSON.stringify(fillVars(reply.tool.input, vars))
+    send(res, { type: 'content_block_delta', index, delta: { type: 'input_json_delta', partial_json: json } })
+    outputTokens += tokensOf(json)
+    send(res, { type: 'content_block_stop', index })
+  }
+  send(res, {
+    type: 'message_delta',
+    delta: { stop_reason: reply.tool === undefined ? 'end_turn' : 'tool_use', stop_sequence: null },
+    usage: { output_tokens: outputTokens, input_tokens: 1024 },
+  })
+  send(res, { type: 'message_stop' })
+  res.end()
+}
+
+/**
+ * The reply one request gets: conversation replies in order, the auxiliary
+ * answer for the shell's own calls — those carry no tool catalog — and the
+ * script from its first reply again once it runs out, so every turn of a
+ * scenario carries the same work.
+ */
+function replyFor(script, request, state) {
+  if (request.tools === undefined || request.tools.length === 0) return script.auxiliary
+  const replies = script.conversation
+  const reply = replies[state.conversation % replies.length]
+  state.conversation += 1
+  return reply
+}
+
+/**
+ * Start the scripted model.
+ *
+ * @param options.port - the port; 0 lets the OS pick one.
+ * @param options.log - where requests are written (created when absent).
+ * @param options.script - the script's name (SCRIPTS), or a script of the
+ *     caller's own in the same shape: a reading that needs a reply of another
+ *     size keeps it beside its own assertions instead of in the table.
+ * @param options.delayMs - the pause between streamed pieces.
+ * @param options.vars - the values a script's `{{name}}` slots are filled from:
+ *     the lane's scratch home is only known at run time (packages/testing/e2e.mjs).
+ * @returns `{ url, port, log, requests, stop }`; `url` is the value to configure
+ *     the host's route with.
+ */
+async function startMockLlm(options = {}) {
+  const log = options.log ?? DEFAULT_LOG
+  const script = typeof options.script === 'object' && options.script !== null
+    ? options.script
+    : SCRIPTS[options.script ?? 'greeting']
+  if (script === undefined) throw new Error(`mock-llm: no script named "${options.script}"`)
+  const delayMs = options.delayMs ?? 50
+  const vars = options.vars ?? {}
+  fs.mkdirSync(log, { recursive: true })
+  /** Every request the host made, in order. */
+  const requests = []
+  /** How many conversation replies the script has handed out. */
+  const state = { conversation: 0 }
+  let counter = 0
+  const server = http.createServer((req, res) => {
+    const chunks = []
+    req.on('data', (part) => chunks.push(part))
+    req.on('end', () => {
+      const body = Buffer.concat(chunks).toString('utf8')
+      const url = req.url ?? '/'
+      const record = { at: new Date().toISOString(), method: req.method, url, headers: req.headers, body }
+      requests.push(record)
+      fs.writeFileSync(path.join(log, `${String(++counter).padStart(3, '0')}-${url.replace(/[^\w.-]+/g, '_')}.json`), `${JSON.stringify(record, null, 2)}\n`)
+      if (!url.startsWith(MESSAGES_PATH)) {
+        res.writeHead(404, { 'content-type': 'application/json' })
+        res.end(JSON.stringify({ error: { type: 'not_found_error', message: `mock-llm serves ${MESSAGES_PATH} only, not ${url}` } }))
+        return
+      }
+      const request = JSON.parse(body)
+      streamReply(res, replyFor(script, request, state), delayMs, vars).catch((error) => {
+        res.destroy(error)
+      })
+    })
+  })
+  const port = await new Promise((resolve) => server.listen(options.port ?? 0, '127.0.0.1', () => resolve(server.address().port)))
+  return {
+    url: `http://127.0.0.1:${port}`,
+    port,
+    log,
+    requests,
+    stop: () => new Promise((resolve) => server.close(resolve)),
+  }
+}
+
+export { startMockLlm, SCRIPTS, DEFAULT_LOG, MESSAGES_PATH }
+
+if (import.meta.main) {
+  startMockLlm({
+    port: argOf('port') === undefined ? 0 : Number(argOf('port')),
+    log: argOf('log'),
+    script: argOf('script'),
+  }).then((mock) => {
+    console.log(`mock-llm: ${mock.url}  (requests → ${mock.log})`)
+    process.on('SIGINT', () => {
+      mock.stop().then(() => process.exit(0))
+    })
+  }).catch((error) => {
+    console.error(error.message)
+    process.exit(1)
+  })
+}

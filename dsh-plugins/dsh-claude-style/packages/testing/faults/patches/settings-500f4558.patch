@@ -1,0 +1,15 @@
+diff --git a/packages/client/src/features/settings/settings-tab-general.ts b/packages/client/src/features/settings/settings-tab-general.ts
+index 54dbc6c..f6c59c9 100644
+--- a/packages/client/src/features/settings/settings-tab-general.ts
++++ b/packages/client/src/features/settings/settings-tab-general.ts
+@@ -35,6 +35,10 @@ export function createSettingsGeneralTab(): SettingsTab {
+           key: option.value,
+           type: 'button',
+           className: 'dsh-claude-brand-card',
++          // The card names its own brand: the two cards draw their art differently
++          // (Claude's mark beside its word, DeepSeek's lockup as one piece), so the
++          // card, not the art inside it, is what a reader and the lane press.
++          'data-brand': option.value,
+           'data-active': option.value === prefs.brand ? '' : undefined,
+           'aria-pressed': option.value === prefs.brand ? 'true' : 'false',
+           'aria-label': option.label,

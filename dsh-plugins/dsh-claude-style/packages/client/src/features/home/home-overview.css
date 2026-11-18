@@ -1,0 +1,176 @@
+/* ---------- the usage panel's Overview tab ---------- */
+/* The six stat cells, Claude Code's blue heat grid, and the yardstick line under
+   it. The shell (the panel frame, its head and the tab pills) is home-panel.css. */
+
+body[data-dsh-claude-style] .dsh-claude-home-stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+}
+
+/* A tile sits one tone deeper than the panel wash, not one tone lighter. */
+body[data-dsh-claude-style] .dsh-claude-home-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 5px 8px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 15%, var(--dsw-alias-bg-layer-2, #ffffff));
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-stat-label {
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-stat-value {
+  color: var(--dsw-alias-label-primary, #161616);
+  /* Claude's tile keeps the figure barely above its own label: 13px bold, which
+     is also what lets a long model id such as deepseek-v4.1-flash sit on one
+     line instead of being cut off. */
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 18px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The favourite model is a name, not a figure: Claude Code sets it at the
+   label's own weight. */
+body[data-dsh-claude-style] .dsh-claude-home-stat[data-stat="model"] .dsh-claude-home-stat-value {
+  font-weight: 400;
+}
+
+/* The heat grid keeps its geometry whether or not the numbers have landed: an
+   empty cell IS the zero step, so the skeleton and the data look like one grid
+   and nothing shifts when the value arrives. */
+/* The grid fills the panel's inner width: one equal column per week, square
+   cells, so the newest week never falls past the edge and the whole block
+   scales with the card instead of with a fixed cell size. */
+body[data-dsh-claude-style] .dsh-claude-home-heat {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  grid-auto-columns: 1fr;
+  gap: 3px;
+  align-content: start;
+  /* The grid is the plane the day tip is placed on: the pill's offsets are
+     lengths in this box (heat-tip.ts), so the grid is the element the pill is
+     positioned against. */
+  position: relative;
+  /* The grid holds its own layout and paint: the tip is an absolutely placed box
+     that travels over the grid, and the panel's own box must not follow it as
+     the pointer crosses a day. */
+  contain: layout style;
+}
+
+/* Claude Code's heat grid is a blue data ramp, not the brand ember: the empty
+   cell stays the neutral base tone, and each level mixes in the data blue by
+   its share of the ramp (constants.ts's HOME_HEAT_RAMP; the build writes one
+   rule per level, scripts/feature-sheets.mjs). The model chart beside it reads
+   the same ink, so both charts tell one story about which model earned a day. */
+body[data-dsh-claude-style] .dsh-claude-home-heat {
+  --dsh-claude-heat-ink: var(--dsh-claude-data-ink);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-heat-cell {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 11%, transparent);
+}
+
+/* Claude Code's day tip: one pill the grid carries, which names the day the
+   pointer is on (heat-tip.ts). It appears after a short rest and grows from the
+   side it hangs on, and it leaves at once; its width, place and side are written
+   before the showing attribute, so a crossing stands over the next day on the
+   first frame rather than travelling there. The paint is solid label ink with the
+   host's raised-surface tone for the words — a wallpaper plugin clears
+   --dsw-alias-bg-base to transparent for the page's ground, so a canvas tone
+   used as ink leaves the words invisible. */
+body[data-dsh-claude-style] .dsh-claude-home-heat-hint {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  box-sizing: border-box;
+  /* The pill is as wide as the day it names: it holds one line, and that line is
+     what the placement measures (heat-tip.ts). */
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--dsw-alias-label-primary, #161616);
+  color: var(--dsw-alias-bg-layer-3, #ffffff);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  pointer-events: none;
+  opacity: 0;
+  translate: var(--dsh-claude-heat-tip-x, 0px) var(--dsh-claude-heat-tip-y, 0px);
+  scale: var(--dsh-claude-scale-surface);
+  transform-origin: 50% 100%;
+  /* The showing rule swaps the fade's length through --dsh-claude-heat-hint-fade
+     and leaves transition-duration alone, so the reduced-motion rule
+     (theme/chrome.css) still outranks it. The pill travels and resizes on the
+     settling curve, so a run along a row reads as one pill following the pointer
+     rather than a box appearing under each day. */
+  --dsh-claude-heat-hint-fade: var(--dsh-claude-duration-hint-exit);
+  transition-property: opacity, scale, translate, width;
+  transition-duration: var(--dsh-claude-heat-hint-fade), var(--dsh-claude-heat-hint-fade), var(--dsh-claude-duration-move), var(--dsh-claude-duration-move);
+  transition-timing-function: var(--dsh-claude-ease-out), var(--dsh-claude-ease-out), var(--dsh-claude-ease-settle), var(--dsh-claude-ease-settle);
+}
+
+/* Hanging under its cell, the pill grows from its own top edge. A pill that
+   crosses to the other side of its cell is read as crossing, so both origins
+   travel on the same clock. */
+body[data-dsh-claude-style] .dsh-claude-home-heat-hint[data-side="below"] {
+  transform-origin: 50% 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-heat-hint[data-shown] {
+  --dsh-claude-heat-hint-fade: var(--dsh-claude-duration-surface);
+  opacity: 1;
+  scale: 1;
+  /* The rest before a hint appears sits on the arrival alone: a pill already
+     showing that follows the pointer to the next day carries no delay. */
+  transition-delay: var(--dsh-claude-duration-hint-delay), var(--dsh-claude-duration-hint-delay), 0s, 0s;
+}
+
+/* The one-liner under the grid: a plain caption, no emphasis of its own. */
+body[data-dsh-claude-style] .dsh-claude-home-fun {
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Skeleton: the label stays, the number is a placeholder of the value's own
+   height, and the grid breathes instead of pretending to hold zeroes. */
+body[data-dsh-claude-style] .dsh-claude-home-stat[data-skeleton] .dsh-claude-home-stat-value {
+  display: block;
+  width: 42px;
+  height: 13px;
+  margin: 2px 0;
+  border-radius: 4px;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 9%, transparent);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-heat[data-skeleton] .dsh-claude-home-heat-cell {
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 5%, transparent);
+}
+
+/* A narrow page stacks the stat cells rather than squeezing three of them;
+   the heat grid follows the panel on its own. */
+body[data-dsh-claude-style][data-dsh-claude-page-under-760] .dsh-claude-home-stats {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}

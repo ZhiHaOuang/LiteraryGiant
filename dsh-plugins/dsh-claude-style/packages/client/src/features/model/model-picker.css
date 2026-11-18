@@ -1,0 +1,522 @@
+/* ---------- Claude Code layout: model picker ---------- */
+/* Replaces the host's two-pane model menu: level 1 carries the current
+   provider's models, a divider, the effort row and a More models row; both
+   rows open their level 2 beside this popover. The card is the shared popover
+   card (shared/popover.css); what is the picker's own is below. */
+body[data-dsh-claude-style] .dsh-claude-model-popover {
+  position: fixed;
+  min-width: 248px;
+  max-width: min(360px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
+  /* The first level is sized by its content like the second: the cap is only
+     the viewport, so a short list does not leave a tall empty card. The level-1
+     list scrolls inside the body instead (see the scoped rule below); this
+     overflow-y stays for the sub popover, whose whole card scrolls. */
+  max-height: calc(var(--dsh-claude-page-height, 100vh) - 80px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transform-origin: bottom right;
+}
+/* Level 1 splits into a scrollable list and a pinned footer: the model rows
+   scroll under the divider / effort / more-models rows, which never leave the
+   viewport edge of the card. Only the first level does this — the sub popover
+   keeps scrolling as one card, with its provider labels pinned (below). */
+body[data-dsh-claude-style] .dsh-claude-model-popover:not(.dsh-claude-model-popover-sub) {
+  overflow: hidden;
+}
+body[data-dsh-claude-style] .dsh-claude-model-popover:not(.dsh-claude-model-popover-sub) .dsh-claude-popover-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+body[data-dsh-claude-style] .dsh-claude-model-footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+/* The sub popover splits the way level 1 does: the search field is pinned at
+   the top and only the list under it scrolls, so the reader keeps what they
+   typed in front of them while they walk the matches. Provider labels stay
+   pinned inside that list. The card keeps its own 6px inset at the top, so the
+   field stands off the card's edge the way its rows do. */
+body[data-dsh-claude-style] .dsh-claude-model-popover-sub {
+  overflow: hidden;
+  /* A query leaves a shorter list than the whole catalog: the card takes the
+     new height over transitions.dev's "Card resize" (MIT), so the edge follows
+     the reader's typing instead of jumping under it. */
+  transition:
+    height var(--dsh-claude-timing-resize);
+  will-change: height;
+}
+/* The reader's animation choice, resolved onto <body> (D40): reduced takes the
+   tween away and the card lands on its new height at once. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-model-popover-sub {
+  transition: none;
+}
+body[data-dsh-claude-style] .dsh-claude-model-popover-sub .dsh-claude-model-sub-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* ---------- The search field at the top of level 2 ---------- */
+/* The field clears the way transitions.dev's "Input clear with dissolve" (MIT)
+   does: the words leaving fly down through a blur while a streak ignites under
+   each of them, and the placeholder falls in from above. The flight is written
+   per frame by features/model/sub-menu.ts — the streak's envelope cannot be a
+   keyframe — so this sheet owns the resting state and the values that script
+   reads. */
+body[data-dsh-claude-style] .dsh-claude-model-search {
+  flex: none;
+  min-width: 0;
+  /* The field is the card's opening control, not a row: its own inset above
+     keeps it off the card's edge, which the card's padding alone leaves it
+     flush against. The list below keeps the card's padding. */
+  padding: 6px 0 2px;
+  box-sizing: border-box;
+}
+/* The field is the positioning context the flight is measured against, and it
+   clips the streak to its own rounded box, so the hairline is drawn inset and
+   darkens with the glow rather than sitting outside it. */
+body[data-dsh-claude-style] .dsh-claude-model-search-field {
+  position: relative;
+  height: 28px;
+  border: 1px solid var(--dsw-alias-border-l1, #e9e9e9);
+  border-radius: 8px;
+  background: var(--dsw-specific-input-major, #ffffff);
+  color: var(--dsw-alias-label-primary, #161616);
+  font-family: var(--dsw-font-family);
+  font-size: 13px;
+  line-height: 20px;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* The streak's strength: the one value the two palettes disagree on, because
+     a wash that darkens a white field does not lighten a dark one. The blend
+     below is the other half of that. */
+  --dsh-claude-clear-glow-opacity: 0.85;
+}
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-model-search-field {
+  --dsh-claude-clear-glow-opacity: 0.42;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-field:focus-within {
+  border-color: var(--dsw-alias-brand-primary, #d97757);
+}
+/* A real input, so selecting and editing a query keep working. Its right
+   padding is the clear control's room, and the mirror is padded to match so
+   the words fly from where they stood. */
+body[data-dsh-claude-style] .dsh-claude-model-search-input {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0 26px 0 8px;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  box-sizing: border-box;
+}
+/* Hidden at rest and shown by the clear alone: while the field holds words it
+   draws them itself, so the mirror is only ever the words on their way out. */
+body[data-dsh-claude-style] .dsh-claude-model-search-mirror,
+body[data-dsh-claude-style] .dsh-claude-model-search-placeholder {
+  position: absolute;
+  inset: 0;
+  padding: 0 26px 0 8px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  white-space: pre;
+  pointer-events: none;
+  z-index: 2;
+  box-sizing: border-box;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-mirror {
+  opacity: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-field[data-dsh-claude-field-clearing] .dsh-claude-model-search-mirror {
+  opacity: 1;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-placeholder {
+  color: var(--dsw-alias-label-tertiary, #91888a);
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-field[data-dsh-claude-field-filled] .dsh-claude-model-search-placeholder {
+  opacity: 0;
+}
+/* The streak overlay: empty by default, and the script writes a stack of
+   radial gradients into its background for one clear. Multiply darkens the
+   field under a light palette; screen lightens it under a dark one, where the
+   same alpha would vanish. */
+body[data-dsh-claude-style] .dsh-claude-model-search-glow {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 3;
+  mix-blend-mode: screen;
+}
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-model-search-glow {
+  mix-blend-mode: multiply;
+}
+/* The words leaving scroll with the field: the field scrolls its own text and
+   the mirror is not inside it, so the offset is written onto this span. */
+body[data-dsh-claude-style] .dsh-claude-model-search-travel {
+  display: block;
+  white-space: pre;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-clear {
+  position: absolute;
+  top: 50%;
+  right: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-top: -10px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  cursor: pointer;
+  /* Gone from the paint and from the tab order while the field is empty: an
+     invisible control a reader can still reach is one they can press by
+     accident. The fade keeps its leave. */
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard), visibility 0s linear var(--dsh-claude-duration-feedback);
+  z-index: 4;
+}
+/* It stands while the field holds words and leaves with them: the clear takes
+   the words away, so a control for them has nothing left to do. */
+body[data-dsh-claude-style] .dsh-claude-model-search-field[data-dsh-claude-field-filled] .dsh-claude-model-search-clear {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transition: opacity var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard), visibility 0s;
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-clear:hover {
+  color: var(--dsw-alias-label-secondary, #70686a);
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.06));
+}
+body[data-dsh-claude-style] .dsh-claude-model-search-clear svg {
+  display: block;
+}
+/* The drawn caret stands over the mirror and the streak: both paint above the
+   field's own text, and the caret is what the reader follows. */
+body[data-dsh-claude-style] .dsh-claude-model-search-field [data-dsh-claude-caret-layer] {
+  z-index: 5;
+}
+/* The reader's animation choice, resolved onto <body> (D40): reduced takes the
+   flight away whole, and the script asks the same question before it starts
+   one, so no half state is left behind. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-model-search-glow {
+  opacity: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-model-group-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Level 2 rows sit close together: the 3px the body uses between sections
+     read as a gap between models of the same provider. */
+  gap: 1px;
+  min-width: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-model-group-row {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  align-self: stretch;
+  margin: 0;
+  padding: 3px 7px 0 7px;
+  background: var(--dsw-alias-bg-overlay, #ffffff);
+}
+
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-model-group-row {
+  background: var(--dsh-claude-card);
+}
+
+body[data-dsh-claude-style] .dsh-claude-model-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin: 0;
+  padding: 1px 7px;
+  background: var(--dsh-claude-inverse-fill);
+  color: var(--dsh-claude-inverse-ink);
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+}
+
+/* Model / effort option and the level-2 row (label + chevron, whose hover opens
+   its own level): same row metrics and hover as the drawer items. */
+body[data-dsh-claude-style] .dsh-claude-model-option,
+body[data-dsh-claude-style] .dsh-claude-model-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 27px;
+  padding: 1px 7px;
+  border: none !important;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary, #161616);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+/* The lists are height-capped column flex boxes: an item whose min-height is
+   explicit stops there instead of overflowing, so a long catalog squeezed every
+   row to the 27px single-line floor and a description row's second line ran into
+   the row below. Rows keep their copy's height; the list scrolls. */
+body[data-dsh-claude-style] .dsh-claude-model-option,
+body[data-dsh-claude-style] .dsh-claude-model-cell {
+  flex: none;
+}
+/* A description makes the row two lines — 16px name, 2px, 14px description —
+   inside 1px of padding above and below, so 34px is its floor. */
+body[data-dsh-claude-style] .dsh-claude-model-option:has(.dsh-claude-model-desc) {
+  min-height: 34px;
+}
+body[data-dsh-claude-style] .dsh-claude-model-option:hover,
+body[data-dsh-claude-style] .dsh-claude-model-cell:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08)) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-model-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-model-name {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 16px;
+}
+/* The name and the host's release tag share one line. The tag never squeezes the
+   name: a long name wraps inside its own share of the line. */
+body[data-dsh-claude-style] .dsh-claude-model-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-model-line .dsh-claude-model-name {
+  min-width: 0;
+}
+/* The release marker is metadata, not a second accent: a neutral plate and the
+   secondary ink let the model name and the effort colour carry the emphasis. */
+body[data-dsh-claude-style] .dsh-claude-model-tag {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 4px;
+  background: var(--dsw-alias-interactive-bg-hover-solid);
+  color: var(--dsw-alias-label-secondary);
+  font-family: var(--dsw-font-family);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 16px;
+}
+/* Claude's wordmark is set in Anthropic's serif, so the rest of the label follows
+   it — the row reads as one piece of lettering rather than serif art beside sans. */
+body[data-dsh-claude-style] .dsh-claude-model-option[data-brand='claude'] .dsh-claude-model-name {
+  font-family: var(--dsh-claude-font-brand) !important;
+}
+/* A vendor lockup: the mark and the vendor's own wordmark as one piece of art,
+   drawn in place of the vendor's name in the label. Its viewBox is the wordmark's
+   capital band, so the label's own cap height sizes it and the mark — which is
+   taller — paints outside the box, which is what the visible overflow is for.
+   Two mark layers ship inside the file: the colour artwork on the ivory canvas,
+   the mono one in currentColor on the warm black canvas, where a brand colour
+   like #000 or #F1F0E8 would disappear. A vendor with no colour artwork carries
+   both classes on its single layer, so it shows on either canvas. */
+body[data-dsh-claude-style] .dsh-claude-model-combine {
+  display: inline-block;
+  /* The label's own cap height sizes the mark, so the mark — which is taller —
+     paints outside the box, which is what the visible overflow is for. `cap` is
+     the unit that means "the cap height"; a browser without it takes the em
+     value here, and the rule below replaces it where the unit is understood.
+     The two heights sit in separate rules on purpose: two declarations of one
+     property in one rule are a rule the importance audit cannot judge. None of
+     the four carries a weight — the class is the skin's own and nothing else
+     styles it, which the audit confirmed by dropping each one (D9). */
+  height: 0.72em;
+  margin-right: 0.25em;
+  vertical-align: baseline;
+}
+@supports (height: 1cap) {
+  body[data-dsh-claude-style] .dsh-claude-model-combine {
+    height: 1cap;
+  }
+}
+body[data-dsh-claude-style] .dsh-claude-model-combine svg {
+  display: block;
+  height: 100%;
+  width: auto;
+  overflow: visible;
+}
+/* Dark canvas is the base: hide a *separate* colour layer. The `:not()` matters —
+   a hand-provided lockup is one layer carrying both classes so it shows on either
+   canvas, and a bare `.dsh-combine-mark-color` rule would hide it on the dark one
+   (which is how the ChatGPT knot went missing on warm black). */
+body[data-dsh-claude-style] .dsh-claude-model-combine .dsh-combine-mark-color:not(.dsh-combine-mark-mono) {
+  display: none;
+}
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-model-combine .dsh-combine-mark-color {
+  display: block;
+}
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-model-combine .dsh-combine-mark-mono:not(.dsh-combine-mark-color) {
+  display: none;
+}
+/* The word the lockup stands in for stays in the accessibility tree. */
+body[data-dsh-claude-style] .dsh-claude-model-combine-alt {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+/* The row carries one description line, in the shell's language: the copy
+   document is localized rather than stacked, so there is no second-language
+   rule to style. */
+body[data-dsh-claude-style] .dsh-claude-model-desc {
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+}
+/* The divider that closes the model list carries the shared separator's role, so
+   its line comes from shared/popover.css with every other separator in a card;
+   what stays here is its margin. The provider header's own rule is the one line
+   this sheet states, in the same language: a 0.5px border of the divider token.
+   It is a border on a zero-height box so the line belongs to the layout. */
+body[data-dsh-claude-style] .dsh-claude-model-rule::after {
+  height: 0;
+  border-top: 0.5px solid var(--dsh-claude-divider, var(--dsw-alias-border-l2, #dedede));
+}
+body[data-dsh-claude-style] .dsh-claude-model-divider {
+  margin: 2px 4px;
+  flex: none;
+}
+/* The provider header: the name first, then the rule running to the right edge.
+   The line is what is left of that row, not a separate full-width rule above it
+   — one rule per provider boundary, and nothing more. An empty label leaves the
+   bare rule, which is how a provider that needs no naming (the official source)
+   is separated. */
+body[data-dsh-claude-style] .dsh-claude-model-rule {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  margin: 2px 4px !important;
+  flex: none !important;
+}
+body[data-dsh-claude-style] .dsh-claude-model-rule::after {
+  content: "" !important;
+  flex: 1 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-model-rule-name {
+  flex: none !important;
+  font-size: 11px !important;
+  line-height: 14px !important;
+  color: var(--dsw-alias-label-caption, #b2acad) !important;
+  letter-spacing: 0.02em !important;
+}
+/* The provider is this menu's only grouping label, and caption is the host's
+   decoration tier: on a light card it reads 2.45:1 (#a6a094 on #f8f8f8), under
+   the 4.5:1 an 11px label needs. Secondary is the tier that carries a name; the
+   fallback is the value that clears the threshold when the token is absent. */
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-model-rule-name {
+  color: var(--dsw-alias-label-secondary, #70686a) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-model-cell-label {
+  flex: 1;
+  min-width: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-model-cell-chevron {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  color: var(--dsw-alias-label-caption, #b2acad);
+}
+
+/* External seats use the same two-part control outside the composer's trailing region. */
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] {
+  display: flex;
+  justify-content: flex-end;
+  min-width: 0;
+  color: var(--dsw-alias-label-primary);
+  font-size: 13px;
+  font-weight: 500;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  height: 28px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0;
+  border-radius: 7px;
+  box-sizing: border-box;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-model,
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-effort {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: background var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-model {
+  flex: 0 1 auto;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-effort {
+  flex: none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-model:hover,
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-seat-effort:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-btn,
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-effort-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 28px;
+  min-width: 0;
+  max-width: 100%;
+  padding: 0 4px;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  white-space: nowrap;
+  cursor: pointer;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-btn-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] .dsh-claude-model-btn > .dsh-claude-model-tag {
+  margin-left: 6px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-external-control="model-picker"] button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}

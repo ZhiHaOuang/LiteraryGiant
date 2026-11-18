@@ -1,0 +1,43 @@
+/* ---------- Sidebar peek ---------- */
+/* features/sidebar-peek/sidebar-peek.ts opens the host's sidebar while the
+   pointer rests on its toggle and marks the frame. The host then widens its
+   first track to the open sidebar; the column leaves the flow for that track's
+   row and stands over the page, and the centre spans the open track as well as
+   its own, keeping clear of the collapsed width it stood at, so it keeps the
+   width it had. The column takes no transform, opacity or clip: the desktop's
+   toggle is fixed inside it, and any of those would carry the toggle along or
+   cut it off, so the slide is an offset. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-dsh-claude-sidebar-peek] > [data-dsh-claude-part~="sidebar-column"] {
+  position: absolute;
+  grid-row: 1;
+  grid-column: 1 / -1;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: var(--dsh-claude-layer-peek);
+  width: max-content;
+  box-shadow: var(--dsw-alias-shadow-lv2);
+  animation: dsh-claude-sidebar-peek-in var(--dsh-claude-duration-open) var(--dsh-claude-ease-out);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-dsh-claude-sidebar-peek] > [data-dsh-claude-part~="center-column"] {
+  grid-column: 1 / span 2;
+  margin-left: var(--dsh-claude-sidebar-peek-rail);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-dsh-claude-sidebar-peek="closing"] > [data-dsh-claude-part~="sidebar-column"] {
+  animation: dsh-claude-sidebar-peek-out var(--dsh-claude-duration-exit) var(--dsh-claude-ease-standard) forwards;
+}
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] [data-dsh-claude-part~="layout-frame"][data-dsh-claude-sidebar-peek] > [data-dsh-claude-part~="sidebar-column"] {
+  animation: none;
+}
+/* The handle the host places at the open sidebar's edge would resize a sidebar
+   that is only standing over the page. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-dsh-claude-sidebar-peek] > [data-side="sidebar"] {
+  display: none;
+}
+
+@keyframes dsh-claude-sidebar-peek-in {
+  from { left: calc(-1 * var(--dsh-claude-sidebar-peek-width, 100vw)); }
+}
+@keyframes dsh-claude-sidebar-peek-out {
+  to { left: calc(-1 * var(--dsh-claude-sidebar-peek-width, 100vw)); }
+}

@@ -1,0 +1,742 @@
+/* ---------- Settings dialog: modal panel background ---------- */
+/* In light mode, the host dialog defaults to var(--dsw-alias-bg-layer-2);
+   align the dialog card with the main canvas (#ffffff). */
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) :is([data-dsh-claude-part~="settings-area"] [data-dsh-claude-part~="panel"], [data-dsh-claude-part~="settings-area"] [role="dialog"], [data-dsh-claude-part~="overlay"] > [data-dsh-claude-part~="panel"]) {
+  background: var(--dsw-alias-bg-base);
+}
+
+/* ---------- Settings dialog: Claude Style tab icon ---------- */
+/* Replace the host's default settings gear icon on the Claude Style nav tab
+   with the monochrome Claude starburst icon (black in light mode). */
+body[data-dsh-claude-style] button[data-dsh-section="claude-style"] [data-dsh-claude-part~="nav-icon"] {
+  display: none;
+}
+
+body[data-dsh-claude-style] button[data-dsh-section="claude-style"]::before {
+  content: "";
+  display: block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  -webkit-mask: var(--dsh-claude-mask-claude-mark);
+  mask: var(--dsh-claude-mask-claude-mark);
+}
+
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-section="claude-style"]::before {
+  background-color: var(--dsw-alias-label-primary);
+}
+
+/* ---------- Claude Code layout: settings page ---------- */
+/* The skin's own page in the settings dialog and on the plugin page. Its
+   segmented controls reuse the composer permission picker's classes
+   (`.dsh-claude-segments` / `.dsh-claude-segment`), so the two are literally one
+   control rather than two lookalikes; the switch and the brand cards are new
+   here. The rows follow the host's own settings rows (ui-chat's PreferenceRow):
+   full width, 16px above and below, a hairline between two rows.
+   No side padding of its own: the host's options column already carries 24px
+   (`.options { padding: 0 24px 24px }`), and a second inset here set the skin's
+   rows 24px inside every other page's. The 16px on top is the host's own row
+   padding, so the page's heading lands where their first row's text does. */
+body[data-dsh-claude-style] .dsh-claude-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0 0;
+  box-sizing: border-box;
+  font-family: var(--dsw-font-family);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dsw-alias-label-primary);
+}
+
+/* The heading's link to the plugin's own repository, at the row's right end.
+   The mark is a mask over the link's ::before box, which carries the ink; that
+   ink is stated there rather than inherited, because the sheet paints every
+   anchor in the link colour through a more specific selector.
+   At rest the link is the mark alone. Hovering or focusing it fills the link
+   with the accent and grows a button out to the left — mark first, word after —
+   since the row keeps the link's right edge where it stands. */
+body[data-dsh-claude-style] .dsh-claude-settings-repo {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  min-width: 24px;
+  padding: 0 4px;
+  border-radius: 6px;
+  text-decoration: none;
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-repo::before {
+  content: "";
+  flex: none;
+  width: 16px;
+  height: 16px;
+  background-color: var(--dsw-alias-label-secondary);
+  -webkit-mask: var(--dsh-claude-image-github-mark) center / contain no-repeat;
+  mask: var(--dsh-claude-image-github-mark) center / contain no-repeat;
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+
+/* The word: no width and no ink at rest; it arrives on hover and on keyboard
+   focus, underlining nothing. */
+body[data-dsh-claude-style] .dsh-claude-settings-repo-label {
+  max-width: 0;
+  margin-left: 0;
+  overflow: hidden;
+  opacity: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--dsw-alias-brand-text, #ffffff);
+  transition:
+    max-width var(--dsh-claude-timing-feedback),
+    margin-left var(--dsh-claude-timing-feedback),
+    opacity var(--dsh-claude-timing-feedback);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-repo:hover,
+body[data-dsh-claude-style] .dsh-claude-settings-repo:focus-visible {
+  background-color: var(--dsw-alias-brand-primary, #d97757);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-repo:hover .dsh-claude-settings-repo-label,
+body[data-dsh-claude-style] .dsh-claude-settings-repo:focus-visible .dsh-claude-settings-repo-label {
+  max-width: 6em;
+  margin-left: 6px;
+  opacity: 1;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-repo:hover::before,
+body[data-dsh-claude-style] .dsh-claude-settings-repo:focus-visible::before {
+  background-color: var(--dsw-alias-brand-text, #ffffff);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-repo:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 1px;
+}
+
+/* The tab strip is the segmented control itself, stretched across the page so
+   every tab gets an equal share; the open tab's rows follow in their own
+   column. A page too narrow for one line of tabs wraps the strip onto a second
+   line: a tab never shrinks under its label's one-line width, so the strip
+   wraps exactly when one line no longer holds every label, and the pill covers
+   the active tab on the line it lands on (shared/sliding-pill.ts). */
+body[data-dsh-claude-style] .dsh-claude-settings-tabs {
+  display: flex;
+  align-self: stretch;
+  flex-wrap: wrap;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-tabs > [role="tab"] {
+  flex: 1 1 0;
+  min-width: max-content;
+}
+
+/* Each tab wears its own mark before its label, on the label's line: the strip
+   stays one text line tall, and the mark takes the tab's colour with it. */
+body[data-dsh-claude-style] .dsh-claude-settings-tabs > [role="tab"] .dsh-claude-settings-tab-icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  vertical-align: -2px;
+}
+
+/* The rows sit in a fieldset so a read-only page disables every control at
+   once (settings.ts); the fieldset's own frame and its min-content floor,
+   which would widen a phone's page, are taken off. */
+body[data-dsh-claude-style] .dsh-claude-settings-rows {
+  display: flex;
+  flex-direction: column;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+/* A tab change slides the pages the way the strip reads: the open tab arrives
+   from the side it sits on through a short blur while the still copy of the
+   tab it replaced leaves to the other side, laid over it and out of the way of
+   every press (transitions.dev's "Page side-by-side", MIT; settings.ts). The
+   tab the page opens on arrives without motion. */
+body[data-dsh-claude-style] .dsh-claude-settings-pages {
+  position: relative;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-leaving {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-enter] {
+  animation: dsh-claude-page-in var(--dsh-claude-duration-open) var(--dsh-claude-ease-settle);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-enter="forward"],
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-leave="back"] {
+  --dsh-claude-page-shift: var(--dsh-claude-distance-travel);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-enter="back"],
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-leave="forward"] {
+  --dsh-claude-page-shift: calc(-1 * var(--dsh-claude-distance-travel));
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-rows[data-dsh-claude-page-leave] {
+  animation: dsh-claude-page-out var(--dsh-claude-duration-open) var(--dsh-claude-ease-settle) forwards;
+}
+
+@keyframes dsh-claude-page-in {
+  from { opacity: 0; transform: translateX(var(--dsh-claude-page-shift)); filter: blur(var(--dsh-claude-blur-enter)); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+
+@keyframes dsh-claude-page-out {
+  from { opacity: 1; transform: none; filter: blur(0); }
+  to { opacity: 0; transform: translateX(var(--dsh-claude-page-shift)); filter: blur(var(--dsh-claude-blur-enter)); }
+}
+
+/* A tab's opening line, above its first row, which keeps no hairline under it. */
+body[data-dsh-claude-style] .dsh-claude-settings-notice {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-rows > :first-child {
+  border-top: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-tab-notice {
+  padding-top: 16px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-tab-notice + .dsh-claude-settings-row {
+  border-top: none;
+}
+
+/* The main window tab's two groups, each under the label that names it
+   (settings-tab-main-window.ts). The label opens its group with no hairline
+   under it, so the label and its rows read as one section; a group after
+   another carries the line that separates the two. */
+body[data-dsh-claude-style] .dsh-claude-settings-group {
+  padding: 24px 0 4px;
+  border-top: 0.5px solid var(--dsh-claude-divider, var(--dsw-alias-border-l2));
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 18px;
+  letter-spacing: .04em;
+  color: var(--dsw-alias-label-secondary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-group:first-child {
+  padding-top: 16px;
+  border-top: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-group + .dsh-claude-settings-row {
+  border-top: none;
+}
+
+/* A sub-row belongs to the row above it: no hairline between the two and no
+   air above it, so they read as one group, and it greys out while its parent
+   is off (its control is disabled as well, so the keyboard skips it). */
+body[data-dsh-claude-style] .dsh-claude-settings-row.dsh-claude-settings-row-sub {
+  border-top: none;
+  padding-top: 0;
+}
+
+/* The host's scroller around the page (the settings dialog's options column,
+   the plugin page) always keeps the scrollbar's room: a tab short enough to
+   need no scrollbar then lays out at the same width as one that does. The
+   page marks its nearest scrolling ancestor while it is mounted (settings.ts). */
+body[data-dsh-claude-style] [data-dsh-claude-settings-scroller] {
+  scrollbar-gutter: stable;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-sub[data-disabled] {
+  opacity: .5;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-sub[data-disabled] :is(button, input) {
+  cursor: not-allowed;
+}
+
+/* A row keeps its control on the right while the two share one line, and hands
+   it the next line — where it starts at the row's left edge — only when the
+   text's room would fall under the text's basis: the controls are `flex: none`,
+   so the basis alone is the wrap decision, and a narrow page drops the control
+   under the text rather than crushing the description into a few characters a
+   line. A segmented control is wider than a switch or a colour well, so its row
+   wraps earlier (220px against 140px). */
+body[data-dsh-claude-style] .dsh-claude-settings-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px 8px;
+  padding: 16px 0;
+  border-top: 0.5px solid var(--dsh-claude-divider, var(--dsw-alias-border-l2));
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-segment > .dsh-claude-settings-row-text {
+  flex: 1 1 220px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-text {
+  flex: 1 1 140px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-right: 48px;
+}
+
+/* A block row stacks its control under the text — the brand picker's cards
+   and the four-way mascot choice need more room than an inline control slot
+   gives. A control keeps its own width; only the brand cards span the row. */
+/* A block row is a column, so it stands apart from the row's wrap rules: its
+   children never wrap sideways, and its text keeps no width basis — in a
+   column a flex basis reads as a height. */
+body[data-dsh-claude-style] .dsh-claude-settings-row-block {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-block > .dsh-claude-settings-row-text {
+  flex: none;
+  align-self: stretch;
+  padding-right: 0;
+}
+
+/* The row title is UI text in the host's row metrics: the sans face, not the
+   serif display face theme/typography.css gives every class naming a title. */
+body[data-dsh-claude-style] .dsh-claude-settings-row-title {
+  font-family: var(--dsw-font-family);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 22px;
+  color: var(--dsw-alias-label-primary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-desc {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+/* A row marked experimental carries the host's tag beside its title, on the
+   title's own line while that fits. */
+body[data-dsh-claude-style] .dsh-claude-settings-row-title[data-experimental] {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-tag {
+  flex: none;
+}
+
+/* A row whose behaviour another plugin owns right now, or whose feature waits for
+   another setting: the control refuses input and dims, while the row's own copy
+   stays readable and a line in the accent colour says who owns it or what it
+   waits for. The reader's stored answer is what the control shows, so it already
+   tells what will happen once that changes. */
+body[data-dsh-claude-style] .dsh-claude-settings-row button:disabled {
+  cursor: not-allowed;
+  opacity: .45;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-row-note {
+  display: block;
+  margin-top: 2px;
+  color: var(--dsw-alias-state-business-primary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-error {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--dsw-alias-state-error-primary, #c0392b);
+}
+
+/* The switch borrows the segment track's palette and radius so a page of rows
+   reads as one control set rather than two. */
+body[data-dsh-claude-style] .dsh-claude-settings-switch {
+  flex: none;
+  appearance: none;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  width: 36px;
+  height: 20px;
+  padding: 2px;
+  box-sizing: border-box;
+  border-radius: 10px;
+  /* A strict capsule: the page inherits superellipse corners from <html>, which
+     squarish the track's caps away from the knob's true circle. */
+  corner-shape: round;
+  background: var(--dsw-specific-selector);
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-settings-switch {
+  background: var(--dsh-claude-chip);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-switch[data-on] {
+  background: var(--dsw-alias-brand-primary, #d97757);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-switch-knob {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  /* A true circle: the page inherits superellipse corners from <html>. */
+  corner-shape: round;
+  background: var(--dsw-alias-bg-overlay, #ffffff);
+  box-shadow: 0 1px 2px rgba(20, 20, 19, 0.18);
+  --dsh-claude-switch-travel: 16px;
+  --dsh-claude-switch-overshoot: 1px;
+  translate: 0 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-switch[data-on] .dsh-claude-settings-switch-knob {
+  translate: var(--dsh-claude-switch-travel) 0;
+}
+
+/* Pressed, the knob travels across with a double bounce — past its end, back,
+   settled — while the track's colour changes on its own clock
+   (transitions.dev's "Toggle", MIT). Only a switch the reader has pressed is
+   armed (data-moved, settings-controls.ts): a knob drawn by a page opening
+   stands where it is. */
+body[data-dsh-claude-style] .dsh-claude-settings-switch[data-moved][data-on] .dsh-claude-settings-switch-knob {
+  animation: dsh-claude-switch-on var(--dsh-claude-duration-bounce) var(--dsh-claude-ease-spring) both;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-switch[data-moved]:not([data-on]) .dsh-claude-settings-switch-knob {
+  animation: dsh-claude-switch-off var(--dsh-claude-duration-bounce) var(--dsh-claude-ease-spring) both;
+}
+
+@keyframes dsh-claude-switch-on {
+  0% { translate: 0 0; }
+  55% { translate: calc(var(--dsh-claude-switch-travel) + var(--dsh-claude-switch-overshoot)) 0; }
+  80%, 100% { translate: var(--dsh-claude-switch-travel) 0; }
+}
+
+@keyframes dsh-claude-switch-off {
+  0% { translate: var(--dsh-claude-switch-travel) 0; }
+  55% { translate: calc(0px - var(--dsh-claude-switch-overshoot)) 0; }
+  80%, 100% { translate: 0 0; }
+}
+
+/* The row's three bordered controls — the username input, the quick-provider
+   trigger and the custom brand rows' buttons — share one plate; each rule
+   below adds only its own sizing and cursor. */
+body[data-dsh-claude-style] .dsh-claude-settings-input,
+body[data-dsh-claude-style] .dsh-claude-settings-picker,
+body[data-dsh-claude-style] .dsh-claude-settings-button {
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-primary);
+  padding: 6px 10px;
+  font: inherit;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+/* Custom username input: same row rhythm as the switch/segments, but wide
+   enough to read a name and narrow enough not to push the description. */
+body[data-dsh-claude-style] .dsh-claude-settings-input {
+  flex: none;
+  width: 180px;
+  max-width: 45%;
+  outline: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-input:focus {
+  border-color: var(--dsw-alias-brand-primary, #d97757);
+}
+
+body[data-dsh-claude-style] .dsh-claude-settings-input::placeholder {
+  color: var(--dsw-alias-label-caption);
+}
+
+/* The quick-provider trigger belongs to the same control family as the username
+   input: one bordered plate that opens a picker. Its card is the shared popover
+   card (features/permissions/permissions.css), so only the trigger is styled here. */
+body[data-dsh-claude-style] .dsh-claude-settings-picker {
+  flex: none;
+  min-width: 140px;
+  max-width: 45%;
+  text-align: left;
+  cursor: pointer;
+}
+body[data-dsh-claude-style] .dsh-claude-settings-picker:hover {
+  border-color: var(--dsw-alias-border-l2);
+}
+body[data-dsh-claude-style] .dsh-claude-settings-picker[aria-expanded="true"] {
+  border-color: var(--dsw-alias-brand-primary, #d97757);
+}
+
+/* The custom brand rows' buttons (settings-brand.ts) are plates of the same
+   family as the input and the picker trigger, sized to their label. */
+body[data-dsh-claude-style] .dsh-claude-settings-button {
+  flex: none;
+  white-space: nowrap;
+  cursor: pointer;
+}
+body[data-dsh-claude-style] .dsh-claude-settings-button:hover:not(:disabled) {
+  border-color: var(--dsw-alias-border-l2);
+}
+body[data-dsh-claude-style] .dsh-claude-settings-button:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 1px;
+}
+body[data-dsh-claude-style] .dsh-claude-settings-button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* One brand image: a preview tile, whose transparent parts show the row's
+   canvas, then its buttons; a refusal is written under them in the page's
+   error colour. */
+body[data-dsh-claude-style] .dsh-claude-brand-image {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  max-width: 55%;
+}
+body[data-dsh-claude-style] .dsh-claude-brand-image-controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+body[data-dsh-claude-style] .dsh-claude-brand-image-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  min-width: 32px;
+  max-width: 128px;
+  box-sizing: border-box;
+  padding: 4px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 8px;
+}
+body[data-dsh-claude-style] .dsh-claude-brand-image-preview[data-empty] {
+  border-style: dashed;
+}
+body[data-dsh-claude-style] .dsh-claude-brand-image-preview > img {
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+body[data-dsh-claude-style] .dsh-claude-brand-image-error {
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary, #c0392b);
+  text-align: right;
+}
+
+/* The colour cards (settings-brand.ts): the brand's four colours and the
+   reader's own, each a row of overlapping discs — the accent, the light and
+   dark canvases and the inline-code ink. A brand card is a read-out; the
+   reader's card is a button, and its discs take a colour well each. The card
+   the page paints wears the accent border, whichever kind it is. */
+body[data-dsh-claude-style] .dsh-claude-palette-cards {
+  display: flex;
+  width: 100%;
+  align-items: stretch;
+  gap: 10px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-card {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  padding: 20px 16px 16px;
+  border: 1px solid var(--dsw-alias-border-l1);
+  border-radius: 12px;
+  background: var(--dsh-claude-card);
+  color: var(--dsw-alias-label-primary);
+  font: inherit;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-card[role="button"] {
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-card[role="button"]:not([data-active]):hover {
+  border-color: var(--dsw-alias-border-l3);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-card[data-active] {
+  border-color: var(--dsw-alias-brand-primary);
+  box-shadow: 0 0 0 1px var(--dsw-alias-brand-primary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-swatches {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-swatch {
+  display: inline-flex;
+  flex: none;
+  box-sizing: border-box;
+  width: 36px;
+  height: 36px;
+  /* A card-coloured ring inside a hairline: each later disc laps over the one
+     before it, so the ring cuts the notch and the hairline traces its edge,
+     which also keeps a canvas-coloured disc visible on the card. */
+  border: 3px solid var(--dsh-claude-card);
+  border-radius: 50%;
+  /* A true circle: the page inherits superellipse corners from <html>. */
+  corner-shape: round;
+  background-color: currentColor;
+  background-clip: padding-box;
+  box-shadow: 0 0 0 1px var(--dsw-alias-border-l1);
+  /* The return springs past the row (transitions.dev's "Avatar group hover"):
+     this rule holds the leaving curve, the lifting rule below the arriving one. */
+  transition:
+    translate var(--dsh-claude-duration-enter) var(--dsh-claude-ease-recoil),
+    scale var(--dsh-claude-duration-enter) var(--dsh-claude-ease-recoil);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-swatch + .dsh-claude-palette-swatch {
+  margin-left: -8px;
+}
+
+/* --dsh-claude-lift-reach is how many discs stand between this one and the one
+   under the pointer (settings-brand.ts); each step keeps the falloff's share. */
+body[data-dsh-claude-style] .dsh-claude-palette-swatches[data-dsh-claude-lifting] > .dsh-claude-palette-swatch {
+  translate: 0 calc(var(--dsh-claude-distance-nudge) * -1 * pow(var(--dsh-claude-scale-lift-falloff), var(--dsh-claude-lift-reach)));
+  transition-timing-function: var(--dsh-claude-ease-settle);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-swatches[data-dsh-claude-lifting] > .dsh-claude-palette-swatch[data-dsh-claude-lifted] {
+  scale: var(--dsh-claude-scale-lift);
+}
+
+/* The group's one hint (transitions.dev's "Tooltip open/close"): it appears
+   after a short rest, travels and resizes between discs while it shows, and
+   leaves at once. The delay sits on the showing rule alone, so leaving and
+   moving carry none. Its place and width are written by placeHint. */
+body[data-dsh-claude-style] .dsh-claude-palette-hint {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  overflow: hidden;
+  padding: 5px 10px;
+  border-radius: 8px;
+  background: var(--dsw-alias-bg-overlay);
+  color: var(--dsw-alias-label-primary);
+  font-size: 12px;
+  line-height: 16px;
+  white-space: nowrap;
+  box-shadow:
+    0 0 0 1px var(--dsw-alias-border-l1),
+    0 2px 6px rgba(20, 20, 19, 0.05),
+    0 4px 24px rgba(20, 20, 19, 0.06);
+  translate: var(--dsh-claude-hint-x, 0px) 0;
+  scale: var(--dsh-claude-scale-surface);
+  transform-origin: 50% 100%;
+  opacity: 0;
+  pointer-events: none;
+  /* The showing rule swaps the fade's length through --dsh-claude-hint-fade and
+     leaves transition-duration alone, so the reduced-motion rule (chrome.css)
+     still outranks it. */
+  --dsh-claude-hint-fade: var(--dsh-claude-duration-hint-exit);
+  transition-property: opacity, scale, translate, width;
+  transition-duration: var(--dsh-claude-hint-fade), var(--dsh-claude-hint-fade), var(--dsh-claude-duration-move), var(--dsh-claude-duration-move);
+  transition-timing-function: var(--dsh-claude-ease-out), var(--dsh-claude-ease-out), var(--dsh-claude-ease-settle), var(--dsh-claude-ease-settle);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-hint[data-show] {
+  --dsh-claude-hint-fade: var(--dsh-claude-duration-surface);
+  opacity: 1;
+  scale: 1;
+  transition-delay: var(--dsh-claude-duration-hint-delay), var(--dsh-claude-duration-hint-delay), 0s, 0s;
+}
+
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-palette-hint {
+  background: var(--dsh-claude-card);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-swatch-input {
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-card-name {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-reset {
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--dsw-alias-label-tertiary);
+  font: inherit;
+  font-size: 12px;
+  line-height: 16px;
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-palette-reset:hover {
+  color: var(--dsw-alias-label-secondary);
+}
+
+/* The quick-provider picker's card (packages/client/src/features/settings/quick-providers.ts):
+   the shared popover card, anchored above the trigger and right-aligned with it
+   (positionAnchoredPopover), so it grows from the corner nearest the trigger —
+   the bottom right, as the model picker's card does. */
+body[data-dsh-claude-style] .dsh-claude-quick-popover {
+  position: fixed !important;
+  min-width: 248px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+  transform-origin: bottom right !important;
+}

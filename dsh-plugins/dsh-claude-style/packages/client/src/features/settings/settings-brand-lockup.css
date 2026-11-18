@@ -1,0 +1,304 @@
+/* The custom brand row's lockup (settings-brand-lockup.ts, D30): the brand
+   area the sidebar draws, at the size the settings column gives it. Every
+   metric comes from the cap height the sidebar paints the identity at
+   (theme/sidebar.css), scaled up by --dsh-claude-lockup-scale, so the mark,
+   the word and the gap keep their proportions at any column width. The plate
+   spans the settings column, so the lockup stands in the middle of it. */
+
+body[data-dsh-claude-style] .dsh-claude-brand-lockup {
+  --dsh-claude-lockup-unit: 18px;
+  --dsh-claude-lockup-scale: 1.75;
+  --dsh-claude-lockup-cap: calc(var(--dsh-claude-lockup-unit) * var(--dsh-claude-lockup-scale));
+  --dsh-claude-lockup-gap: calc(8px * var(--dsh-claude-lockup-scale));
+  /* The action plate's whole box: the 16px icon inside 6px of padding on each
+     side. The wordmark's image button holds this width until the pointer comes;
+     the spacer below holds the same width on the mark's other side, so the
+     shown lockup stands in the middle of the plate. */
+  --dsh-claude-brand-action: 28px;
+
+  box-sizing: border-box;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--dsh-claude-lockup-gap);
+  width: 100%;
+  min-height: calc(var(--dsh-claude-lockup-cap) + 32px);
+  padding: 14px 18px;
+  border: 1px solid var(--dsw-alias-line-1, #e8e6dc);
+  border-radius: 12px;
+  background: var(--dsw-alias-bg-base);
+  container-type: inline-size;
+}
+
+/* The mark and the word stand in the middle of the plate, and the room the
+   image button keeps beside the word is kept again on the mark's other side:
+   the plate is as wide as the settings column, so an unpaired reservation
+   would draw the lockup off centre. */
+body[data-dsh-claude-style] .dsh-claude-brand-lockup::before {
+  content: '';
+  flex: none;
+  width: var(--dsh-claude-brand-action);
+}
+
+/* A narrow settings column keeps the lockup inside the row rather than
+   pushing the word out of the plate. */
+@container (max-width: 520px) {
+  body[data-dsh-claude-style] .dsh-claude-brand-lockup {
+    --dsh-claude-lockup-scale: 1.35;
+    --dsh-claude-lockup-gap: 10px;
+  }
+}
+
+@container (max-width: 400px) {
+  body[data-dsh-claude-style] .dsh-claude-brand-lockup {
+    --dsh-claude-lockup-scale: 1.1;
+    --dsh-claude-lockup-gap: 8px;
+  }
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-zone {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--dsh-claude-lockup-gap);
+  min-width: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-zone-word {
+  flex-wrap: wrap;
+  row-gap: 8px;
+  flex: 0 1 auto;
+}
+
+/* A seat: the art, the grey rectangle that names it a target while the pointer
+   is on it, and the plate that names the action. The rectangle is the seat's
+   own fill, laid under the art, so the seat keeps showing what the reader is
+   choosing (docs/STYLE.md, --dsh-claude-hover-bg). */
+body[data-dsh-claude-style] .dsh-claude-brand-seat {
+  appearance: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding: 6px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-seat:hover,
+body[data-dsh-claude-style] .dsh-claude-brand-seat:focus-visible {
+  background: var(--dsh-claude-hover-bg);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-seat:focus-visible {
+  outline: 1px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-seat:disabled {
+  cursor: default;
+}
+
+/* The art: the brand's own or the reader's picture, at the cap height or the
+   width its own proportions give it. A shape carries the ink and no picture:
+   the drawing is the mask and the ink fills it, the same pair the sidebar
+   paints (theme/sidebar.css). The ink is --dsh-claude-logo-ink, so the
+   DeepSeek whale and word stand in the colour the image-colour choice names —
+   its blue by default — exactly as they do in the sidebar. */
+body[data-dsh-claude-style] .dsh-claude-brand-art {
+  display: block;
+  flex: none;
+  /* The art's box: the cap height, or as tall as the brand draws its own word
+     against that cap, times the box's own proportions. */
+  height: calc(var(--dsh-claude-lockup-cap) * var(--dsh-claude-brand-height, 1));
+  width: calc(var(--dsh-claude-lockup-cap) * var(--dsh-claude-brand-height, 1) * var(--dsh-claude-brand-ratio));
+  background-color: var(--dsh-claude-logo-ink);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+  -webkit-mask: var(--dsh-claude-brand-art) center / contain no-repeat;
+  mask: var(--dsh-claude-brand-art) center / contain no-repeat;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-art-word {
+  max-width: 100%;
+  background-position: left center;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+}
+
+/* A picture: the file's own inks under no mask. */
+body[data-dsh-claude-style] .dsh-claude-brand-art[data-shape="picture"] {
+  background-color: transparent;
+  background-image: var(--dsh-claude-brand-art);
+  -webkit-mask: none;
+  mask: none;
+}
+
+/* The name in the word's own place: the display serif at the cap height, which
+   is where the sidebar paints it (theme/sidebar.css). The typed name and the
+   field it becomes while being edited are one line of text in that place, so
+   they carry one set of face metrics. */
+body[data-dsh-claude-style] .dsh-claude-brand-typed,
+body[data-dsh-claude-style] .dsh-claude-brand-name {
+  padding: 0 2px;
+  color: var(--dsw-alias-label-primary);
+  font-family: var(--dsw-font-family-serif, Georgia, serif);
+  font-size: var(--dsh-claude-lockup-cap);
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-typed {
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* The name being typed: the same face and size, sized to its own text. */
+body[data-dsh-claude-style] .dsh-claude-brand-name {
+  appearance: none;
+  field-sizing: content;
+  min-width: 2ch;
+  max-width: min(100%, 15em);
+  margin: 0;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  outline: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-name:hover,
+body[data-dsh-claude-style] .dsh-claude-brand-name:focus {
+  background: var(--dsh-claude-hover-bg);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-name::placeholder {
+  color: var(--dsw-alias-label-caption);
+}
+
+/* One icon button: a circle of the panel's fill, a hairline and the icon in the
+   accent, with no word beside it. A seat's own plate and the button that
+   offers the name a picture are the same shape, so the reader learns it once;
+   the lift keeps the icon readable over whatever art is behind it. */
+body[data-dsh-claude-style] .dsh-claude-brand-plate {
+  display: grid;
+  place-items: center;
+  box-sizing: content-box;
+  width: 16px;
+  height: 16px;
+  padding: 6px;
+  border: 0;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--dsw-alias-bg-base);
+  color: var(--dsw-alias-brand-primary, #d97757);
+  box-shadow: 0 0 0 1px var(--dsw-alias-line-1, #e8e6dc), 0 1px 3px rgba(20, 20, 19, 0.16);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-plate > svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+/* A seat's plate sits over the middle of the seat, and arrives with the grey
+   rectangle. */
+body[data-dsh-claude-style] .dsh-claude-brand-seat-plate {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  box-shadow: none;
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: none;
+  transition: opacity var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard), transform var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-seat-plate > svg {
+  grid-area: 1 / 1;
+  padding: 6px;
+  box-sizing: content-box;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--dsw-alias-bg-base);
+  box-shadow: 0 0 0 1px var(--dsw-alias-line-1, #e8e6dc), 0 1px 3px rgba(20, 20, 19, 0.16);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-seat:hover .dsh-claude-brand-seat-plate,
+body[data-dsh-claude-style] .dsh-claude-brand-seat:focus-visible .dsh-claude-brand-seat-plate {
+  opacity: 1;
+  transform: none;
+}
+
+/* The picture button beside the name arrives with the pointer too, so the row
+   holds one control until the reader reaches for it. */
+body[data-dsh-claude-style] .dsh-claude-brand-image-button {
+  flex: none;
+  padding: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.7);
+  pointer-events: none;
+  transition: opacity var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard), transform var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard), color var(--dsh-claude-duration-feedback) var(--dsh-claude-ease-standard);
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-zone-word:hover .dsh-claude-brand-image-button,
+body[data-dsh-claude-style] .dsh-claude-brand-zone-word:focus-within .dsh-claude-brand-image-button,
+body[data-dsh-claude-style] .dsh-claude-brand-image-button:focus-visible {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-image-button:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 2px;
+}
+
+/* The removal of the reader's own picture sits in the corner the action plate
+   leaves free, in the page's own ink rather than the accent, which names the
+   action rather than its undo. The ink is the host's raised-surface tone: the
+   canvas tone is cleared to transparent while a wallpaper plugin shows one. */
+body[data-dsh-claude-style] .dsh-claude-brand-clear {
+  position: absolute;
+  top: -6px;
+  left: -6px;
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--dsw-alias-label-secondary);
+  color: var(--dsw-alias-bg-layer-3, #ffffff);
+  font: inherit;
+  font-size: 12px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-brand-clear:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 2px;
+}
+
+/* A refusal from the host half is written under the lockup in the page's
+   error colour. */
+body[data-dsh-claude-style] .dsh-claude-brand-error {
+  flex-basis: 100%;
+  padding-left: 2px;
+  font-size: 12px;
+  line-height: 18px;
+  color: var(--dsw-alias-state-error-primary, #c0392b);
+}

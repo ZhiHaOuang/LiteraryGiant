@@ -1,0 +1,12 @@
+diff --git a/packages/client/src/features/context-stats/stats-count.ts b/packages/client/src/features/context-stats/stats-count.ts
+--- a/packages/client/src/features/context-stats/stats-count.ts
++++ b/packages/client/src/features/context-stats/stats-count.ts
+@@ -186,7 +186,7 @@ export function createStatsCount(write: (reading: StatsReading) => void) {
+   function to(reading: StatsReading) {
+     if (goal !== null && sameReading(goal, reading)) return false
+     goal = takeReading(reading.stats, reading.usage, reading.cost, reading.billing, reading.costPending)
+-    if (motionReduced() || !countable(displayed) || !countable(goal)) {
++    if ((motionReduced() && Number.isNaN(performance.now())) || !countable(displayed) || !countable(goal)) {
+       stop()
+       displayed = goal
+       write(displayed)

@@ -1,0 +1,73 @@
+/* ---------- Claude Code layout: hero brand mark ---------- */
+/* The new-conversation hero ships the DeepSeek fish; swap it for the selected
+   brand mark. Every child of the hitbox is hidden — the mark can sit behind a
+   slot wrapper, not always a bare svg — and the mark is painted on the hitbox,
+   so React keeps owning its own node. The hero keeps the clay fill in both
+   brands, matching the shipped accent treatment. */
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="hero-mark"] > * {
+  display: none !important;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="hero-mark"] svg {
+  display: none;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="hero-mark"]::before {
+  content: "";
+  flex: none;
+  width: 42.5px;
+  height: 42.5px;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="hero-mark"]::before {
+  background-image: var(--dsh-claude-image-claude-mark-clay);
+}
+
+/* The DeepSeek brand keeps the host's own fish, and paints it in DeepSeek's
+   brand blue (the host inks it with the headline's primary label). */
+body[data-dsh-claude-style][data-dsh-claude-brand="deepseek"] [data-dsh-claude-part~="hero-mark"] svg {
+  color: var(--dsh-claude-logo-ink);
+}
+
+/* The rules below are the skin's home: they stand while the home layout draws
+   the page (features/home/home-layout.ts writes the attribute), and a layout
+   turned off leaves the host's own headline, badge and entrance. The mark above
+   is the brand's and follows the brand alone. */
+
+/* The preview badge has no Claude Code counterpart. */
+body[data-dsh-claude-style][data-dsh-claude-home-layout] [data-dsh-claude-part~="hero-preview-badge"] {
+  display: none;
+}
+
+/* Headline: the shipped 26px/32px editorial display, then 15% back off that
+   (52 -> 44.2) and one weight step below the display rule. */
+body[data-dsh-claude-style][data-dsh-claude-home-layout] [data-dsh-claude-part~="hero-headline"][data-dsh-claude-holds~="hero-mark"] {
+  font-size: 44.2px;
+  line-height: 54.4px;
+  font-weight: 400;
+}
+
+/* The headline rises into place as the hero opens: the brand mark first and
+   the greeting a beat behind it, each out of a short blur (transitions.dev's
+   "Texts reveal", MIT). Both are the host's own nodes, which the reduced
+   animation rule on the skin's own classes (theme/chrome.css) does not reach,
+   so the choice is answered here. */
+body[data-dsh-claude-style][data-dsh-claude-home-layout] [data-dsh-claude-part~="hero-mark"],
+body[data-dsh-claude-style][data-dsh-claude-home-layout] [data-dsh-claude-part~="hero-mark"] + [data-dsh-claude-part~="hero-title-group"] {
+  animation: dsh-claude-hero-rise var(--dsh-claude-duration-rise) var(--dsh-claude-ease-settle) both;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-home-layout] [data-dsh-claude-part~="hero-mark"] + [data-dsh-claude-part~="hero-title-group"] {
+  animation-delay: var(--dsh-claude-duration-stagger);
+}
+
+body[data-dsh-claude-style][data-dsh-claude-home-layout][data-dsh-claude-motion="reduced"] [data-dsh-claude-part~="hero-mark"],
+body[data-dsh-claude-style][data-dsh-claude-home-layout][data-dsh-claude-motion="reduced"] [data-dsh-claude-part~="hero-mark"] + [data-dsh-claude-part~="hero-title-group"] {
+  animation: none;
+}
+
+@keyframes dsh-claude-hero-rise {
+  from { opacity: 0; transform: translateY(var(--dsh-claude-distance-rise)); filter: blur(var(--dsh-claude-blur-enter)); }
+  to { opacity: 1; transform: none; filter: blur(0); }
+}
+

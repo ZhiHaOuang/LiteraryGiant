@@ -1,0 +1,31 @@
+version: 2
+
+# The pinned action versions (`actions/checkout@v4`, …) and the Rust toolchain pin are deliberate, so
+# updates are proposed as reviewable pull requests rather than applied silently. Grouping keeps the
+# noise to one PR per ecosystem per week.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      actions:
+        patterns: ['*']
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3
+    groups:
+      dev-dependencies:
+        dependency-type: development
+
+  # The native worker's workspace lives in `native/`, and its lockfile is what CI verifies with
+  # `--locked`, so a dependency bump has to arrive as a lockfile change too.
+  - package-ecosystem: cargo
+    directory: /native
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 3

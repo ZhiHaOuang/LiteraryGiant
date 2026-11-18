@@ -1,0 +1,6 @@
+{
+  "chatRevealTitle": { "zh": "新文字淡入", "en": "New-text fade" },
+  "chatRevealSample": { "zh": "新到的字先淡后实", "en": "New characters fade in" },
+  "chatRevealOn": { "zh": "淡入", "en": "Fade in" },
+  "chatRevealOff": { "zh": "直接出现", "en": "Appears at once" }
+}

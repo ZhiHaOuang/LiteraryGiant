@@ -1,0 +1,23 @@
+diff --git a/packages/engine/src/parts-table.ts b/packages/engine/src/parts-table.ts
+index ced9b59..bc3948b 100644
+--- a/packages/engine/src/parts-table.ts
++++ b/packages/engine/src/parts-table.ts
+@@ -169,7 +169,6 @@ export const CONVERSATION_PARTS: PartTable = {
+   card: 'composer-card-box',
+   workspaceLabel: 'workspace-chip-label',
+   clearButton: 'clear-button',
+-  navList: 'nav-list',
+ }
+ 
+ /** The right sidebar's docked panels. */
+@@ -236,6 +235,10 @@ export const PAGE_PARTS: PartTable = {
+   panel: 'panel',
+   overlay: 'overlay',
+   navIcon: 'nav-icon',
++  // The settings dialog's section rail, which the skin reads to mark its own
++  // tab. The dialog is an overlay outside the conversation's box, so this name
++  // is page-wide.
++  navList: 'nav-list',
+   mask: 'mask',
+   tagSystem: 'tag-system',
+   tagUser: 'tag-user',

@@ -1,0 +1,7 @@
+{
+  "name": "dsh-ops-panel",
+  "version": "0.4.1",
+  "description": "Record OPS logs and reports for developer diagnosis. Turning it on or off does not affect daily use.",
+  "icon": "./icon.png",
+  "type": "module"
+}

@@ -1,0 +1,336 @@
+/* ---------- Sidebar search entry ---------- */
+/* The `standalone` style registers the entry in the host's panel list; `icon`
+   leaves the host's own workspace search in place. The host owns the entry's
+   row, label, collapsed state and click action (search-trigger.ts). */
+/* The Windows desktop shell's sidebar column starts under its 40px titlebar;
+   the brand row and the rows below it rise 6px toward that edge. macOS takes
+   no offset: its own `_topStrip + _logoRow` margin already seats the row where
+   the frame's top clearance wants it. */
+html[data-windows-titlebar] body[data-dsh-claude-style] [data-slot="sidebar"] [data-dsh-claude-part~="logo-row"] {
+  margin-top: -6px !important;
+}
+/* The host's own sidebar search stays mounted while the skin's button stands
+   in for it: its shortcut (Ctrl+K) ends by focusing its input and that focus is
+   what opens the palette, so it is only taken out of sight and out of the header's layout.
+   The `icon` style is the exception — there the host's own button is the
+   reader's way in, and the slot keeps everything the host gives it.
+   The header packs its children to the right and relied on that slot's flex to
+   hold the heading at the left, so the heading now takes the free space
+   itself. */
+body[data-dsh-claude-style] [data-slot="sidebar"] [data-dsh-claude-part~="section-header"] > [data-dsh-claude-part~="section-label"] {
+  margin-right: auto;
+}
+body[data-dsh-claude-style]:not([data-dsh-claude-search-style="icon"]) [data-slot="sidebar"] [data-dsh-claude-part~="search-slot"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
+}
+/* Expanding that search would clear the header's actions (view options, add
+   workspace) out of its way for the moment before the palette folds it back;
+   with the search out of sight they have nothing to make room for. */
+body[data-dsh-claude-style]:not([data-dsh-claude-search-style="icon"]) [data-slot="sidebar"] [data-dsh-claude-part~="section-actions-hidden"] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  max-width: 60px !important;
+  transform: none !important;
+  pointer-events: auto !important;
+}
+/* The host's workspace rail keeps a second search icon further down the
+   column. It stays mounted for the host shortcut, whose focus opens the
+   palette, but leaves the layout while the panel-list entry is registered.
+   The `icon` style leaves that workspace control visible as the reader's way
+   in, just as in the expanded sidebar. */
+body[data-dsh-claude-style]:not([data-dsh-claude-search-style="icon"]) [data-sidebar-collapsed] [data-dsh-claude-holds~="rail-search"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
+}
+/* ---------- Search palette ---------- */
+/* The card is the host's Modal (its mask, focus return and Esc); these rules
+   only re-cut the card: wider, set high in the window, no inner gaps, and the
+   skin's own rows inside. It fades and settles in; on close search.ts marks
+   the overlay and keeps it mounted while card and mask fade out together. */
+body[data-dsh-claude-style] .dsh-claude-search-dialog {
+  /* The card is set high in the window, so it settles down into place; the
+     shared entrance preset travels that way with a negative start (D9). */
+  --dsh-claude-surface-from: calc(-1 * var(--dsh-claude-distance-nudge));
+  animation: dsh-claude-surface-in var(--dsh-claude-duration-surface) var(--dsh-claude-ease-glide);
+  width: min(760px, 100%);
+  max-height: 100%;
+  margin: calc(var(--dsh-claude-page-height, 100vh) * 0.08) 0 auto;
+  padding: 0;
+  gap: 0;
+  border: 1px solid var(--dsw-alias-border-l1, #e9e9e9);
+  border-radius: 16px;
+  background: var(--dsh-claude-card);
+  box-shadow: 0 16px 48px rgba(20, 20, 19, 0.14), 0 2px 8px rgba(20, 20, 19, 0.06);
+}
+body[data-dsh-claude-style] [data-dsh-claude-search-closing] > .dsh-claude-search-dialog {
+  animation: dsh-claude-surface-out var(--dsh-claude-duration-exit) var(--dsh-claude-ease-standard) forwards !important;
+}
+body[data-dsh-claude-style] [data-dsh-claude-search-closing] > [data-dsh-claude-part~="mask"] {
+  animation: dsh-claude-fade-out var(--dsh-claude-duration-exit) var(--dsh-claude-ease-standard) forwards !important;
+}
+body[data-dsh-claude-style] [data-dsh-claude-search-closing] {
+  pointer-events: none !important;
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-dialog {
+  border-color: var(--dsw-alias-border-l2) !important;
+  background: var(--dsh-claude-card) !important;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  font-family: var(--dsw-font-family);
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style] .dsh-claude-search-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px 16px 10px 24px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 32px;
+  padding: 0;
+  border: none !important;
+  outline: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--dsw-alias-label-primary, #161616);
+  font-family: var(--dsw-font-family);
+  font-size: 17px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-input::placeholder {
+  color: var(--dsw-alias-label-tertiary, #91888a);
+}
+body[data-dsh-claude-style] .dsh-claude-search-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: none !important;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, #70686a);
+  cursor: pointer;
+}
+body[data-dsh-claude-style] .dsh-claude-search-close:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.06)) !important;
+  color: var(--dsw-alias-label-primary, #161616) !important;
+}
+
+/* Filters: a segmented control whose highlight slides (shared/sliding-pill). */
+body[data-dsh-claude-style] .dsh-claude-search-filters {
+  position: relative;
+  display: flex;
+  align-self: flex-start;
+  flex-wrap: nowrap;
+  gap: 2px;
+  margin: 0 16px 8px 14px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-filters[data-dsh-claude-pill]::before {
+  top: 0;
+  height: 100%;
+  border-radius: 8px;
+  background: rgba(20, 20, 19, 0.06);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-filters[data-dsh-claude-pill]::before {
+  background: rgba(250, 249, 245, 0.08) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-filter {
+  height: 32px;
+  padding: 0 10px;
+  border: none !important;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-family: var(--dsw-font-family);
+  font-size: 14px;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: color var(--dsh-claude-timing-feedback);
+  user-select: none;
+  -webkit-user-select: none;
+}
+body[data-dsh-claude-style] .dsh-claude-search-filter:hover {
+  color: var(--dsw-alias-label-secondary, #70686a) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-filter[aria-checked="true"] {
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style] .dsh-claude-search-filters:not([data-dsh-claude-pill]) .dsh-claude-search-filter[aria-checked="true"] {
+  background: rgba(20, 20, 19, 0.06) !important;
+}
+
+/* Results: section captions over rows; the highlighted row carries the fill
+   and the Enter glyph. */
+body[data-dsh-claude-style] .dsh-claude-search-list {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: min(520px, calc(var(--dsh-claude-page-height, 100vh) * 0.62));
+  overflow-y: auto;
+  padding: 4px 12px 10px;
+  overscroll-behavior: contain;
+}
+body[data-dsh-claude-style] .dsh-claude-search-section {
+  padding: 14px 12px 6px;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 13px;
+  line-height: 18px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-status {
+  padding: 18px 12px !important;
+  color: var(--dsw-alias-label-tertiary, #91888a) !important;
+  font-size: 14px !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 40px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 20px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item[data-active] {
+  background: rgba(20, 20, 19, 0.05);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-item[data-active] {
+  background: rgba(250, 249, 245, 0.07) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  color: var(--dsw-alias-label-secondary, #70686a);
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-image {
+  width: 18px !important;
+  height: 18px !important;
+  border-radius: 4px !important;
+  object-fit: contain !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-text {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-line {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-name {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-detail,
+body[data-dsh-claude-style] .dsh-claude-search-item-snippet {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  font-size: 13px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-detail {
+  flex: 1 1 0;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-snippet {
+  line-height: 18px !important;
+}
+/* The query inside a message excerpt: the primary label ink at medium weight,
+   no fill, so the excerpt stays one quiet line. */
+body[data-dsh-claude-style] .dsh-claude-search-item-match {
+  background: none !important;
+  color: var(--dsw-alias-label-primary) !important;
+  font-weight: 500 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item-enter {
+  display: inline-flex;
+  flex: none;
+  color: var(--dsw-alias-label-tertiary, #91888a);
+  visibility: hidden;
+}
+body[data-dsh-claude-style] .dsh-claude-search-item[data-active] .dsh-claude-search-item-enter {
+  visibility: visible;
+}
+
+/* Keycaps: the action rows' shortcuts and the footer's hints. The sidebar's
+   New session shortcut deliberately wears this same cap (theme/sidebar.css
+   drops the host's `+` separator, as the box does): one keycap look across the
+   sidebar (docs/STYLE.md "Sidebar box"). */
+body[data-dsh-claude-style] .dsh-claude-search-keys {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 3px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-key,
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-shortcut"] kbd:not([data-dsh-claude-part~="key-separator"]) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  box-sizing: border-box;
+  border: 1px solid var(--dsw-alias-border-l1, #e9e9e9);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary, #70686a);
+  font-family: var(--dsw-font-family);
+  font-size: 12px;
+  line-height: 1;
+}
+/* The New session row's own weight is 500; its cap reads at the regular weight. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-shortcut"] kbd:not([data-dsh-claude-part~="key-separator"]) {
+  font-weight: 400;
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-search-key,
+body[data-dsh-claude-style][data-ds-dark-theme] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-shortcut"] kbd:not([data-dsh-claude-part~="key-separator"]) {
+  border-color: var(--dsw-alias-border-l3);
+}
+body[data-dsh-claude-style] .dsh-claude-search-foot {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 24px;
+  border-top: 0.5px solid var(--dsh-claude-divider, var(--dsw-alias-border-l1, #e9e9e9));
+  color: var(--dsw-alias-label-secondary, #70686a);
+  font-size: 13px;
+}
+body[data-dsh-claude-style] .dsh-claude-search-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,0 +1,57 @@
+name: PR Checks
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pr-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  pr-checks:
+    name: PR checks
+    runs-on: ubuntu-latest
+    environment: pr-checks
+    steps:
+      - uses: actions/checkout@v7
+
+      # No `packageManager` field in this plugin's package.json, so both workflows pin the version explicitly.
+      - uses: pnpm/action-setup@v6
+        with:
+          version: latest
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build
+        run: pnpm run build
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      # `pnpm test`'s compat project boots the BUILT plugin against the REAL harness sources at every baseline tag
+      # (tests/baselines.ts is the source of truth — keep in step); it skips SILENTLY without the tags, so fetch BEFORE Test.
+      - name: Fetch the dsh baseline tags
+        run: |
+          mkdir -p .tmp/dsh-repo
+          cd .tmp/dsh-repo
+          git init -q
+          git remote add origin https://github.com/deepseek-ai/deepseek-harness.git
+          git fetch --depth 1 -q origin \
+            refs/tags/dsh-v0.2.0-rc.2:refs/tags/dsh-v0.2.0-rc.2 \
+            refs/tags/dsh-v0.2.1-rc.2:refs/tags/dsh-v0.2.1-rc.2 \
+            refs/tags/dsh-v0.2.2-rc.1:refs/tags/dsh-v0.2.2-rc.1
+
+      # `pnpm test` is the vitest run only: all three projects plus the per-file coverage thresholds; typecheck is its own step above.
+      - name: Test
+        run: DSH_REPO="$PWD/.tmp/dsh-repo" pnpm test

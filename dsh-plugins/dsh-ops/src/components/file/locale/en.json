@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "dsh-ops-file",
+    "description": "Bounded Native multi-file reading; single-file/hex and advanced operations load through discovery."
+  }
+}

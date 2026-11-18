@@ -1,0 +1,72 @@
+/* The header's last crumb is the session's own name. The words take the plate —
+   the host's own crumb already carries the padding and the radius — and a press
+   opens the field this feature places over them (features/session-title/session-title.ts).
+   The tip beside them is the skin's own element: the host clips the crumb row's
+   overflow for its ellipsis, so a tip drawn inside the row would be cut. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="header-title"] > [data-dsh-claude-part~="header-crumb"]:last-child > span:last-of-type {
+  cursor: text;
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="header-title"] > [data-dsh-claude-part~="header-crumb"]:last-child > span:last-of-type:hover {
+  background: var(--dsh-claude-hover-bg);
+}
+
+/* The tip under the words, in the label ink on the host's raised-surface tone —
+   the pairing the usage panel's day tip uses, and the one whose words stay
+   readable while a wallpaper plugin clears the canvas tone. It never takes the
+   pointer, and its box is placed in the page's own space, so a scaled page
+   keeps it under the words it names. */
+body[data-dsh-claude-style] .dsh-claude-session-title-tip {
+  position: fixed;
+  box-sizing: border-box;
+  z-index: var(--dsh-claude-layer-float);
+  padding: 4px 9px;
+  border-radius: 7px;
+  background: var(--dsw-alias-label-primary, #161616);
+  color: var(--dsw-alias-bg-layer-3, #ffffff);
+  font-family: var(--dsw-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+/* The field the press opens, standing over the words it renames: a canvas field
+   ringed in the selection blue at the title's own small radius, holding the words
+   with the room Claude leaves round them — 1px to each side, 3px above and below —
+   so the title reads as the words being edited rather than a card laid over them.
+   Its box is the words' own line (session-title.ts measures the text, not the
+   host's padded segment), and its width follows the draft (`field-sizing:
+   content`). A title the host refuses keeps the field, ringed in the host's error
+   colour, so the draft is not lost. */
+body[data-dsh-claude-style] .dsh-claude-session-title {
+  position: fixed;
+  box-sizing: border-box;
+  z-index: var(--dsh-claude-layer-float);
+  margin: 0;
+  padding: 3px 1px;
+  border: 1px solid var(--dsh-claude-field-ring, #2a78d6);
+  border-radius: 4px;
+  background: var(--dsw-alias-bg-base, #ffffff);
+  color: var(--dsw-alias-label-primary, #161616);
+  font-family: var(--dsw-font-family);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 20px;
+  field-sizing: content;
+  min-width: 0;
+  min-height: 0;
+  outline: none;
+}
+
+/* The field is a field, not a keyboard focus stop: the ring it shows is its own
+   blue edge, the one the press put there. */
+body[data-dsh-claude-style] .dsh-claude-session-title:focus-visible {
+  outline: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-session-title[aria-invalid="true"] {
+  border-color: var(--dsw-alias-state-error-primary, #c0392b);
+}

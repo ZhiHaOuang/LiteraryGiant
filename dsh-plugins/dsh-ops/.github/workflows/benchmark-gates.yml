@@ -1,0 +1,62 @@
+name: Opt-in OPS acceptance benchmarks
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  benchmark-gates:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { runner: windows-latest, target: win32-x64, suffix: '.exe' }
+          - { runner: ubuntu-24.04, target: linux-x64, suffix: '' }
+          - { runner: macos-latest, target: darwin-arm64, suffix: '' }
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 30
+    env:
+      CARGO_BUILD_JOBS: '3'
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+      - name: Set up pinned Rust
+        shell: bash
+        run: rustup toolchain install 1.97.1 --profile minimal && rustup default 1.97.1
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Build candidate host
+        run: npm run build
+      - name: Acquire optional pinned Windows Bash fixture
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:DSH_HOME = Join-Path $env:RUNNER_TEMP 'ops-benchmark-bash'
+          node bin/dsh-ops.mjs bash-runtime install
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $fixture = node --input-type=module -e "import {pinnedBashExecutable} from './lib/shells/pinned.js'; console.log(pinnedBashExecutable())"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "DSH_OPS_TEST_BASH=$fixture" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Build candidate worker
+        run: npm run build:ptc
+      - name: Materialize exact 0.3.1 source blobs
+        run: node bench/gates/prepare-baseline.mjs baseline-031
+      - name: Build independent 0.3.1 worker
+        run: cargo build --release --locked --manifest-path baseline-031/native/Cargo.toml
+      - name: Verify benchmark harness integrity
+        run: node test/run.mjs bench-gates bench-integrity
+      - name: Run all five real-host acceptance gates
+        run: node bench/cli.mjs gates --baseline-source baseline-031 --baseline-worker baseline-031/native/target/release/dsh-ops-worker${{ matrix.suffix }} --output benchmark-gates.json
+      - name: Upload exact evidence even when a gate fails
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-gates-${{ matrix.target }}
+          path: |
+            benchmark-gates.json
+            benchmark-gates.json.md
+          if-no-files-found: error
+          retention-days: 30

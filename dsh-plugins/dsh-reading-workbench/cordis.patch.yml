@@ -1,0 +1,7 @@
+# reading-workbench 插件的 loader patch：把本包作为一个插件行插入 profile roster。
+# 安装时由 dsh.bundle.patch 指向本文件生效。
+- insert:
+    - id: reading-workbench
+      name: 'dsh-reading-workbench'
+      config:
+        dshHome: !!js dshHomePath()

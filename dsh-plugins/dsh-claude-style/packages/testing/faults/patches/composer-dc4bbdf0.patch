@@ -1,0 +1,41 @@
+diff --git a/packages/client/src/features/composer/inline.css b/packages/client/src/features/composer/inline.css
+index a9e18cc..d3b3035 100644
+--- a/packages/client/src/features/composer/inline.css
++++ b/packages/client/src/features/composer/inline.css
+@@ -390,8 +390,9 @@ body[data-dsh-claude-style] [data-composer-card][data-composer-variant="inline"]
+ body[data-dsh-claude-style] [data-dsh-claude-part~="composer-stack"]:not([data-composer-variant="hero"]) [data-composer-card] button[data-dsh-claude-control="stop"]:hover:not(:disabled) {
+   background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08)) !important;
+ }
+-/* The ring the host's square sits in: drawn here, since the shipped glyph is the
+-   square alone. */
++/* Ring and square are both drawn here: the host ships the square alone, as an SVG
++   glyph, and a scaled glyph rasterizes on a subpixel phase of its own, so at 125%
++   and 150% scalings it lands visibly off the ring's centre. */
+ body[data-dsh-claude-style] [data-composer-card][data-composer-variant="inline"] button[data-dsh-claude-control="stop"]::before,
+ body[data-dsh-claude-style] [data-dsh-claude-part~="composer-stack"]:not([data-composer-variant="hero"]) [data-composer-card] button[data-dsh-claude-control="stop"]::before {
+   content: "";
+@@ -408,14 +409,19 @@ body[data-dsh-claude-style] [data-dsh-claude-part~="composer-stack"]:not([data-c
+ }
+ body[data-dsh-claude-style] [data-composer-card][data-composer-variant="inline"] button[data-dsh-claude-control="stop"] svg,
+ body[data-dsh-claude-style] [data-dsh-claude-part~="composer-stack"]:not([data-composer-variant="hero"]) [data-composer-card] button[data-dsh-claude-control="stop"] svg {
+-  display: block;
+-  width: 7px;
+-  height:  7px;
+-  border-radius: 1.5px;
++  display: none;
+ }
+ body[data-dsh-claude-style] [data-composer-card][data-composer-variant="inline"] button[data-dsh-claude-control="stop"]::after,
+ body[data-dsh-claude-style] [data-dsh-claude-part~="composer-stack"]:not([data-composer-variant="hero"]) [data-composer-card] button[data-dsh-claude-control="stop"]::after {
+-  display: none;
++  content: "";
++  display: block;
++  position: absolute;
++  inset: 0;
++  margin: auto;
++  width: 4px;
++  height:  4px;
++  border-radius: 1.2px;
++  background: currentColor;
+ }
+ /* Toolbar row below input card. The part names the host's own `row`: the shipped
+    input growth wrapper is `grow`, a different local name, so the fixed 28px

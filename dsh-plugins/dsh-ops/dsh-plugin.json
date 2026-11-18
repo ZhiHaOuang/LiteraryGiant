@@ -1,0 +1,170 @@
+{
+  "$schema": "https://raw.githubusercontent.com/T-Auto/dsh-std/8a15541117cb3c13ddb8f2468308691b6051d162/packages/manifest/schema/dsh-plugin-0.15.schema.json",
+  "manifestVersion": "0.15",
+  "id": "dsh-ops.native",
+  "name": "dsh-ops",
+  "version": "0.5.0",
+  "license": "MIT",
+  "facets": {
+    "host": {
+      "entry": "lib/index.js",
+      "apiVersion": "v1alpha1"
+    }
+  },
+  "requires": {
+    "contracts": [
+      {
+        "apiVersion": "tools.dsh/v1alpha1",
+        "kind": "Tool"
+      }
+    ]
+  },
+  "permissions": [
+    {
+      "name": "dsh-ops.process.spawn",
+      "scope": "subprocess",
+      "reason": "Start fixed trusted native file operations through DSH subprocess and policy checks, or confined Bash/PTC execution."
+    },
+    {
+      "name": "dsh-ops.fs.read",
+      "scope": "filesystem-read",
+      "reason": "Read the native worker executable and runtime provenance."
+    },
+    {
+      "name": "dsh-ops.fs.write",
+      "scope": "dsh-home",
+      "reason": "Install runtime receipts; native file operations do not create audit records in read-only mode."
+    }
+  ],
+  "contributes": {
+    "x-display": [
+      {
+        "icon": "./docs/assets/icon.png",
+        "title": "dsh-ops",
+        "description": "Provides optional Bash and native Rust tools for DSH to improve token efficiency; PowerShell remains host-managed",
+        "locales": [
+          "locale/en.json",
+          "locale/zh.json"
+        ]
+      }
+    ],
+    "x-prompt-sections": [
+      {
+        "name": "dsh-ops:repository-tooling:mode-standard",
+        "order": 3250,
+        "summary": "Standard-preset routing: prefer the resident OPS file tools and ops_bash, replacing read/glob/grep once their OPS counterparts are visible; published only for Standard-preset sessions when the row is on and promptPolicy is enabled."
+      },
+      {
+        "name": "dsh-ops:repository-tooling:mode-ptc",
+        "order": 3251,
+        "summary": "PTC-preset routing: scoped progressive PTC SDK guidance for PTC-preset sessions; absent outside PTC-only presentation. PTC rows publish no native routing text."
+      },
+      {
+        "name": "dsh-ops:repository-tooling:mode-cordis",
+        "order": 3252,
+        "summary": "Cordis-preset routing: prefer the resident OPS file tools and ops_bash, replacing read/glob/grep once their OPS counterparts are visible; published only for Cordis-preset sessions when the row is on and promptPolicy is enabled."
+      }
+    ],
+    "x-tool-namespaces": [
+      {
+        "serverName": "dsh-ops",
+        "transport": "in-process",
+        "source": "native Rust file worker",
+        "publicPrefix": "ops_",
+        "tools": [
+          "inspect_local_file",
+          "grep",
+          "glob",
+          "replace",
+          "write_file",
+          "edit_file",
+          "diff",
+          "stat",
+          "copy",
+          "move",
+          "remove",
+          "read_files",
+          "read_table",
+          "read_docx",
+          "read_pdf",
+          "result"
+        ],
+        "shellPermission": "Per-call DSH sandbox policy and native subprocess"
+      },
+      {
+        "serverName": "dsh-ops",
+        "transport": "in-process",
+        "source": "the plugin's bash layer via host subprocess",
+        "publicPrefix": "ops_",
+        "tools": [
+          "bash"
+        ],
+        "shellPermission": "Mode row enabled with the matching preset AND publishBashTool AND authoritative per-session DSH policy; restricted modes require host confinement"
+      },
+      {
+        "serverName": "dsh-ops",
+        "transport": "in-process",
+        "source": "PTC SDK selection and native Rust batch worker",
+        "publicPrefix": "ops_",
+        "tools": [
+          "batch",
+          "load_sdk"
+        ],
+        "shellPermission": "PTC-only scoped bindings: load_sdk selects permitted APIs for the next model step; batch requires configured or selected publication and per-call DSH policy, with host confinement in restricted modes"
+      },
+      {
+        "serverName": "dsh-ops",
+        "transport": "in-process",
+        "source": "scoped Native discovery controller",
+        "publicPrefix": "ops_",
+        "tools": [
+          "discover_tools"
+        ],
+        "shellPermission": "Scoped Native discovery selection only; selecting a capability does not execute it or authorize its later calls"
+      }
+    ],
+    "x-components": [
+      {
+        "id": "dsh-ops",
+        "entry": "dsh-ops",
+        "defaultEnabled": true,
+        "platforms": [
+          "win32",
+          "linux",
+          "darwin"
+        ],
+        "targets": [
+          "win32-x64",
+          "linux-x64",
+          "darwin-arm64",
+          "darwin-x64"
+        ],
+        "presentation": "One row configures every feature: the four preset modes, discovery, capture and the TUI link each carry their own switch and settings on the row page.",
+        "tools": [
+          "ops_bash",
+          "ops_inspect_local_file",
+          "ops_glob",
+          "ops_grep",
+          "ops_read_files",
+          "ops_result",
+          "ops_replace",
+          "ops_write_file",
+          "ops_edit_file",
+          "ops_diff",
+          "ops_stat",
+          "ops_copy",
+          "ops_move",
+          "ops_remove",
+          "ops_read_table",
+          "ops_read_docx",
+          "ops_read_pdf",
+          "ops_batch",
+          "ops_load_sdk",
+          "ops_discover_tools"
+        ],
+        "notes": "A feature that is switched off in the row page is not mounted at all, exactly like the old per-row switch. Legacy component specifiers (mode-*, discovery, panel, tui, shell, file, ptc, hide-official, background) remain exported so a saved override still loads its module, but they are no longer inserted by the bundle."
+      }
+    ]
+  },
+  "subscriptions": []
+}

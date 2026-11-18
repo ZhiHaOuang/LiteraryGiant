@@ -1,0 +1,38 @@
+name: Sync master with main
+
+# `master` is a test branch that mirrors `main`; this keeps it current without anyone remembering to.
+#
+# It is **fast-forward only**: the push below has no `+`, so if `master` ever gains a commit of its
+# own the job fails loudly instead of clobbering it. Nothing here writes to `main`.
+#
+# Pushing `master` does not re-trigger `ci.yml` (that one watches `main` and pull requests), so the
+# mirror costs one short job per merge and no extra validation run — which also keeps it clear of the
+# Actions-minutes concern in #150.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-master
+  cancel-in-progress: false
+
+jobs:
+  fast-forward:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Fast-forward master to main
+        shell: bash
+        run: |
+          set -euo pipefail
+          before=$(git ls-remote origin refs/heads/master | cut -f1)
+          git push origin HEAD:refs/heads/master
+          echo "master: ${before:0:8} → $(git rev-parse --short HEAD)"

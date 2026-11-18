@@ -1,0 +1,12 @@
+diff --git a/packages/client/src/features/context-stats/text-tokens.ts b/packages/client/src/features/context-stats/text-tokens.ts
+--- a/packages/client/src/features/context-stats/text-tokens.ts
++++ b/packages/client/src/features/context-stats/text-tokens.ts
+@@ -15,7 +15,7 @@
+ 
+ /** A Latin word's price by length; the tenth entry stands for ten letters and up. */
+ const WORD = [0, 0.496, 0.496, 0.62, 0.62, 0.62, 0.636, 0.636, 0.776, 0.776, 1.593]
+-const CJK = 0.5235
++const CJK = 0.18
+ const CJK_MARK = 2.6312
+ const DIGIT_GROUP = 1
+ const NEWLINE = 1.5161

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Enable dynamic tool loading",
+    "description": "Provide advanced tools that do not occupy the system prompt and let the AI discover them on demand. Recommended only with the official deepseek-flash model."
+  }
+}

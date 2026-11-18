@@ -1,0 +1,20 @@
+/* The new-conversation page's glyph field (packages/client/src/features/home-ripple/home-ripple.ts)
+
+   The canvas is a child of the hero root, and the root's own background is
+   painted first, so the canvas has to sit above that background and under
+   the page's content: the root takes a stacking context of its own and the
+   canvas the lowest local order, which paints between the two. It never takes
+   a press. The root's own positioning is the host's: the canvas is placed
+   against it, which the host's page root already is. */
+
+body[data-dsh-claude-style] [data-dsh-claude-ripple] {
+  isolation: isolate;
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-ripple] > .dsh-claude-ripple-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: -1;
+  pointer-events: none;
+}

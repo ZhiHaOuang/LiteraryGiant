@@ -1,0 +1,170 @@
+{
+  "contextTotalTime": {
+    "zh": "总用时",
+    "en": "Total time"
+  },
+  "contextCost": {
+    "zh": "费用",
+    "en": "Cost"
+  },
+  "statsLineLabel": {
+    "zh": "对话统计信息",
+    "en": "Conversation statistics"
+  },
+  "contextDisplayTitle": {
+    "zh": "上下文占用图示",
+    "en": "Context meter"
+  },
+  "contextDisplayDesc": {
+    "zh": "控制输入区上下文占用指标的展示形态。",
+    "en": "Control the display style of the context meter in the composer."
+  },
+  "contextDisplayPie": {
+    "zh": "饼图",
+    "en": "Pie"
+  },
+  "contextDisplayRingRamp": {
+    "zh": "圆环 · 绿到红",
+    "en": "Ring · green to red"
+  },
+  "contextDisplayRingBand": {
+    "zh": "圆环 · 蓝黄红",
+    "en": "Ring · blue, yellow, red"
+  },
+  "contextNumbersTitle": {
+    "zh": "上下文占用百分比",
+    "en": "Context percentage"
+  },
+  "contextNumbersDesc": {
+    "zh": "在上下文占用图示旁显示百分比数值。",
+    "en": "Show the percentage value next to the context meter."
+  },
+  "statsPositionTitle": {
+    "zh": "对话统计信息位置",
+    "en": "Conversation statistics position"
+  },
+  "statsPositionInline": {
+    "zh": "独立成行",
+    "en": "On its own line"
+  },
+  "statsPositionContext": {
+    "zh": "收进上下文",
+    "en": "Inside the context popover"
+  },
+  "statsPositionFooter": {
+    "zh": "紧凑底栏",
+    "en": "Compact footer"
+  },
+  "statsFooterAlignTitle": {
+    "zh": "底栏统计位置",
+    "en": "Footer alignment"
+  },
+  "statsFooterAlignLeft": {
+    "zh": "左侧",
+    "en": "Left"
+  },
+  "statsFooterAlignCenter": {
+    "zh": "居中",
+    "en": "Center"
+  },
+  "statsFooterAlignRight": {
+    "zh": "右侧",
+    "en": "Right"
+  },
+  "statsFooterAlignRequired": {
+    "zh": "只在选择「紧凑底栏」时生效。",
+    "en": "Applies only to the Compact footer position."
+  },
+  "billingCurrencyTitle": {
+    "zh": "计费币种",
+    "en": "Billing currency"
+  },
+  "billingCurrencyDesc": {
+    "zh": "计算会话费用所使用的官方价格表币种。",
+    "en": "Select the official currency for session cost calculations."
+  },
+  "billingCurrencyOff": {
+    "zh": "关闭",
+    "en": "Off"
+  },
+  "billingCurrencyCny": {
+    "zh": "人民币",
+    "en": "CNY"
+  },
+  "billingCurrencyUsd": {
+    "zh": "美元",
+    "en": "USD"
+  },
+  "billingTableTitle": {
+    "zh": "自定义计费表",
+    "en": "Custom price table"
+  },
+  "billingTableDesc": {
+    "zh": "自定义模型单价以覆盖默认价格表。",
+    "en": "Custom model prices to override default rate tables."
+  },
+  "billingTableEdit": {
+    "zh": "编辑",
+    "en": "Edit"
+  },
+  "billingTableCount": {
+    "zh": "{count} 条",
+    "en": "{count} rows"
+  },
+  "billingTableCountMissing": {
+    "zh": "{count} 条 · {missing} 个模型尚未计价",
+    "en": "{count} rows · {missing} unpriced models"
+  },
+  "billingTableUnit": {
+    "zh": "单位：{currency} / 百万 token",
+    "en": "Rates: {currency} per million tokens"
+  },
+  "billingTableLegend": {
+    "zh": "缓存读 · 输入 · 输出",
+    "en": "Cache read · Input · Output"
+  },
+  "billingTableModel": {
+    "zh": "模型",
+    "en": "Model"
+  },
+  "billingTableCacheRead": {
+    "zh": "缓存读",
+    "en": "Cache read"
+  },
+  "billingTableInput": {
+    "zh": "输入",
+    "en": "Input"
+  },
+  "billingTableOutput": {
+    "zh": "输出",
+    "en": "Output"
+  },
+  "billingTableAdd": {
+    "zh": "＋ 添加一行",
+    "en": "+ Add a row"
+  },
+  "billingTableLimit": {
+    "zh": "最多 {count} 条",
+    "en": "Up to {count} rows"
+  },
+  "billingTableHint": {
+    "zh": "模型名按价格表的写法填，大小写与 provider/ 前缀都不影响匹配；同名以这里的为准。",
+    "en": "Name a model as the tables do: case and a provider/ prefix do not affect the match, and a row here wins over the tables."
+  },
+  "billingTableRemove": {
+    "zh": "移除这一行",
+    "en": "Remove this row"
+  },
+  "billingTableCancel": {
+    "zh": "取消",
+    "en": "Cancel"
+  },
+  "billingTableSave": {
+    "zh": "保存",
+    "en": "Save"
+  },
+  "billingTableClose": {
+    "zh": "关闭",
+    "en": "Close"
+  }
+}

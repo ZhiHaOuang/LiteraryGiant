@@ -1,0 +1,4 @@
+{
+  "answerAnchorTitle": { "zh": "回答首行定位", "en": "Anchor at the answer's first line" },
+  "answerAnchorDesc": { "zh": "回答生成时将首行对齐至对话区顶部。", "en": "Align the first line of the answer to the top of the conversation when generation begins." }
+}

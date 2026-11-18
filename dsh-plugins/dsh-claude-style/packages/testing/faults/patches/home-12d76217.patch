@@ -1,0 +1,12 @@
+diff --git a/packages/client/src/features/home/home-panel.css b/packages/client/src/features/home/home-panel.css
+index 473a200..bc4503d 100644
+--- a/packages/client/src/features/home/home-panel.css
++++ b/packages/client/src/features/home/home-panel.css
+@@ -46,7 +46,6 @@ body[data-dsh-claude-style][data-dsh-claude-home-layout="studio"] [data-dsh-clau
+   justify-content: flex-start;
+   /* The greeting's left edge lands on the panel's and the card's. */
+   padding: 14px var(--dsh-composer-side-clearance, 0px) 0;
+-  margin-bottom: 30px;
+ }
+ 
+ /* The skin's own seat on the cold start screen, where the host renders no dock

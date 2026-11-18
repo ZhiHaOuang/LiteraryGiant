@@ -1,0 +1,20 @@
+/* @composer-gate */
+/* Only the figures' line leaves the host dock; every host node keeps its React
+   parent, and the meter keeps the row the host draws it in, so the ring stands
+   where the popover position draws it too. */
+body[data-dsh-claude-style][data-dsh-claude-stats-position="footer"] [data-dsh-claude-part~="composer-stack"] {
+  position: relative;
+}
+body[data-dsh-claude-style][data-dsh-claude-stats-position="footer"] [data-dsh-claude-footer-line] {
+  flex: none;
+}
+body[data-dsh-claude-style][data-dsh-claude-stats-position="footer"] [data-dsh-claude-footer-line="overlay"] {
+  position: absolute;
+  left: var(--dsh-claude-footer-left);
+  bottom: var(--dsh-claude-footer-bottom);
+  height: var(--dsh-claude-footer-height);
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  z-index: 3;
+}

@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Optimize the built-in Minimal preset",
+    "description": "Start dynamic tool loading while keeping the Minimal preset's terse prompt style (enable the dynamic tool loading option as well). Replaces pwsh with bash when running on Windows."
+  }
+}

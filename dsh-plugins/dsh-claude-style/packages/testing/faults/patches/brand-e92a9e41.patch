@@ -1,0 +1,53 @@
+diff --git a/packages/client/src/theme/chrome.css b/packages/client/src/theme/chrome.css
+index 2b0c913..744c8ce 100644
+--- a/packages/client/src/theme/chrome.css
++++ b/packages/client/src/theme/chrome.css
+@@ -117,7 +117,6 @@ body[data-dsh-claude-style] button[data-dsh-claude-part~="brand-button"] {
+ }
+ 
+ /* pill CTAs: send + settings sidebar actions */
+-body[data-dsh-claude-style] button[data-dsh-claude-part~="brand-button"],
+ body[data-dsh-claude-style] button[data-dsh-claude-part~="composer-primary"],
+ body[data-dsh-claude-style] [data-slot="sidebar.settings"] > :is(button, [role="button"]) {
+   border-radius: 9999px;
+@@ -129,16 +128,17 @@ body[data-dsh-claude-style] [data-slot="sidebar.settings"] > :is(button, [role="
+   font-weight: 500;
+ }
+ 
+-body[data-dsh-claude-style] button[data-dsh-claude-part~="brand-button"]:hover,
+ body[data-dsh-claude-style] button[data-dsh-claude-part~="composer-primary"]:hover,
+ body[data-dsh-claude-style] [data-slot="sidebar.settings"] > :is(button, [role="button"]):hover {
+   background: var(--dsw-alias-button-primary-hover);
+ }
+ 
+ /* Brand logo chip: the clay pill goes, so the mark and wordmark sit on the
+-   canvas and the pill's arc stops clipping the mark's leading edge. The
+-   settings page's brand cards are the skin's own elements and carry no host
+-   part, so no guard is needed here any more (D3). */
++   canvas and the pill's arc stops clipping the mark's leading edge. The brand
++   button is no pill CTA — this rule is the whole of its look, and a fill on
++   hover would paint a plate under a mark that carries no words. The settings
++   page's brand cards are the skin's own elements and carry no host part, so no
++   guard is needed here any more (D3). */
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-claude-part~="brand-button"],
+ body[data-dsh-claude-style][data-ds-dark-theme] button[data-dsh-claude-part~="brand-button"] {
+   background: transparent;
+diff --git a/packages/client/src/theme/tokens.css b/packages/client/src/theme/tokens.css
+index 099f062..fdeffaa 100644
+--- a/packages/client/src/theme/tokens.css
++++ b/packages/client/src/theme/tokens.css
+@@ -39,14 +39,12 @@ body[data-dsh-claude-style]:not([data-ds-dark-theme]) a:not([data-dsh-claude-par
+   color: var(--dsh-claude-link-hover);
+ }
+ 
+-body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-claude-part~="brand-button"],
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-claude-part~="composer-primary"],
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) [data-slot="sidebar.settings"] > :is(button, [role="button"]) {
+   background: var(--dsw-alias-button-primary-fill);
+   color: var(--dsw-alias-label-primary-foreground, #faf9f5);
+ }
+ 
+-body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-claude-part~="brand-button"]:hover,
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) button[data-dsh-claude-part~="composer-primary"]:hover,
+ body[data-dsh-claude-style]:not([data-ds-dark-theme]) [data-slot="sidebar.settings"] > :is(button, [role="button"]):hover {
+   background: var(--dsw-alias-button-primary-hover);

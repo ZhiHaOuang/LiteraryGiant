@@ -1,0 +1,32 @@
+name: Auto-close issues
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  auto-close:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Close the issue as not planned when its title matches a blocked pattern
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+        run: |
+          # One case-insensitive substring per line; a title matching any of them is closed as not planned.
+          patterns=(
+            'dsh-plugin.org'
+          )
+          title="$(printf '%s' "$ISSUE_TITLE" | tr '[:upper:]' '[:lower:]')"
+          for pattern in "${patterns[@]}"; do
+            if [[ "$title" == *"$pattern"* ]]; then
+              gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --reason "not planned" \
+                --comment "Closed automatically: the title matches a blocked pattern (\`$pattern\`)."
+              exit 0
+            fi
+          done
+          echo "No blocked pattern matched; leaving the issue open."

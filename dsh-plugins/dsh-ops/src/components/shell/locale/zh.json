@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "dsh-ops-bash & host PowerShell",
+    "description": "常规命令优先使用 bash，Windows 原生操作使用宿主 PowerShell"
+  }
+}

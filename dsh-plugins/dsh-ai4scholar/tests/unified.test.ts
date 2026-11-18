@@ -1,0 +1,290 @@
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { validateJsonSchemaValue } from '@deepseek-ai/dsh-tools'
+import type { ObjectJsonSchema } from '@deepseek-ai/dsh-tools'
+import { ARXIV_FEED } from './fixtures-extended.js'
+import { GS_PAGE_1, PUBMED_SEARCH_RESPONSE, S2_SEARCH_RESPONSE } from './fixtures.js'
+import { mount, runContext, stubFetch, textOf } from './helpers.js'
+import type { StubbedFetch } from './helpers.js'
+import { identityKeys, mergePaperLists, titleKey } from '../src/tools/unified.js'
+import type { Paper } from '../src/paper.js'
+
+let stub: StubbedFetch | undefined
+afterEach(() => {
+  stub?.restore()
+  stub = undefined
+})
+
+const agent = {}
+const ctxWithAgent = () => ({ ...runContext(), agent } as unknown as ReturnType<typeof runContext>)
+const paper = (over: Partial<Paper> & Pick<Paper, 'source' | 'id' | 'title'>): Paper => ({ authors: [], url: `https://x/${over.id}`, ...over })
+
+describe('merge logic', () => {
+  it('derives identity keys from DOI, arXiv id, PMID, and title', () => {
+    expect(titleKey('Attention Is All You Need!')).toBe('attentionisallyouneed')
+    const keys = identityKeys(paper({ source: 'semantic-scholar', id: 's2', title: 'Attention Is All You Need', doi: '10.48550/arXiv.1706.03762', externalIds: { ArXiv: '1706.03762v7', PubMed: '123' } }))
+    expect(keys).toEqual(['doi:10.48550/arxiv.1706.03762', 'arxiv:1706.03762', 'pmid:123', 'title:attentionisallyouneed'])
+    expect(identityKeys(paper({ source: 'arxiv', id: '1706.03762', title: 'Short' }))).toEqual(['arxiv:1706.03762'])
+    expect(identityKeys(paper({ source: 'pubmed', id: '99', title: 'Some reasonably long title here' }))).toEqual(['pmid:99', 'title:somereasonablylongtitlehere'])
+  })
+
+  it('normalizes titles across scripts and Unicode forms', () => {
+    // The same paper arrives composed from one platform and decomposed from
+    // another. Before NFKC these produced 'rseaux…' and 'reseaux…' — two keys,
+    // one paper listed twice.
+    const composed = 'R\u00e9seaux de neurones convolutifs profonds'
+    const decomposed = 'Re\u0301seaux de neurones convolutifs profonds'
+    expect(composed).not.toBe(decomposed)
+    expect(titleKey(composed)).toBe(titleKey(decomposed))
+    expect(titleKey(composed)).toBe('réseauxdeneuronesconvolutifsprofonds')
+
+    // Full-width forms fold to their half-width equivalents.
+    expect(titleKey('ＡＩ在科研中的应用')).toBe(titleKey('AI在科研中的应用'))
+
+    // Non-Latin scripts survive. The old rule left these empty, which dropped
+    // the title key entirely and left DOI as the only way to dedup them.
+    expect(titleKey('Нейронные сети глубокого обучения')).toBe('нейронныесетиглубокогообучения')
+    expect(titleKey('Μελέτη των νευρωνικών δικτύων')).toBe('μελέτητωννευρωνικώνδικτύων')
+    expect(identityKeys(paper({ source: 'google-scholar', id: 'g1', title: 'Нейронные сети глубокого обучения' })))
+      .toEqual(['title:нейронныесетиглубокогообучения'])
+
+    // Accents are kept rather than stripped, so two different words stay two
+    // different keys.
+    expect(titleKey('Über die Grössenordnung der Moleküle')).toBe('überdiegrössenordnungdermoleküle')
+
+    // Short titles still dedup by identifier only, counted in code points.
+    expect(identityKeys(paper({ source: 'arxiv', id: '2401.00001', title: '深度学习综述' })))
+      .toEqual(['arxiv:2401.00001'])
+  })
+
+  it('collapses duplicates across lists, unions ids/sources, keeps the best fields, and ranks multi-hits first', () => {
+    const s2 = [
+      paper({ source: 'semantic-scholar', id: 'a', title: 'Attention Is All You Need', doi: '10.1/x', citationCount: 100, year: 2017 }),
+      paper({ source: 'semantic-scholar', id: 'b', title: 'Only on S2, cited a lot', citationCount: 5000, year: 2010 }),
+    ]
+    const pubmed = [
+      paper({ source: 'pubmed', id: '1', title: 'ATTENTION is all you need.', abstract: 'A longer abstract from PubMed.', citationCount: 120, externalIds: { PubMed: '1', DOI: '10.1/x' } }),
+      paper({ source: 'pubmed', id: '2', title: 'PubMed only paper about something', year: 2024 }),
+    ]
+    const arxiv = [
+      paper({ source: 'arxiv', id: '1706.03762', title: 'Attention Is All You Need', pdfUrl: 'https://arxiv.org/pdf/1706.03762', categories: ['cs.CL'] }),
+    ]
+    const merged = mergePaperLists([s2, pubmed, arxiv])
+    // 'a' is on three platforms; 'b' (S2 #2) and '2' (PubMed #2) tie on rank, so citations decide.
+    expect(merged.map((p) => p.id)).toEqual(['a', 'b', '2'])
+    expect(merged[0]).toMatchObject({
+      source: 'semantic-scholar',
+      id: 'a',
+      citationCount: 120,
+      abstract: 'A longer abstract from PubMed.',
+      pdfUrl: 'https://arxiv.org/pdf/1706.03762',
+      categories: ['cs.CL'],
+      externalIds: { PubMed: '1', DOI: '10.1/x' },
+      extra: { foundIn: ['semantic-scholar', 'pubmed', 'arxiv'] },
+    })
+    expect(merged[1]!.extra).toEqual({ foundIn: ['semantic-scholar'] })
+    expect(merged[2]!.extra).toEqual({ foundIn: ['pubmed'] })
+  })
+})
+
+describe('search_papers', () => {
+  it.each([
+    { label: 'omitted', sources: undefined },
+    { label: 'empty', sources: [] },
+  ])('only requests and bills Semantic Scholar when sources are $label', async ({ sources }) => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/graph/v1/paper/search') return { json: S2_SEARCH_RESPONSE, headers: { 'X-Credits-Charged': '10', 'X-Credits-Remaining': '990' } }
+      return { status: 404, text: 'unexpected platform request' }
+    })
+    const tool = mount().tools.get('search_papers')!
+    const value = await tool.execute({ query: 'transformers', ...(sources !== undefined ? { sources } : {}), max_results_per_source: 2 }, ctxWithAgent()) as Record<string, unknown>
+    expect(stub.calls.map((call) => call.url.pathname)).toEqual(['/graph/v1/paper/search'])
+    expect(validateJsonSchemaValue(tool.output.schema as ObjectJsonSchema, value, '')).toEqual([])
+    expect(value).toMatchObject({
+      sources: ['semantic-scholar'],
+      total: 2,
+      perSource: [{ source: 'semantic-scholar', count: 2, total: 1234 }],
+      credits: { charged: 10, remaining: 990, sessionTotal: 10 },
+    })
+    expect(value.warning).toBeUndefined()
+  })
+
+  it('uses PubMed alone when explicitly selected for a biomedical query', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/pubmed/v1/paper/search') return { json: PUBMED_SEARCH_RESPONSE, headers: { 'X-Credits-Charged': '10', 'X-Credits-Remaining': '990' } }
+      return { status: 404, text: 'unexpected platform request' }
+    })
+    const tool = mount().tools.get('search_papers')!
+    const value = await tool.execute({ query: 'GLP-1 cardiovascular outcomes', sources: ['pubmed'] }, ctxWithAgent()) as Record<string, unknown>
+    expect(stub.calls.map((call) => call.url.pathname)).toEqual(['/pubmed/v1/paper/search'])
+    expect(value).toMatchObject({ sources: ['pubmed'], credits: { charged: 10, remaining: 990, sessionTotal: 10 } })
+    expect(value.warning).toBeUndefined()
+  })
+
+  it('fans out to explicitly selected platforms, merges, sums credits, and renders', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname.startsWith('/graph/')) return { json: S2_SEARCH_RESPONSE, headers: { 'X-Credits-Charged': '10', 'X-Credits-Remaining': '990' } }
+      if (url.pathname.startsWith('/pubmed/')) return { json: PUBMED_SEARCH_RESPONSE, headers: { 'X-Credits-Charged': '10', 'X-Credits-Remaining': '980' } }
+      return { status: 404, text: 'unexpected' }
+    })
+    const fake = mount()
+    const tool = fake.tools.get('search_papers')!
+    const value = await tool.execute({ query: 'transformers', sources: ['semantic-scholar', 'pubmed'], max_results_per_source: 2, year_from: 2016, year_to: 2024 }, ctxWithAgent()) as Record<string, unknown>
+    expect(validateJsonSchemaValue(tool.output.schema as ObjectJsonSchema, value, '')).toEqual([])
+    const paths = stub.calls.map((c) => c.url.pathname).sort()
+    expect(paths).toEqual(['/graph/v1/paper/search', '/pubmed/v1/paper/search'])
+    expect(stub.calls.find((c) => c.url.pathname.startsWith('/graph'))!.url.searchParams.get('year')).toBe('2016-2024')
+    expect(stub.calls.find((c) => c.url.pathname.startsWith('/pubmed'))!.body).toMatchObject({ minDate: '2016', maxDate: '2024', limit: 2 })
+    expect(value).toMatchObject({ query: 'transformers', sources: ['semantic-scholar', 'pubmed'], total: 4, truncated: true, credits: { charged: 20, remaining: 980, sessionTotal: 20 } })
+    expect(value.perSource).toEqual([{ source: 'semantic-scholar', count: 2, total: 1234, pageSize: 2, nextOffset: 2 }, { source: 'pubmed', count: 2, total: 42, pageSize: 2, nextOffset: 2 }])
+    const text = textOf(tool.output.render({ query: 'transformers' }, value as never))
+    expect(text).toContain('Papers for "transformers" across Semantic Scholar, PubMed — 4 unique after de-duplication (Semantic Scholar 2 of 1234, PubMed 2 of 42):')
+    expect(text).toContain('AI4Scholar credits — this call: 20 · this session: 20 · remaining: 980')
+    // Card: web sources + credits in the title.
+    const meta = tool.output.presentationMeta!({ query: 'transformers' }, value as never)
+    expect(tool.presentResult!({ query: 'transformers' }, { content: [], isError: false, meta })).toMatchObject({ card: 'web', title: 'Papers: transformers · 20 credits · 980 left', truncated: true })
+  })
+
+  it('keeps going when one platform fails, and fails only when all do', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname.startsWith('/graph/')) return { status: 500, text: 'boom' }
+      if (url.pathname.startsWith('/pubmed/')) return { json: PUBMED_SEARCH_RESPONSE }
+      if (url.hostname === 'export.arxiv.org') return { text: ARXIV_FEED, contentType: 'application/atom+xml' }
+      return { status: 404, text: 'unexpected' }
+    })
+    const tool = mount({ maxRetries: 1 }).tools.get('search_papers')!
+    const value = await tool.execute({ query: 'x', sources: ['semantic-scholar', 'pubmed', 'arxiv'] }, ctxWithAgent()) as Record<string, unknown>
+    expect(value.perSource).toEqual([
+      { source: 'semantic-scholar', count: 0, error: expect.stringContaining('HTTP 500') },
+      { source: 'pubmed', count: 2, total: 42, pageSize: 10, nextOffset: 2 },
+      { source: 'arxiv', count: 2, total: 1234, pageSize: 10, nextOffset: 2 },
+    ])
+    expect(value.warning).toMatch(/Semantic Scholar: Semantic Scholar search failed: HTTP 500/)
+    expect((value.papers as unknown[]).length).toBe(4)
+    expect(textOf(tool.output.render({ query: 'x' }, value as never))).toContain('Semantic Scholar failed, PubMed 2 of 42, arXiv 2 of 1234')
+    stub.restore()
+    stub = stubFetch(() => ({ status: 500, text: 'boom' }))
+    await expect(tool.execute({ query: 'x' }, ctxWithAgent())).rejects.toThrow(/every platform failed/)
+    await expect(tool.execute({ query: 'x', year_from: 2025, year_to: 2020 }, ctxWithAgent())).rejects.toThrow(/year_from/)
+  })
+
+  it('interleaves single-platform hits by each platform\'s own rank', () => {
+    const s2 = [paper({ source: 'semantic-scholar', id: 's1', title: 'S2 first result about topic', citationCount: 5 }), paper({ source: 'semantic-scholar', id: 's2', title: 'S2 second result about topic', citationCount: 9000 })]
+    const pm = [paper({ source: 'pubmed', id: 'p1', title: 'PubMed first result about topic' }), paper({ source: 'pubmed', id: 'p2', title: 'PubMed second result about topic' })]
+    expect(mergePaperLists([s2, pm]).map((p) => p.id)).toEqual(['s1', 'p1', 's2', 'p2'])
+  })
+
+  it('accepts open-ended year ranges for Semantic Scholar', async () => {
+    stub = stubFetch((url) => (url.pathname.startsWith('/graph/') ? { json: { total: 0, data: [] } } : { json: { total: 0, papers: [] } }))
+    const tool = mount().tools.get('search_papers')!
+    await tool.execute({ query: 'x', year_from: 2022 }, ctxWithAgent())
+    expect(stub.calls.find((c) => c.url.pathname.startsWith('/graph'))!.url.searchParams.get('year')).toBe('2022-')
+    await tool.execute({ query: 'x', year_to: 2015 }, ctxWithAgent())
+    expect(stub.calls.filter((c) => c.url.pathname.startsWith('/graph')).at(-1)!.url.searchParams.get('year')).toBe('-2015')
+  })
+
+  it('defaults to one enabled platform when Semantic Scholar is disabled', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/pubmed/v1/paper/search') return { json: PUBMED_SEARCH_RESPONSE }
+      return { status: 404, text: 'unexpected platform request' }
+    })
+    const fake = mount({ semanticScholar: false })
+    const tool = fake.tools.get('search_papers')!
+    const value = await tool.execute({ query: 'biomedical research' }, ctxWithAgent()) as Record<string, unknown>
+    expect(stub.calls.map((call) => call.url.pathname)).toEqual(['/pubmed/v1/paper/search'])
+    expect(value.sources).toEqual(['pubmed'])
+    expect(tool.description).toContain('(default PubMed only;')
+    expect(fake.sections.find((s) => s.name === 'tool:ai4scholar')?.text).not.toContain('Semantic Scholar')
+  })
+
+  it('queries the configured default platforms together and says so to the model', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/graph/v1/paper/search') return { json: S2_SEARCH_RESPONSE, headers: { 'X-Credits-Charged': '10', 'X-Credits-Remaining': '990' } }
+      if (url.pathname === '/google-scholar/v1/search') return { json: { results: [], resultsCount: 0 }, headers: { 'X-Credits-Charged': '1', 'X-Credits-Remaining': '989' } }
+      return { status: 404, text: 'unexpected platform request' }
+    })
+    const fake = mount({ searchSources: ['google-scholar', 'semantic-scholar'] })
+    const tool = fake.tools.get('search_papers')!
+    const value = await tool.execute({ query: 'transformers', max_results_per_source: 2 }, ctxWithAgent()) as Record<string, unknown>
+    // Merge order follows UNIFIED_SOURCES, not the order the user ticked them.
+    expect(value.sources).toEqual(['semantic-scholar', 'google-scholar'])
+    expect(stub.calls.map((call) => call.url.pathname).sort()).toEqual(['/google-scholar/v1/search', '/graph/v1/paper/search'])
+    expect(tool.description).toContain('by default it queries Semantic Scholar + Google Scholar together')
+    expect(tool.description).not.toContain('one platform by default')
+    expect(fake.sections.find((s) => s.name === 'tool:ai4scholar')?.text).toContain('queries Semantic Scholar + Google Scholar together by default')
+    // An explicit sources list still wins for one call.
+    await tool.execute({ query: 'x', sources: ['semantic-scholar'] }, ctxWithAgent())
+    expect(stub.calls.at(-1)!.url.pathname).toBe('/graph/v1/paper/search')
+  })
+
+  it('uses a single configured platform and ignores ones the composition did not mount', async () => {
+    const only = mount({ searchSources: ['google-scholar'] })
+    expect(only.tools.get('search_papers')!.description).toContain('(default Google Scholar only;')
+    expect(only.sections.find((s) => s.name === 'tool:ai4scholar')?.text).toContain('(Google Scholar only)')
+    // Google Scholar unmounted: the configured default falls back to the first mounted platform.
+    const fallback = mount({ searchSources: ['google-scholar'], googleScholar: false })
+    expect(fallback.tools.get('search_papers')!.description).toContain('(default Semantic Scholar only;')
+  })
+
+  it('remounts after a settings save so descriptions pick up the new values', async () => {
+    vi.useFakeTimers()
+    try {
+      const fake = mount()
+      fake.emit('loader/volatile-update', [['searchSources']])
+      expect(fake.restarts()).toBe(0) // deferred past the settings write
+      await vi.runAllTimersAsync()
+      expect(fake.restarts()).toBe(1)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('asks each platform for its own configured count, capped by that platform', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/graph/v1/paper/search') return { json: S2_SEARCH_RESPONSE }
+      if (url.pathname === '/pubmed/v1/paper/search') return { json: PUBMED_SEARCH_RESPONSE }
+      return { status: 404, text: 'unexpected' }
+    })
+    const fake = mount({ searchSources: ['semantic-scholar', 'pubmed'], resultsPerSource: { 'semantic-scholar': 100, 'pubmed': 30 } })
+    const tool = fake.tools.get('search_papers')!
+    await tool.execute({ query: 'x' }, ctxWithAgent())
+    const s2 = stub.calls.find((c) => c.url.pathname.startsWith('/graph'))!
+    const pm = stub.calls.find((c) => c.url.pathname.startsWith('/pubmed'))!
+    expect(s2.url.searchParams.get('limit')).toBe('100')
+    expect(pm.body).toMatchObject({ limit: 30 })
+    expect(JSON.stringify(tool.parameters)).toContain('Semantic Scholar 100, PubMed 30')
+    // An explicit count applies to every platform, still within each one's cap.
+    await tool.execute({ query: 'x', max_results_per_source: 500 }, ctxWithAgent())
+    expect(stub.calls.filter((c) => c.url.pathname.startsWith('/graph')).at(-1)!.url.searchParams.get('limit')).toBe('100')
+    // The platform's own search tool uses the same default.
+    expect(JSON.stringify(fake.tools.get('search_semantic')!.parameters)).toContain('(default 100, max 100)')
+    expect(JSON.stringify(fake.tools.get('search_pubmed')!.parameters)).toContain('(default 30, max 100)')
+    expect(() => mount({ resultsPerSource: { 'google-scholar': 20 } })).toThrow(/google-scholar/)
+  })
+
+  it('states each platform\'s own page size when telling the model how to continue', async () => {
+    stub = stubFetch((url) => {
+      if (url.pathname === '/graph/v1/paper/search') return { json: S2_SEARCH_RESPONSE }
+      if (url.pathname === '/google-scholar/v1/search') return { json: GS_PAGE_1 }
+      return { status: 404, text: 'unexpected' }
+    })
+    const fake = mount({ searchSources: ['semantic-scholar', 'google-scholar'], resultsPerSource: { 'semantic-scholar': 50 } })
+    const tool = fake.tools.get('search_papers')!
+    const value = await tool.execute({ query: 'solid-state battery' }, ctxWithAgent()) as { perSource: { source: string; pageSize?: number }[] }
+    expect(stub.calls.find((c) => c.url.pathname.startsWith('/graph'))!.url.searchParams.get('limit')).toBe('50')
+    expect(value.perSource.map((p) => [p.source, p.pageSize])).toEqual([['semantic-scholar', 50], ['google-scholar', 10]])
+    const text = textOf(tool.output.render({ query: 'solid-state battery' }, value as never))
+    expect(text).toMatch(/search_semantic\(query="solid-state battery", offset=\d+, max_results=50\)/)
+    expect(text).toContain('search_google_scholar(query="solid-state battery", offset=10, max_results=10)')
+    expect(text).not.toContain('max_results as the original request')
+    // Pages are not a result count: the parameter tells the model to keep the configured sizes.
+    expect(JSON.stringify(tool.parameters)).toContain('Omit it unless the user names a number of results')
+  })
+
+  it('offers only the enabled platforms and disappears when none is', () => {
+    const only = mount({ semanticScholar: false, googleScholar: false, chineseLiterature: false, arxiv: false })
+    const tool = only.tools.get('search_papers')!
+    expect(tool.description).toContain('Available platforms: PubMed (default PubMed')
+    expect(mount({ semanticScholar: false, pubmed: false, googleScholar: false, chineseLiterature: false, arxiv: false }).tools.has('search_papers')).toBe(false)
+    expect(mount({ unifiedSearch: false }).tools.has('search_papers')).toBe(false)
+  })
+})

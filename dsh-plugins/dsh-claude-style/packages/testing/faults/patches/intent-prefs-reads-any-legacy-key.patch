@@ -1,0 +1,12 @@
+diff --git a/packages/contracts/src/prefs.ts b/packages/contracts/src/prefs.ts
+--- a/packages/contracts/src/prefs.ts
++++ b/packages/contracts/src/prefs.ts
+@@ -313,7 +313,7 @@ function legacyValue(spec: PrefSpec, raw: unknown): unknown {
+ 
+ /** One preference's value, clamped to its declaration; anything unreadable reads as the default. */
+ function clampPref(spec: PrefSpec, raw: unknown): unknown {
+-  const legacy = legacyValue(spec, raw)
++  const legacy = spec.legacy === undefined ? undefined : spec.legacy[String(raw)]
+   if (legacy !== undefined) return legacy
+   switch (spec.type) {
+     case 'boolean': return typeof raw === 'boolean' ? raw : spec.default

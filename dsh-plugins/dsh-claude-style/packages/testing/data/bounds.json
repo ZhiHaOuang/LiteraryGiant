@@ -1,0 +1,185 @@
+{
+  "note": "The bounds a check compares against, each with the reason it holds that value (D77: a check reads its bound here instead of carrying a number of its own, so loosening one is a visible change with a reason beside it). The bounds of the other lanes move in with the migration; this file holds the ones a check reads so far.",
+  "bounds": [
+    {
+      "name": "longSessionGrowthRatio",
+      "value": 2.5,
+      "reason": "How much longer the second measured turn's transcript has to be for the two rounds to be worth comparing at all. The two lengths are set by the fill turns, and how many rows a scripted answer leaves behind moves the ratio between about 2.8 and 3.8 runs, so the floor sits below the lowest reading that still separates the two lengths."
+    },
+    {
+      "name": "longSessionGrowthSlack",
+      "value": 1.6,
+      "reason": "The long-session walk measures one and the same scripted turn twice, into a short transcript and into one about four times longer, and compares the readings of the two rounds. A cost that follows the page's size travels with that factor; one that follows its square (a scan per row, a whole-document query per element) lands near sixteen times and trips. The slack covers what a shared runner adds between two rounds, and the time readings it is applied to came in flat across runs."
+    },
+    {
+      "name": "longSessionQuerySlack",
+      "value": 2.5,
+      "reason": "The lookup counter counts every whole-document query the page makes, the host's own included, and how many of those a turn issues moves with how the host re-renders the growing answer: readings for the same tree have come in near 1.4 and near 4.9 times between the two rounds. The factor is therefore looser than the one for the time readings, while a lookup per element — the regression this counts for — still runs far past it."
+    },
+    {
+      "name": "longSessionGrowthFloorMs",
+      "value": 120,
+      "reason": "The short round's p95 frame sits near the frame budget on a fast runner, so the p95 ratio is compared against a floor in milliseconds as well as the factor; without it the comparison divides by a number too small to mean anything."
+    },
+    {
+      "name": "longSessionWorstFrameMs",
+      "value": 250,
+      "reason": "The worst frame a long session may take over the measured turn: about fifteen 60 Hz frames. A frame that costs more than this is a stall the reader would see, and the reading is a wall clock between animation frames on a headless runner, so it sits far above one frame on purpose."
+    },
+    {
+      "name": "longSessionMinSpanMs",
+      "value": 300,
+      "reason": "The least stretch of wall clock the sampled frames of the measured turn must cover: twenty frames of a 60 Hz display. The span is read in milliseconds so a display that draws fewer frames a second is judged on the same stretch as one that draws sixty."
+    },
+    {
+      "name": "longSessionLongTaskBudgetMs",
+      "value": 3000,
+      "reason": "All long tasks together over the measured turn. The turn streams a long scripted answer, so some long tasks are the host rendering it; the budget is what the skin's own passes may add on top before the turn counts as blocked."
+    },
+    {
+      "name": "reasonStepMinGapMs",
+      "value": 600,
+      "reason": "The least wait between two steps of the reasoning window. The snippet holds each step for --dsh-claude-period-hold (840ms); a timer only ever fires late, and the change is read at the next frame, so a reading can come in short of the hold by about one frame on either side. The floor sits well under the hold and far above the few milliseconds a wait read in the wrong unit leaves."
+    },
+    {
+      "name": "followAtEndPx",
+      "value": 6,
+      "reason": "A browser clamps a scroll position a few pixels inside `scrollHeight - clientHeight` when a child's own overflow or a scrollbar rounds it, so this is the distance from the end that counts as arrived (D77)."
+    },
+    {
+      "name": "followCatchUpStartPx",
+      "value": 200,
+      "reason": "The distance the capped process body is left from its end before the catch-up is watched. The probe grows the body 900px inside a body about 200px tall, and a walk that never started reads the whole of it, so the floor separates a walk from a write."
+    },
+    {
+      "name": "followSlideStartPx",
+      "value": 100,
+      "reason": "The offset the message column has to start its slide from: the probe grows the column by a 300px block under the host's own streaming mark and pins the end, so a slide recorded from its first frame carries most of that growth; a column that never slid reads 0."
+    },
+    {
+      "name": "followWalkDistinctValues",
+      "value": 2,
+      "reason": "How many different positions between the start and the end the recorded walk has to show. One value between the two ends is what a single write inside a frame leaves, and a sequence that holds the start and then the end is a jump; the two walking cases measured 26 and 18 intermediate readings at 60Hz."
+    },
+    {
+      "name": "followCatchUpMinFrames",
+      "value": 8,
+      "reason": "The fewest frames a recorded catch-up walk may take. The spring covers 95% of a gap in about 170ms, so a walk watched to the end holds about ten frames at 60Hz; the floor is the reading below which the walk was not watched to hear its end."
+    },
+    {
+      "name": "followSlideMinFrames",
+      "value": 8,
+      "reason": "The fewest frames a recorded stream slide may take, counted the same way as the catch-up's: the slide runs for the slide token's 240ms, about fourteen frames at 60Hz, and the floor is the reading below which it was not watched to its end."
+    },
+    {
+      "name": "followSlideRowDriftPx",
+      "value": 0.5,
+      "reason": "How far the live turn's row may move on screen while the column slides under it: the row carries the same slide reversed, started in the same frame, so the two cancel exactly; half a pixel leaves room for the rounding of two offsets and nothing a reader could see."
+    },
+    {
+      "name": "followQuietFrames",
+      "value": 8,
+      "reason": "How many frames at the end of a recorded walk have to read the same position, within followAtEndPx, for the walk to count as finished rather than interrupted: the recorder stops on this many quiet frames, so the check asserts the stop it made was the walk arriving."
+    },
+    {
+      "name": "followHoldGrowthPx",
+      "value": 100,
+      "reason": "The growth a reader holding the conversation keeps. The probe presses on the column, grows it by a 120px block and pins the end the way the host's own follow does, so the position put back under him reads most of that block; a hold the pin won reads the end, where the pin left it."
+    },
+    {
+      "name": "answerAnchorTopPx",
+      "value": 2,
+      "reason": "How far the answer's own top may stand from the scroller's top and still read as brought to the top. The anchor writes the distance between the two boxes it measured in one frame, so the only movement left is the rounding of that write; a page that never moved reads the row far below."
+    },
+    {
+      "name": "answerAnchorGapPx",
+      "value": 100,
+      "reason": "How far the anchored position has to sit from the end. The answer the probe starts is 600px tall in a 240px scroller, so a position at its first line is hundreds of pixels above the end; a page that stayed at the tail reads nothing."
+    },
+    {
+      "name": "answerAnchorAwayPx",
+      "value": 200,
+      "reason": "How far from the end the reader reads in the case that must not be moved: more than the scroller's own 240px, which is also past the distance the follow's own guard takes for a reader reading higher up."
+    },
+    {
+      "name": "answerAnchorSlackPx",
+      "value": 1,
+      "reason": "How far a position may move and still read as standing where it was. Nothing writes it in that case, so the one pixel covers the rounding of a scroll position the page never touched."
+    },
+    {
+      "name": "laneFollowMaxGapPx",
+      "value": 220,
+      "reason": "How far behind the tail the scroller may lag while the reader follows it. The host's own follow pins the end on every growth and the skin's slide writes no position, so the gap is at most the growth of the frame being sampled; the bound is a third of that scenario's 600px viewport: a follow that stopped working leaves hundreds of pixels more."
+    },
+    {
+      "name": "readerScrollPinSlackPx",
+      "value": 40,
+      "reason": "How much of the pinned row's own height a frame may sit within and still count as floating at the pin."
+    },
+    {
+      "name": "readerScrollTailThresholdPx",
+      "value": 25,
+      "reason": "How far the tail has to sit from the end for the pin to have something to hold against."
+    },
+    {
+      "name": "loaderRotateGapMinMs",
+      "value": 9900,
+      "reason": "The least stretch between two changes of the waiting line's loader motion. The rotation is a fixed 10s and a change is read the moment the arriving lane comes into play, which is when the hand-over begins; 10s less the frames of sampling on either end is the floor."
+    },
+    {
+      "name": "loaderRotateGapMaxMs",
+      "value": 11500,
+      "reason": "The most the same stretch may come to: the fixed 10s, room for the rotation's timer firing late on a loaded machine, and room for a change landing between two frames of the probe's own reading."
+    },
+    {
+      "name": "loaderHandOverStepPx",
+      "value": 1.5,
+      "reason": "How far a loader dot coming into view during a hand-over may stand from the nearest dot drawn the frame before. It takes the place of its partner at the frame that partner stands still, so the distance is what the partner drifts in one frame of the probe's reading around its still moment: under half a pixel at 50ms a frame for the slowest of the three motions' still moments."
+    },
+    {
+      "name": "remoteSettingsFollowTimeoutMs",
+      "value": 15000,
+      "reason": "How long a setting written on one page may take to reach the other page."
+    },
+    {
+      "name": "settingsRouteMenuWaitMs",
+      "value": 1500,
+      "reason": "How long the host may take to answer the settings shortcut with its account menu."
+    },
+    {
+      "name": "settingsRouteDialogWaitMs",
+      "value": 20000,
+      "reason": "How long the settings dialog may take to appear after its entry is pressed."
+    },
+    {
+      "name": "sidebarRailLineTolerancePx",
+      "value": 1,
+      "reason": "How far a control's centre may stand from the column's own line and still read as on it."
+    },
+    {
+      "name": "waitLineMinGapMs",
+      "value": 850,
+      "reason": "The state line changes at most once a second, and the record is stamped by the page when it writes the wording; the slack under that second covers only a change landing between two frames of that write."
+    },
+    {
+      "name": "streamComposerDriftPx",
+      "value": 1,
+      "reason": "How far the composer card's own box may move while a fast answer streams. The card is the conversation scroller's sibling in the host's layout, so nothing the answer grows can move it; the one movement measured on any speed was half a pixel, on the frame a scrollbar appeared. One pixel holds that and nothing a reader could see."
+    },
+    {
+      "name": "streamPinSlipRatio",
+      "value": 1.5,
+      "reason": "How far, in the column's own one-frame growth, a frame may leave the sliding column's foot above the scroller's end. The host's pin writes the end in the frame the growth lands; the skin's slide puts the column back down by that growth and carries it up to a slide's full stretch, so an ordinary frame leaves the foot one growth above the end. The half on top is the frame the slide's restart is read on."
+    },
+    {
+      "name": "streamPinSlipPx",
+      "value": 1200,
+      "reason": "The most a frame may leave the sliding column above the scroller's end, in pixels: the longest stretch one slide carries (SCROLL_EASE_LEAD_PX), which a burst wider than a slide is put back down by. A burst that was never slid leaves the whole of it standing, thousands of pixels at this scenario's answer length."
+    },
+    {
+      "name": "streamColumnFootPx",
+      "value": 16,
+      "reason": "The foot the message column keeps under its last row, counting the wrapper the host puts around it: room for the composer that a scroller overflows into. The scenario's lag is read from that last row, so this foot comes off the longest stretch a slide carries before it is compared."
+    }
+  ]
+}

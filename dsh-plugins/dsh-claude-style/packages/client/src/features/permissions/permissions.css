@@ -1,0 +1,67 @@
+/* ---------- Claude Code layout: permission segments ---------- */
+/* The shipped access control is one popup-select button; it is replaced by
+   a Read | Edit | Auto | Yolo segmented control over presets — for
+   as long as the permission control is installed to stand in for it. The
+   host's button is the one packages/client/src/features/composer/composer.ts marks as the
+   access control. The control itself is the shared large segment look
+   (packages/client/src/shared/segment-control.css). */
+body[data-dsh-claude-style][data-dsh-claude-composer-active][data-dsh-claude-permissions] button[data-dsh-claude-control="access"] {
+  display: none;
+}
+
+/* ---------- Claude Code layout: in-conversation permission popover ---------- */
+body[data-dsh-claude-style] .dsh-claude-perm-container {
+  position: relative;
+  display: inline-flex;
+  z-index: var(--dsh-claude-layer-picker);
+}
+body[data-dsh-claude-style] .dsh-claude-perm-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: var(--dsh-claude-footer-control-height);
+  /* The tier names run from "Read only" to "Workspace write": the button takes
+     the room the composer's bottom line reserves for it and the label truncates
+     past that, so a long name never pushes the row's other controls. */
+  max-width: 132px;
+  padding: 0 var(--dsh-claude-footer-control-pad);
+  border-radius: 7px;
+  border: none !important;
+  font-family: var(--dsw-font-family);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 20px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary, #161616);
+  cursor: pointer;
+  user-select: none;
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-perm-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: var(--dsh-claude-footer-ink-opacity);
+  transition: opacity var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-perm-btn:hover .dsh-claude-perm-label,
+body[data-dsh-claude-style] .dsh-claude-perm-btn[data-open="true"] .dsh-claude-perm-label {
+  opacity: var(--dsh-claude-footer-ink-hover-opacity);
+}
+body[data-dsh-claude-style] .dsh-claude-perm-btn:hover,
+body[data-dsh-claude-style] .dsh-claude-perm-btn[data-open="true"] {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+/* The preset list's card is the shared popover card (shared/popover.css). */
+body[data-dsh-claude-style] .dsh-claude-perm-popover {
+  position: fixed;
+  min-width: 248px;
+  display: flex;
+  flex-direction: column;
+  /* Two-line preset rows (label + description) need air between them: the
+     2px gap read as one solid block, so each row is separated by 6px. */
+  gap: 6px;
+  transform-origin: bottom left;
+}
+

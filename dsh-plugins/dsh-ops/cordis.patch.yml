@@ -1,0 +1,41 @@
+# One row, named exactly like the package: dsh-client-modules mounts a package's
+# browser half on the row whose specifier is the package name, so this row also
+# carries the Plugins-page configuration for every feature.
+#
+# Each section owns its enable switch and only the keys that feature reads. The
+# data capture and the TUI integration stay off by default. Legacy component modules (mode-*, discovery, panel, tui, shell,
+# file, ptc, hide-official, background) remain exported: a saved override for one
+# of those specifiers still loads its legacy module, it just cannot match this row.
+- insert:
+    - id: dsh-ops
+      name: dsh-ops
+      config:
+        # Four bundle switches (one per preset switch), then each preset; all default on.
+        global:
+          bash: true
+          hidePwsh: true
+          hideOfficialTools: true
+          dynamicTools: true
+        minimal:
+          enabled: true
+        standard:
+          enabled: true
+          residentTools: true
+        ptc:
+          enabled: true
+          residentTools: true
+        cordis:
+          enabled: true
+          residentTools: true
+        discovery:
+          enabled: true
+        # Inert until template is set; off by default so an install that never
+        # opted in gets no listener at all.
+        download-guard:
+          enabled: false
+          downloadGuard:
+            template: ""
+        panel:
+          enabled: false
+        tui:
+          enabled: false

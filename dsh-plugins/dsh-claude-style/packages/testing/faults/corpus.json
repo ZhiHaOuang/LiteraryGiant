@@ -1,0 +1,229 @@
+{
+  "about": "Known defects as patches on the product sources (D77): fixes from history that still reverse on the current tree, and defects written down from a spec's intent. packages/testing/faults.mjs applies each in a scratch copy and reports which specs turn red.",
+  "faults": [
+    {
+      "id": "host-44607d72",
+      "from": "history 44607d72",
+      "apply": "reverse",
+      "patch": "patches/host-44607d72.patch",
+      "defect": "undoes: 会话检索被取代的一轮不再清掉新一轮的状态"
+    },
+    {
+      "id": "chat-send-27603238",
+      "from": "history 27603238",
+      "apply": "reverse",
+      "patch": "patches/chat-send-27603238.patch",
+      "defect": "undoes: 等待落点稳定加上硬上限，页面一直在动也不扣住消息"
+    },
+    {
+      "id": "context-stats-b0fb6171",
+      "from": "history b0fb6171",
+      "apply": "reverse",
+      "patch": "patches/context-stats-b0fb6171.patch",
+      "defect": "undoes: 修复 Firefox 悬停统计弹层反复闪烁"
+    },
+    {
+      "id": "chat-send-14ddf739",
+      "from": "history 14ddf739",
+      "apply": "reverse",
+      "patch": "patches/chat-send-14ddf739.patch",
+      "defect": "undoes: 落地回弹回到原来的阻尼比"
+    },
+    {
+      "id": "effort-509a5efb",
+      "from": "history 509a5efb",
+      "apply": "reverse",
+      "patch": "patches/effort-509a5efb.patch",
+      "defect": "undoes: 未登记强度的档位留在原位，注释按宿主契约写"
+    },
+    {
+      "id": "client-1b58ef75",
+      "from": "history 1b58ef75",
+      "apply": "reverse",
+      "patch": "patches/client-1b58ef75.patch",
+      "defect": "undoes: 工作区树模式恢复逐层缩进"
+    },
+    {
+      "id": "permissions-2860a318",
+      "from": "history 2860a318",
+      "apply": "reverse",
+      "patch": "patches/permissions-2860a318.patch",
+      "defect": "undoes: 选中标记只写存在"
+    },
+    {
+      "id": "account-39ff153f",
+      "from": "history 39ff153f",
+      "apply": "reverse",
+      "patch": "patches/account-39ff153f.patch",
+      "defect": "undoes: 设置入口的查找不再把账号菜单触发器当成设置按钮"
+    },
+    {
+      "id": "brand-e92a9e41",
+      "from": "history e92a9e41",
+      "apply": "reverse",
+      "patch": "patches/brand-e92a9e41.patch",
+      "defect": "undoes: 侧栏品牌标识不再浮出悬停底板"
+    },
+    {
+      "id": "sidebar-0a71dc49",
+      "from": "history 0a71dc49",
+      "apply": "reverse",
+      "patch": "patches/sidebar-0a71dc49.patch",
+      "defect": "undoes: 工作区名字过长时不再把行尾按钮挤出栏外"
+    },
+    {
+      "id": "settings-3182aa74",
+      "from": "history 3182aa74",
+      "apply": "reverse",
+      "patch": "patches/settings-3182aa74.patch",
+      "defect": "undoes: 开关的滑道用严格的圆角，胶囊两端与圆形滑块对上"
+    },
+    {
+      "id": "composer-dc4bbdf0",
+      "from": "history dc4bbdf0",
+      "apply": "reverse",
+      "patch": "patches/composer-dc4bbdf0.patch",
+      "defect": "undoes: 停止按钮的方块不再偏出圆环中心"
+    },
+    {
+      "id": "chat-wait-c8890633",
+      "from": "history c8890633",
+      "apply": "reverse",
+      "patch": "patches/chat-wait-c8890633.patch",
+      "defect": "undoes: Claude 品牌下的扫光不再用宿主的蓝色"
+    },
+    {
+      "id": "theme-1114eab0",
+      "from": "history 1114eab0",
+      "apply": "reverse",
+      "patch": "patches/theme-1114eab0.patch",
+      "defect": "undoes: 深色弹层的边只剩边框本身"
+    },
+    {
+      "id": "theme-d3aed732",
+      "from": "history d3aed732",
+      "apply": "reverse",
+      "patch": "patches/theme-d3aed732.patch",
+      "defect": "undoes: 深色模式下分段控件的当前项有了底色"
+    },
+    {
+      "id": "home-12d76217",
+      "from": "history 12d76217",
+      "apply": "reverse",
+      "patch": "patches/home-12d76217.patch",
+      "defect": "undoes: 工作台首页的问候语与用量面板之间只留一个列间距"
+    },
+    {
+      "id": "settings-500f4558",
+      "from": "history 500f4558",
+      "apply": "reverse",
+      "patch": "patches/settings-500f4558.patch",
+      "defect": "undoes: 主题风格的两张卡片各带自己的品牌标记"
+    },
+    {
+      "id": "search-9b098f2b",
+      "from": "history 9b098f2b",
+      "apply": "reverse",
+      "patch": "patches/search-9b098f2b.patch",
+      "defect": "undoes: 分类页签的滑块随按下立刻移动"
+    },
+    {
+      "id": "chat-fold-4d2aab06",
+      "from": "history 4d2aab06",
+      "apply": "reverse",
+      "patch": "patches/chat-fold-4d2aab06.patch",
+      "defect": "undoes: 推理窗口的高度随文字当帧长高，不再等下一个节拍"
+    },
+    {
+      "id": "settings-d773a629",
+      "from": "history d773a629",
+      "apply": "reverse",
+      "patch": "patches/settings-d773a629.patch",
+      "defect": "undoes: 写下的设置值在宿主答复之前不再被文档盖回"
+    },
+    {
+      "id": "settings-8d70b272",
+      "from": "history 8d70b272",
+      "apply": "reverse",
+      "patch": "patches/settings-8d70b272.patch",
+      "defect": "undoes: 设置页导航的 Claude Style 一格重新画出星芒"
+    },
+    {
+      "id": "host-3882030f",
+      "from": "history 3882030f",
+      "apply": "reverse",
+      "patch": "patches/host-3882030f.patch",
+      "defect": "undoes: 归档会话的删除接受插件生成的会话 id"
+    },
+    {
+      "id": "home-59db7ea1",
+      "from": "history 59db7ea1",
+      "apply": "reverse",
+      "patch": "patches/home-59db7ea1.patch",
+      "defect": "undoes: 热力格的日期提示按格子两侧的余量决定挂在上方还是下方"
+    },
+    {
+      "id": "composer-a823f3d5",
+      "from": "history a823f3d5",
+      "apply": "reverse",
+      "patch": "patches/composer-a823f3d5.patch",
+      "defect": "undoes: 窄窗口下模型外显名先压缩，对话区不再冒出横向滚动条"
+    },
+    {
+      "id": "chat-follow-962c32df",
+      "from": "history 962c32df",
+      "apply": "reverse",
+      "patch": "patches/chat-follow-962c32df.patch",
+      "defect": "undoes: 流式输出很快时跟随滑动跟上内容"
+    },
+    {
+      "id": "intent-pill-ignores-zoom",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-pill-ignores-zoom.patch",
+      "defect": "Under page zoom the segmented controls place their highlight from boxes measured in the viewport's pixels, so it stands beside the chosen segment."
+    },
+    {
+      "id": "intent-count-ignores-reduced-motion",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-count-ignores-reduced-motion.patch",
+      "defect": "The statistics under the composer keep rolling to every new reading for a reader who asked for reduced motion."
+    },
+    {
+      "id": "intent-focus-mirror-misses-blur",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-focus-mirror-misses-blur.patch",
+      "defect": "A window that loses focus keeps painting its selection in the active colour until something else redraws it."
+    },
+    {
+      "id": "intent-prefs-reads-any-legacy-key",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-prefs-reads-any-legacy-key.patch",
+      "defect": "A stored preference holding an object with a toString field, or the word toString, breaks the read of every preference or turns one into a function."
+    },
+    {
+      "id": "intent-estimate-counts-wide-as-narrow",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-estimate-counts-wide-as-narrow.patch",
+      "defect": "While a Chinese answer streams, the token figure under the composer grows at a third of the rate the text does."
+    },
+    {
+      "id": "intent-part-marking-reads-menu",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-part-marking-reads-menu.patch",
+      "defect": "With the @ menu open inside the composer's overlay seat, the menu's own rows read the composer's row and cluster marks, so the meter's dock is measured off a menu row and the numbers are lifted onto the open menu."
+    },
+    {
+      "id": "intent-session-cost-stuck",
+      "from": "intent",
+      "apply": "forward",
+      "patch": "patches/intent-session-cost-stuck.patch",
+      "defect": "A reader who leaves a conversation before its first total arrives never sees a cost again: the line keeps the currency's dash for the rest of the page's life."
+    }
+  ]
+}

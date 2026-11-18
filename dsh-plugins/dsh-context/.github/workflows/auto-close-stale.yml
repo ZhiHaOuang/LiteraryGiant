@@ -1,0 +1,56 @@
+name: Auto-close stale issues and PRs
+
+# GitHub Actions cron is UTC-only: 16:00 UTC is 00:00 in Asia/Shanghai (UTC+8).
+on:
+  schedule:
+    - cron: '0 16 * * *'
+  workflow_dispatch:
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  auto-close:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      MAX_AGE_DAYS: '15'
+    steps:
+      - name: Close issues and PRs open for more than ${{ env.MAX_AGE_DAYS }} days
+        run: |
+          set -euo pipefail
+
+          cutoff="$(date -u -d "-${MAX_AGE_DAYS} days" +%Y-%m-%dT%H:%M:%SZ)"
+          comment="Closed automatically because it has been open for more than ${MAX_AGE_DAYS} days."
+          failed=0
+          echo "::notice::Closing open items created before ${cutoff}"
+
+          for kind in issue pr; do
+            # Only API-controlled fields reach the pipe: user titles may contain tabs or newlines and must never be re-split into commands.
+            stale="$(gh "$kind" list --repo "$GITHUB_REPOSITORY" --state open --limit 1000 \
+              --json number,createdAt \
+              --jq ".[] | select(.createdAt < \"${cutoff}\") | \"\(.number)\t\(.createdAt)\"")"
+
+            while IFS=$'\t' read -r number created_at; do
+              if [[ -z "$number" ]]; then
+                continue
+              fi
+              echo "Closing ${kind} #${number} (opened ${created_at})"
+              if [[ "$kind" == "issue" ]]; then
+                close_cmd=(gh issue close "$number" --repo "$GITHUB_REPOSITORY" \
+                  --reason "not planned" --comment "$comment")
+              else
+                close_cmd=(gh pr close "$number" --repo "$GITHUB_REPOSITORY" --comment "$comment")
+              fi
+              if ! "${close_cmd[@]}"; then
+                echo "::warning::Failed to close ${kind} #${number}"
+                failed=$((failed + 1))
+              fi
+            done <<< "$stale"
+          done
+
+          if [[ "$failed" -gt 0 ]]; then
+            echo "::error::${failed} of the overdue items could not be closed"
+            exit 1
+          fi

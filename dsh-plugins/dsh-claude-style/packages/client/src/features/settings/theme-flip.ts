@@ -1,0 +1,125 @@
+import { DARK_THEME_ATTRIBUTE } from '@dsh-claude-style/contracts/dom'
+import { subscribeMutations } from '@dsh-claude-style/engine/bus'
+import { requestFrame } from '@dsh-claude-style/engine/frame'
+import { motionMs } from '../../shared/motion'
+
+/**
+ * The skin's own 0.12s border/box-shadow transitions (composer card, input
+ * scroll, attachment rail, hero tray) are worth keeping for hover/focus, but
+ * a theme flip re-runs them: the canvas repaints in one recalc (CSS
+ * variables swap with the attribute) while the borders and halos ease in
+ * behind it — the staged "colours first, styles later" beat. Two layers
+ * make the swap land in one frame:
+ *
+ * 1. An attribute on <html> and <body> suppresses every transition the
+ *    suppression rule can out-specify (see theme-flip.css).
+ * 2. A forced style flush inside the flip's microtask, then cancelling
+ *    every running paint transition: the flush makes the transitions the
+ *    flip would start NOW (before any paint), and cancel() snaps
+ *    their properties to the final values in the same frame. This covers
+ *    the high-specificity rules the stylesheet cannot out-specify (the
+ *    input scroll is (0,6,1), the rail (0,7,1)). A cancel in a rAF would
+ *    be one frame late — recalc runs after rAF callbacks.
+ *
+ * Only paint properties themes actually change are cancelled; transform
+ * and opacity transitions (hover/menu feedback) keep running. The flag
+ * comes down after a short window, so everyday hover/focus feel is
+ * untouched.
+ *
+ * The host flips `data-ds-dark-theme` on <body> itself; this subscription
+ * only times the suppression around that flip. It is a channel of its own on
+ * the observation bus (D40): the scheduler's pass only hears
+ * aria-label/aria-selected (D9), and this flag must not feed it.
+ *
+ * It lives with the settings page, and both exist exactly while this theme
+ * paints the page (D74). A skin arriving in the same task as a flip still
+ * reaches the sweep, which is why it asks for the stamp first.
+ */
+export const THEME_FLIP_ATTR = 'data-dsh-theme-transitioning'
+export const THEME_FLIP_MS = motionMs('--dsh-claude-duration-fade')
+// Paint properties a theme flip changes; cancelling their transitions
+// snaps them to the new theme's values in one frame.
+export const THEME_FLIP_PROPS: Record<string, boolean> = {
+  'border-color': true,
+  'border': true,
+  'border-top-color': true,
+  'border-right-color': true,
+  'border-bottom-color': true,
+  'border-left-color': true,
+  'box-shadow': true,
+  'color': true,
+  'background-color': true,
+  'background': true,
+  'background-image': true,
+  'outline-color': true,
+  'fill': true,
+  'stroke': true,
+  'text-decoration-color': true,
+  'caret-color': true
+}
+
+export function installThemeFlip() {
+  const body = document.body
+  const root = document.documentElement
+  let flipTimer: ReturnType<typeof setTimeout> | null = null
+  /** Cancels the next frame of the transition sweep. */
+  let cancelSweep: (() => void) | null = null
+
+  // The flag lives on <html> AND <body> so the suppression selector can
+  // out-specify the gated composer rules it can (html[flag] body[skin][flag] *).
+  function setFlag(on: boolean) {
+    root.toggleAttribute(THEME_FLIP_ATTR, on)
+    body.toggleAttribute(THEME_FLIP_ATTR, on)
+  }
+
+  function cancelThemeTransitions() {
+    const anims = document.getAnimations()
+    for (let i = 0; i < anims.length; i++) {
+      const anim = anims[i]
+      // CSSTransition carries transitionProperty; CSSAnimation does not.
+      if (!(anim instanceof CSSTransition)) continue
+      if (!THEME_FLIP_PROPS[anim.transitionProperty]) continue
+      anim.cancel()
+    }
+  }
+
+  function onThemeFlip() {
+    // A skin arriving in the same task as this flip has already taken the
+    // page: its transitions are not this one's to cancel (D74).
+    if (!body.hasAttribute('data-dsh-claude-style')) return
+    setFlag(true)
+    // Force the flip's style recalc right now — inside this microtask,
+    // before any paint — so every transition it would start has started.
+    void root.offsetHeight
+    cancelThemeTransitions()
+    // The host may commit more of the flip after us; sweep the next two
+    // frames to catch those starts as well.
+    if (cancelSweep !== null) cancelSweep()
+    cancelSweep = requestFrame({
+      write() {
+        cancelThemeTransitions()
+        cancelSweep = requestFrame({
+          write() {
+            cancelSweep = null
+            cancelThemeTransitions()
+          },
+        })
+      },
+    })
+    if (flipTimer !== null) clearTimeout(flipTimer)
+    flipTimer = setTimeout(() => {
+      setFlag(false)
+      flipTimer = null
+    }, THEME_FLIP_MS)
+  }
+
+  // Called inside the flip's own mutation microtask, before any paint (D40).
+  const stopThemeWatch = subscribeMutations(body, { attributeFilter: [DARK_THEME_ATTRIBUTE] }, onThemeFlip)
+
+  return () => {
+    stopThemeWatch()
+    if (cancelSweep !== null) cancelSweep()
+    if (flipTimer !== null) clearTimeout(flipTimer)
+    setFlag(false)
+  }
+}

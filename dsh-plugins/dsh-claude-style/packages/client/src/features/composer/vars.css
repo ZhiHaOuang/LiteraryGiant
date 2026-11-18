@@ -1,0 +1,58 @@
+/* ---------- Composer values the rest of the page reads ---------- */
+
+/* The fade band's height and the tone band are values, not looks: the wait
+   badge and the panels standing above the composer read them too, so they are
+   declared on the document outside the composer gate (D9). The rules they feed
+   stay under the gate. */
+
+body[data-dsh-claude-style] {
+  --dsh-composer-fade-h: 40px;
+  /* One box and one ink strength for the controls on the composer's bottom
+     line: their words share a control height and tail, and resolve to full
+     strength under the pointer instead of each taking a colour of its own. */
+  --dsh-claude-footer-control-height: 28px;
+  --dsh-claude-footer-control-pad: 2px;
+  --dsh-claude-footer-ink-opacity: 0.72;
+  --dsh-claude-footer-ink-hover-opacity: 1;
+  /* The colour band a reading takes (features/context-stats/stats-ramp.ts): the
+     band is semantic, so its values are the skin's own and not the host's
+     tokens. Each tone keeps its hue and lightness at about three fifths of its
+     hue's chroma, so the band stays with the skin's palette. */
+  --dsh-claude-tone-red: #d5746a;
+  --dsh-claude-tone-red-orange: #d38469;
+  --dsh-claude-tone-orange: #cb936c;
+  --dsh-claude-tone-yellow: #c09f66;
+  --dsh-claude-tone-lime: #b0c988;
+  --dsh-claude-tone-green-light: #a2dda4;
+  --dsh-claude-tone-green: #6faf73;
+  /* The three-band face's colours (features/context-stats/context-meter-face.ts):
+     the blue and the gold measured from the reference images, and the red given
+     for the third face (#DC3C3D). The ink values are what the number beside the
+     ring wears; the graphic keeps these colours on either canvas, and the light
+     canvas darkens the blue and the gold ink, where a 12 px number has to stay
+     readable. */
+  --dsh-claude-band-blue: #257de0;
+  --dsh-claude-band-yellow: #fbb315;
+  --dsh-claude-band-red: #dc3c3d;
+  --dsh-claude-band-blue-ink: var(--dsh-claude-band-blue);
+  --dsh-claude-band-yellow-ink: var(--dsh-claude-band-yellow);
+  --dsh-claude-band-red-ink: var(--dsh-claude-band-red);
+  /* The plate the meter's pie has not taken (features/context-stats/
+     context-meter-pie.ts): the quiet end of the same band. */
+  --dsh-claude-pie-rest: rgba(250, 249, 245, 0.18);
+}
+
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) {
+  --dsh-claude-tone-red: #af514d;
+  --dsh-claude-tone-red-orange: #af6045;
+  --dsh-claude-tone-orange: #af784e;
+  --dsh-claude-tone-yellow: #8b6d42;
+  --dsh-claude-tone-lime: #779756;
+  --dsh-claude-tone-green-light: #6da173;
+  --dsh-claude-tone-green: #46784e;
+  /* The number's inks at the step a light canvas keeps legible; the graphic
+     keeps the measured colours, and the red #DC3C3D stands on either. */
+  --dsh-claude-band-blue-ink: #1f6fce;
+  --dsh-claude-band-yellow-ink: #8a5f00;
+  --dsh-claude-pie-rest: rgba(20, 20, 19, 0.14);
+}

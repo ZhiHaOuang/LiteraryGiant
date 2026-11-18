@@ -1,0 +1,6 @@
+{
+  "name": "dsh-ops-ptc",
+  "description": "Independent typed PTC file APIs, progressive SDK loading and bounded result references.",
+  "icon": "./icon.png",
+  "type": "module"
+}

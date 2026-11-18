@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2023",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "types": [],
+    "paths": {
+      "@dsh-claude-style/client/pure": ["./packages/client/src/pure.ts"],
+      "@dsh-claude-style/contracts/*": ["./packages/contracts/src/*"],
+      "@dsh-claude-style/engine/*": ["./packages/engine/src/*"]
+    }
+  },
+  "include": ["packages/client/src", "packages/contracts/src", "packages/engine/src", "packages/testing/specs"]
+}

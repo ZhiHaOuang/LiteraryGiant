@@ -1,0 +1,26 @@
+diff --git a/packages/client/src/shared/popover.css b/packages/client/src/shared/popover.css
+index 92fcee6..3983a4f 100644
+--- a/packages/client/src/shared/popover.css
++++ b/packages/client/src/shared/popover.css
+@@ -56,10 +56,9 @@ body[data-dsh-claude-style] .dsh-claude-popover-card[data-open="true"] {
+ body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-popover-card {
+   background: var(--dsh-claude-card);
+   /* The edge is the dark border ladder's highlight (tokens.json), so the card
+-     keeps the border it always had; the drop deepens and a 3px dark falloff
+-     outside it separates the lit edge from the near-black canvas. */
++     keeps the border it always had; only the drop under it deepens. */
+   border-color: var(--dsw-alias-border-l1);
+-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35), 0 8px 28px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.45);
++  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.45);
+ }
+ /* The host-mounted menu cards of the account footer and the hero row's pickers
+    (features/account, features/hero-menu) take the same raised dark card; the
+@@ -67,7 +66,7 @@ body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-popover-card {
+ body[data-dsh-claude-style][data-ds-dark-theme] :is([data-dsh-claude-account-menu], [data-dsh-claude-hero-menu]) {
+   background: var(--dsh-claude-card) !important;
+   border-color: var(--dsw-alias-border-l1) !important;
+-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.35), 0 8px 28px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.45) !important;
++  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.65), 0 2px 8px rgba(0, 0, 0, 0.45) !important;
+ }
+ /* Under the host's colours the card's fill is the host's overlay layer, which
+    a theme plugin may turn translucent (a wallpaper's glass): the card blurs

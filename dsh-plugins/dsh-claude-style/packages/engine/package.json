@@ -1,0 +1,11 @@
+{
+  "name": "@dsh-claude-style/engine",
+  "description": "The mechanism the skin shares with the host: in the browser the observation bus, the frame pipeline, host element access, scrolling, the host's floating layer in a page drawn at a scale, and the seam the skin hands its own vocabulary over; in the host process the request handling, harness paths, cache files and static file serving",
+  "version": "0.16.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./node/*": "./node/*.ts",
+    "./*": "./src/*.ts"
+  }
+}

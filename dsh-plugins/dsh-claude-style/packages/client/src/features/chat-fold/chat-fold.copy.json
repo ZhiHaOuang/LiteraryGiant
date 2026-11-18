@@ -1,0 +1,17 @@
+{
+  "processSummaryThinking": { "zh": "思考×{count}", "en": "Thinking×{count}" },
+  "processSummaryOutput": { "zh": "输出×{count}", "en": "Output×{count}" },
+  "processSummaryTool": { "zh": "工具×{count}", "en": "Tools×{count}" },
+  "processSummaryRecord": { "zh": "记录×{count}", "en": "Records×{count}" },
+  "processSummaryFullThoughtOne": { "zh": "执行 {count} 次思考", "en": "{count} thought" },
+  "processSummaryFullThoughtOther": { "zh": "执行 {count} 次思考", "en": "{count} thoughts" },
+  "processSummaryFullOutputOne": { "zh": "输出 {count} 段文字", "en": "{count} output" },
+  "processSummaryFullOutputOther": { "zh": "输出 {count} 段文字", "en": "{count} outputs" },
+  "processSummaryFullToolOne": { "zh": "调用 {count} 次工具", "en": "{count} tool call" },
+  "processSummaryFullToolOther": { "zh": "调用 {count} 次工具", "en": "{count} tool calls" },
+  "processSummaryFullRecordOne": { "zh": "记录 {count} 条", "en": "{count} record" },
+  "processSummaryFullRecordOther": { "zh": "记录 {count} 条", "en": "{count} records" },
+  "processSummaryFullSeparator": { "zh": "，", "en": ", " },
+  "messageFoldMore": { "zh": "展开全文", "en": "Show the whole message" },
+  "messageFoldLess": { "zh": "收起", "en": "Show less" }
+}

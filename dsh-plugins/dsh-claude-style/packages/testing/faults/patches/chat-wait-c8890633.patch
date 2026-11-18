@@ -1,0 +1,21 @@
+diff --git a/packages/client/src/theme/tokens.json b/packages/client/src/theme/tokens.json
+index a282fcea..8c586f35 100644
+--- a/packages/client/src/theme/tokens.json
++++ b/packages/client/src/theme/tokens.json
+@@ -805,6 +805,16 @@
+         "token": "--dsw-alias-label-caption",
+         "tone": "ink-4"
+       },
++      {
++        "token": "--dsw-alias-label-shimmer",
++        "tone": "shimmer",
++        "use": "the highlight band's tint over running words: the host's own rows and the skin's band (shared/sweep-band.ts) alike"
++      },
++      {
++        "token": "--dsw-alias-label-deep-diving-shimmer",
++        "tone": "shimmer",
++        "use": "the band's tint inside the running row, which the host points --dsw-alias-label-shimmer at; under Claude it is the same warm band as everywhere else"
++      },
+       {
+         "token": "--dsw-alias-state-business-primary",
+         "tone": "accent"

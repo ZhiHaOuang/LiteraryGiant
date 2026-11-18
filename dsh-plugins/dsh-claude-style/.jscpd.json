@@ -1,0 +1,7 @@
+{
+  "path": ["."],
+  "format": ["typescript", "javascript", "css"],
+  "pattern": "{packages/client/src,packages/host/src,packages/engine/src,packages/engine/node,packages/contracts/src,packages/testing,scripts}/**/*",
+  "ignore": ["**/*.test.ts", "**/node_modules/**"],
+  "reporters": ["console"]
+}

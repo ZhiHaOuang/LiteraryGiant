@@ -1,0 +1,109 @@
+dsh-ops
+Copyright (c) 2026 T-Auto and the dsh-ops contributors
+
+================================================================
+LICENSE
+================================================================
+
+dsh-ops is licensed under the MIT License. The license text is in `LICENSE`.
+Nothing in this distribution is relicensed. The MIT grant covers only the work
+this repository authored; components with their own licenses are noted below.
+
+Versions before 0.3.2 also vendored FastCtx (Apache-2.0 by its author) in
+`vendor/fastctx/` and published this fork's build as
+`@dsh-ops/fastctx-<platform>-<arch>`; those releases carried a composite
+`MIT AND Apache-2.0` statement. This distribution removes the FastCtx source
+and binary together with the background component that used them, and contains
+no FastCtx code. FastCtx's license text is kept in
+`licenses/fastctx/LICENSE-APACHE`, upstream's notice in
+`licenses/fastctx/NOTICE`, and the attribution below is kept for those earlier
+versions. The upstream revision and every difference from it remain recorded in
+`vendor/fastctx/UPSTREAM.md` and `vendor/fastctx/FORK.md` in the repository
+history and in the published tarballs of earlier versions.
+
+================================================================
+THIRD-PARTY COMPONENTS
+================================================================
+
+The Windows x64 default backend is the complete official Niubash v1.5.0
+portable distribution, embedded unchanged under runtime/win32-x64/niubash.
+Source: https://github.com/unixwin/niubash/releases/tag/v1.5.0
+The archive and complete file inventory are SHA-256 pinned and verified
+before staging or execution. bash-runtime install acquires this same
+archive into an operator-managed DSH_HOME copy, not PortableGit.
+
+Niubash and its rubash library and WinuxCmd are MIT-licensed. The complete
+upstream package also carries gawk (GPL-3.0-or-later), niugit (GPL-2.0-only),
+ripgrep (MIT OR Unlicense), fd (MIT OR Apache-2.0), and the DLL closure
+listed in licenses/dll-closure. Their license texts, provenance and
+corresponding-source pointers are retained in the payload's licenses/
+directory. Upstream provenance is retained verbatim, including its version
+labels; the frozen archive inventory is the authority for shipped bytes.
+Per-call command faces are derived only from the verified WinuxCmd binary;
+the immutable source distribution is not modified by shell execution.
+
+PortableGit is no longer a default optional dependency. The explicit legacy
+Git Bash build/provision path retains the pinned Git for Windows
+v2.56.0.windows.2 (GPL-2.0) for compatibility. Upstream source and terms:
+https://github.com/git-for-windows/git and https://github.com/git/git.
+Existing operator-selected Git Bash installations are not removed.
+
+  * PowerShell remains managed by the host. `dsh-ops upgrade-host-pwsh`
+    previews a standard Windows installation and `--yes` executes WinGet.
+    It does not override the host executor or remove existing copies.
+    The legacy provisioner retains a PIN, not a redistribution.
+    This distribution does not contain, forward, repackage, or
+    redistribute PowerShell. The pin records the upstream release
+    (`PowerShell-7.6.6-win-x64.zip`, PowerShell `v7.6.6`), the official
+    URL that publishes it, and its SHA-256; `dsh-ops provision-shells
+    --pwsh` reads the pin, downloads that asset on the user's own
+    machine, and verifies the digest there; OPS does not automatically
+    activate that legacy copy. PowerShell is distributed by
+    Microsoft under the MIT licence; that licence text, its copyright,
+    and the corresponding source belong to Microsoft and to the
+    PowerShell project (https://github.com/PowerShell/PowerShell).
+
+================================================================
+HISTORICAL ATTRIBUTION — FastCtx (versions before 0.3.2)
+================================================================
+
+FastCtx's NOTICE requires that a derivative work carry the following notice
+verbatim in its documentation. It is reproduced here, and in the repository
+READMEs, as required for those versions.
+
+    This product includes FastCtx
+    (https://github.com/yc-duan/fastctx), Copyright (c) 2026 yc-duan,
+    used under the Apache License 2.0.
+
+    FastCtx is redistributed and/or modified here by the maintainer of
+    this distribution. Any such change is that maintainer's own work
+    and their sole responsibility. It is not endorsed by, not
+    supported by, and not attributable to the author of FastCtx, who
+    accepts no liability of any kind arising from this distribution or
+    from anything built on top of it.
+
+The changes those releases made to FastCtx were removals — of distribution and
+CI machinery, and of the code that existed only for upstream's standalone
+product (the control terminal, the self-updater and its upstream update
+detection, and the Codex integration) — together with the edits those removals
+forced in the files that remained. Every source file those releases touched
+carried its own Apache-2.0 section 4(b) notice at the top, and the complete
+enumeration is in `vendor/fastctx/FORK.md` in the repository history and in the
+published tarballs of earlier versions.
+
+================================================================
+
+FastCtx is developed and maintained at
+https://github.com/yc-duan/fastctx
+
+
+DeepSeek Harness shell contract, approval and job adapters are adapted from
+@deepseek-ai/dsh-tool-bash 0.2.0-rc.2 (MIT), Copyright (c) 2026 DeepSeek.
+Upstream: https://github.com/deepseek-ai/deepseek-harness
+License: licenses/deepseek-harness/LICENSE
+
+The native worker's DOCX reader uses pinned third-party Rust ZIP/XML libraries.
+Their exact versions and dependency rationale are recorded in docs/document-dependencies.md;
+original license notices (MIT choices for dual-licensed packages, plus zlib-rs's Zlib license)
+are reproduced in licenses/documents/THIRD-PARTY-NOTICES.txt. Existing upstream notices above
+remain unchanged. No third-party code is relicensed by the plugin's own MIT grant.

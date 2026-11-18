@@ -1,0 +1,22 @@
+diff --git a/packages/engine/src/parts.ts b/packages/engine/src/parts.ts
+--- a/packages/engine/src/parts.ts
++++ b/packages/engine/src/parts.ts
+@@ -283,7 +283,7 @@
+   const lookups: RegionLookup[] = []
+   for (const lookup of LOOKUPS) {
+     if (element.closest(lookup.within) === null) continue
+-    if (insideSkipped(element, lookup)) continue
++    // no region keeps its names out of a subtree
+     lookups.push(lookup)
+   }
+   const parent = element.parentElement
+@@ -312,8 +312,7 @@
+  * starts here are dropped, because nothing under it is the region's own.
+  */
+ function lookupsBelow(element: Element, lookups: readonly RegionLookup[]): readonly RegionLookup[] {
+-  if (SKIP_SELECTOR === '' || !element.matches(SKIP_SELECTOR)) return lookups
+-  return lookups.filter((lookup) => lookup.skip === null || !element.matches(lookup.skip))
++  return lookups
+ }
+ 
+ /**

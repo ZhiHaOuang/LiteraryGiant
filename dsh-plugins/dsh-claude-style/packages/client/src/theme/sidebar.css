@@ -1,0 +1,577 @@
+/* ---------- Claude Code layout: sidebar brand ---------- */
+/* The shipped whale and wordmark give way to the selected brand, each painted as
+   an alpha mask over currentColor so it follows the label colour. The choice is a
+   document attribute, so the settings page flips one attribute and the UI follows.
+   Sizing: an 18px cap height to match the shipped brandName box, the wordmark's
+   width read from that height through the artwork's aspect ratio (its viewBox,
+   512.22 × 121.54, packages/assets/src/brand/claude-word.svg). */
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] :is([data-dsh-claude-part~="brand-mark"], [data-dsh-claude-part~="rail-mark"]) > * {
+  display: none !important;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] :is([data-dsh-claude-part~="brand-mark"], [data-dsh-claude-part~="rail-mark"])::before {
+  content: "";
+  display: block;
+  flex: none;
+  background-color: currentColor;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+/* Claude (default): starburst mark + the Claude wordmark. The mask values are
+   the shared ones (shared/masked.css). */
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] :is([data-dsh-claude-part~="brand-mark"], [data-dsh-claude-part~="rail-mark"])::before {
+  width: 18px;
+  height: 18px;
+  -webkit-mask: var(--dsh-claude-mask-claude-mark);
+  mask: var(--dsh-claude-mask-claude-mark);
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="brand-identity"] > [data-dsh-claude-part~="brand-name"] > * {
+  display: none !important;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="brand-identity"] > [data-dsh-claude-part~="brand-name"]::before {
+  content: "";
+  display: block;
+  flex: none;
+  background-color: currentColor;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-brand="claude"] [data-dsh-claude-part~="brand-identity"] > [data-dsh-claude-part~="brand-name"]::before {
+  width: calc(18px * 512.22 / 121.54);
+  max-width: 100%;
+  height: 18px;
+  -webkit-mask: var(--dsh-claude-mask-claude-word);
+  mask: var(--dsh-claude-mask-claude-word);
+}
+
+/* DeepSeek: the host's own whale and wordmark in DeepSeek's brand blue, or in
+   the ink the image-colour choice names (features/brand/brand.ts). The
+   expanded brand is a button on most platforms and a plain row on macOS, and the
+   collapsed rail's whale sits in the sidebar toggle, so the art is inked where it
+   sits. */
+body[data-dsh-claude-style][data-dsh-claude-brand="deepseek"] :is([data-dsh-claude-part~="brand-identity"], [data-dsh-claude-part~="rail-mark"]) {
+  color: var(--dsh-claude-logo-ink);
+}
+
+/* ---------- Claude Code layout: the brand area's switch ---------- */
+/* The Appearance tab's Brand row hides the sidebar's brand area. The host gives
+   its logo row a height of its own — 60px on the web, 40px in the desktop
+   window's titlebar — and the sidebar toggle stands in that row beside the brand
+   (in the flow on the web, fixed in the titlebar), so the row keeps drawing the
+   toggle and takes the height its remaining content asks for. The collapsed
+   rail already draws its mark in the toggle, so the switch reaches the expanded
+   column alone. */
+body[data-dsh-claude-style][data-dsh-claude-sidebar-brand="off"] [data-dsh-claude-part~="brand-button"] {
+  display: none;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-sidebar-brand="off"] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) [data-dsh-claude-part~="logo-row"] {
+  height: auto;
+}
+
+/* ---------- Claude Code layout: new session button ---------- */
+/* A narrow, left-aligned row with a leading 20px chip, flat until the pointer is
+   on it. The row treatment holds while the column is expanded: collapsed, the host
+   re-seats this button as its own icon control, where a full-width plate would
+   span the titlebar. The expanded state is read down from the app frame, which
+   carries the collapsed marker and holds the sidebar column as a direct child —
+   `body:not(:has(collapsed))` made every DOM change re-match the document.
+   The panel rows below share the same row metrics. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"],
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"] {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+  height: 28px;
+  line-height: 28px;
+  padding: 0 8px;
+  margin: 0 0 6px 0;
+  border: none !important;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dsw-alias-label-primary, #161616);
+  font-family: var(--dsw-font-family);
+  font-size: 13px;
+  font-weight: 500;
+  /* Explicit, so the label's x does not depend on the host's gap: every sidebar
+     row places its text at padding + 20px icon box + 6px. */
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background-color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"]:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"] {
+  color: var(--dsw-alias-label-primary);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+/* Collapsed rail and titlebar: the host draws its own plate for its icon control,
+   and in the titlebar one reads as a stray rectangle. */
+body[data-dsh-claude-style] [data-sidebar-collapsed] button[data-dsh-claude-part~="new-session"]:hover {
+  background: transparent !important;
+}
+/* Collapsed, that control is the host's 36px icon button with the chip as its
+   icon, and the host's own icon seat holds nothing there (the svg below is
+   hidden, the label is 0 wide). The seat still takes its share of the flex row,
+   which pushes the chip that far left of the rail's centre line; the seat goes,
+   and the button's own centring puts the chip where every other icon stands. */
+body[data-dsh-claude-style] [data-sidebar-collapsed] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-mask"] {
+  display: none;
+}
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"] svg {
+  display: none;
+}
+/* The expanded row centers its label inside a flex-1 mask and parks the shortcut
+   at the far right; Claude's row reads left to right from the chip. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-content"] {
+  justify-content: flex-start;
+}
+/* The row's shortcut hint is the host's own key caps: one `kbd` per key with a
+   `+` between them. The caps take the search button's keycap look, which lives
+   with the search palette (features/search/search.css); the `+` goes, the way
+   the button leaves it out. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"] [data-dsh-claude-part~="new-session-shortcut"] kbd[data-dsh-claude-part~="key-separator"] {
+  display: none;
+}
+/* The chip paints BOTH the circular fill and the plus. A mask cannot: it clips the
+   element to the glyph and takes the fill with it, so the plus is a background
+   image, which costs the currentColor adaptivity and buys a theme pair below. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"]::before {
+  content: "";
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  margin-right: 0;
+  flex: none;
+  border-radius: 50%;
+  /* The page inherits `corner-shape: superellipse(1.5)` from <html>, which turns a
+     50% radius into a pebble; the host's own spinner/dot/toggle rules say round
+     for the same reason. */
+  corner-shape: round;
+  background-color: rgba(0, 0, 0, 0.10);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23141413' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='6' x2='12' y2='18'></line><line x1='6' y1='12' x2='18' y2='12'></line></svg>");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+  -webkit-mask: none;
+  mask: none;
+}
+body[data-dsh-claude-style][data-ds-dark-theme] button[data-dsh-claude-part~="new-session"]::before {
+  background-color: rgba(255, 255, 255, 0.14);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23faf9f5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><line x1='12' y1='6' x2='12' y2='18'></line><line x1='6' y1='12' x2='18' y2='12'></line></svg>");
+}
+
+/* ---------- the sidebar's panel rows (插件 + plugin entries) ---------- */
+/* The panel entries live in a `nav.panelList` whose own gap stacks on the row
+   margin, so the rows' 6px margin is the only spacing, and each row takes the
+   new-session metrics — including the 20px icon box, so both labels start at the
+   same x. */
+body[data-dsh-claude-style] nav[data-dsh-claude-part~="panel-list"] {
+  gap: 0;
+}
+/* The host's scroll viewport keeps an empty 8px grid row above the panel list.
+   Collapse that row on the viewport itself and take the scroll region's own 4px
+   top margin out, so the plate's 6px foot alone sets the first row's distance.
+   Moving the list with a negative margin leaves the grid's own track in place. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) [data-dsh-claude-part~="sidebar-scroll-region"] {
+  margin-top: 0;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) [data-dsh-claude-part~="sidebar-scroll-area"] {
+  grid-template-rows: 0 max-content 2px max-content;
+}
+/* The expanded list's first row stands 6px under the New session plate. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"] {
+  margin-bottom: 6px;
+}
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"] {
+  /* The host floors this row at 36px with a min-height, which the `height` in
+     the shared row rule above cannot beat. */
+  min-height: 28px;
+}
+/* An entry's row stands inside the host's wrapper, which carries the paint inset
+   as a transparent inline border, so the row's own padding has that inset to
+   give back: the glyph box and the label then start on the line the New session
+   plate above and the More launcher below keep. More is no entry — the host
+   wraps it in a bare box of its own — so it keeps the row's own padding. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="panel-entry"] button[data-dsh-claude-part~="panel-row"] {
+  padding-inline: calc(8px - var(--dsh-sidebar-paint-inset, 3px));
+}
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"]:hover {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+body[data-dsh-claude-style][data-ds-dark-theme] button[data-dsh-claude-part~="panel-row"] {
+  color: var(--dsw-alias-label-primary);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] button[data-dsh-claude-part~="panel-row"]:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+}
+/* A 13px glyph in a 20px box: the box the new-session chip occupies. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"] svg {
+  width: 13px;
+  height: 13px;
+  margin: 0 3.5px;
+  flex: none;
+}
+
+/* More is three dots in Claude's sidebar: the host's tiles-and-plus glyph gives
+   way to three round dots in the same box, one per third of its width. The box
+   scales: the wide row asks for 13px and the collapsed rail's icon button for
+   18px (below), so the dots and their step are stated once, off the box. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"][aria-haspopup="menu"] [data-dsh-claude-part~="panel-glyph"] > svg {
+  display: none;
+}
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"][aria-haspopup="menu"] [data-dsh-claude-part~="panel-glyph"]::before {
+  --dsh-claude-dot-box: 13px;
+  content: "";
+  display: block;
+  flex: none;
+  width: var(--dsh-claude-dot-box);
+  height: var(--dsh-claude-dot-box);
+  margin: 0 3.5px;
+  background-image: radial-gradient(circle, currentColor calc(var(--dsh-claude-dot-box) * 0.085), transparent calc(var(--dsh-claude-dot-box) * 0.115));
+  background-size: calc(var(--dsh-claude-dot-box) / 3) 100%;
+  background-repeat: repeat-x;
+}
+
+/* ---------- the collapsed rail: the host's 36px icon buttons ---------- */
+/* Collapsed, the host re-seats every panel row as a 36px icon button with a 12px
+   plate and asks its glyph for 18px; the workspace's own add-folder and search
+   controls beside it carry the same pair, and the frame's marker scopes this
+   past the compact block. The host wraps each row in a box of its own, and that
+   box is one pixel narrower than the row the rail asks for, so a row that may
+   shrink is shrunk: the rail's rows would then be a pixel narrower than the
+   new-session button above them, and the column would read as ragged. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-sidebar-collapsed] nav[data-dsh-claude-part~="panel-list"] {
+  gap: 12px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-sidebar-collapsed] button[data-dsh-claude-part~="panel-row"] {
+  width: 36px;
+  height: 36px;
+  min-height: 36px;
+  margin: 0;
+  padding: 0;
+  flex: none;
+  justify-content: center;
+  border-radius: 12px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-sidebar-collapsed] button[data-dsh-claude-part~="panel-row"] svg {
+  width: 18px;
+  height: 18px;
+  margin: 0;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"][data-sidebar-collapsed] button[data-dsh-claude-part~="panel-row"][aria-haspopup="menu"] [data-dsh-claude-part~="panel-glyph"]::before {
+  --dsh-claude-dot-box: 18px;
+  margin: 0;
+}
+
+/* ---------- sidebar rows: the icon turns a quarter on hover ---------- */
+/* Both glyphs are four-fold symmetric, so the turn ends where it started and the
+   transition turns it back when the pointer leaves. */
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"]::before,
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"] svg {
+  transition: transform var(--dsh-claude-duration-slide) var(--dsh-claude-ease-standard);
+  transform-origin: center;
+}
+body[data-dsh-claude-style] button[data-dsh-claude-part~="new-session"]:hover::before,
+body[data-dsh-claude-style] button[data-dsh-claude-part~="panel-row"]:hover svg {
+  transform: rotate(90deg);
+}
+
+/* ---------- Claude Code layout: workspace & session sidebar ---------- */
+/* Typography: Anthropic Sans and compact sizes */
+body[data-dsh-claude-style] :is([data-pane="sidebar"], [data-dsh-claude-part~="sidebar-column"], [data-dsh-claude-part~="tree-body"], [role="tree"]) :is([data-dsh-claude-part~="row-title"], [data-dsh-claude-part~="row-project-text"], [data-dsh-claude-part~="section-label"], [data-dsh-claude-part~="session-row"], [data-dsh-claude-part~="project-row"], [data-dsh-claude-part~="row-time"]) {
+  font-family: var(--dsw-font-family);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-title"] {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: normal;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-title"] {
+  font-size: 13px;
+  line-height: 18px;
+  letter-spacing: normal;
+  color: var(--dsw-alias-label-secondary, #70686a);
+  transition: color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-title"] {
+  color: var(--dsw-alias-label-tertiary);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"]:is(:hover, [data-dsh-claude-part~="row-selected"], [data-dsh-claude-part~="row-active"], [data-dsh-claude-part~="row-menu-open"], [aria-selected="true"], [data-selected="true"]) [data-dsh-claude-part~="row-title"] {
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] [data-dsh-claude-part~="session-row"]:is(:hover, [data-dsh-claude-part~="row-selected"], [data-dsh-claude-part~="row-active"], [data-dsh-claude-part~="row-menu-open"], [aria-selected="true"], [data-selected="true"]) [data-dsh-claude-part~="row-title"] {
+  color: var(--dsw-alias-label-primary);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-time"] {
+  font-size: 11px;
+  line-height: 16px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="section-label"] {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+/* Compact scale: shrunken heights, margins and paddings */
+/* The host indents rows through `--dsh-workspace-indent`, written inline on each
+   group container as `depth * 12px`; the shipped row rule carries
+   `padding-inline-start: calc(8px + var(--dsh-workspace-indent, 0px))`. This
+   rule's specificity is (0,2,1) where that rule's is (0,1,0), so the shorthand
+   below decides the whole padding family and the tree would draw every level at
+   the same x. The second declaration restores the indentation on the skin's own
+   6px base. The variable is unset in the flat list and `0px` in the
+   group-by-workspace list, so both keep the 6px row they have today. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  padding-inline-start: calc(6px + var(--dsh-workspace-indent, 0px));
+  gap: 4px;
+  border-radius: 6px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] {
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  padding-inline-start: calc(6px + var(--dsh-workspace-indent, 0px));
+  gap: 0;
+  border-radius: 6px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-title"] {
+  margin: 0 4px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="group-section"] > * + * {
+  margin-top: 1px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="group-section"] + [data-dsh-claude-part~="group-section"] {
+  margin-top: 6px !important;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-actions"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-actions"] {
+  gap: 6px;
+}
+/* The host sizes the row's icon buttons 24px with -4px margins; at the compact
+   16px box that overhang would overlap neighbours, so the rule clears it. */
+body[data-dsh-claude-style] :is([data-dsh-claude-part~="project-row"], [data-dsh-claude-part~="session-row"]) [data-dsh-claude-part~="row-icon-button"] {
+  width: 16px;
+  height: 16px;
+  margin: 0;
+}
+
+/* ---------- the sidebar-layout choice: the compact scale ---------- */
+/* Every rule here restates one above with less air, so the reader's own choice
+   (the Sidebar tab's row, SIDEBAR_LAYOUT_ATTR) only ever takes space away: the
+   foot under the top block's rows, the panel list's own foot — which is what
+   separates that block from the workspace region — the workspace heading, the
+   conversation rows' height and the gap between two groups, and the footer's
+   own padding. The relaxed value is the stylesheet as written. */
+/* The New session plate states its foot in the frame-scoped selector above, so
+   the tightening restates that whole selector; the panel rows are matched
+   directly. The scroll region's margin is already taken out above, leaving 4px
+   here against 6px relaxed. */
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] button[data-dsh-claude-part~="new-session"] {
+  margin-bottom: 4px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] button[data-dsh-claude-part~="panel-row"] {
+  margin-bottom: 2px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] nav[data-dsh-claude-part~="panel-list"] {
+  margin-bottom: 2px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="section-header"] {
+  margin-top: 0;
+  margin-bottom: 2px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="project-row"],
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="session-row"] {
+  height: 24px;
+  min-height: 24px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="group-section"] > * + * {
+  margin-top: 0;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="group-section"] + [data-dsh-claude-part~="group-section"] {
+  margin-top: 2px !important;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="foot-area"] {
+  padding-top: 4px;
+  padding-bottom: 3px;
+}
+body[data-dsh-claude-style][data-dsh-claude-sidebar-layout="compact"] [data-dsh-claude-part~="foot-area"] [data-dsh-claude-part~="settings-trigger"] {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+/* Hover and active plates belong to session rows alone: a folder row is a heading,
+   so its cue is the label darkening below. This also cancels the shipped
+   .projectRow:hover background. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"]:hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"][data-dsh-claude-part~="row-selected"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"][data-dsh-claude-part~="row-menu-open"] {
+  background: var(--dsh-claude-hover-bg, rgba(0, 0, 0, 0.08));
+}
+
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"]:hover,
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"][data-dsh-claude-part~="row-menu-open"],
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"][data-dsh-claude-part~="row-selected"] {
+  background: transparent;
+}
+
+/* Folder header: muted label, no folder icon, dropdown arrow instead */
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-title"] {
+  color: var(--dsw-alias-label-secondary, #70686a);
+  font-weight: 500;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"]:hover [data-dsh-claude-part~="row-title"] {
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-folder-active"] {
+  color: inherit;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-folder"] {
+  display: none;
+}
+/* Title left, dropdown arrow beside it. The label takes its content width and
+   yields past it, which keeps the hover actions inside the column. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] {
+  display: flex;
+  align-items: center;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-project-text"] {
+  order: 1;
+  flex: 0 1 auto;
+  margin-right: 2px;
+}
+/* The chevron is a reveal-on-hover affordance. The shipped CSS gates it on
+   .projectRow:hover alone, which drops it the moment the pointer moves down into
+   the folder's conversation list, so the trigger is the whole group section —
+   keyed on the section's own :hover rather than `:has(row:hover)`, which made
+   every DOM change re-match the document. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-chevron"] {
+  order: 2;
+  display: none;
+  width: 14px;
+  height: 14px;
+  align-items: center;
+  justify-content: center;
+  color: var(--dsw-alias-label-secondary, #70686a);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="group-section"]:hover [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-chevron"] {
+  display: inline-flex !important;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-actions"] {
+  order: 3;
+  margin-left: auto;
+}
+/* The shipped solid triangle gives way to a chevron */
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-chevron"] svg {
+  display: none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"] [data-dsh-claude-part~="row-chevron"]::after {
+  content: "";
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 6l4 4 4-4%27/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27 fill=%27none%27 stroke=%27black%27 stroke-width=%271.5%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3E%3Cpath d=%27M4 6l4 4 4-4%27/%3E%3C/svg%3E") center / contain no-repeat;
+  transition: transform var(--dsh-claude-duration-surface) var(--dsh-claude-ease-in-out);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="project-row"][aria-expanded="false"] [data-dsh-claude-part~="row-chevron"]::after {
+  transform: rotate(-90deg);
+}
+/* Session status circle. The host renders the leading seat through a slot outlet
+   whose anchor (`div[data-slot]`, display:contents) is a child of the seat even
+   when nothing is registered, so an idle row's seat is never :empty and the circle
+   hangs on the empty anchor as well; a seat carrying dots or another plugin's
+   content keeps its own paint. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-slot"] {
+  width: 14px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-slot"]:empty::after,
+body[data-dsh-claude-style] [data-dsh-claude-part~="session-row"] [data-dsh-claude-part~="row-slot"] > [data-slot]:empty::after {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  corner-shape: round;
+  border: 1px solid var(--dsw-alias-label-caption, #b2acad);
+  box-sizing: border-box;
+}
+
+/* Session status ongoing indicator: the host's own spinner, repainted as the
+   mark the Motion tab picks. Its glyph is a `<g>` of two circles and is hidden
+   below, so the box itself is the whole paint. The idle seat's hollow circle
+   stays 6px, so the shipped look is a filled dot of the same size breathing in
+   place — filled against hollow is what reads a row as running, and the breath
+   is what tells it from a state the host paints filled and still. The other
+   look is the 10px ring the skin drew before the dot: a track with one lit head
+   turning through it. The settings page's two preview cards carry the same
+   looks on `.dsh-claude-ongoing-mark`, which is why every rule below names both
+   boxes. */
+body[data-dsh-claude-style] :is(svg[data-state="ongoing"], .dsh-claude-ongoing-mark) {
+  width: 6px;
+  height: 6px;
+  box-sizing: border-box;
+  border: none;
+  border-radius: 50%;
+  corner-shape: round;
+  background: var(--dsw-alias-label-secondary);
+  /* The shared pulse, whose whole motion is opacity: a light that changes size
+     with its brightness reads as a growing dot, not as a lamp. */
+  animation: dsh-claude-pulse var(--dsh-claude-period-breathe) var(--dsh-claude-ease-in-out) infinite;
+  display: inline-block;
+  flex: none;
+  color: transparent;
+  fill: none;
+}
+/* The ring, under the reader's choice on <body> (core/prefs.ts) or under the
+   preview card's own `data-look`. The track is the theme's own, kept apart from
+   the head on top of it, which is what the rotation carries. */
+body[data-dsh-claude-style] .dsh-claude-ongoing-mark[data-look="ring"],
+body[data-dsh-claude-style][data-dsh-claude-ongoing-indicator="ring"] svg[data-state="ongoing"] {
+  width: 10px;
+  height: 10px;
+  border: 1.5px solid rgba(255, 255, 255, 0.18);
+  border-top-color: var(--dsw-alias-label-primary);
+  background: transparent;
+  animation: dsh-claude-ongoing-spin var(--dsh-claude-period-spin) linear infinite;
+  transform-origin: center center;
+}
+body[data-dsh-claude-style]:not([data-ds-dark-theme]) .dsh-claude-ongoing-mark[data-look="ring"],
+body[data-dsh-claude-style]:not([data-ds-dark-theme])[data-dsh-claude-ongoing-indicator="ring"] svg[data-state="ongoing"] {
+  border-color: rgba(20, 20, 19, 0.12);
+  border-top-color: var(--dsw-alias-label-secondary);
+}
+@keyframes dsh-claude-ongoing-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+body[data-dsh-claude-style] svg[data-state="ongoing"] * {
+  display: none;
+}
+/* The reader's animation choice (D40): Reduced holds both looks still — the lit
+   dot and the ring's lit head still read a row as running — so neither needs the
+   exception the ring carried while it was the only mark. The system's own
+   setting reaches this rule through the resolved attribute, and the host's
+   reduced-motion block reaches its spinner's `<g>` and arc, hidden above, and
+   never this box. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] :is(svg[data-state="ongoing"], .dsh-claude-ongoing-mark) {
+  animation: none;
+}

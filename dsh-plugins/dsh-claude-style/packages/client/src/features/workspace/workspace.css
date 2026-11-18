@@ -1,0 +1,165 @@
+/* ---------- Workspace section: 进行中 / 已归档 segments ---------- */
+/* The segment control and the archived row action dress the host's own
+   workspace browser under the marks packages/client/src/features/workspace/workspace-view.ts
+   writes; sidebar-adjacent, but split from theme/sidebar.css when that file
+   neared the 750-line stop line. */
+
+/* ---------- workspace section: 进行中 / 已归档 ---------- */
+/* The section label gives way to a two-state segment control (the skin's own
+   markup, built by packages/client/src/features/workspace/workspace-view.ts);
+   the two segments are the host's own archived filter, so the tree below the
+   header stays the host's in both. The label and the control cross-fade by
+   opacity further down.
+   The control's look is the shared small segment look (shared/segment-control.css);
+   this sheet keeps its placement over the label and the crossfade.
+   The control is a mode switch, not furniture: while 进行中 is the state it steps
+   aside for the plain 工作区 heading and comes back as soon as the pointer is in
+   the section — the header itself or the tree below it. In 已归档 it stays put,
+   because it is the way back.
+   The two swap by opacity rather than display, so they cross-fade; the control
+   is laid over the label's own slot (absolute, same 16px) so neither the header's
+   height nor the actions' position moves while they swap. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="section-header"] {
+  position: relative;
+}
+body[data-dsh-claude-style] .dsh-claude-ws-segments {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity var(--dsh-claude-duration-surface) var(--dsh-claude-ease-standard), visibility var(--dsh-claude-duration-surface) var(--dsh-claude-ease-standard);
+}
+body[data-dsh-claude-style] [data-dsh-claude-ws-view="active"] .dsh-claude-ws-segments {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-ws-view="active"]:hover .dsh-claude-ws-segments,
+body[data-dsh-claude-style] [data-dsh-claude-part~="section-header"]:hover .dsh-claude-ws-segments {
+  /* The hover rule outranks the hidden state above on specificity alone: it
+     carries one pseudo-class more (D9). */
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="section-label"][data-dsh-claude-ws-label] {
+  /* The heading is a label, not a target: it must not swallow clicks aimed at the
+     control laid over it, nor start a selection drag. */
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  opacity: 0;
+  transition: opacity var(--dsh-claude-duration-surface) var(--dsh-claude-ease-standard);
+}
+body[data-dsh-claude-style] [data-dsh-claude-ws-view="active"] [data-dsh-claude-part~="section-label"][data-dsh-claude-ws-label] {
+  opacity: 1;
+}
+body[data-dsh-claude-style] [data-dsh-claude-ws-view="active"]:hover [data-dsh-claude-part~="section-label"][data-dsh-claude-ws-label],
+body[data-dsh-claude-style] [data-dsh-claude-part~="section-header"]:hover [data-dsh-claude-part~="section-label"][data-dsh-claude-ws-label] {
+  opacity: 0 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-ws-segment {
+  padding: 0 8px;
+  height: 20px;
+  /* The checked plate cross-fades here, where the view tabs only fade their ink. */
+  transition: background-color var(--dsh-claude-timing-feedback), color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-segment:hover {
+  color: var(--dsw-alias-label-primary, #161616);
+}
+/* ---------- 已归档: the skin's own page of the archive ---------- */
+/* The 已归档 segment is the skin's own list (archived-list.ts), not the host's
+   tree: the host would mount every archived conversation at once, which is what
+   slows the section down once the archive holds hundreds. While the segment
+   stands the host's own list area stays hidden and the section's rows are the
+   skin's, one page of thirty with the next appending at the foot. */
+body[data-dsh-claude-style] [data-dsh-claude-ws-view="archived"] [data-dsh-claude-part~="list-area"] {
+  display: none;
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived {
+  /* The list takes the section's own room the way the host's tree did: the
+     same row rhythm, the same sides. The room is the host's own column and its
+     tree body is hidden here, so this box has to be the section's scroll port:
+     without the bound and the overflow the rows run past the section, which
+     the region clips. */
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  flex: 1 1 0%;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 0 6px 16px;
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  height: 28px;
+  min-height: 28px;
+  padding: 0 6px;
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--dsw-alias-label-secondary, #6f6a6b);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-row:hover,
+body[data-dsh-claude-style] .dsh-claude-ws-archived-row:focus-visible {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  font-weight: 500;
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  opacity: 0;
+  transition: opacity var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-row:hover .dsh-claude-ws-archived-actions,
+body[data-dsh-claude-style] .dsh-claude-ws-archived-row:focus-within .dsh-claude-ws-archived-actions {
+  opacity: 1;
+}
+/* The open/unarchive/delete entries stand in the host's own 16px row-action
+   box; the destructive hover ink is the skin's, as on the host's rows. */
+body[data-dsh-claude-style] :is(.dsh-claude-ws-archived-unarchive, .dsh-claude-ws-archived-delete) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  border: none;
+  border-radius: var(--dsw-radius-xs, 4px);
+  background: transparent;
+  color: var(--dsw-alias-label-tertiary, #b2acad);
+  cursor: pointer;
+  flex: none;
+  transition: background-color var(--dsh-claude-timing-feedback), color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-unarchive:hover,
+body[data-dsh-claude-style] .dsh-claude-ws-archived-unarchive:focus-visible {
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, 0.05));
+  color: var(--dsw-alias-label-primary, #161616);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-delete:hover,
+body[data-dsh-claude-style] .dsh-claude-ws-archived-delete:focus-visible {
+  background: rgba(192, 57, 43, 0.12);
+  color: var(--dsw-alias-state-error-primary, #c0392b);
+}
+body[data-dsh-claude-style] .dsh-claude-ws-archived-empty {
+  padding: 12px 6px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--dsw-alias-label-tertiary, #b2acad);
+}

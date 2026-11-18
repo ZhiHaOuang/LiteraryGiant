@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Data inspection",
+    "description": "Record OPS logs and reports for developer diagnosis. Turning it on or off does not affect daily use."
+  }
+}

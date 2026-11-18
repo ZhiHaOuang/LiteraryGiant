@@ -1,0 +1,45 @@
+/* ── Deepy, the DeepSeek brand's pixel whale ────────────────────────────────
+   The whale is drawn on a 52×52 grid of logical pixels at 2px a pixel (104px
+   square), its ground line — row 48.5, the middle of its shadow — on the top
+   edge of what it stands on. The sheets hold five device pixels to a logical
+   pixel, so the browser scales them down smoothly at every pixel density
+   (`image-rendering` stays at its default: a pixelated downscale drops rows).
+   The shared frame mechanics — the anchor, the sprite's window and the strip —
+   are in packages/client/src/features/mascot/mascot-frame.css; this file gives the
+   whale its size, placement and pointer window. Only the whale's body takes
+   the pointer. */
+
+/* Feet on the top edge of what it stands on. Every sheet's crop box ends 3px
+   below the whale's ground line (logical row 50 against the ground line at
+   48.5), and the whale paints over the host's cards — the composer card, and
+   the todo, goal and queue cards stacked above it in a conversation — so that
+   overhang, which is the soft tail of the shadow, would darken the top of the
+   card being stood on. Lifting the box by that 3px lands the sprite's last row
+   on the card's top edge instead, which leaves the shadow resting on the card
+   and nothing painted across it. */
+body[data-dsh-claude-style] .dsh-claude-deepy {
+  position: absolute;
+  right: 8px;
+  bottom: calc(100% - 4px);
+  z-index: 1;
+  width: 104px;
+  height: 104px;
+  pointer-events: none;
+}
+
+/* On the panel that takes the composer card's place, the whale rests a little
+   higher, as that panel starts above its card. */
+body[data-dsh-claude-style] [data-dsh-claude-deepy-anchor="panel"] > .dsh-claude-deepy {
+  bottom: calc(100% - 11px);
+}
+
+/* The resting whale's body, head to tail: columns 12–44, rows 30–48. */
+body[data-dsh-claude-style] .dsh-claude-deepy-hit {
+  position: absolute;
+  left: 24px;
+  top: 60px;
+  width: 64px;
+  height: 36px;
+  pointer-events: auto;
+  touch-action: none;
+}

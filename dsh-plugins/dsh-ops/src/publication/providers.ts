@@ -1,0 +1,134 @@
+/** Exact visible OPS registrations supply Native projections; no shared registry mutation. */
+import type { ToolDefinition } from '../adapter/dsh/types.js'
+import type { Context } from '../adapter/dsh/types.js'
+import { withToolChange } from './changes.js'
+import { loadScopes } from '../adapter/dsh/host.js'
+import { publicationRegistration, publicationReady, publicationError } from './reentry.js'
+interface Host { root?: object; emit?(name: 'tools/change'): unknown; get(name: 'tools'): { definitions(scope?: object): readonly ToolDefinition[] } | undefined }
+export interface NativeProvider { definition: ToolDefinition; scope: unknown; active: boolean; inheritable: boolean; priority: number }
+interface Provider extends NativeProvider { publish(visible: boolean): void; ready(): Promise<void> }
+interface State { providers: Set<Provider>; shadows: Set<NativeProvider>; ptc: Set<unknown>; revisions: WeakMap<object, number>; globalRevision: number; selections: Set<{ scope: unknown; names: ReadonlySet<string> }> }
+const owners = new WeakMap<object, State>()
+const readiness = new WeakMap<() => void, () => Promise<void>>()
+export function nativeProviderReady(dispose: () => void): Promise<void> { return readiness.get(dispose)?.() ?? Promise.resolve() }
+function state(ctx: Host): State {
+  const key = ctx.root ?? ctx
+  let entry = owners.get(key)
+  if (!entry) { entry = { providers: new Set(), shadows: new Set(), ptc: new Set(), revisions: new WeakMap(), globalRevision: 0, selections: new Set() }; owners.set(key, entry) }
+  return entry
+}
+function changed(owner: State, scope: unknown): void {
+  if (scope && typeof scope === 'object') owner.revisions.set(scope, (owner.revisions.get(scope) ?? 0) + 1)
+  else ++owner.globalRevision
+}
+/** Source-provider revisions include hidden registrations, unlike the projected tool view. */
+export function nativeProviderRevision(ctx: Host, chain: readonly unknown[]): string {
+  const owner = state(ctx)
+  return [owner.globalRevision, ...chain.map(scope => scope && typeof scope === 'object' ? owner.revisions.get(scope) ?? 0 : 0)].join(':')
+}
+function refresh(owner: State, scope: unknown): void {
+  withToolChange(scope && typeof scope === 'object' ? [scope] : [], () => {
+    const providers = [...owner.providers].filter(provider => provider.scope === scope)
+    const chosen = new Map<string, Provider>()
+    if (!owner.ptc.has(scope)) for (const provider of providers) {
+      if (!selectionAllows(owner, scope, provider)) continue
+      if ((chosen.get(provider.definition.name)?.priority ?? -Infinity) <= provider.priority) chosen.set(provider.definition.name, provider)
+    }
+    // Withdraw the previous owned registration before publishing its replacement in the same layer.
+    for (const provider of providers) if (chosen.get(provider.definition.name) !== provider) provider.publish(false)
+    for (const provider of chosen.values()) provider.publish(true)
+  })
+}
+export async function registerNativeProvider(ctx: Context, definitions: ToolDefinition[], register: (tool: ToolDefinition) => (() => void), options: { inheritable?: boolean; priority?: number } = {}): Promise<() => void> {
+  const { scopeOf } = await loadScopes()
+  const stop = registerNativeProviderAtScope(ctx, scopeOf(ctx), definitions, register, options)
+  try { await nativeProviderReady(stop) } catch (error) {
+    try { stop() } catch (cleanup) { ctx.logger.warn(`dsh-ops: native provider cleanup failed: ${publicationError(cleanup)}`) }
+    throw error
+  }
+  return stop
+}
+/** Callers that already resolved the public scope API can commit synchronously. */
+export function registerNativeProviderAtScope(ctx: Context, scope: unknown, definitions: ToolDefinition[], register: (tool: ToolDefinition) => (() => void), options: { inheritable?: boolean; priority?: number } = {}): () => void {
+  if (!definitions.length) return () => {}
+  const owner = state(ctx)
+  const providers = definitions.map(definition => {
+    let dispose: (() => void) | undefined
+    const provider: Provider = { definition, scope, active: true, inheritable: options.inheritable ?? true, priority: options.priority ?? 0, publish(visible) {
+      if (visible && provider.active && !dispose) dispose = register(definition)
+      else if (!visible && dispose) { const remove = dispose; dispose = undefined; remove() }
+    }, async ready() {
+      for (;;) {
+        if (!provider.active) throw new Error('Native provider is disposed')
+        const current = dispose
+        if (!current) return
+        try { await publicationReady(current) } catch (error) { if (current === dispose) throw error }
+        if (current === dispose) return
+      }
+    } }
+    owner.providers.add(provider)
+    return provider
+  })
+  changed(owner, scope)
+  let notification: (() => void) | undefined
+  const notify = () => withToolChange(scope && typeof scope === 'object' ? [scope] : [], () => ctx.emit('tools/change'))
+  const stop = () => {
+    changed(owner, scope)
+    const errors: unknown[] = []
+    for (const provider of providers) {
+      provider.active = false; owner.providers.delete(provider)
+      try { withToolChange(scope && typeof scope === 'object' ? [scope] : [], () => provider.publish(false)) } catch (error) { errors.push(error) }
+    }
+    try { refresh(owner, scope) } catch (error) { errors.push(error) }
+    try { notification?.() } catch (error) { errors.push(error) }
+    if (errors.length) throw new AggregateError(errors, 'Native provider teardown failed')
+  }
+  try {
+    refresh(owner, scope)
+    // Metadata-only changes still need notification when every provider is
+    // hidden. This is not another registry mutation; share its refusal window
+    // and keep teardown observable after the row context begins unloading.
+    notification = publicationRegistration(ctx.root ?? ctx, () => { notify(); return notify })
+  } catch (error) {
+    try { stop() } catch (cleanup) { ctx.logger.warn(`dsh-ops: native provider cleanup failed: ${publicationError(cleanup)}`) }
+    throw error
+  }
+  readiness.set(stop, async () => { await Promise.all([publicationReady(notification!), ...providers.map(provider => provider.ready())]) })
+  return stop
+}
+function selectionAllows(owner: State, scope: unknown, provider: NativeProvider): boolean {
+  return ![...owner.selections].some(selection => selection.scope === scope && selection.names.has(provider.definition.name)
+    && (provider.scope !== scope || provider.priority < 10))
+}
+/** Discovery controls only owned advanced Native providers in its exact layer. */
+export function claimNativeSelection(ctx: Host, scope: unknown, names: ReadonlySet<string>): () => void {
+  const owner = state(ctx), selection = { scope, names }
+  owner.selections.add(selection); changed(owner, scope); refresh(owner, scope)
+  return () => { owner.selections.delete(selection); changed(owner, scope); refresh(owner, scope) }
+}
+/** Whether this plugin holds an exact PTC claim over that layer, which excludes its Native tools. */
+export function ptcSurfaceClaimed(ctx: Host, scope: unknown): boolean { return state(ctx).ptc.has(scope) }
+/** Yield only this plugin's registrations in the exact layer being claimed. */
+export function claimPtcSurface(ctx: Host, scope: unknown): () => void {
+  const owner = state(ctx)
+  owner.ptc.add(scope); refresh(owner, scope)
+  return () => { owner.ptc.delete(scope); refresh(owner, scope) }
+}
+/** Keep an exact origin for Native shadows; ancestor discovery activations are never inheritable. */
+export function trackNativeShadow(ctx: Host, scope: unknown, definition: ToolDefinition, source: NativeProvider): () => void {
+  const owner = state(ctx), shadow: NativeProvider = { definition, scope, inheritable: source.inheritable, priority: source.priority, get active() { return source.active } }
+  owner.shadows.add(shadow)
+  return () => { owner.shadows.delete(shadow) }
+}
+/** Read the public definition list once, rather than rebuilding a view per provider. */
+function visibleOf(tools: ReturnType<Host['get']>, scope: unknown): (name: string) => ToolDefinition | undefined {
+  const visible = new Map(tools?.definitions(scope as object).map(definition => [definition.name, definition]))
+  return name => visible.get(name)
+}
+
+/** Capture before publishing PTC: external restrictions and sibling scopes remain authoritative. */
+export function nativeProviders(ctx: Host, scope: unknown, respectSelections = false): NativeProvider[] {
+  const owner = state(ctx), visible = visibleOf(ctx.get('tools'), scope)
+  return [...owner.providers, ...owner.shadows].filter(provider => provider.active && visible(provider.definition.name) === provider.definition
+    && (!respectSelections || selectionAllows(owner, scope, provider)))
+}

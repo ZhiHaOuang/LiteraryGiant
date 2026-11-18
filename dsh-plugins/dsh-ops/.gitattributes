@@ -1,0 +1,9 @@
+# Source and docs are text; keep them LF in the repository regardless of the
+# platform that checked them out.
+* text=auto eol=lf
+
+*.exe binary
+*.dll binary
+*.png binary
+*.gif binary
+*.pdf binary

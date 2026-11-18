@@ -1,0 +1,17 @@
+{
+  "chatWaitOvertime": { "zh": "暂未响应", "en": "No response yet" },
+  "chatWaitThinking": { "zh": "正在思考", "en": "Thinking…" },
+  "chatWaitWriting": { "zh": "正在写回答", "en": "Writing…" },
+  "chatWaitToolCall": { "zh": "正在准备工具调用", "en": "Preparing a tool call…" },
+  "chatWaitTools": { "zh": "正在调用工具", "en": "Running tools…" },
+  "chatWaitReading": { "zh": "正在读取 {file}", "en": "Reading {file}" },
+  "chatWaitEditing": { "zh": "正在编辑 {file}", "en": "Editing {file}" },
+  "chatWaitWritingFile": { "zh": "正在写入 {file}", "en": "Writing {file}" },
+  "statusMotionTitle": { "zh": "状态行动画", "en": "Waiting-line animation" },
+  "statusMotionSweep": { "zh": "扫光", "en": "Highlight sweep" },
+  "statusMotionWash": { "zh": "渐变流动", "en": "Colour wash" },
+  "statusDetailTitle": { "zh": "精确状态行", "en": "Precise status line" },
+  "statusDetailSampleRead": { "zh": "正在阅读 README.md", "en": "Reading README.md" },
+  "statusDetailSampleCheckout": { "zh": "正在检出当前工作树", "en": "Checking out current tree" },
+  "statusDetailSampleThinking": { "zh": "正在思考", "en": "Thinking…" }
+}

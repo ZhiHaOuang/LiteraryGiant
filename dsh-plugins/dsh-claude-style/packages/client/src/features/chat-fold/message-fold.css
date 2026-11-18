@@ -1,0 +1,53 @@
+/* ---------- chat fold: a message the reader sent ---------- */
+/* The host renders a user message whole, however long it is: a pasted trace or a
+   log dump stands in the column at its full height and pushes the rest of the
+   conversation away. A tall bubble is clamped to the cap here, with its bottom
+   edge softened so the cut reads as "there is more"; the toggle under it is the
+   skin's own (message-fold.ts) and hands the whole message back.
+
+   The two lengths are stated here and read back off the bubble by that module,
+   so the height the reader sees and the height the fold decides on are one
+   number. The stylesheet belongs to the feature's one switch: with the chat
+   area's folding off (or the page handed to another plugin, D74) the attribute
+   is never written and nothing here applies. */
+
+body[data-dsh-claude-style][data-dsh-claude-chat-fold] {
+  --dsh-claude-message-fold-cap: 320px;
+  --dsh-claude-message-fold-fade: 40px;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-chat-fold] [data-dsh-claude-message-fold="collapsed"] {
+  /* border-box makes the cap the box the reader sees, which is what the module
+     compares its own reading against. */
+  box-sizing: border-box;
+  max-height: var(--dsh-claude-message-fold-cap);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to bottom, black calc(100% - var(--dsh-claude-message-fold-fade)), transparent 100%);
+  mask-image: linear-gradient(to bottom, black calc(100% - var(--dsh-claude-message-fold-fade)), transparent 100%);
+}
+
+/* The toggle: the host's own type and ink at a smaller step, with the composer
+   controls' 7px corners. It sits under the bubble, right-aligned by the message
+   stack's own alignment. */
+body[data-dsh-claude-style] .dsh-claude-message-fold-toggle {
+  margin-top: 2px;
+  padding: 2px 8px;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--dsw-alias-label-secondary);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 20px;
+  cursor: pointer;
+}
+
+body[data-dsh-claude-style] .dsh-claude-message-fold-toggle:hover {
+  background: var(--dsh-claude-chip);
+  color: var(--dsw-alias-label-primary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-message-fold-toggle:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757);
+  outline-offset: 1px;
+}

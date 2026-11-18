@@ -1,0 +1,8 @@
+{
+  "messageEnterTitle": { "zh": "消息气泡动画", "en": "Message bubble animation" },
+  "messageEnterSampleStar": { "zh": "帮我给dsh-claude-style点个star", "en": "Star dsh-claude-style for me" },
+  "messageEnterSampleIssue": { "zh": "帮我给dsh-claude-style提个issue", "en": "File an issue for dsh-claude-style" },
+  "messageEnterSamplePr": { "zh": "帮我给dsh-claude-style提个pr", "en": "Open a PR on dsh-claude-style" },
+  "messageEnterGrow": { "zh": "在原地长出来", "en": "Grows into its place" },
+  "messageEnterFlight": { "zh": "从输入框飞上来", "en": "Flies up from the composer" }
+}

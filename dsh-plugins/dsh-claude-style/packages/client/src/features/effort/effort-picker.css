@@ -1,0 +1,432 @@
+/* ---------- The effort card (its own popover) ---------- */
+/* Same card language as the model picker — the two panels open over the same
+   corner and must read as one design — sized to the slider, which is the only
+   thing it holds. The card is the shared popover card (shared/popover.css). */
+body[data-dsh-claude-style] .dsh-claude-effort-popover {
+  position: fixed;
+  min-width: 264px;
+  max-width: min(320px, calc(var(--dsh-claude-page-width, 100vw) - 16px));
+  transform-origin: bottom right;
+}
+
+/* ---------- Reasoning-effort slider (its own card) ---------- */
+/* The effort ladder drawn as a track instead of a second level. The knob
+   travels continuously with the pointer and settles on the nearest level at
+   the release, so the control never reads as a hard switch between fixed
+   stops. The transition is what makes that settle read as a settle; it is
+   switched off while the pointer owns the knob, which is what `data-dragging`
+   marks. */
+body[data-dsh-claude-style] .dsh-claude-effort {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 3px 7px 4px 7px;
+  min-width: 0;
+  /* The slider's travel, as the name swap's progress. The override writes
+     these; the stylesheet only turns them into the two layers' motion. */
+  --dsh-claude-effort-swap-progress: 0;
+  --dsh-claude-effort-swap-rest: 1;
+  --dsh-claude-effort-swap-dir: 1;
+  user-select: none;
+  -webkit-user-select: none;
+}
+body[data-dsh-claude-style] .dsh-claude-effort-head {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  /* The outgoing name is absolutely positioned over the incoming one. */
+  position: relative;
+}
+/* The label recedes and the level's name carries the weight — Claude's own
+   `Effort High` pairs a grey caption with a near-black value. */
+body[data-dsh-claude-style] .dsh-claude-effort-label {
+  flex: none;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-secondary, #70686a);
+  transition: color var(--dsh-claude-timing-feedback);
+}
+/* The level's name trails the label instead of sitting at the far edge: the
+   control reads as one phrase, `Reasoning effort High`, the way the ends below
+   read as one scale. The name is two layers: this one holds the words on show,
+   the preview holds the words the knob is travelling toward. The slider's own
+   travel feeds both layers, so a slow drag holds the halfway words and a pull
+   back runs the same motion in reverse. On release the same move transition as
+   the knob carries the layers to their stop. */
+body[data-dsh-claude-style] .dsh-claude-effort-value {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-primary, #161616);
+  opacity: calc(1 - var(--dsh-claude-effort-swap-progress));
+  transform: translateY(calc(var(--dsh-claude-swap-distance) * -1 * var(--dsh-claude-effort-swap-dir) * var(--dsh-claude-effort-swap-progress)));
+  filter: blur(calc(var(--dsh-claude-swap-blur) * var(--dsh-claude-effort-swap-progress)));
+  transition: color var(--dsh-claude-timing-feedback), opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), transform var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), filter var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide);
+}
+/* The two halves of the name's swap are siblings, so both are told the travel:
+   the shared preset over the short distance, this line being 16px tall
+   (shared/motion.css, D9). */
+body[data-dsh-claude-style] .dsh-claude-effort-value,
+body[data-dsh-claude-style] .dsh-claude-effort-value-preview {
+  --dsh-claude-swap-distance: var(--dsh-claude-distance-nudge);
+}
+/* The incoming name. It sits exactly where the value sits (the override writes
+   its left offset) and takes no layout space; its share of the travel decides
+   whether it waits below (stronger) or above (weaker). */
+body[data-dsh-claude-style] .dsh-claude-effort-value-preview {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  font-size: 13px;
+  line-height: 16px;
+  color: var(--dsw-alias-label-primary, #161616);
+  opacity: var(--dsh-claude-effort-swap-progress);
+  transform: translateY(calc(var(--dsh-claude-swap-distance) * var(--dsh-claude-effort-swap-dir) * var(--dsh-claude-effort-swap-rest)));
+  filter: blur(calc(var(--dsh-claude-swap-blur) * var(--dsh-claude-effort-swap-rest)));
+  transition: color var(--dsh-claude-timing-feedback), opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), transform var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), filter var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide);
+}
+/* The drag writes the progress every frame, so the layers must not trail it.
+   The reset mark serves the same purpose on the first frame of a jump between
+   stops: the direction has to land before the progress starts moving. */
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-value,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-value-preview,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dsh-claude-effort-swap-reset] .dsh-claude-effort-value,
+body[data-dsh-claude-style] .dsh-claude-effort[data-dsh-claude-effort-swap-reset] .dsh-claude-effort-value-preview {
+  transition: none;
+}
+/* The ends name the axis: a scale, not a value, so they keep the caption colour
+   and take their words from the copy table (更快 / 更强 in Chinese). */
+body[data-dsh-claude-style] .dsh-claude-effort-ends {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--dsw-alias-label-caption, #b2acad);
+  transition: color var(--dsh-claude-timing-feedback);
+}
+body[data-dsh-claude-style] .dsh-claude-effort-track {
+  position: relative;
+  /* The hit area is the knob's height; the groove itself sits centred in it. */
+  height: 30px;
+  margin-top: 1px;
+  cursor: pointer;
+  touch-action: none;
+}
+body[data-dsh-claude-style] .dsh-claude-effort-track::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  /* Claude's real Effort slider reads as one chunky groove the knob rides IN:
+     the groove is 26px tall, the knob 30px — it pokes 2px out top and bottom.
+     (The first pass at this control was 6px, a thin rail; 14px was an
+     intermediate groove. 26px matches the reference.) */
+  height: 26px;
+  margin-top: -13px;
+  /* A rounded rectangle, NOT a pill: the recorded slider's end is a ~1/3-height
+     corner (the reference plugin solves the same 26px groove to 9px), so a
+     999px radius rounded the ends far more than Claude's do. */
+  border-radius: 8px;
+  /* The page inherits superellipse corners from <html>; the groove keeps true
+     circular corners. */
+  corner-shape: round;
+  background: var(--dsw-alias-interactive-bg-hover, rgba(0, 0, 0, 0.08));
+}
+/* The filled portion: from the track's left end to the knob's centre, where
+   the opaque knob swallows it. Its colour IS the label ink at low alpha, so it
+   darkens the light groove and lightens the dark one with a single rule. */
+body[data-dsh-claude-style] .dsh-claude-effort-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 26px;
+  margin-top: -13px;
+  /* No width here: the override drives it with an inline style, and any
+     stylesheet width (even 0) would win through !important and pin the fill
+     shut forever. Unset shrinks the absolute box to 0 until the first paint. */
+  /* Square on the right: the fill ends at the knob's centre, and a rounded
+     right cap curves away from the knob at the groove's top and bottom rows,
+     which showed a sliver of bare track between them ("the fill let go of the
+     knob"). The left cap still matches the groove's corner. */
+  border-radius: 8px 0 0 8px;
+  corner-shape: round;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 26%, transparent);
+  transition: width var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-standard);
+  pointer-events: none;
+}
+/* One tick per stop, centred on the stop's resting position (the override
+   computes the px). Same ink as the fill: the fill swallows passed ticks, the
+   knob swallows the current one, so a tick only ever shows on bare track. */
+body[data-dsh-claude-style] .dsh-claude-effort-ticks {
+  position: absolute;
+  inset: 0;
+  transition: opacity var(--dsh-claude-duration-move) var(--dsh-claude-ease-standard);
+  pointer-events: none;
+}
+body[data-dsh-claude-style] .dsh-claude-effort-tick {
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  margin-top: -2px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  corner-shape: round;
+  background: color-mix(in srgb, var(--dsw-alias-label-primary, #161616) 26%, transparent);
+}
+/* The top rung's dot matrix: a grid of accent blocks floating on the bare track
+   (the 1px gaps ARE the grid lines). Three layers ride every block: its own
+   hash-scattered flash, a band of light travelling right to left through
+   hash-scattered clusters, and a one-pass glow as the entrance sweep passes it.
+   The plume shape (solid at the nozzle, dissolving into the track by the far
+   left) is a static per-block opacity all three ride through. The grid lives
+   only while the apex is shown, so the cost stays bounded to that state. */
+body[data-dsh-claude-style] .dsh-claude-effort-matrix {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 26px;
+  margin-top: -13px;
+  border-radius: 8px;
+  corner-shape: round;
+  overflow: hidden;
+  box-sizing: border-box;
+  /* display: none while the apex is off — the twinkle costs nothing until the
+     top rung is actually reached. */
+  display: none;
+  pointer-events: none;
+}
+body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-matrix {
+  display: grid !important;
+  grid-auto-flow: row !important;
+}
+/* No base opacity: an !important declaration would outrank the animation in
+   the cascade and freeze the cell at 0. fill-mode both covers the pre-delay
+   (from) and the rest (to), so the keyframes own the whole life cycle. */
+body[data-dsh-claude-style] .dsh-claude-effort-matrix-cell {
+  animation: dsh-claude-fade-in var(--dsh-claude-duration-surface) var(--dsh-claude-ease-standard) both;
+}
+body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq {
+  width: 100%;
+  height: 100%;
+  border-radius: 1px;
+  /* NOT !important: the flash animates background-color, and no animation can
+     outrank an !important declaration — the same cascade trap the cell's
+     opacity fell into. Nothing in the host targets these private classes. */
+  background-color: var(--dsh-claude-apex, #8b7ad0);
+  --dsh-flash-light: var(--dsh-claude-apex-flash, #d9d2f5);
+  /* One flash cycle: the block holds the accent, jumps to its lighter peak for a
+     short window, and eases back over the rest of the period. var() in keyframes
+     resolves against the animated block, so one keyframes rule serves every
+     block's own peak colour. */
+  animation: dshClaudeEffortFlash var(--dsh-claude-period-flash) infinite var(--dsh-claude-ease-in-out);
+}
+/* The block's flash peak lives HERE, never inline: the override only picks the
+   share of apex the peak mixes (--dsh-flash-mix), so a stylesheet swap always
+   re-colours every block. Inline rgb peaks did not — after the accent landed,
+   blocks built by the previous clay bundle kept flashing orange from their
+   stale inline values. A continuous share, not eight buckets: the buckets
+   showed as bands across a wide track. The rule is its own so the declarations
+   above keep the shape the importance walk recorded. */
+body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq {
+  position: relative;
+  --dsh-flash-light: color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) var(--dsh-flash-mix, 62%), var(--dsh-claude-apex-flash, #d9d2f5));
+}
+/* The frontier glow: the block lights past its own peak as the entrance sweep
+   passes it, which is what makes the arrival read as an edge rather than a
+   fade. One pass per block, on the block's own entrance delay. */
+body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: var(--dsh-claude-apex-flash, #d9d2f5);
+  opacity: 0;
+  animation: dshClaudeEffortFront var(--dsh-claude-duration-surface) var(--dsh-claude-ease-standard) var(--dsh-front-delay, 0s) both;
+}
+/* The flow: a stream of light travelling right to left, each block lighting only
+   while the stream is on it (--dsh-flow-delay) and only as far as its sparse
+   cluster gate allows (--dsh-flow-strength), so the stream passes as scattered
+   particles rather than a stripe. It wears the brightest tone of the three
+   layers and the flash peak is held below it, so the one direction on the field
+   is the stream's; the base flash alone is a field of independent blinks. */
+body[data-dsh-claude-style] .dsh-claude-effort-matrix-sq::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: var(--dsh-claude-apex-flash, #d9d2f5);
+  opacity: 0;
+  animation: dshClaudeEffortFlow var(--dsh-claude-period-flow) linear var(--dsh-flow-delay, 0s) infinite;
+}
+/* The closed card keeps its blocks laid out — placement reads the card's box —
+   and visibility:hidden stops their pixels, not their animation clocks. The
+   flash paints a background-color, so a card left closed with the top rung in
+   force kept a style recalculation and two infinite animations per block on
+   the main thread with nothing on screen. Reduced motion stops the same pair:
+   the net in theme/chrome.css shortens every animation it reaches, but the
+   flash's own `infinite` outranks that net's iteration count, so it kept
+   repainting the same colour every frame. Opening with motion full puts the
+   shorthand back. */
+body[data-dsh-claude-style] .dsh-claude-effort-popover:not([data-open="true"]) .dsh-claude-effort-matrix-sq,
+body[data-dsh-claude-style] .dsh-claude-effort-popover:not([data-open="true"]) .dsh-claude-effort-matrix-sq::before,
+body[data-dsh-claude-style] .dsh-claude-effort-popover:not([data-open="true"]) .dsh-claude-effort-matrix-sq::after,
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-effort-matrix-sq {
+  animation: none !important;
+}
+/* The reduced answer stops the two added layers at once: their animations are
+   not `!important`, so the choice in the selector outranks them (theme/chrome.css
+   holds the base flash, which is). */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-effort-matrix-sq::before,
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-effort-matrix-sq::after {
+  animation: none;
+  opacity: 0;
+}
+@keyframes dshClaudeEffortFlash {
+  0%, 14% { background-color: var(--dsh-claude-apex, #8b7ad0); }
+  20%, 34% { background-color: var(--dsh-flash-light, #d9d2f5); }
+  100% { background-color: var(--dsh-claude-apex, #8b7ad0); }
+}
+@keyframes dshClaudeEffortFront {
+  0% { opacity: 0; }
+  30% { opacity: .9; }
+  100% { opacity: 0; }
+}
+@keyframes dshClaudeEffortFlow {
+  0% { opacity: 0; }
+  3% { opacity: calc(var(--dsh-flow-strength, 1) * .95); }
+  6% { opacity: 0; }
+  100% { opacity: 0; }
+}
+/* Reaching the top rung: the plain fill and the ticks hand the groove over to
+   the matrix, the knob takes the theme accent's tint and a soft glow, and the
+   level's name keeps the same ramp colour the trigger and the card's text wear. */
+body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-fill {
+  opacity: 0 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-ticks {
+  opacity: 0 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-effort[data-apex] .dsh-claude-effort-knob {
+  background: color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 22%, var(--dsw-static-neutral-bluish-00, #ffffff)) !important;
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 80%, transparent), 0 0 0 1px color-mix(in srgb, var(--dsh-claude-apex, #8b7ad0) 35%, transparent) !important;
+}
+
+/* A vertical capsule, not a bead: 16px wide, 30px tall, poking 2px past the
+   groove top and bottom. The width stays 16px, which the override's travel
+   geometry (and the fill's +8) depends on. */
+body[data-dsh-claude-style] .dsh-claude-effort-knob {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 16px;
+  height: 30px;
+  margin-top: -15px;
+  /* A rounded rectangle with a flat run down each side, not a capsule: the
+     recorded knob has a visibly straight edge between two ~1/3 corners. */
+  border-radius: 5px;
+  corner-shape: round;
+  /* Pinned to the host's static white in BOTH appearances: the knob is the one
+     light pebble in the groove, and a dark knob drowned in the dark groove. */
+  background: var(--dsw-static-neutral-bluish-00, #ffffff);
+  box-shadow: 0 1px 3px rgba(20, 20, 19, 0.28), 0 0 0 1px rgba(20, 20, 19, 0.06);
+  /* The lift is the `scale` property and the travel is the `translate`
+     property — both INDIVIDUAL transform properties, which compose in the order
+     translate → scale. That order is the whole point: positioning with
+     `transform` while lifting with `scale` multiplies the travel by the lift
+     (the composed matrix is scale · translate), so a 1.1 lift at the last stop
+     put the knob 10% of the travel PAST the track's end and, mid-drag, ahead of
+     the fill. The explicit 1 also gives the release a numeric target to ease
+     back to (an unset value is `none`, which does not interpolate). */
+  scale: 1;
+  transition: translate var(--dsh-claude-duration-move) var(--dsh-claude-ease-glide), scale var(--dsh-claude-timing-feedback), background-color var(--dsh-claude-duration-fade) var(--dsh-claude-ease-standard), box-shadow var(--dsh-claude-duration-fade) var(--dsh-claude-ease-standard);
+  will-change: translate, scale;
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-effort-knob {
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 0, 0, 0.4);
+}
+body[data-dsh-claude-style][data-ds-dark-theme] .dsh-claude-effort[data-apex] .dsh-claude-effort-knob {
+  box-shadow: 0 0 10px color-mix(in srgb, var(--dsh-claude-apex, #9d8ce0) 80%, transparent), 0 0 0 1px color-mix(in srgb, var(--dsh-claude-apex, #9d8ce0) 35%, transparent) !important;
+}
+/* Held: the knob lifts 10%. Only `transform` stays un-transitioned (the drag
+   writes it every frame); the lift itself eases in and, on release, eases back
+   — so grabbing and letting go read as motion rather than a size jump. */
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-knob {
+  scale: 1.1 !important;
+  /* `translate` is dropped from the transition (the drag writes it every
+     frame); the lift itself still eases in and back out. */
+  transition: scale var(--dsh-claude-timing-feedback), background-color var(--dsh-claude-duration-fade) var(--dsh-claude-ease-standard), box-shadow var(--dsh-claude-duration-fade) var(--dsh-claude-ease-standard) !important;
+}
+body[data-dsh-claude-style] .dsh-claude-effort[data-dragging] .dsh-claude-effort-fill {
+  transition: none !important;
+}
+body[data-dsh-claude-style] .dsh-claude-effort-track:focus-visible {
+  outline: 2px solid var(--dsw-alias-brand-primary, #d97757) !important;
+  outline-offset: 1px !important;
+  border-radius: 10px !important;
+}
+/* No ladder to climb: the track is dimmed and the value reads as a dash, but the
+   knob still travels and eases home — the control keeps its shape. */
+body[data-dsh-claude-style] .dsh-claude-effort[data-empty] .dsh-claude-effort-track::before {
+  opacity: 0.55 !important;
+}
+body[data-dsh-claude-style] .dsh-claude-effort[data-empty] .dsh-claude-effort-value {
+  color: var(--dsw-alias-label-caption, #b2acad) !important;
+}
+
+/* ---------- reasoning-effort level ---------- */
+/* The second text of the composer's seat box (features/model/seat-box.ts): one
+   hit area of the row's one item, laid out by the row rather than pinned from a
+   box the page computes. The box's own rule carries its face, height and border
+   (features/composer/inline-bar.css), and this one carries what the level adds:
+   its colour. The box grows leftward from the row's right end, which is the edge
+   its card hangs from, so a level's name changing width moves nothing the reader
+   is pointing at. */
+body[data-dsh-claude-style] .dsh-claude-effort-btn {
+  /* The level keeps its words when the row is tight: the model's name is the
+     one that shortens, since a level cut to a letter names nothing. */
+  flex: none;
+  transition: opacity var(--dsh-claude-timing-feedback);
+}
+/* The level's words sit inside the seat box's own 2px tail, so both texts in
+   that box share one inner edge and the meter's reserved gap stays the only
+   space after them. */
+body[data-dsh-claude-style] .dsh-claude-effort-btn-label {
+  display: block;
+  padding: 0;
+}
+/* The rung in force colours the trigger and the card's level name while the
+   Composer tab's effort-accent row is on. The override writes the rung's place
+   on a ramp (0 to 100) whose two ends are mixed from the theme's accent in
+   OKLCH: the weak end toward the raised surface (less saturated, less contrast),
+   the strong end toward the label ink (more contrast). The hue then travels
+   slightly toward red as the rung climbs: an accent above 180° leans toward
+   359°, one below 180° toward 0°, by a quarter of that distance at the top.
+   HSL carries the same hue as HSV, and the shift leaves its saturation and
+   lightness alone. A rung with
+   no place on the ramp — the switch-off level, the model's own default level —
+   leaves the attribute off and keeps the resting ink. */
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn[data-tint],
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] {
+  --dsh-claude-effort-ramp: color-mix(in oklch, var(--dsh-claude-effort-low, var(--dsw-alias-brand-primary)), var(--dsh-claude-effort-high, var(--dsw-alias-brand-primary)) calc(var(--dsh-claude-effort-tint, 0) * 1%));
+  --dsh-claude-effort-ink: hsl(from var(--dsh-claude-effort-ramp) calc(h + (359 * clamp(0, (h - 180) * 1000, 1) - h) * var(--dsh-claude-effort-tint, 0) * 0.0025) s l);
+}
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-model-seat-effort > .dsh-claude-effort-btn[data-tint] {
+  color: var(--dsh-claude-effort-ink);
+}
+/* The open card's level name takes the same rung colour as the trigger. */
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] .dsh-claude-effort-value,
+body[data-dsh-claude-style][data-dsh-claude-effort-accent] .dsh-claude-effort[data-tint] .dsh-claude-effort-value-preview {
+  color: var(--dsh-claude-effort-ink);
+}

@@ -1,0 +1,20 @@
+- insert:
+    - id: credentials-local
+      name: "@deepseek-ai/dsh-credentials-local"
+
+- id: llm-pi-ai
+  config:
+    providers:
+      bench-server:
+        baseURL: https://<your-server>/v1
+        apiKeyEnv: DSH_API_KEY_ENV_NAME
+        api: openai-completions
+        models:
+          - id: <model-id>
+            contextWindow: 262144
+            maxTokens: 32768
+
+- id: agent-default-model
+  config:
+    provider: bench-server
+    model: <model-id>

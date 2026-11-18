@@ -1,0 +1,77 @@
+import type { IncomingMessage, ServerResponse } from 'node:http'
+
+/**
+ * What the host half reads off the DSH plugin context (D73).
+ *
+ * The half runs inside DSH's loader, which hands it a context object; DSH ships
+ * no types for it, so this file declares the members the half actually touches,
+ * with the meaning the half gives them. Reading by name (`get`) is lenient: a
+ * host that does not provide a service answers `undefined`, and each reader
+ * decides what that means (D12).
+ */
+
+/** One host plugin context, as the half reads it. */
+export interface DshContext {
+  /** A service by name; `undefined` when the host does not provide it. */
+  get(name: string): any
+  /** Wait for services and hand back a scope that declares them. */
+  inject?(deps: string[], run: (scope: DshScope) => void): void
+  /** The host's logger, when it has one. */
+  logger?: { warn?(message: string): void, info?(message: string): void, error?(message: string): void }
+  /** Run a function and drop its disposals with this generation. */
+  effect?(run: () => void): void
+  /** Listen for one host event; the listener drops with this generation. */
+  on?(name: string, listener: (...args: any[]) => void): unknown
+  /** The loader fiber, which carries the entry that mounted this half. */
+  fiber?: { entry?: { id?: unknown, options?: unknown } }
+}
+
+/** The scope `inject` hands back: the base context plus the declared services. */
+export interface DshScope extends DshContext {
+  webServer?: DshWebServer
+  settings?: DshSettings
+  /** Run a function and drop it with this generation, naming it in the host's log. */
+  effect(run: () => void, name?: string): void
+}
+
+/**
+ * One host session observation, as the half reads it.
+ *
+ * The host's `sessionQuery.observeSession` answers a live or stored log without
+ * the corpus listing its `readSession` preflights, which is what a per-session
+ * read over the whole history can afford. The value is a lease released through
+ * the well-known symbol: until it is released a stored log stays pinned in the
+ * host's prepared-session cache, whose entries an unreleased observation keeps
+ * out of eviction. `events` is the host's own frozen array, read in place and
+ * never written to.
+ */
+export interface DshSessionObservation {
+  readonly events: readonly unknown[]
+  /** Release the lease (`Symbol.dispose`). */
+  dispose(): void
+}
+
+/** The host's settings domain, as the half configures it. */
+interface DshSettings {
+  configure(options: { auto?: boolean }, fiber?: unknown): unknown
+}
+
+/** The host's web server service, as the half registers routes on it. */
+interface DshWebServer {
+  /** Register one route; a path another plugin holds is refused by throwing, and the answer disposes it. */
+  register(options: DshRoute): unknown
+}
+
+/** One route registration: the path it answers, how paths match, and its handler. */
+export interface DshRoute {
+  path: string
+  /** `prefix` matches every path under `path`; a route without it matches the path alone. */
+  kind?: string
+  handler: (req: DshRequest, res: DshResponse) => void
+}
+
+/** The request the host's web server hands a route handler: Node's own. */
+export type DshRequest = IncomingMessage
+
+/** The response the host's web server hands a route handler: Node's own. */
+export type DshResponse = ServerResponse

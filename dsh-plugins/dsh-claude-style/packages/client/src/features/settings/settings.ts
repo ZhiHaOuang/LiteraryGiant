@@ -1,0 +1,449 @@
+import * as React from 'react'
+import { BUNDLE_CONFIG_SLOT, PACKAGE_NAME, REPOSITORY_URL, SETTINGS_SCROLLER_ATTR, SETTINGS_SECTION_SLOT, USERNAME_MAX } from '../../constants'
+import { SEGMENT_CLASS } from '../../shared/segment-control'
+import { loadModelCopy, onModelCopyLoaded } from '../model/model-copy'
+import { createHostAccountMenu } from '../account/host-menu'
+import { adoptSettingsForm, motionReduced, readPrefs, savePrefs, subscribePrefs } from '../../core/prefs'
+import { cacheFirstMatch, hostSlots } from '@dsh-claude-style/engine/host'
+import { motionMs } from '../../shared/motion'
+import { ClaudeStyleSegmentGroup, createSettingsControls, tabRows } from './settings-controls'
+import { createSettingsAppearanceTab } from './settings-tab-appearance'
+import { createSettingsGeneralTab } from './settings-tab-general'
+import { createSettingsMainWindowTab } from './settings-tab-main-window'
+import { createSettingsMotionTab } from './settings-tab-motion'
+import { createSettingsSidebarTab } from './settings-tab-sidebar'
+import { settingsTabIcon } from './settings-tab-icons'
+import { installThemeFlip } from './theme-flip'
+import type { Prefs } from '../../constants'
+import type { SettingsTabId } from '../../core/feature'
+import type { HostContext } from '@dsh-claude-style/engine/host'
+import type { HostSlotsService } from '@dsh-claude-style/contracts/services'
+import type { FeatureUi } from '../../core/feature'
+import type manifest from './settings.manifest'
+import type { SettingsTab, SettingsView } from './settings-controls'
+import type { QuickProvidersHandle } from './quick-providers'
+import { copy } from './copy'
+
+/** Pause after the last keystroke before the username is written to the settings store. */
+const USERNAME_SAVE_DEBOUNCE_MS = 600
+/** On the open tab's rows: the way it arrived, which the stylesheet slides it in from. */
+const PAGE_ENTER_ATTR = 'data-dsh-claude-page-enter'
+/** On the still copy of the tab being replaced: the way it leaves. */
+const PAGE_LEAVE_ATTR = 'data-dsh-claude-page-leave'
+
+/** Which way a tab change reads along the strip. */
+type PageDirection = 'forward' | 'back'
+
+/**
+ * The skin's settings page, mounted by every seat this host declares.
+ *
+ * Two seats render it: the `plugins.bundle.config` entry on the plugin
+ * page (0.1.7+, keyed by the package name) and the full-page
+ * `settings.section` tab in the settings dialog. An older host declares
+ * only the latter; a newer one gets both, and since both render the same
+ * component against the same prefs store, two live instances stay in
+ * step. Neither seat hands the component a store: it reads and writes the
+ * skin preferences through packages/client/src/core/prefs.ts, which owns the host round
+ * trip, and follows changes the same way the rest of the skin does.
+ *
+ * Copy comes from the model copy document's `settings` block, so the page
+ * follows the shell language like every other string the skin paints. The
+ * English literals are the fallback for a failed fetch.
+ *
+ * The rows are grouped into tabs (packages/client/src/features/settings/settings-tab-*.ts),
+ * picked from a strip at the top that reuses the segmented control and its
+ * sliding highlight; the main window tab draws its rows as two labelled groups,
+ * the conversation side above and the composer's below. The open tab lives in
+ * the component: it survives a preference change, not a remount.
+ */
+/**
+ * The quick-provider popover (packages/client/src/features/settings/quick-providers.ts). The settings
+ * row is React-rendered while that card is imperative, so the row reaches the
+ * popover through this handle. The handle is read through the live registry
+ * (D72) rather than kept: a page yielded to another owner takes the
+ * quick-provider install down and brings a fresh one back, while this page's
+ * section stays mounted, and a stored handle would drive the dead one.
+ */
+let quickProviderHandle: (() => QuickProvidersHandle | null) | null = null
+
+/**
+ * The host's slot registry, kept from the settings-section registration so
+ * the nav cell can be found later. The nav entry carries no key of its own
+ * on the host's markup; the registry's entry list is the only place the
+ * section's position is stated.
+ */
+export let slotsApi: HostSlotsService | null = null
+
+/** The host's own id for the settings section this plugin registers. */
+export const SETTINGS_SECTION_ID = 'claude-style'
+
+/** The page's tabs, in strip order, and the controls their rows are built from. */
+export const SETTINGS_TABS: SettingsTab[] = [
+  createSettingsGeneralTab(),
+  createSettingsAppearanceTab(),
+  createSettingsMainWindowTab(),
+  createSettingsSidebarTab(),
+  createSettingsMotionTab(),
+]
+export const SETTINGS_CONTROLS = createSettingsControls()
+
+/** The strip that picks the open tab: a segmented control with tab semantics. */
+export function ClaudeStyleSettingsTabStrip(props: { active: SettingsTabId, onPick(id: SettingsTabId): void }) {
+  const buttons = SETTINGS_TABS.map(tab => React.createElement(
+    'button',
+    {
+      key: tab.id,
+      type: 'button',
+      role: 'tab',
+      className: SEGMENT_CLASS,
+      'data-active': tab.id === props.active ? '' : undefined,
+      'aria-selected': tab.id === props.active ? 'true' : 'false',
+      onClick() { if (tab.id !== props.active) props.onPick(tab.id) },
+    },
+    settingsTabIcon(tab.id),
+    tab.label(),
+  ))
+  return React.createElement(ClaudeStyleSegmentGroup, { role: 'tablist', className: 'dsh-claude-settings-tabs' }, buttons)
+}
+
+/**
+ * The page's heading: the skin's name, and the link to the plugin's own
+ * repository at the row's right end.
+ *
+ * The link opens in a new tab: the desktop window hands an http(s) popup to
+ * the system's browser, so the GUI page keeps its state. Its mark is all it
+ * shows at rest; the word beside it arrives on hover and on keyboard focus,
+ * growing the link into a button to the left of the mark (settings.css).
+ */
+function ClaudeStyleSettingsHeading() {
+  const label = copy('repository')
+  return React.createElement(
+    'div',
+    { className: 'dsh-claude-settings-title' },
+    React.createElement('span', null, copy('title')),
+    React.createElement(
+      'a',
+      {
+        className: 'dsh-claude-settings-repo',
+        href: REPOSITORY_URL,
+        target: '_blank',
+        rel: 'noopener noreferrer',
+        title: label,
+        'aria-label': label,
+      },
+      React.createElement('span', { className: 'dsh-claude-settings-repo-label' }, copy('repositoryButton')),
+    ),
+  )
+}
+
+export function ClaudeStyleSettingsSection(props: { embed?: boolean }) {
+  const state = React.useState(readPrefs())
+  const prefs = state[0]
+  const setPrefs = state[1]
+  const errorState = React.useState<string | null>(null)
+  const error = errorState[0]
+  const setError = errorState[1]
+  const usernameState = React.useState(prefs.username)
+  const username = usernameState[0]
+  const setUsername = usernameState[1]
+  const tabState = React.useState(SETTINGS_TABS[0].id)
+  const activeTab = tabState[0]
+  const setActiveTab = tabState[1]
+  /** Which way the open tab arrived, or null for the tab the page opened on. */
+  const enterState = React.useState<PageDirection | null>(null)
+  const usernameTimer = React.useRef<number | null>(null)
+  const quickTrigger = React.useRef<HTMLButtonElement>(null)
+  const pageRef = React.useRef<HTMLDivElement>(null)
+  const rowsRef = React.useRef<HTMLFieldSetElement>(null)
+  const leavingRef = React.useRef<HTMLDivElement>(null)
+
+  /**
+   * Open another tab, sliding the pages the way the strip reads: a tab to the
+   * right arrives from the right while the one it replaces leaves to the left,
+   * and back again (transitions.dev's "Page side-by-side", MIT). The page that
+   * leaves is a still copy of its rows laid over the new one, out of the tab
+   * order and the accessibility tree, and gone once it has played
+   * (settings.css).
+   */
+  const pickTab = (next: SettingsTabId) => {
+    const direction: PageDirection = SETTINGS_TABS.findIndex(item => item.id === next) > SETTINGS_TABS.findIndex(item => item.id === activeTab) ? 'forward' : 'back'
+    const rows = rowsRef.current
+    const holder = leavingRef.current
+    if (rows !== null && holder !== null && !motionReduced()) {
+      const still = rows.cloneNode(true) as HTMLElement
+      still.removeAttribute('role')
+      still.removeAttribute(PAGE_ENTER_ATTR)
+      still.setAttribute('aria-hidden', 'true')
+      still.setAttribute('inert', '')
+      still.setAttribute(PAGE_LEAVE_ATTR, direction)
+      holder.replaceChildren(still)
+      window.setTimeout(() => still.remove(), motionMs('--dsh-claude-duration-open'))
+    }
+    enterState[1](direction)
+    setActiveTab(next)
+  }
+
+  // The host scrolls the page in a container of its own (the settings
+  // dialog's options column, the plugin page). Mark the nearest scrolling
+  // ancestor while the page is mounted so the stylesheet keeps the
+  // scrollbar's room there: switching to a tab short enough to need no
+  // scrollbar then leaves the layout where it was.
+  React.useLayoutEffect(() => {
+    let scroller = pageRef.current === null ? null : pageRef.current.parentElement
+    while (scroller !== null && !/(auto|scroll)/.test(getComputedStyle(scroller).overflowY)) scroller = scroller.parentElement
+    if (scroller === null) return undefined
+    scroller.setAttribute(SETTINGS_SCROLLER_ATTR, '')
+    return () => { scroller.removeAttribute(SETTINGS_SCROLLER_ATTR) }
+  }, [])
+
+  // The skin's own apply-side writes land here too (a reload, a conflict
+  // re-read), so the page never drifts from what the document says.
+  React.useEffect(() => {
+    syncSettingsNav()
+    let alive = true
+    const unsubscribe = subscribePrefs(next => {
+      if (alive) {
+        setPrefs(next)
+        setUsername(next.username)
+      }
+    })
+    const unsubscribeCopy = onModelCopyLoaded(() => {
+      if (alive) setPrefs(p => Object.assign({}, p))
+    })
+    return () => {
+      alive = false
+      unsubscribe()
+      if (unsubscribeCopy) unsubscribeCopy()
+      if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    }
+  }, [])
+
+  /**
+   * Apply one change. The control flips immediately and the host write
+   * follows; a refusal re-reads the authoritative value and says so.
+   */
+  const write = (patch: Partial<Prefs>) => {
+    setError(null)
+    setPrefs(Object.assign({}, prefs, patch))
+    savePrefs(patch).then(result => {
+      if (result === null) setError(copy('unavailable'))
+    })
+  }
+
+  const saveUsernameNow = (value: string) => {
+    const next = value.trim().slice(0, USERNAME_MAX)
+    if (next === readPrefs().username) return
+    setError(null)
+    setPrefs(Object.assign({}, readPrefs(), { username: next }))
+    savePrefs({ username: next }).then(result => {
+      if (result === null) setError(copy('unavailable'))
+    })
+  }
+
+  const queueUsernameSave = (value: string) => {
+    if (usernameTimer.current) clearTimeout(usernameTimer.current)
+    usernameTimer.current = setTimeout(() => {
+      usernameTimer.current = null
+      saveUsernameNow(value)
+    }, USERNAME_SAVE_DEBOUNCE_MS)
+  }
+
+  const commitUsername = () => {
+    if (usernameTimer.current) {
+      clearTimeout(usernameTimer.current)
+      usernameTimer.current = null
+    }
+    saveUsernameNow(username)
+  }
+
+  const view: SettingsView = {
+    prefs,
+    write,
+    controls: SETTINGS_CONTROLS,
+    quickTrigger,
+    quickProviderApi: () => quickProviderHandle === null ? null : quickProviderHandle(),
+    username: {
+      value: username,
+      onChange(e) {
+        setUsername(e.target.value)
+        queueUsernameSave(e.target.value)
+      },
+      onBlur: commitUsername,
+      onKeyDown(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault()
+          commitUsername()
+          if (e.currentTarget && e.currentTarget.blur) e.currentTarget.blur()
+        } else if (e.key === 'Escape') {
+          setUsername(prefs.username)
+          if (e.currentTarget && e.currentTarget.blur) e.currentTarget.blur()
+        }
+      },
+    },
+  }
+  // activeTab only ever holds an id from SETTINGS_TABS.
+  const tab = SETTINGS_TABS.find(item => item.id === activeTab)!
+
+  // The plugin page already heads the form with the bundle's own title and
+  // description, so the embedded rendering drops the skin's title rather
+  // than printing it twice.
+  const embedded = !!(props && props.embed)
+  return React.createElement(
+    'div',
+    { ref: pageRef, className: embedded ? 'dsh-claude-settings dsh-claude-settings-embedded' : 'dsh-claude-settings' },
+    embedded ? null : React.createElement(ClaudeStyleSettingsHeading),
+    React.createElement(ClaudeStyleSettingsTabStrip, { active: activeTab, onPick: pickTab }),
+    React.createElement(
+      'div',
+      { className: 'dsh-claude-settings-pages' },
+      // The leaving page's holder renders no children of its own: the still
+      // copy pickTab puts there is never one React has to reconcile.
+      React.createElement('div', { ref: leavingRef, className: 'dsh-claude-settings-leaving' }),
+      React.createElement('fieldset', { ref: rowsRef, className: 'dsh-claude-settings-rows', role: 'tabpanel', key: tab.id, [PAGE_ENTER_ATTR]: enterState[0] ?? undefined }, tabRows(tab, view)),
+    ),
+    error === null ? null : React.createElement('div', { className: 'dsh-claude-settings-error' }, error),
+  )
+}
+
+/**
+ * The plugin page's configuration entry (0.1.7+).
+ *
+ * A `plugins.bundle.config` entry is asked for two views: `summary` is the
+ * one-liner on the bundle's card, `page` is the form itself. The host does
+ * not hand this seat a form — the entry is keyed to the package, not to a
+ * namespace — so the rows read and write through packages/client/src/core/prefs.ts like
+ * every other surface in the skin, which is where the official form is
+ * bound.
+ */
+export function ClaudeStyleBundleConfig(props: { view?: string }) {
+  if (props && props.view === 'summary') {
+    return React.createElement('span', null, copy('title'))
+  }
+  return React.createElement(ClaudeStyleSettingsSection, { embed: true })
+}
+
+/**
+ * The nav list the entry's cell stands in, resolved on demand and kept while
+ * it stays the document's first match (packages/engine/src/host.ts). The query is a
+ * whole-document walk — a part match plus a class substring — and the pass
+ * asked for it every frame while the answer moves only when the host rebuilds
+ * the dialog or opens the overlay the list lives in.
+ */
+const settingsNavList = cacheFirstMatch<HTMLElement>(':is([data-dsh-claude-part~="settings-area"], [data-dsh-claude-part~="overlay"], [class*="SettingsRoot"]) [data-dsh-claude-part~="nav-list"]')
+
+/**
+ * Stamped onto the Claude Style nav button in the settings dialog so CSS
+ * can replace the host's default settings gear with the black Claude mark.
+ */
+export function syncSettingsNav() {
+  const navList = settingsNavList()
+  if (!navList) return
+  if (navList.querySelector(`[data-dsh-section="${SETTINGS_SECTION_ID}"]`) !== null) return
+  // The section's position among the slot's entries is the nav cell's
+  // position in the list: one cell per registered section, in the same
+  // order. No label text is read, so a host renaming the entry or a copy
+  // document that has not arrived leaves the mark where it belongs.
+  const index = settingsSectionIndex()
+  if (index < 0) return
+  const buttons = navList.querySelectorAll('button')
+  if (index >= buttons.length) return
+  buttons[index].setAttribute('data-dsh-section', SETTINGS_SECTION_ID)
+}
+
+/** This plugin's entry position in the settings slot, or -1 while unknown. */
+export function settingsSectionIndex() {
+  if (slotsApi === null || typeof slotsApi.entries !== 'function') return -1
+  const entries = slotsApi.entries(SETTINGS_SECTION_SLOT)
+  for (let i = 0; i < entries.length; i++) {
+    const options = entries[i] === null || entries[i] === undefined ? null : entries[i].options
+    if (options !== null && options !== undefined && options.id === SETTINGS_SECTION_ID) return i
+  }
+  return -1
+}
+
+/**
+ * Register the settings section.
+ *
+ * Two waits are needed, and both are declarative rather than polling:
+ *
+ *   1. `ctx.inject(['slots'], …)` waits for the slot registry service. The
+ *      renderer provides it, so reading `ctx.get('slots')` directly during
+ *      `apply` could see nothing and silently drop the section.
+ *   2. `slots.inject('settings.section', …)` waits for the slot *declaration*,
+ *      which `dsh-client-ui-settings-general` publishes later. Registering
+ *      eagerly instead would throw and fail the boot.
+ */
+export function install(ctx: HostContext, ui: FeatureUi<typeof manifest>) {
+  loadModelCopy()
+  // The flip's transition suppression rides this page: both exist exactly
+  // while this theme paints the page (D74).
+  const stopThemeFlip = installThemeFlip()
+  // The settings services are up by now even when they were not at apply
+  // time, so retry the official-form binding before choosing a seat. It is
+  // idempotent.
+  adoptSettingsForm(ctx)
+  // The host's settings drive behind Ctrl+,: it presses the host's own entry,
+  // which outlives the account area's switch, and it has no drawer to fold.
+  const hostSettings = createHostAccountMenu({ close() {} })
+  if (ui) {
+    ui.settingsNav = {
+      sync: syncSettingsNav,
+      /** A pointer press anywhere: the nav's class changes are outside the
+       * observer's attributeFilter, so no pass would fire for them. */
+      onPointerDown() { syncSettingsNav() },
+      /** Ctrl+, opens settings, and the key goes no further. It rides this
+       * page rather than the account area, whose switch can take that away. */
+      onKey(e: KeyboardEvent) {
+        if (!(e.ctrlKey || e.metaKey) || e.key !== ',') return
+        e.preventDefault()
+        hostSettings.openSettings()
+      },
+    }
+    quickProviderHandle = () => ui.quickProviders ?? null
+  }
+  if (typeof ctx.inject !== 'function') return stopThemeFlip
+  const fiber = ctx.inject(['slots'], scope => {
+    const slots = hostSlots(scope)
+    if (slots === undefined || slots === null || typeof slots.inject !== 'function') return
+    slotsApi = slots
+    // 0.1.7 keeps a bundle's own configuration on the plugin's page: the
+    // entry is keyed by the bundle's package name and rendered there —
+    // `view: 'page'` for the form, `view: 'summary'` for the card's
+    // one-liner. The slot is declared by that host's plugin manager, so this
+    // registration is a no-op on an older host.
+    scope.effect(() => slots.inject(BUNDLE_CONFIG_SLOT, () => slots.register(
+      {
+        name: BUNDLE_CONFIG_SLOT,
+        key: PACKAGE_NAME,
+        label() { return copy('title') },
+      },
+      ClaudeStyleBundleConfig,
+    )), 'dsh-claude-style: plugin page')
+    // The full-page section registers on every host that declares the
+    // slot. On an older host it is the only seat; on 0.1.7+ the same page
+    // also renders on the plugin page, and this tab keeps a route to it
+    // inside the settings dialog. Two live instances share the prefs
+    // store, so a change in one shows in the other.
+    scope.effect(() => slots.inject(SETTINGS_SECTION_SLOT, () => slots.register(
+      {
+        name: SETTINGS_SECTION_SLOT,
+        id: SETTINGS_SECTION_ID,
+        order: 22,
+        // A function, so the navigation entry localizes once the copy
+        // document has arrived; the literal is the pre-fetch fallback.
+        label() { return copy('title') },
+      },
+      ClaudeStyleSettingsSection,
+    )), 'dsh-claude-style: settings section')
+  })
+  return () => {
+    stopThemeFlip()
+    hostSettings.stopSettingsDrive()
+    if (ui && ui.settingsNav) {
+      delete ui.settingsNav
+    }
+    quickProviderHandle = null
+    slotsApi = null
+    if (fiber && typeof fiber.dispose === 'function') fiber.dispose()
+  }
+}

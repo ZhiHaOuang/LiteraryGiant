@@ -1,0 +1,307 @@
+name: CI
+
+# A push to master is judged by the checks, the build and the spec lane alone:
+# development carries no page gate (D77), so a push answers in minutes and waits
+# on nothing. The page lanes that a push leaves out run beside it in
+# `.github/workflows/observe.yml`, which joins no branch rule. The whole matrix —
+# the smoke, the behaviour specs on three systems and the end-to-end lane — is
+# judged on a pull request, a merge-queue entry and a manual run, and the manual
+# run is the one a release takes before its tag; the release workflow runs the
+# gates once more before it publishes. A branch is judged through its pull
+# request or the queue, so a branch push of its own is not read here, and
+# `branches` keeps every other push out, tag pushes with them: the release
+# workflow owns tags.
+#
+# One concurrency group per event and commit, so a series of pushes each finish
+# with a verdict instead of cancelling one another, and a pull request does not
+# cancel the push run it came from. A repeat of the same event on the same commit
+# — the pull request a push already opened — is the duplicate this drops. A queue
+# entry is never cancelled: it is the run a merge waits on.
+#
+# `scripts/ci-scope.mjs` reads the change before any lane starts and prints the
+# three outputs the jobs below read. A push holding only documents, locale files
+# or the workflow itself reaches no page a lane reads, so `code` is false and the
+# page lanes are skipped while the checks still run. A change inside one feature
+# directory names that directory, so the smoke walks its cases alone; a change to
+# the shared layer, and any path the map cannot place, earns the whole walk. The
+# directory names are checked against the feature table the manifests produce
+# (D42), so a printed selection is one the smoke accepts. `tree` is the hash of
+# the tree (`scripts/shared/tree-hash.mjs`), which keys the build cache: the
+# build's slow pure steps are stored under the hash of their inputs, so a run
+# over the same tree restores them instead of computing them
+# (`scripts/build-cache.mjs`).
+#
+# The jobs are split by what they need. `checks` reads no built page, so it runs
+# on every event and starts while the scope job is still reading the diff; the
+# lanes that read a page wait on the checks and on the scope. `build-unit-smoke`
+# carries the build, the spec lane in a real browser, the smoke and the behaviour
+# specs over the built plugin; `smoke-windows` carries the same over the readers'
+# own system; `behaviour-macos` walks the behaviour specs on the third platform;
+# `e2e` drives a scratch `dsh web` on the newest host version published, under
+# whichever dist-tag (`packages/testing/host-version.mjs` reads the registry; the
+# lane gives no verdict on a machine whose host differs) with the scripted
+# model service (D77), so a selector or entry the host stopped honouring shows
+# up in the run that meets the new host. Every job carries a deadline, and
+# every step that waits on the network carries its own: the job's is the
+# backstop, the step's ends a stuck wait in minutes.
+#
+# The end-to-end lane's default table is sliced by
+# `packages/testing/e2e.mjs --shard <index>:<total>`, one slice per matrix entry,
+# because the scenarios do not depend on one another: the whole table is covered
+# in the time the longest single scenario takes, and each shard uploads its own
+# traces under its own name. The cost is that one failure's traces sit in one of
+# four artifacts, so reading them means knowing the shard number, and a change
+# the path map cannot place still walks the whole smoke, so a new class of
+# directory stays slow.
+#
+# `required` runs `always()` over every job above, so it reports on a run whose
+# other jobs failed or were cancelled, and `scripts/ci-required.mjs` is the one
+# check the branch rule names: it reads the result of every job above through
+# `toJson(needs)`, fails on any that reports neither `success` nor `skipped`, and
+# prints them all. A skipped job counting as passed is what lets a push that
+# touched no code finish green, and the rule surviving a job added, renamed or
+# removed is what keeps a new job from being left out of a merge.
+#
+# Four things outside the repository decide this shape: the merge queue's
+# conclusion time, GitHub counting a skipped job as passed, the host version
+# `e2e` installs, and the Actions versions Dependabot proposes weekly
+# (`.github/dependabot.yml`). When one of them moves, this file is where the
+# arrangement is read again: a shorter conclusion from the queue earns fewer
+# shards, and GitHub's reading of a skipped job is what the aggregation rests on.
+on:
+  push:
+    branches: [master]
+    # The daily data refresh writes only these files; its own workflow validates
+    # them, and a full matrix for a numbers-only commit buys nothing.
+    paths-ignore:
+      - 'packages/host/data/**'
+  pull_request:
+    paths-ignore:
+      - 'packages/host/data/**'
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: CI-${{ github.event_name }}-${{ github.sha }}
+  cancel-in-progress: ${{ github.event_name != 'merge_group' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # The base is what the event names — the pull request's base commit, the commit
+  # a push came from, master when neither is there — and the three-dot diff reads
+  # the merge base, so the answer is the commits this event added rather than
+  # everything master did meanwhile.
+  changed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      code: ${{ steps.scope.outputs.code }}
+      smoke: ${{ steps.scope.outputs.smoke }}
+      tree: ${{ steps.scope.outputs.tree }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # The token is not left in `.git/config` for the steps that follow.
+          persist-credentials: false
+          # The diff needs the base commit and, on a new branch, master's.
+          fetch-depth: 0
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      # The scope reads the feature manifests, which esbuild bundles (D42), so
+      # the dependencies are installed here as well.
+      - run: npm ci
+      - id: scope
+        run: node scripts/ci-scope.mjs --base "${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}"
+      # The pushes the scope refuses against the same base: an appearance
+      # snapshot moved without the sheets that draw it, and a record that only
+      # shrinks grown (D77, D9).
+      - run: node scripts/ci-scope.mjs --appearance --ledgers --base "${{ github.event.pull_request.base.sha || github.event.before || 'origin/master' }}"
+
+  # The gates that need no build: the lint rules, the decisions index against
+  # the files it lists, the changelog, AGENTS.md's command table and the numbers
+  # the checks decide on.
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run docs:check
+      - run: npm run changelog:check
+      - run: npm run agents:check
+      - run: npm run checks:numbers -- --check
+
+  build-unit-smoke:
+    needs: [changed, checks]
+    if: needs.changed.outputs.code == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # A miss computes everything and saves the entry for the next run over the
+      # same tree.
+      - uses: actions/cache@v6
+        with:
+          path: .debug/build-cache
+          key: build-cache-${{ runner.os }}-${{ needs.changed.outputs.tree }}
+      - run: npm run build
+        timeout-minutes: 15
+      - run: npm test
+        timeout-minutes: 15
+      # The entry is called directly: the selection `changed` printed carries a
+      # flag, and npm would read a flag of its own rather than pass it on.
+      - run: node packages/testing/smoke.mjs ${{ needs.changed.outputs.smoke }}
+        if: github.event_name != 'push'
+        timeout-minutes: 30
+      # The behaviour specs read the same build on the same stand-in host (D77);
+      # a failure leaves its trace, screenshot and evidence for the artifact.
+      - run: npm run behaviour
+        if: github.event_name != 'push'
+        timeout-minutes: 15
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: behaviour-evidence-linux
+          path: .debug/behaviour
+          if-no-files-found: ignore
+
+  # The readers' desktop runs on Windows, and the host half reads session
+  # directories, drive-letter paths and file times there.
+  smoke-windows:
+    needs: [changed, checks]
+    if: needs.changed.outputs.code == 'true' && github.event_name != 'push'
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # A cache entry is per platform, so this one is the Windows half of the
+      # same tree hash.
+      - uses: actions/cache@v6
+        with:
+          path: .debug/build-cache
+          key: build-cache-${{ runner.os }}-${{ needs.changed.outputs.tree }}
+      - run: npm run build
+        timeout-minutes: 15
+      - run: npm run smoke
+        timeout-minutes: 30
+      - run: npm run behaviour
+        timeout-minutes: 15
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: behaviour-evidence-windows
+          path: .debug/behaviour
+          if-no-files-found: ignore
+
+  # The third platform of the release matrix (packages/testing/data/matrix.json,
+  # D77): the behaviour specs over macOS's own fonts and Chrome, where a layout
+  # that fits on the other two can still overflow.
+  behaviour-macos:
+    needs: [changed, checks]
+    if: needs.changed.outputs.code == 'true' && github.event_name != 'push'
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v6
+        with:
+          path: .debug/build-cache
+          key: build-cache-${{ runner.os }}-${{ needs.changed.outputs.tree }}
+      - run: npm run build
+        timeout-minutes: 15
+      - run: npm run behaviour
+        timeout-minutes: 15
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: behaviour-evidence-macos
+          path: .debug/behaviour
+          if-no-files-found: ignore
+
+  # The assembled host: a scratch `dsh web` with this checkout's plugin and the
+  # scripted model service, driven through a real conversation (D77).
+  e2e:
+    needs: [changed, checks]
+    if: needs.changed.outputs.code == 'true' && github.event_name != 'push'
+    strategy:
+      # One shard's failure is evidence about that shard; the others finish and
+      # report their own.
+      fail-fast: false
+      matrix:
+        shard: [0, 1, 2, 3]
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - uses: actions/cache@v6
+        with:
+          path: .debug/build-cache
+          key: build-cache-${{ runner.os }}-${{ needs.changed.outputs.tree }}
+      - run: npm run build
+        timeout-minutes: 15
+      # The lane boots the host's own CLI, which needs pnpm to install a
+      # profile's plugins.
+      - run: npm install --global pnpm@11 @deepseek-ai/dsh@$(node packages/testing/host-version.mjs)
+        timeout-minutes: 10
+      # A named scenario takes its own deadline; this is the shard's backstop.
+      - run: node packages/testing/e2e.mjs --shard ${{ matrix.shard }}:4
+        timeout-minutes: 25
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: e2e-traces-${{ matrix.shard }}
+          path: .debug/e2e/out
+          if-no-files-found: ignore
+
+  required:
+    if: always()
+    needs: [changed, checks, build-unit-smoke, smoke-windows, behaviour-macos, e2e]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: node scripts/ci-required.mjs '${{ toJson(needs) }}'

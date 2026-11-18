@@ -1,0 +1,156 @@
+{
+  "name": "dsh-ai4scholar",
+  "version": "0.6.6",
+  "description": "AI4Scholar for DeepSeek Harness: 43 native research tools, natural-language /ai4s-* commands, papers, scholars, patents, full text, references and scientific figures. Powered by ai4scholar.net.",
+  "type": "module",
+  "license": "MIT",
+  "author": "ai4scholar",
+  "homepage": "https://ai4scholar.net?src=dsh_ai4scholar",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/literaf/dsh-ai4scholar.git"
+  },
+  "bugs": {
+    "url": "https://github.com/literaf/dsh-ai4scholar/issues"
+  },
+  "main": "./lib/index.js",
+  "types": "./lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": {
+      "types": "./lib/client-types/client/index.d.ts",
+      "default": "./lib/client.js"
+    },
+    "./package.json": "./package.json",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "lib",
+    "locale",
+    "cordis.patch.yml",
+    "README.md",
+    "README_CN.md",
+    "LICENSE",
+    "assets/icon.svg",
+    "docs/detail.zh.md",
+    "RELEASING.md"
+  ],
+  "sideEffects": false,
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "ai4scholar",
+    "academic",
+    "literature",
+    "paper-search",
+    "semantic-scholar",
+    "pubmed",
+    "google-scholar",
+    "arxiv",
+    "biorxiv",
+    "medrxiv",
+    "doi",
+    "auto-cite",
+    "scientific-figures",
+    "citation-graph",
+    "google-patents",
+    "author-search"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-connection",
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-api-remotes",
+        "@deepseek-ai/dsh-client-ui-settings-plugins",
+        "@deepseek-ai/dsh-client-ui-conversation",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "build": "pnpm run build:lib && pnpm run build:client",
+    "build:lib": "tsc -p tsconfig.build.json",
+    "build:client": "tsdown && tsc -p tsconfig.client-types.json",
+    "clean": "rm -rf lib",
+    "typecheck": "tsc -p tsconfig.json",
+    "pretest": "pnpm run build",
+    "test": "vitest run",
+    "prepare": "pnpm run build",
+    "prepublishOnly": "pnpm run clean && pnpm run typecheck && pnpm run test",
+    "postpublish": "node scripts/sync-mirror.mjs",
+    "sync-mirror": "node scripts/sync-mirror.mjs"
+  },
+  "dependencies": {
+    "@napi-rs/canvas": "0.1.80",
+    "pdf-parse": "2.4.5"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": ">=4.0.1",
+    "@deepseek-ai/dsh-commands": ">=0.1.0-rc.6",
+    "@deepseek-ai/dsh-credentials": ">=0.1.0-rc.6",
+    "@deepseek-ai/dsh-host-webserver": ">=0.1.0-rc.6",
+    "@deepseek-ai/dsh-llm": ">=0.1.0-rc.6",
+    "@deepseek-ai/dsh-system-prompt": ">=0.1.0-rc.6",
+    "@deepseek-ai/dsh-tools": ">=0.1.0-rc.6",
+    "@deepseek-ai/schemastery": ">=3.18.1",
+    "react": "^18.2.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-host-webserver": {
+      "optional": true
+    },
+    "@deepseek-ai/dsh-commands": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.0.2",
+    "@deepseek-ai/dsh-api-remotes": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-connection": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-locale": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-runtime": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-conversation": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-primitives": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-settings-plugins": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-client-ui-slots": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-commands": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-credentials": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-host-webserver": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-llm": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-system-prompt": "0.1.1-rc.2",
+    "@deepseek-ai/dsh-tools": "0.1.1-rc.2",
+    "@deepseek-ai/schemastery": "3.18.5",
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.20.0",
+    "@types/react": "^18.3.31",
+    "@types/react-dom": "^18.3.7",
+    "jsdom": "^26.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsdown": "^0.22.14",
+    "typescript": "^5.9.0",
+    "vitest": "^4.1.8"
+  },
+  "icon": "./assets/icon.svg"
+}

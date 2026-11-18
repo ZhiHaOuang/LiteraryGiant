@@ -1,0 +1,6 @@
+{
+  "name": "dsh-ops-mode-cordis",
+  "description": "Add useful OPS tools to the built-in Cordis preset, replace some built-in tools, and use bash instead of pwsh on Windows.",
+  "icon": "./icon.png",
+  "type": "module"
+}

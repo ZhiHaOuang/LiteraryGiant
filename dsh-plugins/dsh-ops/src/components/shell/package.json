@@ -1,0 +1,6 @@
+{
+  "name": "dsh-ops-bash & host PowerShell",
+  "description": "Prefer bash for general commands and use host PowerShell for Windows-native functionality.",
+  "icon": "./icon.png",
+  "type": "module"
+}

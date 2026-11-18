@@ -1,0 +1,7 @@
+{
+  "meta": {
+    "title": "dsh-ai4scholar",
+    "description": "43 个科研工具，支持自然语言斜杠命令、论文与学者检索、Google Patents 专利、全文精读、引用和科研配图。由 ai4scholar.net 提供。",
+    "detail": "docs/detail.zh.md"
+  }
+}

@@ -1,0 +1,10 @@
+/* @composer-gate */
+/* The host's bar root pads 4px under the conversation's card; the default stop
+   writes nothing and leaves that padding standing, the other two replace it. */
+body[data-dsh-claude-style][data-dsh-claude-composer-gap="compact"] [data-dsh-claude-part~="composer-stack"][data-composer-variant="inline"] [data-dsh-claude-holds~="composer-card"] {
+  padding-bottom: 0;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-composer-gap="roomy"] [data-dsh-claude-part~="composer-stack"][data-composer-variant="inline"] [data-dsh-claude-holds~="composer-card"] {
+  padding-bottom: 16px;
+}

@@ -1,0 +1,9 @@
+{
+  "ratePeak": { "zh": "峰价", "en": "Peak rate" },
+  "rateOffPeak": { "zh": "谷价", "en": "Off-peak rate" },
+  "rateCampaign": { "zh": "活动价", "en": "Promotion" },
+  "rateNow": { "zh": "此刻 {rate}", "en": "Now {rate}" },
+  "rateNext": { "zh": "{countdown} 后转为 {next}", "en": "in {countdown} → {next}" },
+  "peakrateTitle": { "zh": "峰谷电表", "en": "Peak rate meter" },
+  "peakrateDesc": { "zh": "模型菜单每一行的此刻倍率与切换时间。", "en": "Each model menu row's current rate and when it changes." }
+}

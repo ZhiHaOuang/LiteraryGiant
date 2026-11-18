@@ -1,0 +1,97 @@
+{
+  "note": "The whole-document lookups the browser half still makes outside the modules that own them, one entry per file: what it counts, when those reads happen where that is known, and which of them are debt. A lookup in a refresh pass or a frame callback costs the page's own size on every frame of a long conversation, so the sanctioned readers are the engine host.ts's accessors (cacheFirstMatch caches a match and a miss until the page's structure changes), the engine bus.ts's observeMatches registry, the engine stylesheet.ts's own sheet, and the engine chat-dom.ts's two per-frame answers; every other site is recorded here and the list only shrinks. A read by an element's id is not counted: the browser answers it from its own index rather than by walking the tree, which is how the fold controls reach the body their aria-controls names. scripts/lint.mjs counts the sites the way this file records them: a file whose count rises is refused, a file whose count falls has to be written down again, and an entry whose count reaches zero is taken out.",
+  "files": {
+    "packages/client/src/features/hero-menu/hero-menu.ts": {
+      "count": 1,
+      "reason": "The hero row's open pickers, read in the refresh pass. Their openness is the host's `aria-expanded` on nodes that stay mounted, and the bus's registry follows node additions alone, so it cannot serve this site: it would keep serving a trigger that has closed (eight smoke checks said so). The answer this site needs is invalidated by an attribute change, which is either a reader of its own or the row the pass already holds."
+    },
+    "packages/client/src/features/search/search-host-takeover.ts": {
+      "count": 1,
+      "reason": "The host search box's clear button, read when the search box takes focus."
+    },
+    "packages/client/src/features/permissions/permissions.ts": {
+      "count": 2,
+      "reason": "The cold start screen finds its mode strip inside the composer card, and the teardown sweeps the segment groups and the tier card's nodes in one call."
+    },
+    "packages/client/src/features/model/model-cards.ts": {
+      "count": 2,
+      "reason": "The two cards' instance-scoped sweep during refresh and when they are dropped or torn down."
+    },
+    "packages/client/src/features/account/account-footer.ts": {
+      "count": 2,
+      "reason": "The takeover's teardown sweeps the rows it injected and the marks it put on the host's entries."
+    },
+    "packages/client/src/features/account/account-drawer.ts": {
+      "count": 1,
+      "reason": "The self-built trigger and popover, swept when the drawer is dropped."
+    },
+    "packages/client/src/features/composer/composer.ts": {
+      "count": 2,
+      "reason": "The marks the composer wrote, swept once at install and once at teardown."
+    },
+    "packages/client/src/features/context-stats/meter-ring.ts": {
+      "count": 1,
+      "reason": "The ring a generation whose teardown a client reload dropped left behind in the model slot, swept once when the next generation installs."
+    },
+    "packages/client/src/features/chat-fold/process-summary.ts": {
+      "count": 3,
+      "reason": "The process groups, read once at install and again when the shell language changes, and the summary marks swept at teardown."
+    },
+    "packages/client/src/features/chat-send/send-rows.ts": {
+      "count": 3,
+      "reason": "The submission echo row and the sent row, read once per batch of mutations around one send. The echo and row selectors carry attributes the host renders with the node, and the callers hold no registry lifetime for a bus list to be released against; moving them is a change to how send-flight and send-grow own their seats."
+    },
+    "packages/client/src/features/context-stats/stats-panel.ts": {
+      "count": 2,
+      "reason": "The stray context block and panel marks swept once when the statistics are installed; composer cards come from the engine's card registry."
+    },
+    "packages/client/src/features/context-stats/session-stats.ts": {
+      "count": 2,
+      "reason": "The context statistics' own block and panel marks, swept at teardown."
+    },
+    "packages/client/src/features/chat-send/send-flight.ts": {
+      "count": 2,
+      "reason": "The composer's input, read when a send begins and when the flight's seat is measured."
+    },
+    "packages/client/src/features/ban-screen/ban-screen.ts": {
+      "count": 1,
+      "reason": "The hold screen's own node, swept once when the screen is installed."
+    },
+    "packages/client/src/features/chat-fold/process-fold.ts": {
+      "count": 1,
+      "reason": "The process groups already on the page, settled once right after install."
+    },
+    "packages/client/src/features/chat-fold/reasoning-fold.ts": {
+      "count": 1,
+      "reason": "The thinking rows already on the page, settled once right after install."
+    },
+    "packages/client/src/features/chat-reveal/reveal-diff.ts": {
+      "count": 1,
+      "reason": "The streaming containers, scanned when an attribute or structural batch arrives. `data-streaming` is set and removed on a node that stays mounted, which a registry of added nodes cannot follow."
+    },
+    "packages/client/src/features/chat-reveal/reveal-engine.ts": {
+      "count": 1,
+      "reason": "The streaming containers, read once when the reveal engine is installed."
+    },
+    "packages/client/src/features/chat-send/send-grow.ts": {
+      "count": 1,
+      "reason": "The echo rows lying on the page, noted once at install."
+    },
+    "packages/client/src/features/chat-wait/chat-wait.ts": {
+      "count": 1,
+      "reason": "The waiting line's own marks, swept at teardown."
+    },
+    "packages/client/src/features/effort/effort-picker.ts": {
+      "count": 2,
+      "reason": "The effort popover's instance-scoped node, swept when its card is built and when the control is switched off or torn down."
+    },
+    "packages/client/src/features/home/greeting-copy.ts": {
+      "count": 1,
+      "reason": "The hero's title groups, read in the pass that writes the greeting. The part mark is written onto the host's node after it mounts, which a registry of added nodes cannot see."
+    },
+    "packages/client/src/features/permissions/stray-nodes.ts": {
+      "count": 3,
+      "reason": "The first pass of an install reads the control's nodes a previous generation left in the document (a client reload drops its disposals); later passes work from the nodes the feature holds."
+    }
+  }
+}

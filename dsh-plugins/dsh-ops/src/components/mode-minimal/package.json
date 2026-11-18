@@ -1,0 +1,6 @@
+{
+  "name": "dsh-ops-mode-minimal",
+  "description": "Start dynamic tool loading without loosening the Minimal preset's terse prompts, and replace pwsh with bash on Windows.",
+  "icon": "./icon.png",
+  "type": "module"
+}

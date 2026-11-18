@@ -1,0 +1,68 @@
+name: Bug Report / 缺陷报告
+description: Report a problem with the dsh-context plugin on DeepSeek Harness. / 反馈 dsh-context 插件在 DeepSeek Harness 上的问题。
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: input
+    id: dsh-version
+    attributes:
+      label: DeepSeek Harness version / DeepSeek Harness 版本
+      description: The `@deepseek-ai/dsh` version in use, from `dsh --version`. / 正在使用的 `@deepseek-ai/dsh` 版本（`dsh --version`）。
+      placeholder: e.g. 0.2.1-rc.2
+    validations:
+      required: true
+  - type: input
+    id: plugin-version
+    attributes:
+      label: dsh-context version / dsh-context 版本
+      description: The installed dsh-context plugin version. / 已安装的 dsh-context 插件版本。
+      placeholder: e.g. 0.56.1
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Problem summary / 问题概述
+      description: A clear and concise statement of the problem. / 清晰、简洁地说明问题。
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to reproduce / 复现步骤
+      description: Minimal, deterministic steps that trigger the problem. / 能够稳定触发问题的最小步骤。
+      placeholder: |
+        1. Open ... / 打开 ...
+        2. Click ... / 点击 ...
+        3. Observe ... / 观察到 ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior / 期望行为
+      description: What you expected to happen. / 你期望发生什么。
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / 实际行为
+      description: What actually happened instead. / 实际发生了什么。
+    validations:
+      required: true
+  - type: textarea
+    id: error-stack
+    attributes:
+      label: Error logs / 错误日志
+      description: The full error message and stack trace from the dsh logs or the browser console, if any. / 来自 dsh 日志或浏览器控制台的完整错误信息与堆栈（如有）。
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots / 截图或录屏
+      description: Drag & drop screenshots or screen recordings here, if any. / 如有截图或录屏，请拖拽到此处。
+    validations:
+      required: true

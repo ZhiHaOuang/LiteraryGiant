@@ -1,0 +1,96 @@
+/* ---------- Claude palette over a wallpaper: one mask over the whole window ---------- */
+/* The wallpaper plugin (`dsh-plugin-wallpaper-engine`) marks `body` with
+   `data-we-wallpaper` while a wallpaper shows, and holds the wallpaper, its
+   scrim and its effect layers as the body's children at z-index -2 and -1. The
+   attribute is another plugin's marker, so it stays out of the host contract
+   table (D3).
+   Under the Claude palette the shell paints no fill and one fixed mask in the
+   canvas colour (`body::after`, z-index -1, after the plugin's layers in
+   document order) lies over the wallpaper, so every region reads on the same
+   ground. The canvas rules in `tokens.css`, `typography.css` and `chrome.css`
+   carry the same `:not([data-we-wallpaper])` gate. `--dsw-alias-bg-base` keeps
+   the canvas colour against the plugin's clearing, so host dialogs and cards
+   stay opaque. "Follow the host" lays no mask (D30). Theme layering from the
+   host would let the shell stand aside by layer. */
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] {
+  background-color: transparent;
+}
+
+/* The plugin's wallpaper, scrim and effect layers are the body's own children at
+   z-index -2 and -1; the body's last pseudo-element at -1 comes after all of
+   them in document order, so the mask lies over them and under the shell. */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper]::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--dsh-claude-canvas) 86%, transparent);
+}
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-ds-dark-theme][data-we-wallpaper]::after {
+  background: color-mix(in srgb, var(--dsh-claude-canvas) 82%, transparent);
+}
+
+/* A background opacity below 100 reaches the window through the mask alone:
+   the shell's fills stand down under a wallpaper as they always do, so the
+   mask's own share is multiplied by the opacity and the one layer carries
+   both (theme/chrome.css restates the unpainted-surfaces rule for the window
+   itself). */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper][data-dsh-claude-background-opacity]::after {
+  background: color-mix(in srgb, var(--dsh-claude-canvas) calc(86% * var(--dsh-claude-background-opacity)), transparent);
+}
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-ds-dark-theme][data-we-wallpaper][data-dsh-claude-background-opacity]::after {
+  background: color-mix(in srgb, var(--dsh-claude-canvas) calc(82% * var(--dsh-claude-background-opacity)), transparent);
+}
+
+/* ---------- the shell stands down ---------- */
+/* Each of these paints the canvas over the whole window or a whole column. */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] :is([data-dsh-claude-part~="layout-frame"][data-dsh-claude-holds~="sidebar-column"], [data-dsh-claude-part~="center-column"], [data-dsh-claude-part~="rightbar-column"], [data-dsh-claude-holds~="conversation-scroll"]) {
+  background: transparent;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] :is([data-pane="sidebar"], [data-dsh-claude-part~="sidebar-column"]) {
+  --dsw-specific-sidebar-fill: transparent;
+  background: transparent;
+}
+
+/* The composer's seat and the two fades at the transcript's ends paint the full
+   canvas across the column, which over the mask shows as brighter bands. They
+   stand down, and the transcript passing under the dock row is covered by a
+   tray in the canvas colour: the composer card's own width, from under the
+   card's top edge to the window's bottom, so the dock row and the figures under
+   the card sit on the card's ground. The seat is sticky, so the tray goes with it. */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] :is([data-phase="active"], [data-content-phase="active"]) [data-composer-seat],
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] [data-dsh-claude-transcript] [data-composer-seat] {
+  background: transparent;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] :is([data-phase="active"], [data-content-phase="active"]) [data-composer-seat]::before,
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] [data-dsh-claude-transcript] [data-composer-seat]::before,
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] [data-dsh-claude-part~="conversation-header"][data-dsh-claude-holds~="view-tabs"]::after {
+  display: none;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] :is([data-phase="active"], [data-content-phase="active"]) [data-composer-seat]::after,
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper] [data-dsh-claude-transcript] [data-composer-seat]::after {
+  content: "";
+  position: absolute;
+  top: 16px;
+  bottom: 0;
+  left: calc(50% - var(--dsh-composer-card-max-width, 100%) / 2);
+  right: calc(50% - var(--dsh-composer-card-max-width, 100%) / 2);
+  z-index: -1;
+  pointer-events: none;
+  background: var(--dsh-claude-canvas);
+}
+
+/* The opacity spares this tray: it keeps the canvas fill it has always
+   painted, read through the alias while the frame's token redefinition
+   (theme/chrome.css) carries the mixed share past it. */
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper][data-dsh-claude-background-opacity] :is([data-phase="active"], [data-content-phase="active"]) [data-composer-seat]::after,
+body[data-dsh-claude-style][data-dsh-claude-palette="claude"][data-we-wallpaper][data-dsh-claude-background-opacity] [data-dsh-claude-transcript] [data-composer-seat]::after {
+  background: var(--dsw-alias-bg-base);
+}

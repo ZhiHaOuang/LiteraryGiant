@@ -1,0 +1,257 @@
+/* ---------- home layout: the settings previews, as miniature real pages ---------- */
+/* The real page's hierarchy is exaggerated for a small settings card: a broad
+   content column, a slightly narrower dashboard, readable stats and heat cells.
+   The dashboard uses the real panel, stat and heat-cell classes. */
+
+body[data-dsh-claude-style] .dsh-claude-home-card {
+  gap: 6px;
+  padding: 8px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample {
+  container-type: inline-size;
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  min-height: 150px;
+  aspect-ratio: 16 / 10;
+  box-sizing: border-box;
+  padding: 0;
+  overflow: hidden;
+  border: 0.5px solid var(--dsw-alias-border-l1);
+  border-radius: 6px;
+  background: var(--dsw-alias-bg-base);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-column {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5cqw;
+  box-sizing: border-box;
+  width: 84%;
+  height: 100%;
+  margin-inline: auto;
+  padding-block: 3cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-headline {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 1.2cqw;
+  min-width: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-mark {
+  flex: none;
+  width: 5cqw;
+  height: 5cqw;
+  border-radius: 0;
+  background: var(--dsh-claude-image-claude-mark-clay) center / contain no-repeat;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-title {
+  width: auto;
+  height: auto;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 0;
+  background: none;
+  color: var(--dsw-alias-label-primary);
+  font-size: 3.8cqw;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="classic"] .dsh-claude-home-sample-column,
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="off"] .dsh-claude-home-sample-column {
+  justify-content: center;
+  gap: 4cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="classic"] .dsh-claude-home-sample-headline,
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="off"] .dsh-claude-home-sample-headline {
+  justify-content: center;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="classic"] .dsh-claude-home-sample-mark {
+  width: 9cqw;
+  height: 9cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="classic"] .dsh-claude-home-sample-title {
+  font-family: var(--dsh-claude-font-serif);
+  font-size: 5.4cqw;
+  font-weight: 400;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="off"] .dsh-claude-home-sample-title {
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 4.2cqw;
+  font-weight: 400;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample[data-layout="studio"] .dsh-claude-home-sample-headline {
+  width: 86%;
+}
+
+/* The studio dashboard: the real panel's header, six cells and heat grid. */
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-sample-panel {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 1.2cqw;
+  box-sizing: border-box;
+  width: 86%;
+  margin: 0;
+  padding: 1.6cqw;
+  overflow: hidden;
+  border-radius: 2cqw;
+  -webkit-mask-image: none;
+  mask-image: none;
+  animation: none;
+  font-size: 2.4cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-panel-head {
+  gap: 1cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample :is(.dsh-claude-home-tabs, .dsh-claude-home-ranges) {
+  gap: 0.3cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample :is(.dsh-claude-home-tab, .dsh-claude-home-range) {
+  padding: 0.1cqw 0.8cqw;
+  border-radius: 0.8cqw;
+  font-size: 2.1cqw;
+  line-height: 3cqw;
+  white-space: nowrap;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-stats {
+  gap: 0.6cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-stat {
+  gap: 0;
+  padding: 0.6cqw 0.8cqw;
+  border-radius: 1.2cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-stat-label {
+  font-size: 1.9cqw;
+  line-height: 2.4cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-stat-value {
+  font-size: 2.2cqw;
+  line-height: 2.8cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-heat {
+  gap: 0.45cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample .dsh-claude-home-heat-cell {
+  border-radius: 0.45cqw;
+}
+
+/* Context chips and the composer, including the classic card's footer tray. */
+body[data-dsh-claude-style] .dsh-claude-home-sample-context {
+  display: flex;
+  gap: 1.2cqw;
+  width: 100%;
+  margin-top: auto;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-chip {
+  box-sizing: border-box;
+  max-width: 50%;
+  padding: 0.2cqw 1.4cqw;
+  overflow: hidden;
+  border: 0.5px solid var(--dsw-alias-border-l1);
+  border-radius: 1.2cqw;
+  color: var(--dsw-alias-label-secondary);
+  font-size: 2.2cqw;
+  line-height: 3.4cqw;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-composer {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  gap: 1.2cqw;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  padding: 1.4cqw;
+  border: 0.5px solid var(--dsw-alias-border-l2);
+  border-radius: 1.5cqw;
+  background: var(--dsw-alias-bg-layer-1);
+  color: var(--dsw-alias-label-tertiary);
+  font-size: 2.4cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-prompt {
+  overflow: hidden;
+  line-height: 3.4cqw;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1cqw;
+  min-width: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-tool-list {
+  display: flex;
+  gap: 0.5cqw;
+  flex: none;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-tool {
+  padding: 0.1cqw 0.7cqw;
+  border-radius: 0.6cqw;
+  font-size: 2cqw;
+  line-height: 2.8cqw;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-tool-active {
+  background: color-mix(in srgb, var(--dsw-alias-label-primary) 8%, transparent);
+  color: var(--dsw-alias-label-primary);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-model {
+  overflow: hidden;
+  font-size: 2cqw;
+  line-height: 2.8cqw;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-sample-tray {
+  display: flex;
+  gap: 1cqw;
+  padding-top: 1.2cqw;
+  border-top: 0.5px solid var(--dsh-claude-divider);
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-card-name {
+  font-size: 12px;
+  line-height: 16px;
+}
+
+body[data-dsh-claude-style] .dsh-claude-home-card[data-active] .dsh-claude-home-card-name {
+  color: var(--dsw-alias-label-primary);
+}

@@ -1,0 +1,14 @@
+diff --git a/packages/client/src/shared/sliding-pill.ts b/packages/client/src/shared/sliding-pill.ts
+--- a/packages/client/src/shared/sliding-pill.ts
++++ b/packages/client/src/shared/sliding-pill.ts
+@@ -69,8 +69,8 @@ export function createSlidingPill(activeSelector: string) {
+     measuredItem = active
+     // Both boxes in the pixels the four properties are read in; the control's
+     // own border and padding already are (shared/page-zoom.ts).
+-    const box = inPageBox(next.getBoundingClientRect())
+-    const itemBox = active === null ? null : inPageBox(active.getBoundingClientRect())
++    const box = next.getBoundingClientRect()
++    const itemBox = active === null ? null : active.getBoundingClientRect()
+     if (box.width === 0 || itemBox === null || itemBox.width === 0) {
+       reading = null
+       return

@@ -1,0 +1,103 @@
+/* ---------- A line of words that swaps in place ---------- */
+/* transitions.dev's "Text states swap" (MIT), composed the way its "Thinking
+   states" recipe does it: the outgoing copy leaves upward through a blur while
+   the incoming copy rises from below, both in the box at once, and the outgoing
+   copy is taken down once the incoming one has settled (shared/swapping-text.ts).
+
+   The box's width and height belong to the hidden sizer, which is the recipe's
+   own arrangement: the copies are out of the flow, so a box holding only them
+   would read as empty for the length of the swap and throw every neighbour to
+   the left edge and back, and the entering copy rising from below would make
+   the box taller while it is still off its mark. The sizer carries the widest
+   of the words a swap puts in the box while it runs and comes down onto the
+   words standing once it settles (shared/swapping-text.ts), so the clock beside
+   the line sits right after them at rest. */
+
+/* The words are the caller's: they can be a clause the model itself wrote,
+   longer than any state word and longer than the box may take. The box clips
+   what it cannot hold and the copies draw an ellipsis (below), so the wording
+   gives way rather than running over what stands beside it. The padding and its
+   own negative margin give the clip box room for the swap's travel — the copies
+   move one distance each way — while the label's layout stays exactly as it
+   was. */
+/* The values the swap travels — its distance, blur, duration, its gap and its
+   curve — are the shared ones from shared/motion.css (D9), as motion tokens;
+   the box and the copies read them, and a caller that wants a shorter travel
+   sets --dsh-claude-swap-distance where it uses the label. */
+body[data-dsh-claude-style] .dsh-claude-swap-label {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  padding: var(--dsh-claude-swap-distance) 0;
+  margin: calc(var(--dsh-claude-swap-distance) * -1) 0;
+  /* The box's width is where the clock beside the line stands, so the two
+     instants a swap changes it travel instead of jumping: shared/swapping-text.ts
+     pins the box at the width it stands at and writes the one it heads for, and
+     this carries it there. Between two `auto` widths no transition can run,
+     which is why the pin exists — the words standing take the box back the
+     moment the move is over. */
+  transition: width var(--dsh-claude-duration-slide) var(--dsh-claude-ease-glide);
+}
+
+/* The sizer paints nothing and is never read out; it is the box. Every wording
+   a swap carries lies in its one grid cell, so it is as wide as the widest of
+   them, and it keeps its own content's width while the box is pinned — the
+   width shared/swapping-text.ts reads for the box to travel to. A label
+   narrower than that clips it with the copies. */
+body[data-dsh-claude-style] .dsh-claude-swap-sizer {
+  display: grid;
+  width: max-content;
+  visibility: hidden;
+  white-space: nowrap;
+}
+
+body[data-dsh-claude-style] .dsh-claude-swap-sizer-word {
+  grid-area: 1 / 1;
+}
+
+/* Every copy lies over the sizer, so the box keeps its size whatever is
+   moving inside it. It sits inside the label's padding, which is what the label
+   added for the travel: its own box is the one the words are laid out in. */
+body[data-dsh-claude-style] .dsh-claude-swap-copy {
+  position: absolute;
+  inset: var(--dsh-claude-swap-distance) 0;
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  transform: translateY(0);
+  filter: blur(0);
+  opacity: 1;
+  transition:
+    transform var(--dsh-claude-swap-duration) var(--dsh-claude-swap-ease),
+    filter var(--dsh-claude-swap-duration) var(--dsh-claude-swap-ease),
+    opacity var(--dsh-claude-swap-duration) var(--dsh-claude-swap-ease);
+  will-change: transform, filter, opacity;
+}
+
+body[data-dsh-claude-style] .dsh-claude-swap-copy.is-exit {
+  transform: translateY(calc(var(--dsh-claude-swap-distance) * -1));
+  filter: blur(var(--dsh-claude-swap-blur));
+  opacity: 0;
+}
+
+body[data-dsh-claude-style] .dsh-claude-swap-copy.is-enter-start {
+  transition: none;
+  transform: translateY(var(--dsh-claude-swap-distance));
+  filter: blur(var(--dsh-claude-swap-blur));
+  opacity: 0;
+}
+
+/* The reader's animation choice, resolved onto <body> by core/prefs.ts (D40).
+   The helper writes the words without a swap on that setting, so this is the
+   second net for a swap already in flight when the choice changes — the copies'
+   own motion and the box's travel alike. */
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-swap-copy {
+  transition: none;
+  transform: none;
+  filter: none;
+}
+
+body[data-dsh-claude-style][data-dsh-claude-motion="reduced"] .dsh-claude-swap-label {
+  transition: none;
+}

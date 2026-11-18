@@ -88,3 +88,43 @@ scripts/api_env.sh
 *.sqlite-shm
 *.sqlite3-wal
 *.sqlite3-shm
+
+# Vendored code includes legitimate key/token/secret test and implementation names.
+!/dsh/
+!/dsh/**
+!/dsh-plugins/
+!/dsh-plugins/**
+# Machine dependencies and state remain local; child upstream ignore files also apply.
+/.dsh-dev/
+/dsh-plugins/node_modules/
+/dsh-plugins/*/node_modules/
+/dsh-plugins/*/node_modules
+/experiments/**/node_modules
+/dsh-plugins/*/lib/
+!/dsh-plugins/dsh-ascii-sharks/lib/
+!/dsh-plugins/dsh-ascii-sharks/lib/**
+/dsh-plugins/*/runtime/
+/dsh-plugins/*/native/target/
+/dsh-plugins/*/.tmp/
+/dsh-plugins/*/.debug/
+/dsh-plugins/*/dist/
+/dsh-plugins/*/*.tsbuildinfo
+/dsh/**/.env
+/dsh/**/.env.*
+/dsh-plugins/**/.env
+/dsh-plugins/**/.env.*
+!/dsh/**/.env.*.example
+!/dsh-plugins/**/.env.*.example
+/dsh/**/*.p12
+/dsh/**/*.pfx
+/dsh-plugins/**/*.p12
+/dsh-plugins/**/*.pfx
+.DS_Store
+
+# LG client bundles are rebuilt by dsh-plugins/scripts/build.mjs.
+/dsh-plugins/lg-*/client.js
+
+# Claude-style's LICENSE excludes these upstream assets from its MIT grant.
+/dsh-plugins/dsh-claude-style/packages/assets/src/fonts/anthropic/
+/dsh-plugins/dsh-claude-style/packages/assets/src/mascot/crab/
+/dsh-plugins/dsh-claude-style/scripts/draw-crab.py
