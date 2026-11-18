@@ -1,0 +1,660 @@
+{
+  "schema": "lg.blind-answer-review.v1",
+  "input_file": "round1-blind.json",
+  "input_sha256": "eda40b4a4e198830a625aa41e2ef00c597cbf804dc7dd885667c73a142c58624",
+  "reviewer_scope": "Only round1-blind.json read for this review. No mapping or runs opened; no attempt to infer implementation identities. Review is by a separate assistant, not an independent human or paid judge.",
+  "method": {
+    "primary_answer_only": false,
+    "quote_rule": "Count quotations in explanations as well as blockquotes; repeating fragments from one source is not confused with citing a second source paragraph.",
+    "severity": "major means missing the requested deliverable or an erroneous central interpretation/character state; minor means localized metadata, reporting, or phrasing defect. Both confirmed levels remain visible and cannot be averaged away.",
+    "uncertainty": "review_needed is not a pass and is not counted as a confirmed error. Clear conditional examples are not automatically treated as asserted story facts.",
+    "relative_comparison": "Per-item contrasts, not a summed winner. Shared errors remain shared; an empty answer is not made a perfect baseline by making no assertions.",
+    "reliability_limit": "runCompleted/memberStatus/workspaceUnchanged are supplied metadata, not raw-trace validation. Timing, retries, actual tool scope, and extraction correctness need main-agent verification."
+  },
+  "reviews": [
+    {
+      "id": "read-01-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "keeper": "supported_complete",
+            "one_quote": "violated_extra_source_quote"
+          },
+          "forbidden_checks": {
+            "wrong_key": "not_observed",
+            "unseen_transfer": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "second_source_quote",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "instruction_completeness",
+              "answer_excerpts": [
+                "第 2 章第 3 段同样写到“蓝布袋仍系在阿苇腰间”",
+                "按您只引用一处的要求，这里就不列出了。"
+              ],
+              "description": "正文证明处之外，说明中实际逐字引用了第2章第3段，形成第二处来源引文；“不列出”的自述与已写出的内容不符。不能因未用blockquote就不计引文。",
+              "source_basis": "作者全篇只允许引用一处；第二处来源是第2章第3段。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [],
+            "memberStatus": []
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "keeper": "supported_complete",
+            "one_quote": "violated_extra_source_quote"
+          },
+          "forbidden_checks": {
+            "wrong_key": "not_observed",
+            "unseen_transfer": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "second_source_quote",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "instruction_completeness",
+              "answer_excerpts": [
+                "第 2 章第 3 段“蓝布袋仍系在阿苇腰间”只是间接旁证",
+                "按你“只引用一处”的要求，没有列出。"
+              ],
+              "description": "说明中明确引了第2章第3段，实际不止一处，却声称没有列出。主要保管人和直接证据正确不能抵销数量违例。",
+              "source_basis": "作者全篇只允许引用一处；第二处来源是第2章第3段。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        }
+      },
+      "pair_comparison": {
+        "relation": "shared_confirmed_failure",
+        "A_vs_B_regressions": [],
+        "B_vs_A_regressions": [],
+        "explanation": "两者主要事实都正确，但共享同一明确引文数量违例。没有证据把其中一个判为全要求通过。"
+      }
+    },
+    {
+      "id": "read-02-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "first_account": "supported_complete",
+            "second_account": "supported_complete",
+            "unresolved": "supported_complete"
+          },
+          "forbidden_checks": {
+            "drop_older": "not_observed",
+            "settle_truth": "not_observed",
+            "extra_quotes": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "wrong_paragraph_count",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "第 1 章有 3 段，第 2 章有 2 段"
+              ],
+              "description": "第2章实际3段，回答前言报成2段，后文又正确引用第3段，自相矛盾。两条人物自述、实际引用位置和未裁定真伪结论均保留。",
+              "source_basis": "提供的第2章有三个非空段，第3段明确未确认任何一次自述。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "first_account": "supported_complete",
+            "second_account": "supported_complete",
+            "unresolved": "supported_complete"
+          },
+          "forbidden_checks": {
+            "drop_older": "not_observed",
+            "settle_truth": "not_observed",
+            "extra_quotes": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "growth_as_birth",
+              "severity": "major",
+              "certainty": "confirmed",
+              "dimension": "correctness",
+              "answer_excerpts": [
+                "在出生地和是否到过石湾这两点上直接冲突"
+              ],
+              "description": "原文只说长大/从小居住地点，没有任何出生地陈述。回答把成长/居住地提升为出生地信息，新增了不受来源支持的人物身世事实；此错误涉及本题核心的来历比较。",
+              "source_basis": "第1章第2段“在南岸的石湾长大”；第2章第2段“从小住在北岸柳坡”，均未陈述出生地。"
+            },
+            {
+              "id": "former_latter_order",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "clarity",
+              "answer_excerpts": [
+                "前者说十五岁才离开石湾，后者说成年以前从没到过石湾。"
+              ],
+              "description": "该句前面先列第2章再列第1章；按就近对应，“前者/后者”颠倒。读者也可能按全文第一次/第二次自述理解，所以保留为指代歧义，不另判确定事实错误。",
+              "source_basis": "第1章是十五岁离开，第二章是成年前没去过。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [],
+            "memberStatus": []
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        }
+      },
+      "pair_comparison": {
+        "relation": "different_confirmed_failures",
+        "A_vs_B_regressions": [
+          "A独有的第2章段落总数错误。"
+        ],
+        "B_vs_A_regressions": [
+          "B新增把成长地说成出生地；A没有这项错误。"
+        ],
+        "explanation": "不能用A的段落数错误抵销B的人物身世误读，也不能只因两条引用均正确就判两者等价。"
+      }
+    },
+    {
+      "id": "read-03-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "porridge": "omitted",
+            "rice": "omitted",
+            "noodles": "omitted",
+            "current_choice": "omitted",
+            "proposal_not_rule": "omitted"
+          },
+          "forbidden_checks": {
+            "omit_tier": "observed_omission",
+            "adopt_proposal": "not_observed",
+            "incorrect_affordance": "not_observed",
+            "reuse_tickets": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "no_substantive_answer",
+              "severity": "major",
+              "certainty": "confirmed",
+              "dimension": "completion",
+              "answer_excerpts": [
+                "成员目前仍在处理中。本轮先到此结束",
+                "再向你呈现档位、原文出处、可行兑换组合与信息缺口。"
+              ],
+              "description": "提供的最终可见文本只有进度说明，所有档位、条件、兑换份数/余票及提案状态均未交付。元数据runCompleted=true、成员completed不能替代作者答案。是否为抓取阶段/宿主汇总问题需主任务另查，本评阅不推断技术成因。",
+              "source_basis": "作者要求列全档位、原文出处及可行兑换方式，当前可见文本一项也没有。"
+            }
+          ],
+          "notes": [
+            "review_needed: supplied answer says member is running while metadata says completed; final-answer extraction or missing parent continuation must be checked by the main agent without rewriting this observed text."
+          ],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "porridge": "supported_complete",
+            "rice": "supported_complete",
+            "noodles": "supported_complete",
+            "current_choice": "correct_table_but_contradictory_explanation",
+            "proposal_not_rule": "supported_complete"
+          },
+          "forbidden_checks": {
+            "omit_tier": "not_observed",
+            "adopt_proposal": "not_observed",
+            "incorrect_affordance": "not_observed",
+            "reuse_tickets": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "valid_option_reclassified_as_zero",
+              "severity": "major",
+              "certainty": "confirmed",
+              "dimension": "correctness",
+              "answer_excerpts": [
+                "但连喝一碗都不够的方案（例如剩余 6 张却不再换）就等于不兑换，未列入。"
+              ],
+              "description": "表格已经正确列出1碗热粥用6票、余6票，末尾却把“余6票不再换”说成不兑换，与表格、算术及题意相矛盾。不能因表格出现正确答案就忽略解释否定了一个合法选项。",
+              "source_basis": "6票换1碗，原有12票；已兑换1碗后余6票显然不是0份兑换，作者也未要求用尽票。"
+            },
+            {
+              "id": "invent_spend_all_requirement",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "instruction_completeness",
+              "answer_excerpts": [
+                "若按“可行兑换方案”要求把票用尽，严格可兑换的最优结果是 **2 碗热粥、剩余 0 张**。"
+              ],
+              "description": "引入作者未要求的“用尽票/最优”解释。句子以“若”明确是条件讨论，故不单独判成断言作者有此要求，但容易混淆本题应列全而非优化的目标。",
+              "source_basis": "作者明确要求所有可行方式及余票，没有要求票必须用尽。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [],
+            "memberStatus": []
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        }
+      },
+      "pair_comparison": {
+        "relation": "B_more_complete_but_not_clean_pass",
+        "A_vs_B_regressions": [
+          "A缺少整个实质答复。"
+        ],
+        "B_vs_A_regressions": [],
+        "explanation": "B交付了所有核心材料，相对A有明显完成度提升；但B自身存在核心兑换解释矛盾，因此不能认定其达到严格质量门槛。A没有实质答案，不应把B每一个新句子机械记为相对A退化。"
+      }
+    },
+    {
+      "id": "read-04-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "world_location": "supported_complete",
+            "belief": "supported_complete",
+            "knowledge_boundary": "supported_complete"
+          },
+          "forbidden_checks": {
+            "omniscient_character": "not_observed",
+            "invent_motive": "not_observed",
+            "assert_search": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "false_edit_report",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "reliability_reporting",
+              "answer_excerpts": [
+                "改动仅限第 1—2 章的内容"
+              ],
+              "description": "回答此前宣称没改正文，结尾又声称改动限于前两章；提供元数据workspaceUnchanged=true。此处是自相矛盾的执行报告，不代表实际文件真的被改。",
+              "source_basis": "作者未要求改写，提供元数据确认工作区未变；回答应明确只有分析而无修改。"
+            },
+            {
+              "id": "no_clues_overstatement",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "从“没谈”“没收到消息”能推出她没获得线索"
+              ],
+              "description": "没谈钥匙/没收到移动消息不严格等于不存在任何线索；不过当前完整上下文还明确她仍相信旧位置，本题核心“不知被移动”有充分依据。将更广泛的“没获得线索”记为表述过强待审。",
+              "source_basis": "第2章第1、2、3段支持没有获知移动和旧相信，不枚举全部可能线索。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "world_location": "supported_complete",
+            "belief": "supported_complete",
+            "knowledge_boundary": "supported_complete"
+          },
+          "forbidden_checks": {
+            "omniscient_character": "not_observed",
+            "invent_motive": "not_observed",
+            "assert_search": "not_observed"
+          },
+          "issues": [],
+          "notes": [
+            "三项核心状态、来源和未说明的动机均准确区分。引语中的内层双引号改为单引号属于嵌套排版，不改变原文字词，不按内容失真处理。",
+            "“没有交代第三次移动”在文中已先列初始放入和随后转移，虽不必要，但不能据此确定错误。"
+          ],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [],
+            "memberStatus": []
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": true
+        }
+      },
+      "pair_comparison": {
+        "relation": "B_cleaner_reporting",
+        "A_vs_B_regressions": [
+          "A额外声称“改动仅限前两章”，与无修改元数据和自身前文冲突。"
+        ],
+        "B_vs_A_regressions": [],
+        "explanation": "两者核心事实均齐全；B未见A的执行报告矛盾，未发现B对A的确认退化。"
+      }
+    },
+    {
+      "id": "read-05-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "ordering": "supported_complete",
+            "uncertain_gap": "supported_complete",
+            "missing_dates": "supported_complete"
+          },
+          "forbidden_checks": {
+            "invent_gap": "not_observed",
+            "invert_order": "not_observed",
+            "invent_date": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "narrator_fact_recast_as_memory",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "即使“年份的差”和“先后关系”在正文里写得很清楚，也仍然建立在人物的记忆上。"
+              ],
+              "description": "把所有年份与先后依据概括成仍建立在人物记忆上过宽。2025到雁关是人物记忆，但2026年6月到澄城由叙述直接陈述；两类来源不应混并。核心先后和无法确定精确一年仍正确。",
+              "source_basis": "第1章第2段是“他记得”；第2章第1段为叙述直接给出2026年6月。"
+            },
+            {
+              "id": "extra_missing_journey_node",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "两个年份分别对应旅程中的哪个节点，正文没有说明。"
+              ],
+              "description": "文本已把两年分别绑定雁关到访和澄城到访；所缺主要是具体月日。“旅程节点”若仅指精确抵达/离开时点有一定解释空间，故待审，不当成已确认关键缺口。",
+              "source_basis": "第1章第2段明确2025到过雁关，第2章第1段明确2026年6月到澄城住几天。"
+            },
+            {
+              "id": "author_intent_speculation",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "unrequested_interpretation",
+              "answer_excerpts": [
+                "这段留白看起来像是作者有意设置的模糊处理。"
+              ],
+              "description": "这是明示为“看起来”的作者意图推测，原文无意图证据；不影响核心回答，但不是本题所需的事实。不能把该推测当确定文学判断。",
+              "source_basis": "原文只呈现日期缺失，未交代作者的创作意图。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "ordering": "supported_complete",
+            "uncertain_gap": "correct_uncertainty_headline_but_erroneous_contradiction_argument",
+            "missing_dates": "supported_complete"
+          },
+          "forbidden_checks": {
+            "invent_gap": "not_observed",
+            "invert_order": "not_observed",
+            "invent_date": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "missing_evidence_as_contradiction",
+              "severity": "major",
+              "certainty": "confirmed",
+              "dimension": "reasoning_reliability",
+              "answer_excerpts": [
+                "如果按常识以“年份差一”反推“恰好一年”，就会与原文“叙述没有记下抵达的具体日子”直接矛盾。"
+              ],
+              "description": "缺少具体日期意味着无法推出恰好一年，并不与实际恰好一年构成矛盾。回答把“不足以确认”推成“与原文矛盾”，是本题关键不确定性推理错误。",
+              "source_basis": "2025某日与2026年6月某日可能恰好相隔一年，也可能不是；未记日期并未排除任一可能。"
+            },
+            {
+              "id": "unproven_negative_conclusion",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "clarity",
+              "answer_excerpts": [
+                "原文缺少这两次到访的已知日期，也没有给出间隔天数，因此**不能成立**。"
+              ],
+              "description": "“不能成立”可能是指不能证成，也可能被读作已证明不是恰好一年；标题又说无法确定，保留为结论用语歧义，不能自动算正确的否定结论。",
+              "source_basis": "可确认的是不能判断，不是确认不满/超过/不等于一年。"
+            },
+            {
+              "id": "unneeded_approximate_gap",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "“相隔一年左右”在字面上不与原文冲突"
+              ],
+              "description": "此句是可能相容性判断而非明确断言实际约一年，不能直接判成确定日期幻觉；但来源也不支持以约一年作为已知结论，应去掉不必要的近似估计以免误导。",
+              "source_basis": "雁关只知2025年，澄城只知2026年6月，间隔有较宽范围。"
+            }
+          ],
+          "notes": [],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [],
+            "memberStatus": []
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        }
+      },
+      "pair_comparison": {
+        "relation": "different_failures_B_has_central_inference_error",
+        "A_vs_B_regressions": [
+          "A把叙述直接给出的澄城日期也笼统归为人物记忆。"
+        ],
+        "B_vs_A_regressions": [
+          "B新增“缺少日期与恰好一年直接矛盾”的核心推理错误，A没有这个否定推断。"
+        ],
+        "explanation": "主要答案均说无法确定，不能因此忽略B解释里的错误。约一年和不能成立另列待审，不混作确证错误。"
+      }
+    },
+    {
+      "id": "read-06-r1",
+      "answers": {
+        "A": {
+          "required_checks": {
+            "rope": "supported_complete",
+            "chips": "supported_complete",
+            "footprint": "supported_complete",
+            "cloth": "supported_complete",
+            "unconfirmed_suspect": "supported_complete"
+          },
+          "forbidden_checks": {
+            "incomplete_list": "not_observed",
+            "suspect_as_fact": "not_observed",
+            "certain_cause": "not_observed"
+          },
+          "issues": [
+            {
+              "id": "all_quotes_have_observation_verbs",
+              "severity": "minor",
+              "certainty": "confirmed",
+              "dimension": "source_grounding",
+              "answer_excerpts": [
+                "引文中都有“她看到”或“发现”这样的直接观察动词"
+              ],
+              "description": "四处引文中木屑和鞋印两段没有所称直接观察动词。四处均为题面要求的实际痕迹不受影响，但对文字形式的解释不实。",
+              "source_basis": "第1章第3段以钟锤下方开头，第4段以二层窗台开头，均无她看到/发现等词。"
+            },
+            {
+              "id": "non_witness_recast_as_absent",
+              "severity": "major",
+              "certainty": "confirmed",
+              "dimension": "correctness",
+              "answer_excerpts": [
+                "说法出自未在场者",
+                "**没有目击者，也没有工具**"
+              ],
+              "description": "“伙计没看见货郎进入”不能推出伙计不在场，更不能推出完全没有目击者。回答把一个人的未目击扩成现场与所有见证者事实，新增无依据人物状态。",
+              "source_basis": "第2章第2段仅称伙计看见蓝布，没有看见货郎进入钟楼；并未说明伙计是否在现场，也未穷尽其他目击者。"
+            },
+            {
+              "id": "unproven_causal_negative",
+              "severity": "minor",
+              "certainty": "review_needed",
+              "dimension": "reasoning_reliability",
+              "answer_excerpts": [
+                "**切口与“停钟”之间的联系不成立**"
+              ],
+              "description": "应当说没有证据确认因果，而不是确认联系不成立。紧接的解释说文本没有说明切口足以导致停钟，因此标题可能是省略了“证据”的表达；保留为表述过强待审。",
+              "source_basis": "浅切口未断，无法据此确认其造成或未造成停钟。"
+            }
+          ],
+          "notes": [
+            "据给定元数据恰好一名analysis成员且completed，显式委派控制通过；四处痕迹和引文来源均齐全。"
+          ],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": false
+        },
+        "B": {
+          "required_checks": {
+            "rope": "supported_complete",
+            "chips": "supported_complete",
+            "footprint": "supported_complete",
+            "cloth": "supported_complete",
+            "unconfirmed_suspect": "supported_complete"
+          },
+          "forbidden_checks": {
+            "incomplete_list": "not_observed",
+            "suspect_as_fact": "not_observed",
+            "certain_cause": "not_observed"
+          },
+          "issues": [],
+          "notes": [
+            "据给定元数据恰好一名analysis成员且completed，显式委派控制通过；四处痕迹、未证实货郎猜测及证据不足均完整。",
+            "“内部人员或其他人同样可能带入”是明确的可能性反例，没有被提升为已发生事实；不判成编造具体剧情。",
+            "“没有出现任何进入记录”在该段货郎上下文中按货郎的进入记录理解；不能故意取最不利的所有人含义再判错。",
+            "“跑货郎”存在轻微笔误，但不改变指向或事实结论，记录为文字质量备注，不计正确性/完整性失败。"
+          ],
+          "supplied_execution_metadata": {
+            "runCompleted": true,
+            "workspaceUnchanged": true,
+            "memberRoles": [
+              "analysis"
+            ],
+            "memberStatus": [
+              "completed"
+            ]
+          },
+          "visible_hidden_sentinel_leak": false,
+          "scope_limit": "Only visible answers and supplied metadata reviewed. No raw trace was opened; absence of leaked markers does not prove no out-of-scope tool attempt.",
+          "strict_answer_pass": true
+        }
+      },
+      "pair_comparison": {
+        "relation": "B_has_fewer_unsupported_assertions",
+        "A_vs_B_regressions": [
+          "A独有全部引文带观察动词的错误。",
+          "A独有把未目击改成未在场/不存在目击者的无依据断言。"
+        ],
+        "B_vs_A_regressions": [],
+        "explanation": "双方完成明确委派且交付全部核心线索；A额外解释引入了B没有的证据与人物状态错误。"
+      }
+    }
+  ],
+  "summary": {
+    "pairs_reviewed": 6,
+    "answers_reviewed": 12,
+    "confirmed_issue_answers": 10,
+    "clean_answers_under_visible_review": [
+      "read-04-r1:B",
+      "read-06-r1:B"
+    ],
+    "pairwise_zero_regression_established": false,
+    "main_agent_must_recheck": [
+      "read-03-r1 A progress-only text despite completed member metadata",
+      "read-01-r1 both second-source quotation violation",
+      "read-02-r1 B growth/birth semantic substitution",
+      "read-03-r1 B valid one-bowl option contradicted by final explanation",
+      "read-05-r1 B missing-evidence/contradiction inference",
+      "read-06-r1 A non-witness/absence extrapolation"
+    ]
+  }
+}

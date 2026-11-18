@@ -1,0 +1,539 @@
+{
+  "schema": 1,
+  "reviewer": "ops_eval_design",
+  "inputFile": "$LITISLAND_ROOT/main-agent-quality-20261111/reviews/round2-blind.json",
+  "inputSHA256": "c07bb7b8ce76296d98d375e6da3a92135caca525f349ad0c0a0bde54f14aff1f",
+  "method": "Offline independent per-answer reading of supplied question, source chapters, expected assertions and visible answers; no model API; no mapping or run files read for this review.",
+  "blindnessLimitations": [
+    "材料包含memberRoles与答案自述，可能提示处理机制，不能声称严格双盲；本审读未查看映射，也不以臂身份评分。"
+  ],
+  "evidenceLimits": [
+    "runCompleted/workspaceUnchanged/memberStatus仅引用匿名包元数据；本次没有独立重验文件系统和事件时间线。",
+    "不以总分互相抵消；每个确定违例单列，待裁定问题不伪装成确定错误。"
+  ],
+  "pairs": [
+    {
+      "id": "read-01-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "pass",
+            "reason": "保管人为阿苇，未混淆北门木钥匙与粮仓铜钥匙。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "给出姓名、直接证据、正确章号与段落号。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "唯一原文引文与第2章第2段逐字相符；附加说明是第1章内容的释义。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "只引用一处原文，未续写；所给元数据显示作品未改变。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "满足本题有限范围验收。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        },
+        "B": {
+          "correctness": {
+            "status": "pass",
+            "reason": "姓名与钥匙种类正确。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "必要姓名与主引文、章段齐全。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "第二处引文也真实存在，但真实不代表允许额外引用。"
+          },
+          "instructions": {
+            "status": "fail",
+            "reason": "作者明确只引用一处，回答又引用了第2章第3段。"
+          },
+          "outcome": {
+            "status": "fail",
+            "reason": "存在确证的格式/数量约束违例，不能用事实答案正确抵消。"
+          },
+          "confirmedIssues": [
+            {
+              "id": "extra_source_quote",
+              "dimension": "instructions",
+              "answerExcerpt": "第2章第3段还有一句“蓝布袋仍系在阿苇腰间”",
+              "reason": "这已构成第二处来源的直接引用；后接“按你要求只引用一处，我就不再展开”不能撤销已经发生的引用。",
+              "severity": "material",
+              "certainty": "confirmed"
+            }
+          ],
+          "unresolvedRisks": []
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [
+          {
+            "direction": "B relative to A",
+            "dimensions": [
+              "instructions"
+            ],
+            "reason": "A仅有一处引文，B增加另一段原文。"
+          }
+        ],
+        "unresolvedRegressions": []
+      }
+    },
+    {
+      "id": "read-02-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "pass",
+            "reason": "按顺序保留南岸石湾长大/十五岁离开与北岸柳坡/成年前未到石湾的两次自述，并未裁定真伪。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "两次原话、章段及现有文字不足裁定的说明均齐全。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "两段引文和支持不足的引用可追溯到所给正文；未虚构撒谎或伪装原因。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "两项分别各有一处人物原话，补充叙述依据不违反本题要求；本题没有像read-01那样限制全文总引用数。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "满足本题；有冗余说明，但没有据此确证质量退化。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        },
+        "B": {
+          "correctness": {
+            "status": "pass",
+            "reason": "两次自述与次序准确，保留真伪未定。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "原话、章段、缺乏证实信息均具备。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "区分摆渡人的口音印象和叙述确认，没有把任何自述升级为事实。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "未替人物解释原因，未越过第1—2章。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "满足本题有限范围验收。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [],
+        "unresolvedRegressions": []
+      },
+      "adjudicationNotes": [
+        "A将“出生地”列为尚缺的可核查资料，并没有说石湾或柳坡是何栖出生地；不能据此判定把成长地误写成出生地。",
+        "A在两项之后增加了支持真伪未定的叙述引文；用户要求每项一处原话，没有要求全文只能两处引用。"
+      ]
+    },
+    {
+      "id": "read-03-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "fail",
+            "reason": "三个档位本身正确，但可行方式与算术结论错误且内部矛盾。"
+          },
+          "completeness": {
+            "status": "fail",
+            "reason": "将一碗热粥剩6票划掉并最终排除，未正确交付全部可行方式。"
+          },
+          "sourceSupport": {
+            "status": "fail",
+            "reason": "“剩6票不够再换任何一份”没有依据，直接与6票一碗的已引规则相矛盾。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "来源范围、各档引文与出处、提议未生效、不修改正文等显式边界有遵守；错误另归正确性与完整性。"
+          },
+          "outcome": {
+            "status": "fail",
+            "reason": "存在实质性错误；不能因答案某处列过正确数字就算通过。"
+          },
+          "confirmedIssues": [
+            {
+              "id": "remaining_six_can_buy_porridge",
+              "dimension": "correctness",
+              "answerExcerpt": "6 张票不够再换第二碗或换汤饼",
+              "reason": "剩余6票足以再换一碗6票热粥。不能把不能买18票汤饼推广成什么都买不了。",
+              "severity": "material",
+              "certainty": "confirmed"
+            },
+            {
+              "id": "valid_one_bowl_option_excluded",
+              "dimension": "completeness",
+              "answerExcerpt": "莫禾用 12 张票能做得成的兑换，只有“2 碗热粥、剩 0 张”这一种组合",
+              "reason": "一碗耗6票剩6票也是可行兑换，用户只排除完全不兑换，没有要求必须用完票。表格删除线和最后“只有”把有效方案排除了。",
+              "severity": "material",
+              "certainty": "confirmed"
+            },
+            {
+              "id": "held_ticket_count_typo",
+              "dimension": "correctness",
+              "answerExcerpt": "热汤饼要 18 张票，他不够 12 张",
+              "reason": "正文持有12张；应为12不足18。此处即使视为笔误，也不能修复随后对6票余量的实质误判。",
+              "severity": "minor",
+              "certainty": "confirmed"
+            }
+          ],
+          "unresolvedRisks": []
+        },
+        "B": {
+          "correctness": {
+            "status": "pass",
+            "reason": "准确列出6/12/18票及空碗/当日夜班章条件，给出一碗剩6票、两碗剩0票，排除蒸饭和汤饼。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "当前所有档位、全部有效方式、余票和未生效提议均完整。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "引用符合来源，伙计多份说明与未落实建议明确区分。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "未把建议当生效规则、没有加入零兑换方案，出处足以定位。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "满足本题有限范围验收；额外未知项较冗长，不等于事实违例。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [
+          {
+            "direction": "A relative to B",
+            "dimensions": [
+              "correctness",
+              "completeness",
+              "sourceSupport"
+            ],
+            "reason": "B正确保留两个可行方案，A排除一个并作出错误算术判断。"
+          }
+        ],
+        "unresolvedRegressions": []
+      }
+    },
+    {
+      "id": "read-04-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "pass",
+            "reason": "实际位置为壁柜最下层夹板，闻笙相信木盒且未获知移动，三者区分清楚。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "实际状态、人物相信、是否知情与未知动机均有交代。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "所用主要引文均对应正确章段；未凭空给阿照赋予动机。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "没有补写回房、搜索、通知或后续情节。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "符合给定状态连续性口径。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        },
+        "B": {
+          "correctness": {
+            "status": "needs_adjudication",
+            "reason": "正确报告已写出的移动及闻笙错误认知，但又将截至章末的位置是否仍保持列为未知，之后小结再使用读者已知位置。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "问题各项和相应引文均出现；问题在于附加限定是否削弱了已经回答的状态，而不是单纯遗漏。"
+          },
+          "sourceSupport": {
+            "status": "needs_adjudication",
+            "reason": "对未出现的第三人移动或其他察觉方式的怀疑没有新文本依据，但它们被标为未知而非断言发生。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "未断言新的剧情发生；原文范围和人物动机边界保持。"
+          },
+          "outcome": {
+            "status": "needs_adjudication",
+            "reason": "应让root按冻结的状态连续性规则裁定，不能与明确算术错误同等认定，也不应自动判全部通过。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": [
+            {
+              "id": "unsupported_doubt_about_persisted_location",
+              "dimension": "correctness",
+              "answerExcerpt": "第 2 章结束时，夹板里那把钥匙是否还在原处、是否被第三个人动过——正文未说明。",
+              "reason": "第1章明确移动到夹板，第2章无再移动；预设expected要求按最后已建立事实回答在夹板。B的开放世界式保留可能把已建立状态降为未知，削弱答案确定性。其小结仍保留读者已知位置，因此是否构成整题退化需裁定。",
+              "certainty": "needs_adjudication"
+            },
+            {
+              "id": "unnecessary_alternative_knowledge_path",
+              "dimension": "sourceSupport",
+              "answerExcerpt": "她是否通过其他途径（比如亲眼看到阿照的动作）察觉——正文没有写",
+              "reason": "原文已给出她离开后移动、她仍相信木盒、未回房且未收到消息。该额外可能性没有文本支持，容易冲淡已答出的不知情结论；但并未断言她实际看见。",
+              "certainty": "needs_adjudication"
+            },
+            {
+              "id": "ambiguous_no_direct_key_description",
+              "dimension": "correctness",
+              "answerExcerpt": "第 2 章没有直接写钥匙",
+              "reason": "若字面指没有提到钥匙，则第2章第2、3段反证；结合上下文，更可能意指没有重新描写实际物理位置，因此不把这句单独列为确证事实错误。",
+              "certainty": "needs_adjudication"
+            }
+          ]
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [],
+        "unresolvedRegressions": [
+          {
+            "direction": "B relative to A",
+            "dimensions": [
+              "correctness",
+              "sourceSupport"
+            ],
+            "reason": "B增加了无新增证据的状态怀疑；A对已建立位置与人物认知回答明确。"
+          }
+        ]
+      }
+    },
+    {
+      "id": "read-05-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "fail",
+            "reason": "先后顺序和“无法确定恰好一年”正确，但新增时间间隔下界错误。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "雁关缺月日、澄城缺具体日子的两项缺口及原文出处都齐全。"
+          },
+          "sourceSupport": {
+            "status": "fail",
+            "reason": "2025年到2026年6月不支持“至少约一年”；2025年末到2026年6月只约半年，符合全部已知信息。"
+          },
+          "instructions": {
+            "status": "fail",
+            "reason": "加入了不能由给定信息推出的间隔下界，违背保留时间不确定性的要求。"
+          },
+          "outcome": {
+            "status": "fail",
+            "reason": "主结论正确不能抵消同一回答后半段的错误范围推断。"
+          },
+          "confirmedIssues": [
+            {
+              "id": "false_minimum_interval",
+              "dimension": "correctness",
+              "answerExcerpt": "二者相隔至少约一年、至多不足两年",
+              "reason": "“至少约一年”被所给年份允许的2025年末至2026年6月反例否定；该反例仅展示可行边界，不是给人物补真实日期。",
+              "severity": "material",
+              "certainty": "confirmed"
+            },
+            {
+              "id": "unsupported_interval_assertion",
+              "dimension": "sourceSupport",
+              "answerExcerpt": "这些“无从得知”是文本明写的空缺，并非我遗漏的线索。根据现有信息只能得到：……至少约一年",
+              "reason": "以信息缺口说明引出无依据确定下界，扩大了原文支持范围。",
+              "severity": "material",
+              "certainty": "confirmed"
+            }
+          ],
+          "unresolvedRisks": []
+        },
+        "B": {
+          "correctness": {
+            "status": "pass",
+            "reason": "先雁关后澄城明确；恰好一年未知。几个月或十几个月只是与已有年月相容的可能范围，没有断言某个真实间隔。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "具体列出两地缺失的月日信息，给出来源与不确定性解释。"
+          },
+          "sourceSupport": {
+            "status": "pass",
+            "reason": "关键引文与章节段落相符；未把票面年份未明示与人物记忆2025混作新事实。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "没有读取后续章节的证据，没有补真实日期或断言具体间隔；提供的作品未变元数据符合只读要求。"
+          },
+          "outcome": {
+            "status": "pass",
+            "reason": "满足本题有限范围验收。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": []
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [
+          {
+            "direction": "A relative to B",
+            "dimensions": [
+              "correctness",
+              "sourceSupport",
+              "instructions"
+            ],
+            "reason": "B保留真实间隔未知，A额外给出错误的至少约一年下界。"
+          }
+        ],
+        "unresolvedRegressions": []
+      }
+    },
+    {
+      "id": "read-06-r2",
+      "answers": {
+        "A": {
+          "correctness": {
+            "status": "not_assessable",
+            "reason": "没有交付痕迹与猜测的实质答案，因此不能把未作答算作正确。回答说成员仍运行，与给定末态completed不一致，但仅匿名材料不能还原通知到达顺序。"
+          },
+          "completeness": {
+            "status": "fail",
+            "reason": "没有列四处痕迹、各自引文出处，也没有解释尚未证实猜测的证据不足。"
+          },
+          "sourceSupport": {
+            "status": "not_assessable",
+            "reason": "只给任务安排与未来承诺，尚无可审读的证据汇总。"
+          },
+          "instructions": {
+            "status": "fail",
+            "reason": "虽给定元数据显示恰好一名analysis成员已完成，但作者要求等待完成后核对汇总，用户收到的答案没有履行。"
+          },
+          "outcome": {
+            "status": "fail",
+            "reason": "确证为最终交付不完整；runCompleted=true不能替代作者目标完成。"
+          },
+          "confirmedIssues": [
+            {
+              "id": "no_final_evidence_summary",
+              "dimension": "completeness",
+              "answerExcerpt": "成员完成后我会读取其完整制品……现在只是任务已派出，没有分析结果。",
+              "reason": "本次交付只有未来承诺，没有作者要求的四处痕迹及未证实猜测。",
+              "severity": "material",
+              "certainty": "confirmed"
+            },
+            {
+              "id": "requested_workflow_not_delivered",
+              "dimension": "instructions",
+              "answerExcerpt": "本轮先结束，等待完成通知。",
+              "reason": "明确指令是等待一名analysis完成后由主Agent核对汇总；给定成员最终completed而最终答案仍停留在等待，工作流交付失败。",
+              "severity": "material",
+              "certainty": "confirmed"
+            }
+          ],
+          "unresolvedRisks": [
+            {
+              "id": "status_message_vs_end_metadata",
+              "dimension": "correctness",
+              "answerExcerpt": "任务在运行中",
+              "reason": "匿名末态记录memberStatus=completed；需要trace确认是在收到完成通知后误报，还是记录顺序问题。本审读不读runs，不自行归因为harness或模型。",
+              "certainty": "needs_adjudication"
+            }
+          ]
+        },
+        "B": {
+          "correctness": {
+            "status": "pass",
+            "reason": "四处痕迹、绳未断、三片木屑无工具、半枚朝室内鞋印主人未知、蓝布未取出均保留；没有把货郎或停钟原因断言成事实。"
+          },
+          "completeness": {
+            "status": "pass",
+            "reason": "四项原文及章段齐全，另给未证实猜测与证据不足；给定元数据是一名analysis已完成。"
+          },
+          "sourceSupport": {
+            "status": "needs_adjudication",
+            "reason": "关键引文均可靠，但对“新鲜”的判断主体以及扩大后的故意破坏因果链有额外推演，应与原文直接陈述分开。"
+          },
+          "instructions": {
+            "status": "pass",
+            "reason": "仅一名analysis、主Agent已汇总；没有把新猜测写成事实或续写事件。"
+          },
+          "outcome": {
+            "status": "pass_with_observations",
+            "reason": "主任务完整可用；附加推演和不必要疑问记录为待裁定，不作为没有根据的确定性失败。"
+          },
+          "confirmedIssues": [],
+          "unresolvedRisks": [
+            {
+              "id": "expanded_hypothesis",
+              "dimension": "sourceSupport",
+              "answerExcerpt": "有人故意划开钟绳，并用一片蓝布卡住主齿轮，导致钟没有响；甚至进一步推测，动手的是卖蓝布的货郎。",
+              "reason": "原文明确的猜测是伙计仅凭蓝布怀疑货郎。回答把四处痕迹串成更具体的故意破坏因果链；它明确标为猜测并否认已证实，因此不是把猜测当事实，但是否超出“指出一个尚未证实猜测”的预期应裁定。",
+              "certainty": "needs_adjudication"
+            },
+            {
+              "id": "freshness_judgment_attribution",
+              "dimension": "sourceSupport",
+              "answerExcerpt": "「新鲜」是她的现场判断",
+              "reason": "原文叙述新鲜木屑并处于阮青观察场景，没有明确把该性质降为她的主观判断；这是额外归因，未改变四项关键事实。",
+              "certainty": "needs_adjudication"
+            },
+            {
+              "id": "unnecessary_record_count_doubt",
+              "dimension": "correctness",
+              "answerExcerpt": "至于能否把它当作确认总数，你可以自行判断",
+              "reason": "原文明确“四处”，回答也先确认四处且完整列出；末尾再次把总数判断交给作者不必要，但没有因此遗漏或改错数量。",
+              "certainty": "needs_adjudication"
+            }
+          ]
+        }
+      },
+      "relativeComparison": {
+        "confirmedRegressions": [
+          {
+            "direction": "A relative to B",
+            "dimensions": [
+              "completeness",
+              "instructions",
+              "outcome"
+            ],
+            "reason": "A未交付汇总，B实际交付四处证据并区分猜测。"
+          }
+        ],
+        "unresolvedRegressions": [
+          {
+            "direction": "B standalone additional-inference risk",
+            "dimensions": [
+              "sourceSupport"
+            ],
+            "reason": "B增加因果猜测和判断主体归因；A没有实质答案，不能借A缺答案来证明这些增加无风险。"
+          }
+        ]
+      }
+    }
+  ],
+  "gateNote": "至少存在read-03-r2与read-05-r2中的实质算术/时间推断错误，以及read-01-r2格式违例、read-06-r2未交付；映射后逐题判定候选是否退化，不能从主答案总分或成本得出接入许可。",
+  "newModelRequests": 0
+}

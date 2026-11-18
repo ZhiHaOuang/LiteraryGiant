@@ -1,0 +1,42 @@
+{
+  "date": "2026-11-10",
+  "codex": {
+    "repository": "https://github.com/openai/codex",
+    "commit": "6dfaca4dad030f5ecaf4925f210f539353b15594",
+    "selection": "main HEAD downloaded for read-only audit; not a claimed stable release",
+    "builtOrExecuted": false
+  },
+  "dsh": {
+    "version": "0.2.2-rc.1",
+    "vendorBaseline": "fcc0ad462172522aaf5c93a7b2e01f6b9f0b0159",
+    "selection": "current local source with earlier LG changes; hashes below identify reviewed bytes"
+  },
+  "files": {
+    "codex": {
+      "codex-rs/core/src/session/turn.rs": "27ddd2742f0f69f450cf77542bed7013f336e2e6e163bc4368298ee94e79a91a",
+      "codex-rs/core/src/session/mod.rs": "0f83bf2cd8436764afad5559f35bc9b293c3e4abdd211ca70d7e622c225397b5",
+      "codex-rs/core/src/tools/parallel.rs": "fd7f4c38755eb13449e2bd1116b6e4d6acd221eb760aea8c1840bcaa8728131b",
+      "codex-rs/core/src/tools/router.rs": "c178e5687c4a3b1e9fdd5f73076118cb9e17b3c61193fc001cc12b601ffe498a",
+      "codex-rs/core/src/tools/registry.rs": "47cf764b3489c7f613218ee33005f23ef56f0127c4078a3c232aa79d082df865",
+      "codex-rs/core/src/tools/handlers/multi_agents_spec.rs": "e24132911b9da01e84691dd8e3ae1179f8b9a53b6653adc703dee2250abc9d0b",
+      "codex-rs/core/src/tools/handlers/multi_agents_v2/wait.rs": "a38f1d9ada718c09fa9d821cfc017e456a8363297e6757a120ee69de66c5803a",
+      "codex-rs/core/src/context_manager/history.rs": "8dbe1572736fd5586b590925696f6e8fb814f9b7dcc636fecf3fba81699be898",
+      "codex-rs/core/src/client.rs": "544c428df0ebe2eb7e99bdaf507eb7873d6a8ec8e4e193885b3bfa37a200d03f",
+      "codex-rs/prompts/src/model_instructions.rs": "e53d3d2b7196b5520ebfa0d9a010b07c6e5925c1d0ef2619d4b1ad5498e2b78f"
+    },
+    "dsh": {
+      "dsh/packages/core/agent-loop/src/agent.ts": "ad9ee0778c0a93dec40363f88b53f442add9b033837b9ff049675a1ada3df61f",
+      "dsh/packages/core/agent-loop/src/runtime-context.ts": "7da577d2f50da7059e1fd830a393681c15b0810b6506c36b3f6e58cb3f73383c",
+      "dsh/packages/core/system-prompt/src/index.ts": "b144df20ea25b674ff40faf28d6beda05e184b7e98c64b2da37154af77520596",
+      "dsh/packages/core/tools/src/index.ts": "020c566150cf82dd49d368f5585043c73c191aaeba9103fd77a3efde6ee909dd",
+      "dsh/packages/core/tools/src/schema.ts": "140a8eab0fc1ea95b29d04f0535ad05ac1d491704cf4a72915728ed01cd867a0",
+      "dsh/packages/core/tools/src/json-schema.ts": "13deffdfd34539e23706b0fde235991da45b2f07c5c18dbbf3ca734c1da0c788",
+      "dsh/packages/core/tools/src/batch.ts": "5451e17f844cea8a56b8bf6dfadbf357d3081c4796d0b1046b761a82e4d8e355",
+      "dsh/packages/llm/llm/src/call-config.ts": "1b70454e4c6d579ebe2a24f76c25f22f90d4e9c7fb0c90f73afd731371962bd0",
+      "dsh/packages/guard/repeat-tool-reminder/src/index.ts": "1e917986fe9c5187d8f0fa11154ab2bf3b7c1d30db991540f4d1e62a2c59236d",
+      "dsh-plugins/lg-literary-team/index.js": "5afcfbd777d731c2a356f0fb65b4ea493013d46ab0becc49aa3e35754a9bb65f",
+      "dsh-plugins/dsh-ops/src/prompt-injection/index.ts": "abe4919283496e0bafeeb4e4c6d7b1ae780e29b2ae5ab4d1daad7186aa7aca54",
+      "dsh-plugins/dsh-ops/src/discovery/controller.ts": "fae70dab3b87014b579244f403571bd60cf703fe759b418bf20589fe6aa64e2d"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+{
+  "observedChanges": [
+    {
+      "path": "dsh-plugins/lg-agent-teams/index.js",
+      "baselineHash": "cb0f006d00b8fe11b147cb4981b6f719be09e024ffec0a426d0e022b89d4c803",
+      "currentHash": "770d9d08e26ec3574e6cfdeb3a81cfb30de47a5fce61bec73bafd456b5e81fa5"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/package.json",
+      "baselineHash": "9494444e333e54a700da177765e0f2ed10d8ab38eb73fcca36355abb85c71df1",
+      "currentHash": "74921bd2302f647000ecd045f28991f5188b6b5079925dc8a9357cf16cb7c775"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/tests/context.test.mjs",
+      "baselineHash": "aaf5609ddae3cdc606c9b58b1a08805c01ff0a4e7b26db822058ff79ab8f7df5",
+      "currentHash": "5eec185aa35fa6d664a0315ea45d3762a6d42dd5aa9aa8d80dcb198d3d871e0a"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/tests/host.test.mjs",
+      "baselineHash": "f10639d7fc1079b964199832f9e2e16191df0c146c31cd02e45fa22dbc3e5945",
+      "currentHash": "7c8e381b76e73880cc54d399eef8506980dc6ca879895d95b5509a3f25f5a547"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/tests/telemetry.test.mjs",
+      "baselineHash": "268bc592eb684194b7f83bfc1fd8892dbd8f58cfa0a882436c70f82ad6c406fc",
+      "currentHash": "7db1c6d9a731a4bada9d727fdf7c8d7321af152dd5afdcfee6667c9221396c8b"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/src/telemetry.js",
+      "baselineHash": "fd16de255f6ffadbf9693a952d4aca094cec1f4e063209df5da0cfbdcab72d83",
+      "currentHash": "48cc1cf3ee66f1a2af179de424a7e85d6c955c4178149fa524f4ffecca6631be"
+    },
+    {
+      "path": "dsh-plugins/lg-agent-teams/src/context.js",
+      "baselineHash": "2d4e0d6005d63c34ca1d0741329821ba6d664fadbf545c52f2011941856df66f",
+      "currentHash": "d67287aeb3e18f4e67d9fa1f1d4e31a7a930ca5b05a56c9caee00f66fe105fa0"
+    },
+    {
+      "path": "dsh-plugins/lg-books/index.js",
+      "baselineHash": "fb8c0cbecd0ab16f887dbdec651edacf984e3f345f9f1a1c6da36384c81f94a7",
+      "currentHash": "b663e9288257a4e139e1556353f7faf4d632b6b59c5e491ca74987d71df2cabb"
+    },
+    {
+      "path": "dsh-plugins/lg-books/tests/plugin.test.mjs",
+      "baselineHash": "30a48a7e65cbe86817d1b525a4fdacb3d03f025f20d2504d5a839b6918cb03b7",
+      "currentHash": "33451e1dd65cd9387ca8e6b0b1fdbdb6938132128ff9e8c3694cd0922afe9bfa"
+    },
+    {
+      "path": "dsh-plugins/lg-books/src/story-data/store.js",
+      "baselineHash": "7ce1b3d0a95ff030adc5db8a9a82940487884a9f4639f60706a8e1466e3c4808",
+      "currentHash": "f60273481763a9c7bebb3b4427a7b8fc482f83707a1db84ecb0216d621ea58e2"
+    },
+    {
+      "path": "dsh-plugins/lg-books/src/story-data/catalog.json",
+      "baselineHash": "080a322ae18745ff578304dbf5f2a1e89b943943c6fcfd5b68bda14feed03d0c",
+      "currentHash": "df88b3577b2aa37c1f82be6d84ebf0cdc40ecf35cae8ba945293ff2f8a18ea14"
+    },
+    {
+      "path": "dsh-plugins/lg-books/src/story-data/validate.js",
+      "baselineHash": "b8584e2b516190b402d0047687923fdf21c8489b0b1a2630abcb50087dbab0e6",
+      "currentHash": "94d05b4d1879ef01b38da1cc2876763e674299044785bbf9dd28e85ffd951330"
+    },
+    {
+      "path": "dsh-plugins/lg-books/src/story-data/contract.json",
+      "baselineHash": "b003112fabe26a57de8a48c09ca11caa2001aee74617c8a5a613b8910b09ba9f",
+      "currentHash": "cabd9bc49bc197e1bdfcc8ce3d425da68867c4e118cefd41e6f58370423d34a5"
+    }
+  ],
+  "taskWroteProductionFiles": false,
+  "frozenExperimentUnaffected": true,
+  "integrationRequiresFreshCompatibilityReview": true
+}

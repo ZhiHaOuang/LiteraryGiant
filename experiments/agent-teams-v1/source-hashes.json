@@ -1,0 +1,17 @@
+{
+  "dsh-plugins/lg-agent-teams/prompts/analysis.md": "159aa47dd7c8d18880a4d0906fc94c15af69c913335403aec96f4176b5ca56e8",
+  "dsh-plugins/lg-agent-teams/prompts/coordinator.md": "63260360d37efc3ff2190fa221c176f73af9c1114d6ad728831f6d2de16aed97",
+  "dsh-plugins/lg-agent-teams/prompts/planning.md": "0996f4e344f36b0dc2f8a01e2f7cb662099b74992acf7e1155e573a4520a603f",
+  "dsh-plugins/lg-agent-teams/prompts/writing.md": "2c77a78297b1afe5a0ee726327b5ef36b57c94b04bb445c1adb954f01617dbe2",
+  "dsh-plugins/lg-agent-teams/methods/analysis.md": "ea7df8947c4f5e0ce41e43c0ed4bd675b7957aa6bb0c3ede7fcf5bdb791bea61",
+  "dsh-plugins/lg-agent-teams/methods/planning.md": "bbec69cfb08411e5a4df29e4bb7be7125c157dd4afa7e6227b49b9cadc689e26",
+  "dsh-plugins/lg-agent-teams/methods/writing.md": "0aa2ca35f36757aeffdc0b76e29e42d929a8dd78e7ad13450e6dfddc97e24a64",
+  "dsh-plugins/lg-agent-teams/src/context.js": "2d4e0d6005d63c34ca1d0741329821ba6d664fadbf545c52f2011941856df66f",
+  "dsh-plugins/lg-agent-teams/src/contracts.js": "25f570730f896e8c0176262f06ad3bd7dbdc84792c9a3653ee8c5af9ae82e4f0",
+  "dsh-plugins/lg-agent-teams/src/roles.js": "d2dfe09ccd40f61dff01d4c62b024354c15eec5264841d2ed88a7bf25070f26a",
+  "dsh-plugins/lg-agent-teams/src/store.js": "0bebab41d0174f383351a684699018c5768044bdd7a0b5324189feb7cf87df71",
+  "dsh-plugins/lg-agent-teams/index.js": "fece8a8e5d17bb6ae8f34bb3602d4e679d7233d44a67e3c1cb569381f7869c2d",
+  "dsh-plugins/lg-dashboard/src/team-panel.jsx": "4c3e647a10abc375ca35a4aefd2188fa47ccd8014516a3cda4ff2e00dd575bc6",
+  "dsh-plugins/dsh-better-sidebar/src/context-types.ts": "abf787bd128626a5b2048075eed93ace19b912d74c7a0613fd2de64b6b087cab",
+  "dsh-plugins/dsh-better-sidebar/src/client/team-projection.ts": "4edba7f0383c74469786b86c0734e380fa97c50c8149679228aa0473e34832ee"
+}

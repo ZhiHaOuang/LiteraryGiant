@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-10",
+  "isolatedTests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "projectTests": {
+    "passed": 7,
+    "failed": 0,
+    "skipped": 0
+  },
+  "projectCli": {
+    "exitCode": 0,
+    "timedOut": false,
+    "scriptedRequests": 14,
+    "providerRequests": 0,
+    "reportedToCaptain": true,
+    "canonicalWrites": 0,
+    "localEvidence": "~/.local/share/python-envs/LitIsLand/audits/literary-team-v2/preflight-smoke-eywgrnye"
+  },
+  "realModelRequests": 0,
+  "codexBuilt": false,
+  "dshCoreChanged": false,
+  "desktopProfileChanged": false,
+  "qualityImprovementProven": false,
+  "initialFixtureFailure": "Two host tests used an unavailable private agent.done property; corrected to the public agent/status idle event; no host patch."
+}

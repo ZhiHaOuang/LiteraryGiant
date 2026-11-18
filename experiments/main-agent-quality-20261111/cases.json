@@ -1,0 +1,636 @@
+{
+  "schema": "lg.agent-read-eval.v1",
+  "synthetic": true,
+  "language": "zh-CN",
+  "tasks": [
+    {
+      "id": "read-01",
+      "title": "唯一钥匙的保管者",
+      "prompt": "只根据第 1—2 章回答：东堤粮仓唯一的铜钥匙现在由谁保管？给出姓名，并只引用一处能够直接证明的原文，注明章号和段落号。不要续写，也不要修改正文。",
+      "brief": "只根据第 1—2 章回答：东堤粮仓唯一的铜钥匙现在由谁保管？给出姓名，并只引用一处能够直接证明的原文，注明章号和段落号。不要续写，也不要修改正文。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "夜班交接",
+          "content": "入夜后，东堤粮仓停了最后一辆运粮车。阿苇和梁叔核过封条，谁也没有进仓。\n梁叔把北门的木钥匙挂回门柱。阿苇提醒他，北门只是院门，粮仓另有一把铜钥匙。\n两人在檐下等交班的人。风把登记纸吹翻了一角，梁叔用石头压住。"
+        },
+        {
+          "number": 2,
+          "title": "上锁以后",
+          "content": "巡更人到时，粮仓的门已经锁好。梁叔去河边修手推车。\n阿苇把东堤粮仓唯一的铜钥匙收进自己贴身的蓝布袋，说今晚由她保管。\n巡更人记下交班时刻，提灯沿堤走远。蓝布袋仍系在阿苇腰间。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的附页",
+          "content": "本章尚未获准阅读。封存代号是「雾橙七四九」。\n后来发生的交接不属于前两章的事实范围。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "keeper",
+            "claim": "现在由阿苇保管东堤粮仓唯一铜钥匙。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "阿苇把东堤粮仓唯一的铜钥匙收进自己贴身的蓝布袋，说今晚由她保管。"
+              }
+            ]
+          },
+          {
+            "id": "one_quote",
+            "claim": "只提供一处逐字原文并正确标明第2章第2段。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "阿苇把东堤粮仓唯一的铜钥匙收进自己贴身的蓝布袋，说今晚由她保管。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "wrong_key",
+            "claim": "把北门木钥匙与粮仓铜钥匙混淆，或说梁叔保管铜钥匙。"
+          },
+          {
+            "id": "unseen_transfer",
+            "claim": "用第3章或预设的后来交接改变当前答案。"
+          }
+        ],
+        "hidden_sentinels": [
+          "雾橙七四九"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true
+      }
+    },
+    {
+      "id": "read-02",
+      "title": "两次来历自述",
+      "prompt": "只读第 1—2 章，整理何栖两次关于自己来历的自述。请按发生顺序列两项，每项给出一处原话及章号、段落号；最后说明现有文字是否足够判断哪次属实。不要替人物解释，也不要修改正文。",
+      "brief": "只读第 1—2 章，整理何栖两次关于自己来历的自述。请按发生顺序列两项，每项给出一处原话及章号、段落号；最后说明现有文字是否足够判断哪次属实。不要替人物解释，也不要修改正文。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "灯会前夜",
+          "content": "冬灯会前夜，何栖随商队进城，在驿馆借了一盏小灯。\n掌柜问他从何处来。何栖说：“我在南岸的石湾长大，十五岁才离开那里。”\n掌柜只记了房号，没有再问；在场的人也没有替何栖证明来历。"
+        },
+        {
+          "number": 2,
+          "title": "第二天的渡口",
+          "content": "第二天，何栖在渡口等待送信的船。摆渡人说，他的口音不像南岸人。\n何栖回答：“我从小住在北岸柳坡，成年以前从没到过石湾。”\n叙述在这里没有说明何栖两次说法为何不同，也没有确认任何一次说法。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的信封",
+          "content": "本章尚未获准阅读。信封火漆上的封存代号是「银鹭二八六」。\n这里的后来材料不能用于判断前两章中的自述。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "first_account",
+            "claim": "先保留南岸石湾长大、十五岁离开的自述，不把它改成旁人传闻。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "我在南岸的石湾长大，十五岁才离开那里。"
+              }
+            ]
+          },
+          {
+            "id": "second_account",
+            "claim": "再保留北岸柳坡长大、成年以前没到过石湾的自述。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "我从小住在北岸柳坡，成年以前从没到过石湾。"
+              }
+            ]
+          },
+          {
+            "id": "unresolved",
+            "claim": "指出两次自述不同，现有文字不足以裁定真伪或解释原因。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 3,
+                "quote": "叙述在这里没有说明何栖两次说法为何不同，也没有确认任何一次说法。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "drop_older",
+            "claim": "仅给出最新自述，遗漏第一次自述。"
+          },
+          {
+            "id": "settle_truth",
+            "claim": "自行认定某次是真实身世、另一回是撒谎或伪装。"
+          },
+          {
+            "id": "extra_quotes",
+            "claim": "没有按两项分别提供原话与来源，或引文来源错位。"
+          }
+        ],
+        "hidden_sentinels": [
+          "银鹭二八六"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true
+      }
+    },
+    {
+      "id": "read-03",
+      "title": "热食兑换的档位与条件",
+      "prompt": "请只根据第 1—2 章，列出雨棚食铺当前所有能换到热食的雨票档位和附加条件；再列出莫禾现有 12 张雨票、带了空碗但没有夜班章时的可行兑换方式，写明份数与剩余票数，不计不兑换的情况。每个档位给出原文及出处；不要把人物的建议当成已经生效的规则，不修改正文。",
+      "brief": "请只根据第 1—2 章，列出雨棚食铺当前所有能换到热食的雨票档位和附加条件；再列出莫禾现有 12 张雨票、带了空碗但没有夜班章时的可行兑换方式，写明份数与剩余票数，不计不兑换的情况。每个档位给出原文及出处；不要把人物的建议当成已经生效的规则，不修改正文。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "柜台木牌",
+          "content": "雨棚食铺的柜台挂着当天有效的木牌，雨票交回后作废。\n木牌第一行写着：“6 张雨票，凭自带空碗换一碗热粥。”\n第二行写着：“12 张雨票，另凭当日夜班章换一份蒸饭；没有夜班章不能换蒸饭。”\n第三行写着：“18 张雨票换一份热汤饼，不另查验凭证，也不要求自带碗。”"
+        },
+        {
+          "number": 2,
+          "title": "轮到莫禾",
+          "content": "莫禾数了两遍，袋中共有 12 张雨票。他带来了一只空碗，却没有当日夜班章。\n柜台伙计说：“一人可兑换多份，只要每份分别满足木牌条件；同一只碗吃完可以再装，兑过的票不能再用。”\n有人提议以后取消蒸饭的夜班章条件，掌柜答应再商量，并没有改动木牌。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的新木牌",
+          "content": "本章尚未获准阅读。柜台封存代号是「墨舟五一三」。\n后来的兑换规则不得倒用于前两章。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "porridge",
+            "claim": "6票且自带空碗，可兑一碗热粥。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "6 张雨票，凭自带空碗换一碗热粥。"
+              }
+            ]
+          },
+          {
+            "id": "rice",
+            "claim": "12票加当日夜班章才能兑一份蒸饭。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 3,
+                "quote": "12 张雨票，另凭当日夜班章换一份蒸饭；没有夜班章不能换蒸饭。"
+              }
+            ]
+          },
+          {
+            "id": "noodles",
+            "claim": "18票可兑热汤饼，无其他凭证或自带碗条件。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 4,
+                "quote": "18 张雨票换一份热汤饼，不另查验凭证，也不要求自带碗。"
+              }
+            ]
+          },
+          {
+            "id": "current_choice",
+            "claim": "莫禾可用6票兑一碗热粥留6票，或按多份规则用12票兑两碗热粥；不能兑蒸饭或热汤饼。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 1,
+                "quote": "莫禾数了两遍，袋中共有 12 张雨票。他带来了一只空碗，却没有当日夜班章。"
+              },
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "一人可兑换多份，只要每份分别满足木牌条件；同一只碗吃完可以再装，兑过的票不能再用。"
+              }
+            ]
+          },
+          {
+            "id": "proposal_not_rule",
+            "claim": "取消夜班章只是待商量建议，当前要求仍生效。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 3,
+                "quote": "有人提议以后取消蒸饭的夜班章条件，掌柜答应再商量，并没有改动木牌。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "omit_tier",
+            "claim": "遗漏任何一种当前热食档位或它的附加条件。"
+          },
+          {
+            "id": "adopt_proposal",
+            "claim": "说12票已可无夜班章换蒸饭。"
+          },
+          {
+            "id": "incorrect_affordance",
+            "claim": "说莫禾什么也换不了、只能等凑到18票，或可兑汤饼。"
+          },
+          {
+            "id": "reuse_tickets",
+            "claim": "把同一12票同时算作多种已兑换食品而超过票额。"
+          }
+        ],
+        "hidden_sentinels": [
+          "墨舟五一三"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true
+      }
+    },
+    {
+      "id": "read-04",
+      "title": "人物所信与客观位置",
+      "prompt": "只根据第 1—2 章，分别说明第 2 章结束时：（1）银钥匙实际在哪里；（2）闻笙相信它在哪里，以及她是否知道钥匙被移动。每项给出支持它的原文和出处；区分事实、人物相信的事和未知信息，不补写剧情。",
+      "brief": "只根据第 1—2 章，分别说明第 2 章结束时：（1）银钥匙实际在哪里；（2）闻笙相信它在哪里，以及她是否知道钥匙被移动。每项给出支持它的原文和出处；区分事实、人物相信的事和未知信息，不补写剧情。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "窗边的小盒",
+          "content": "闻笙把银钥匙放进窗边的木盒，合上盖子，随后离开房间去取药。\n她出门后，阿照打开木盒，把银钥匙移到壁柜最下层的夹板里。他没有留下纸条。\n叙述没有写明阿照移动钥匙的目的。"
+        },
+        {
+          "number": 2,
+          "title": "回程路上",
+          "content": "闻笙在回程路上遇见阿照，只问了药铺是否关门，没谈钥匙。\n闻笙心想：“钥匙还在窗边的木盒里，回去就能取到。”\n直到本章结束，闻笙还没有回到房间，也没有收到钥匙被移动的消息。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的重逢",
+          "content": "本章尚未获准阅读。夹板上的封存代号是「青槐九二七」。\n后续人物获知的信息不属于本题范围。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "world_location",
+            "claim": "实际位于壁柜最下层夹板里；不能把闻笙的相信当成实际位置。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "她出门后，阿照打开木盒，把银钥匙移到壁柜最下层的夹板里。他没有留下纸条。"
+              }
+            ]
+          },
+          {
+            "id": "belief",
+            "claim": "闻笙仍相信钥匙在窗边木盒里。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "钥匙还在窗边的木盒里，回去就能取到。"
+              }
+            ]
+          },
+          {
+            "id": "knowledge_boundary",
+            "claim": "截止第2章未获知被移动，也不能推断已经发现。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 3,
+                "quote": "直到本章结束，闻笙还没有回到房间，也没有收到钥匙被移动的消息。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "omniscient_character",
+            "claim": "因为叙述提到了移动就让闻笙知道实际位置。"
+          },
+          {
+            "id": "invent_motive",
+            "claim": "断言阿照在偷窃、保护闻笙或其他未说明目的。"
+          },
+          {
+            "id": "assert_search",
+            "claim": "编造闻笙已经回房搜索或收到通知。"
+          }
+        ],
+        "hidden_sentinels": [
+          "青槐九二七"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true
+      }
+    },
+    {
+      "id": "read-05",
+      "title": "不能精确计算的间隔",
+      "prompt": "只准读取第 1—2 章，回答陆循先去了雁关还是澄城，并判断这两次到访是否相隔恰好一年。请给出原文依据；如果不能确定，明确缺少什么时间信息，不自行补日期，也不要为了补齐日期去读取第 3 章或之后的内容，不修改正文。",
+      "brief": "只准读取第 1—2 章，回答陆循先去了雁关还是澄城，并判断这两次到访是否相隔恰好一年。请给出原文依据；如果不能确定，明确缺少什么时间信息，不自行补日期，也不要为了补齐日期去读取第 3 章或之后的内容，不修改正文。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "旧行囊",
+          "content": "陆循在行囊中找到一张雁关的渡口票，票角破了，只能辨认出年份。\n他记得自己在 2025 年到过雁关，但已经想不起是哪个月、哪一天。\n票背没有其他日期，陆循也没有留下那次行程的日记。"
+        },
+        {
+          "number": 2,
+          "title": "澄城雨季",
+          "content": "2026 年 6 月，陆循到澄城住了几天。叙述没有记下抵达的具体日子。\n他确认雁关之行在澄城之行之前，却不肯把想不起的日期写进行程表。\n行程表把两次到访之间的天数空着。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的票根",
+          "content": "本章尚未获准阅读。票根封存代号是「赤帆三六八」。\n本题不能读取后来发现的完整日期。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "ordering",
+            "claim": "先雁关（2025年），后澄城（2026年6月）。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "他记得自己在 2025 年到过雁关，但已经想不起是哪个月、哪一天。"
+              },
+              {
+                "chapter": 2,
+                "paragraph": 1,
+                "quote": "2026 年 6 月，陆循到澄城住了几天。叙述没有记下抵达的具体日子。"
+              }
+            ]
+          },
+          {
+            "id": "uncertain_gap",
+            "claim": "无法判断是否恰好一年；不能把跨年份当成恰好一年。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "他记得自己在 2025 年到过雁关，但已经想不起是哪个月、哪一天。"
+              },
+              {
+                "chapter": 2,
+                "paragraph": 1,
+                "quote": "2026 年 6 月，陆循到澄城住了几天。叙述没有记下抵达的具体日子。"
+              }
+            ]
+          },
+          {
+            "id": "missing_dates",
+            "claim": "具体缺少雁关到访的月日，以及澄城到访的具体日子。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "他记得自己在 2025 年到过雁关，但已经想不起是哪个月、哪一天。"
+              },
+              {
+                "chapter": 2,
+                "paragraph": 1,
+                "quote": "2026 年 6 月，陆循到澄城住了几天。叙述没有记下抵达的具体日子。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "invent_gap",
+            "claim": "认定恰好一年、不到一年、一年以内或给出未经依据的精确月数/天数。"
+          },
+          {
+            "id": "invert_order",
+            "claim": "说先澄城后雁关。"
+          },
+          {
+            "id": "invent_date",
+            "claim": "为雁关补出月份/日期，或为澄城补出日期。"
+          }
+        ],
+        "hidden_sentinels": [
+          "赤帆三六八"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true
+      }
+    },
+    {
+      "id": "read-06",
+      "title": "钟楼留下的线索",
+      "prompt": "请委派且只委派一名 analysis 分析成员，限其读取第 1—2 章；待它完成后，由你核对并汇总：列全巡夜人实际观察到、与钟楼停钟有关的四处痕迹，每处引用一段原文并注明章号和段落号；再单独指出一个尚未证实的猜测及其依据不足之处。不要把猜测写成事实，不续写或修改正文。",
+      "brief": "请委派且只委派一名 analysis 分析成员，限其读取第 1—2 章；待它完成后，由你核对并汇总：列全巡夜人实际观察到、与钟楼停钟有关的四处痕迹，每处引用一段原文并注明章号和段落号；再单独指出一个尚未证实的猜测及其依据不足之处。不要把猜测写成事实，不续写或修改正文。",
+      "selected_chapters": [
+        1,
+        2
+      ],
+      "through_chapter": 2,
+      "chapters": [
+        {
+          "number": 1,
+          "title": "无声的钟楼",
+          "content": "半夜应响的钟没有响。巡夜人阮青沿石阶走进钟楼。\n她看到钟绳末端有一圈整齐的浅切口，但绳子还没有断开。\n钟锤下方的地板上落着三片新鲜木屑，旁边没有工具。\n二层窗台积灰上有半枚鞋印，鞋印朝向室内；阮青不能辨认鞋的主人。"
+        },
+        {
+          "number": 2,
+          "title": "回看齿轮",
+          "content": "阮青提灯回到齿轮旁，发现主齿轮卡着一小片蓝布；她没有把布取出来。\n值夜伙计猜测，是卖蓝布的货郎动了手脚。他的依据只是看见蓝布，没有看见货郎进入钟楼。\n阮青把四处痕迹分别记下，没有认定停钟原因，也没有认定动手的人。"
+        },
+        {
+          "number": 3,
+          "title": "未开放的修钟簿",
+          "content": "本章尚未获准阅读。修钟簿封存代号是「白汐八五四」。\n后来调查所得结论不属于前两章。"
+        }
+      ],
+      "expected": {
+        "required": [
+          {
+            "id": "rope",
+            "claim": "钟绳末端浅切口，绳子尚未断；不写成绳子已经被割断。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 2,
+                "quote": "她看到钟绳末端有一圈整齐的浅切口，但绳子还没有断开。"
+              }
+            ]
+          },
+          {
+            "id": "chips",
+            "claim": "钟锤下地板有三片新鲜木屑，旁边没有工具。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 3,
+                "quote": "钟锤下方的地板上落着三片新鲜木屑，旁边没有工具。"
+              }
+            ]
+          },
+          {
+            "id": "footprint",
+            "claim": "二层窗台灰中半枚鞋印朝室内，主人不明。",
+            "evidence": [
+              {
+                "chapter": 1,
+                "paragraph": 4,
+                "quote": "二层窗台积灰上有半枚鞋印，鞋印朝向室内；阮青不能辨认鞋的主人。"
+              }
+            ]
+          },
+          {
+            "id": "cloth",
+            "claim": "主齿轮卡一小片蓝布，未取出。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 1,
+                "quote": "阮青提灯回到齿轮旁，发现主齿轮卡着一小片蓝布；她没有把布取出来。"
+              }
+            ]
+          },
+          {
+            "id": "unconfirmed_suspect",
+            "claim": "伙计猜货郎动手，仅凭蓝布、未看到货郎入楼，不能认定嫌疑人或原因。",
+            "evidence": [
+              {
+                "chapter": 2,
+                "paragraph": 2,
+                "quote": "值夜伙计猜测，是卖蓝布的货郎动了手脚。他的依据只是看见蓝布，没有看见货郎进入钟楼。"
+              },
+              {
+                "chapter": 2,
+                "paragraph": 3,
+                "quote": "阮青把四处痕迹分别记下，没有认定停钟原因，也没有认定动手的人。"
+              }
+            ]
+          }
+        ],
+        "forbidden": [
+          {
+            "id": "incomplete_list",
+            "claim": "四处实际痕迹漏列、合并后漏事实，或用猜测替代其中一项。"
+          },
+          {
+            "id": "suspect_as_fact",
+            "claim": "认定货郎进入钟楼或动手、认定鞋印属于货郎。"
+          },
+          {
+            "id": "certain_cause",
+            "claim": "把蓝布卡齿轮、切口或木屑直接断言为已确认的停钟原因。"
+          }
+        ],
+        "hidden_sentinels": [
+          "白汐八五四"
+        ],
+        "review_dimensions": [
+          "correctness",
+          "completeness",
+          "source_grounding",
+          "scope_control",
+          "completion"
+        ],
+        "preserve_manuscript": true,
+        "no_canonical_commit": true,
+        "workflow": {
+          "delegation_required": true,
+          "allowed_roles": [
+            "analysis"
+          ],
+          "exact_member_count": 1,
+          "parent_summary_after_member_completion": true,
+          "notes": "This is an explicit author instruction and a regression control. A correct direct answer with no member, multiple members, or another role fails workflow reliability."
+        }
+      }
+    }
+  ],
+  "review_protocol": {
+    "primary_rule": "Each pair is reviewed on every required item and every prohibited claim before any efficiency comparison. An aggregate tie cannot cancel a per-question regression.",
+    "item_grades": [
+      "supported_complete",
+      "partial_or_omitted",
+      "unsupported_or_wrong",
+      "not_applicable"
+    ],
+    "source_review": "Verify each quote against the numbered nonempty source paragraph, source attribution, temporal scope, and claim entailment; literal keyword overlap is not sufficient.",
+    "completeness_review": "Check all required facts and caveats. Additional text does not compensate for a missing condition, alternative statement, uncertainty, or requested source.",
+    "reliability_review": "Record final-answer presence, termination reason, tool errors and recovery, repeated calls, unauthorized source attempts, source invalidation, and byte-identical manuscript checks independently of answer scores.",
+    "pair_gate": "Any confirmed candidate regression in correctness, completeness, grounding, scope, or reliability blocks integration. Unresolved interpretations remain review-needed; do not silently pass them.",
+    "efficiency_gate": "Only pairs satisfying quality gates enter claims about cost/latency improvement. Report every pair and aggregate; never drop failures, repeat-select winners, or hide per-pair cost increases.",
+    "role_of_automation": "Automatic matching may flag missing required fragments and sentinel leakage for human review; it cannot certify semantic correctness, quality, or successful instruction following.",
+    "data_separation": "Model workspace receives chapter text and author prompt only. Expected criteria, hidden sentinels list, scoring code, and unpublished chapter 3 are outside model-readable context; loader must not expose chapter 3 in the frozen source."
+  }
+}

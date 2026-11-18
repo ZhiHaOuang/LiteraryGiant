@@ -1,0 +1,14 @@
+{
+  "read-01-r1-A": "candidate",
+  "read-01-r1-B": "baseline",
+  "read-02-r1-A": "baseline",
+  "read-02-r1-B": "candidate",
+  "read-03-r1-A": "baseline",
+  "read-03-r1-B": "candidate",
+  "read-04-r1-A": "baseline",
+  "read-04-r1-B": "candidate",
+  "read-05-r1-A": "baseline",
+  "read-05-r1-B": "candidate",
+  "read-06-r1-A": "baseline",
+  "read-06-r1-B": "candidate"
+}

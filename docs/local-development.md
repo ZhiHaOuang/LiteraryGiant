@@ -1,5 +1,9 @@
 # Mac 开发与 Linux 服务器运行
 
+## 新 DSH 开发入口（2026-11-07）
+
+当前优先方向为 `dsh/` 框架与 `dsh-plugins/` 插件，逐步承接原产品功能。它们作为源码快照纳入父仓库，不是外部目录链接或新增子模块。Node >=24.9、固定 pnpm 的准备与构建命令见 [DSH 源码与本机开发入口](dsh-local-app.md)。下方 Python、Extension 和旧 Runtime 的步骤继续用于原产品与迁移对照，不表示已接入新 DSH。
+
 ## 取得完整源码
 
 ```bash
@@ -38,6 +42,33 @@ python -m pip install -r requirements.txt
 服务器还保留了另一套基础环境 `/opt/conda`：Python 3.10.14、torch 2.8.0+cu128、transformers 4.56.2、vLLM 0.10.2、accelerate 1.10.1、sentencepiece 0.2.1、safetensors 0.6.2。以上只是已安装包的元数据快照，本次没有改动这套推理环境。2026-10-18 的 `nvidia-smi` 返回 `No devices were found`，因此当前实例没有可见 GPU，不能把包已安装当作 GPU 任务可运行的证明。完整的名称/版本清单随私有迁移包保存。
 
 ## 配置与产品 Runtime
+
+### Apple Silicon 本地正文清洗（2026-11-10 实测）
+
+M3 Ultra / 96 GB 已使用作者提供的 `models/weights/Qwen_14B` 原始 BF16 权重完成单书全文清洗。配置为 `Qwen2ForCausalLM`，不根据目录名推定 Hugging Face 仓库。每次运行在 `identity.json` 固定全部权重、分词器、规则和源 TXT 的 SHA-256。
+
+本机后端为 vLLM Metal 0.33.0、vLLM 0.33.0+cpu、MLX 0.32.4、Torch 2.14.0；引擎实际使用 MLX GPU 与 MPS，`+cpu` 是 vLLM 安装包标识，不表示本次推理使用 CPU。依赖快照在 `requirements/local-clean-metal.lock.txt`，仅用于 macOS ARM64 / Python 3.12 独立环境，不加入基础或 DSH 依赖。未应用上游可选的 nightly Torch 性能补丁。
+
+```bash
+# 在独立 LitIsLand 推理环境安装；不要覆盖 DSH 或基础 Python 环境。
+python -m pip install -r requirements/local-clean-metal.lock.txt
+
+# 指定独立环境的 vllm 可执行文件和已有权重目录。
+sh scripts/run_local_clean_metal.sh /absolute/inference/bin/vllm /absolute/Qwen_14B
+
+# 另一个终端，在仓库根目录运行；只允许 localhost 模型服务。
+python -m scripts.clean_local_book \
+  --source /absolute/book.txt \
+  --model-dir /absolute/Qwen_14B \
+  --output /absolute/new-run \
+  --prefix 100
+```
+
+启动器仅监听 `127.0.0.1:18080`，关闭使用统计，使用 8K 上下文、最多 4 个序列、0.55 内存比例，并指定 `GLOO_SOCKET_IFNAME=lo0` 避免本机名称解析等待。完成后用 Ctrl-C 停止前台服务释放内存。
+
+清洗产物是待复核副本，原 TXT 不写入。输出包含全文、章节 JSON 集合、前缀导入包、标准化/规则/模型差异和逐批响应；异常响应停止发布。相同目录可续跑；规则修复后使用新目录及 `--replay-from /absolute/previous-run`，校验来源、权重和每份请求后离线复用响应。编号异常、源文件缺章和正文夹杂广告仍需复核，不把模型判断当作事实认证。
+
+`scripts/import_clean_prefix.mjs` 专用于本次前 100 章实验：通过 LG 原生接口创建草稿书，标记空章，验证统计和章节文件同步。调用方式为 `node scripts/import_clean_prefix.mjs /absolute/dsh-plugins /absolute/run/prefix.json /absolute/new-book`。只接受新的或本脚本已登记的同一导入目录；不覆盖已有正文。导入本身不调用模型。书架中添加该新书目录后即可查看；本次已验证应用退出、重启后书架与正文仍可读取。
 
 新 clone 后可执行：
 

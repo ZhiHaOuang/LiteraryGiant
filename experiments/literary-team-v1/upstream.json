@@ -1,0 +1,12 @@
+{
+  "agentTeams": {
+    "repository": "https://github.com/NanmiCoder/dsh-agent-teams",
+    "commit": "369c2785c473e546124ab1709664058e6ea93948",
+    "version": "0.1.29"
+  },
+  "hostVersion": "0.2.2-rc.1",
+  "support": "single analysis member only; targeted drain/reassignment/archive unverified",
+  "modelRequestLimit": 20,
+  "modelRequestsUsed": 19,
+  "realTeamAcceptance": "failed; corrected schema only verified with 2 real read-check requests"
+}

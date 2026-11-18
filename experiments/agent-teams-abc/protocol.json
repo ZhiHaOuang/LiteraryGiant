@@ -1,0 +1,81 @@
+{
+  "id": "lg-agent-abc-20261111",
+  "status": "offline_ready_awaiting_new_call_authorization",
+  "question": "在同一来源、模型和预算上限下，分阶段 B 相对直接 A、独立成员 C 相对单会话 B 的短场景可用性是否改善？",
+  "arms": {
+    "A": "同一写作者直接初稿，再统一修订一次",
+    "B": "同一原生 Agent 会话依次分析、规划、创作，再统一修订一次",
+    "C": "三个原生 spawn 成员分别分析、规划、创作，通过已验证结构化制品交接；写作者再统一修订一次"
+  },
+  "execution": "固定宿主调度，复用 DSH AgentLoop/startActivation 与冻结的 LG Prompt/校验器；不测试主 Agent 自由路由，不据此声称日常插件总成本更优。",
+  "cases": {
+    "calibration": [
+      "cal-1",
+      "cal-2"
+    ],
+    "holdout": [
+      "new-1",
+      "new-2"
+    ],
+    "runsPerArmPerCase": 1,
+    "totalOutputs": 12
+  },
+  "order": [
+    "cal-1-B",
+    "cal-1-A",
+    "cal-1-C",
+    "cal-2-C",
+    "cal-2-B",
+    "cal-2-A",
+    "new-1-A",
+    "new-1-C",
+    "new-1-B",
+    "new-2-B",
+    "new-2-C",
+    "new-2-A"
+  ],
+  "provider": "deepseek-account",
+  "model": "deepseek-flash",
+  "reasoning": "off",
+  "sampling": "沿用固定供应商默认，不假设支持 seed；单次样本不衡量随机方差",
+  "limits": {
+    "totalRequests": 96,
+    "cellRequests": 8,
+    "cellTokens": 120000,
+    "maxOutputPerRequest": 2400,
+    "httpRetries": 0,
+    "paidJudgeCalls": 0
+  },
+  "tokenAccounting": "每次发送前用完整模型输入的 UTF-8 字节数＋协议余量＋输出上限保守预留；有供应商用量后按 input+cacheRead+cacheWrite+output 结算，未知用量保留预留。若实际量超过预留则标记预算假设失效，不继续该组。相同上限不代表实际Token相等。",
+  "calibrationGate": "6份校准结果完成后只检查分组、来源、工具、计量和评阅口径，不按文本偏好调整 Prompt。驱动若有缺陷，停止并报告，不拿旧组与修复组混比；新题冻结且未调用之前不改要求。",
+  "review": {
+    "mechanical": [
+      "完整交付/失败（所有尝试保留）",
+      "初稿与修订稿分别统计纯正文Han",
+      "schema/证据退回次数",
+      "实际Token、未知用量、墙钟耗时"
+    ],
+    "semantic": "按每题预先写定的5项约束逐条审读，区分严重违例、轻微问题和满足；程序引文匹配不是语义正确性。",
+    "quality": {
+      "角色选择与动机": "0不成立/1可用但需修/2可信且具体",
+      "场景推进": "0无推进/1有变化但弱/2明确行动和阻力带来变化",
+      "语言与对白": "0影响理解/1可读但有明显赘述/2清楚且有角色区分"
+    },
+    "adoption": "0不可用，1需大改，2少改可用，3可直接采用",
+    "reviewer": "本助手匿名顺序审读可出初报，但参与实现，不能算独立作者盲评；另交匿名原稿与作者评分表，不使用付费模型裁判。"
+  },
+  "decisionRule": "仅在两道新题C均没有新增严重违例、两题采用程度均高于B、质量三项合计平均至少高1分/6，且平均Token不超过B的1.5倍时，记为值得扩大验证的优势信号。其余记为无明确优势/成本收益待定，定位分析遗漏、规划失真或交接损失，再讨论优化，不默认让集群成为标准。此门槛是本轮产品筛查约定，不是统计显著性。",
+  "limitations": [
+    "每格仅一次，不支持稳定胜率/因果普遍化",
+    "原小说可能存在模型预训练记忆，提示截止范围不能消除",
+    "实验来源仅指定章节，不能代表长篇检索",
+    "固定调度的角色拓扑比较，不是当前产品自由协调端到端A/B"
+  ],
+  "revision": "v2-numbered-source",
+  "calibrationAmendment": {
+    "pilot": "cal-1-B",
+    "requests": 8,
+    "excludedFromEffectComparison": true,
+    "reason": "Driver omitted explicit paragraph labels supplied by product context tool; restored for every arm before full comparison. Original candidates and requests retained. No prompt or task changes."
+  }
+}

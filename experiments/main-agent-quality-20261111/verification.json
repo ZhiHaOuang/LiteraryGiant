@@ -1,0 +1,37 @@
+{
+  "taskProductionPluginWrites": [],
+  "productionPluginFilesUnchanged": false,
+  "concurrentChangedFiles": 13,
+  "checkedProductionFiles": 85,
+  "productionPluginInstalled": false,
+  "coreModifiedByTask": false,
+  "realProjectsOrLibraryReadByTask": false,
+  "fixtureWorkspaceHashesUnchanged": 24,
+  "freeTests": {
+    "baseline": 23,
+    "candidate": 32,
+    "budget": 13,
+    "budgetNativeLoop": 3,
+    "skipped": 0
+  },
+  "realCliSmoke": {
+    "baseline": true,
+    "candidate": true,
+    "modelCalls": 0
+  },
+  "initialSmokeFailure": "Both arms initially lacked AJV 8.20.0 in their isolated dependency lookup. No model requests. Added a link to the already installed exact version; fresh profiles passed. Failed profiles retained.",
+  "budget": {
+    "requests": 119,
+    "limitRequests": 120,
+    "estimateCNY": 0.48656808,
+    "limitCNY": 3,
+    "missingUsage": 0,
+    "closed": true
+  },
+  "patchAppliesCheck": true,
+  "patchApplied": false,
+  "freshCompatibilityReviewRequired": true,
+  "privateLab": "$LITISLAND_ROOT/main-agent-quality-20261111",
+  "rawReasoningExported": false,
+  "credentialsIncluded": false
+}

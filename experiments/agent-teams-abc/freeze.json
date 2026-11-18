@@ -1,0 +1,17 @@
+{
+  "schema": "lg.abc.freeze.v1",
+  "files": {
+    "protocol.json": "2d11f87c66949f44aa1e8b46a14f0d80b353227a28cd1388bbc1efc086d408a1",
+    "run.mjs": "faaa2e6a4075e4dd43a9d1872f8ccaa479d9c3925dc7dffaba4f22b047a73ec2",
+    "report.mjs": "b1c070151082b11638a64f769e7d9ea6559293022ded587b2447591e604fba65",
+    "lib/runtime.mjs": "8f46f9f3ad473a91d1f42a5bc0771f31c6ce9dc22f3c550d732ccc8f63d93a86",
+    "lib/ledger.mjs": "db9a8430047b27a4a83a697d1b13b1942c18bbb30c7574b2139ae4eb90dc8ba6",
+    "tests/experiment.test.mjs": "d65759f80a7d1c7e6e30feb973395d7a7e209ce48b265779f2de4d1d33b7fa4b",
+    "frozen/src/contracts.js": "25f570730f896e8c0176262f06ad3bd7dbdc84792c9a3653ee8c5af9ae82e4f0",
+    "frozen/prompts/analysis.md": "159aa47dd7c8d18880a4d0906fc94c15af69c913335403aec96f4176b5ca56e8",
+    "frozen/prompts/planning.md": "0996f4e344f36b0dc2f8a01e2f7cb662099b74992acf7e1155e573a4520a603f",
+    "frozen/prompts/writing.md": "2c77a78297b1afe5a0ee726327b5ef36b57c94b04bb445c1adb954f01617dbe2",
+    "private/cases.json": "301950b20bf4b6f5bada80e076de26373ef956a640854f3a450a94f5e2e38a48"
+  },
+  "runTag": "v2"
+}

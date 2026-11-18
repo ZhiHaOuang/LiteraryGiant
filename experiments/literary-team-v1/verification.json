@@ -1,0 +1,28 @@
+{
+  "date": "2026-11-10",
+  "status": "experimental; full real-team acceptance pending",
+  "model": {
+    "route": "glm-4.5-air",
+    "requests": 19,
+    "limit": 20,
+    "ledgerClosed": true,
+    "automaticRetry": false
+  },
+  "checks": {
+    "subagentTests": 19,
+    "agentTeamsCompatTests": 19,
+    "literaryAndBudgetTests": 5,
+    "projectCliScriptedLoop": true,
+    "hostAggregate": true,
+    "clientAggregate": true,
+    "realTeam": false,
+    "correctedReadCheck": true,
+    "fullAgentTeamsStability": false
+  },
+  "sourceSha256": {
+    "dsh-plugins/lg-literary-team/index.js": "5afcfbd777d731c2a356f0fb65b4ea493013d46ab0becc49aa3e35754a9bb65f",
+    "dsh-plugins/lg-literary-team/src/analysis.js": "16b7ebeca884ee5829ca1e5d81bf5941bab6617b18020156a0160a8b863bdc18",
+    "dsh-plugins/lg-literary-team/tests/schema.test.mjs": "0080b9f796076cff4559a1f5bfa927fc0e8011693c8af683e2bf8a009ece9009",
+    "dsh-plugins/lg-literary-team/tests/analysis.test.mjs": "2ae3b93788c320196910a0dda3e01f8a4f3973576347d5c9b24f56f4890fcb55"
+  }
+}

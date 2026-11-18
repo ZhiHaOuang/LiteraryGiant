@@ -1,0 +1,18 @@
+{
+  "metrics.json": "85ccc20a370e5dd339cb52b622206939db902c2903e7cc557810b025f8aa2108",
+  "plan.json": "0d47bc0b45e8d722e178f9c911740196fffa2c95d0f85a6fde916847a0f53f30",
+  "frozen-plugin-hashes.json": "2a18e0746dde176f428c6a6b161d4c718974740b247dfe40fbd758089ea3ddb4",
+  "candidate.patch": "5fe5b0385a9b9948f9d76eec34509c24af2f9396279271bc13446def10742822",
+  "acceptance.json": "487959bfba8d18b4a8d96c85be5a38b409f826786ed287ad23653d2f8a9ab5a6",
+  "concurrent-project-changes.json": "68b80cb924320d6e877f67c38f1e7f4fdef1aec993ad5b5cefbb3984a8c03c44",
+  "README.md": "6bf73c558bc2fec65a0d354eae768353f2ebd10c0c1d3d5e02c02466d99f6df5",
+  "paired-metrics.json": "54e7c014bb50cbb791c8fcc82a5ba171fe6675ee20cc20e5cdf69bbabe092b66",
+  "cases.json": "ff438dea9e04de62d83cfcca1e517fcd50bcb26c6a20074a01f83a37015e7381",
+  "verification.json": "f5ed9a68ddd969382af69dd9f9ab0ce855fb7ad10073e910f4b58bb11cfe0887",
+  "answers.json": "6a227a6e23cd26e661012ade963c779284343f9e4c95a3d9bee654d01d624d6f",
+  "host-equivalence.json": "09a6c50e0d6b9ee236feeda89066271e091880b75531ee1fe615cbf73d48f6fb",
+  "reviews/round2-mapping.json": "1485406c88c4d55a4c36988608611933d64f24eb3b75df42e9d85fbf6b82f7e3",
+  "reviews/round1-review.json": "71f872c917c9a5219c0cccd2c531d00d88a34cb2ab7d71cab039f7456eae5ed5",
+  "reviews/round2-review.json": "8e24e58b57fe4cd5368c2a4320f7cece9828ac94540f75c82763e6f6cc182121",
+  "reviews/round1-mapping.json": "206322d18f77125c11c115a43c9a4d258961b58304980216e901395137597647"
+}

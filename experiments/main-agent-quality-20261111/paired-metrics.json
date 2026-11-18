@@ -1,0 +1,518 @@
+[
+  {
+    "id": "read-01-r1",
+    "baseline": {
+      "case": "read-01",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-01-baseline-r1",
+      "requests": 6,
+      "tools": 5,
+      "toolErrors": 0,
+      "tokens": 15469,
+      "CNY": 0.02124352,
+      "wallMs": 13086,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "90db9b7cc133882e8f3a4999e0126304c3b9b8cf0ae37893ab7dfd7bdf921fe5",
+      "promptHash": "2c04508623bb6235e77aa4dc718d091fc2634d5355898961387d0666265a3952",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-01",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-01-candidate-r1",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 7586,
+      "CNY": 0.00901208,
+      "wallMs": 5324,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "90db9b7cc133882e8f3a4999e0126304c3b9b8cf0ae37893ab7dfd7bdf921fe5",
+      "promptHash": "2c04508623bb6235e77aa4dc718d091fc2634d5355898961387d0666265a3952",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-01-r2",
+    "baseline": {
+      "case": "read-01",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-01-baseline-r2",
+      "requests": 7,
+      "tools": 7,
+      "toolErrors": 1,
+      "tokens": 19571,
+      "CNY": 0.01891768,
+      "wallMs": 12301,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "90db9b7cc133882e8f3a4999e0126304c3b9b8cf0ae37893ab7dfd7bdf921fe5",
+      "promptHash": "2c04508623bb6235e77aa4dc718d091fc2634d5355898961387d0666265a3952",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-01",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-01-candidate-r2",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 7416,
+      "CNY": 0.00486464,
+      "wallMs": 4332,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "90db9b7cc133882e8f3a4999e0126304c3b9b8cf0ae37893ab7dfd7bdf921fe5",
+      "promptHash": "2c04508623bb6235e77aa4dc718d091fc2634d5355898961387d0666265a3952",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-02-r1",
+    "baseline": {
+      "case": "read-02",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-02-baseline-r1",
+      "requests": 6,
+      "tools": 5,
+      "toolErrors": 0,
+      "tokens": 18116,
+      "CNY": 0.0278908,
+      "wallMs": 16967,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "351cdf536c03207a4bbeffbad9b9b937a284ba13babd7cf54adbd92062482191",
+      "promptHash": "15d1e63251e111e3fa4823bb351baf25d287ecac1a4dd7c54099574a0a6d3a34",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-02",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-02-candidate-r1",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 7804,
+      "CNY": 0.00779952,
+      "wallMs": 6199,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "351cdf536c03207a4bbeffbad9b9b937a284ba13babd7cf54adbd92062482191",
+      "promptHash": "15d1e63251e111e3fa4823bb351baf25d287ecac1a4dd7c54099574a0a6d3a34",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-02-r2",
+    "baseline": {
+      "case": "read-02",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-02-baseline-r2",
+      "requests": 6,
+      "tools": 5,
+      "toolErrors": 0,
+      "tokens": 17163,
+      "CNY": 0.02510056,
+      "wallMs": 17334,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "351cdf536c03207a4bbeffbad9b9b937a284ba13babd7cf54adbd92062482191",
+      "promptHash": "15d1e63251e111e3fa4823bb351baf25d287ecac1a4dd7c54099574a0a6d3a34",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-02",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-02-candidate-r2",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 7616,
+      "CNY": 0.00624864,
+      "wallMs": 5139,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "351cdf536c03207a4bbeffbad9b9b937a284ba13babd7cf54adbd92062482191",
+      "promptHash": "15d1e63251e111e3fa4823bb351baf25d287ecac1a4dd7c54099574a0a6d3a34",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-03-r1",
+    "baseline": {
+      "case": "read-03",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-03-baseline-r1",
+      "requests": 5,
+      "tools": 4,
+      "toolErrors": 0,
+      "tokens": 13986,
+      "CNY": 0.02297552,
+      "wallMs": 16397,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "c1b33ee13b3252a1d791e20fdc11f061020ca240fab6955b0153fe719c2267c5",
+      "promptHash": "2a54174f55977b250c6603859f4dff418da71c269155018c4ce20083359f6680",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-03",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-03-candidate-r1",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 8620,
+      "CNY": 0.01235464,
+      "wallMs": 8943,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "c1b33ee13b3252a1d791e20fdc11f061020ca240fab6955b0153fe719c2267c5",
+      "promptHash": "2a54174f55977b250c6603859f4dff418da71c269155018c4ce20083359f6680",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-03-r2",
+    "baseline": {
+      "case": "read-03",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-03-baseline-r2",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 24098,
+      "CNY": 0.03962704,
+      "wallMs": 23830,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "c1b33ee13b3252a1d791e20fdc11f061020ca240fab6955b0153fe719c2267c5",
+      "promptHash": "2a54174f55977b250c6603859f4dff418da71c269155018c4ce20083359f6680",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-03",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-03-candidate-r2",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 8770,
+      "CNY": 0.013159760000000001,
+      "wallMs": 9827,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "c1b33ee13b3252a1d791e20fdc11f061020ca240fab6955b0153fe719c2267c5",
+      "promptHash": "2a54174f55977b250c6603859f4dff418da71c269155018c4ce20083359f6680",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-04-r1",
+    "baseline": {
+      "case": "read-04",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-04-baseline-r1",
+      "requests": 6,
+      "tools": 5,
+      "toolErrors": 0,
+      "tokens": 18022,
+      "CNY": 0.02942368,
+      "wallMs": 20127,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "e9a1ad6384146a73c69038a8be9f24bb3c0466e2b788c2bb44fcce3b6a460008",
+      "promptHash": "715da4cbbaff8620587a9fe45baf9363491bd10c12e51b19520085ff0cef2436",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-04",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-04-candidate-r1",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 8202,
+      "CNY": 0.01100152,
+      "wallMs": 8580,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "e9a1ad6384146a73c69038a8be9f24bb3c0466e2b788c2bb44fcce3b6a460008",
+      "promptHash": "715da4cbbaff8620587a9fe45baf9363491bd10c12e51b19520085ff0cef2436",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-04-r2",
+    "baseline": {
+      "case": "read-04",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-04-baseline-r2",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 19864,
+      "CNY": 0.0281456,
+      "wallMs": 19536,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "e9a1ad6384146a73c69038a8be9f24bb3c0466e2b788c2bb44fcce3b6a460008",
+      "promptHash": "715da4cbbaff8620587a9fe45baf9363491bd10c12e51b19520085ff0cef2436",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-04",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-04-candidate-r2",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 8038,
+      "CNY": 0.00970264,
+      "wallMs": 7567,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "e9a1ad6384146a73c69038a8be9f24bb3c0466e2b788c2bb44fcce3b6a460008",
+      "promptHash": "715da4cbbaff8620587a9fe45baf9363491bd10c12e51b19520085ff0cef2436",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-05-r1",
+    "baseline": {
+      "case": "read-05",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-05-baseline-r1",
+      "requests": 6,
+      "tools": 5,
+      "toolErrors": 0,
+      "tokens": 18138,
+      "CNY": 0.02958968,
+      "wallMs": 17900,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "be0f2db388f2e2fd39c849aa7b4126ad86d98793a31b3378b1ee9c78131f29cc",
+      "promptHash": "8c04795befe6482614de63c92d9e64f99af0f44a8826051a7e2f7d74d33b52af",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-05",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-05-candidate-r1",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 7978,
+      "CNY": 0.00899352,
+      "wallMs": 6579,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "be0f2db388f2e2fd39c849aa7b4126ad86d98793a31b3378b1ee9c78131f29cc",
+      "promptHash": "8c04795befe6482614de63c92d9e64f99af0f44a8826051a7e2f7d74d33b52af",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-05-r2",
+    "baseline": {
+      "case": "read-05",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-05-baseline-r2",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 21933,
+      "CNY": 0.03386832,
+      "wallMs": 22363,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "be0f2db388f2e2fd39c849aa7b4126ad86d98793a31b3378b1ee9c78131f29cc",
+      "promptHash": "8c04795befe6482614de63c92d9e64f99af0f44a8826051a7e2f7d74d33b52af",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-05",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-05-candidate-r2",
+      "requests": 3,
+      "tools": 2,
+      "toolErrors": 0,
+      "tokens": 8065,
+      "CNY": 0.00957064,
+      "wallMs": 6837,
+      "members": 0,
+      "memberRoles": [],
+      "sourceHash": "be0f2db388f2e2fd39c849aa7b4126ad86d98793a31b3378b1ee9c78131f29cc",
+      "promptHash": "8c04795befe6482614de63c92d9e64f99af0f44a8826051a7e2f7d74d33b52af",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": []
+  },
+  {
+    "id": "read-06-r1",
+    "baseline": {
+      "case": "read-06",
+      "arm": "baseline",
+      "repeat": 1,
+      "run": "read-06-baseline-r1",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 22225,
+      "CNY": 0.03486744,
+      "wallMs": 23710,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "3e1d6f99b610aeb303457a2f6ecf993dfeffb25aa6144294225e2680a69dd0b6",
+      "promptHash": "addfa0953ebc340452ec0e5856b4397ce25f59b855cbda1e3c5b195b6a6d16c6",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-06",
+      "arm": "candidate",
+      "repeat": 1,
+      "run": "read-06-candidate-r1",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 23053,
+      "CNY": 0.029237120000000005,
+      "wallMs": 19608,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "3e1d6f99b610aeb303457a2f6ecf993dfeffb25aa6144294225e2680a69dd0b6",
+      "promptHash": "addfa0953ebc340452ec0e5856b4397ce25f59b855cbda1e3c5b195b6a6d16c6",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": [
+      "tokens"
+    ]
+  },
+  {
+    "id": "read-06-r2",
+    "baseline": {
+      "case": "read-06",
+      "arm": "baseline",
+      "repeat": 2,
+      "run": "read-06-baseline-r2",
+      "requests": 5,
+      "tools": 4,
+      "toolErrors": 0,
+      "tokens": 13050,
+      "CNY": 0.02083616,
+      "wallMs": 16343,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "3e1d6f99b610aeb303457a2f6ecf993dfeffb25aa6144294225e2680a69dd0b6",
+      "promptHash": "addfa0953ebc340452ec0e5856b4397ce25f59b855cbda1e3c5b195b6a6d16c6",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "candidate": {
+      "case": "read-06",
+      "arm": "candidate",
+      "repeat": 2,
+      "run": "read-06-candidate-r2",
+      "requests": 7,
+      "tools": 6,
+      "toolErrors": 0,
+      "tokens": 23881,
+      "CNY": 0.032137360000000004,
+      "wallMs": 21792,
+      "members": 1,
+      "memberRoles": [
+        "analysis"
+      ],
+      "sourceHash": "3e1d6f99b610aeb303457a2f6ecf993dfeffb25aa6144294225e2680a69dd0b6",
+      "promptHash": "addfa0953ebc340452ec0e5856b4397ce25f59b855cbda1e3c5b195b6a6d16c6",
+      "normalTurnCompletion": true,
+      "workspaceUnchanged": true
+    },
+    "resourceIncreases": [
+      "requests",
+      "tools",
+      "tokens",
+      "CNY",
+      "wallMs"
+    ]
+  }
+]

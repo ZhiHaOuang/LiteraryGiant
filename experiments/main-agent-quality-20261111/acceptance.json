@@ -1,0 +1,44 @@
+{
+  "status": "NOT_ACCEPTED",
+  "productionIntegrationAllowed": false,
+  "candidate": "lg-agent-teams scoped coordinator read",
+  "frozenComparisonTasks": 24,
+  "matchedPairs": 12,
+  "confirmedBlockingRegressions": [
+    {
+      "pair": "read-03-r2",
+      "dimension": "correctness and completeness",
+      "baseline": "Includes one bowl with six tickets retained and two bowls with no tickets left.",
+      "candidate": "Excludes one-bowl choice; incorrectly says six tickets cannot buy six-ticket porridge."
+    },
+    {
+      "pair": "read-05-r2",
+      "dimension": "unsupported inference",
+      "baseline": "Allows a gap of several months or over a year and does not assert a one-year lower bound.",
+      "candidate": "Adds an incorrect lower bound of at least approximately one year for 2025 to June 2026."
+    }
+  ],
+  "additionalCandidateFailures": [
+    "read-01-r1: quotes another passage despite one-quote requirement",
+    "read-02-r1: substitutes birthplace for place of upbringing",
+    "read-03-r1: contradictory explanation of the one-bowl choice",
+    "read-05-r1: treats unknown dates as contradicting an exactly-one-year interval"
+  ],
+  "baselineDeliveryFailures": [
+    "read-03-r1",
+    "read-06-r2"
+  ],
+  "mechanismTests": {
+    "baseline": 23,
+    "candidate": 32,
+    "budget": 13,
+    "budgetNativeLoop": 3,
+    "skipped": 0
+  },
+  "realRequests": 119,
+  "peakPriceEstimateCNY": 0.48656808,
+  "ledgerClosed": true,
+  "newProductionCodeFiles": [],
+  "literaryQualityImprovementProven": false,
+  "efficiencyCannotOverrideQualityGate": true
+}

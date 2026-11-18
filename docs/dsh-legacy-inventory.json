@@ -1,0 +1,1827 @@
+{
+  "date": "2026-11-07",
+  "parentCommit": "7e23cf4f85670cb0ee5c7a195ac70a0ecf14f5d7",
+  "legacyCommit": "07893dca25129189788796d0df0cb9824393b8ec",
+  "includesUncommittedWork": true,
+  "modules": [
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/__init__.py",
+      "lines": 5,
+      "public": [],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/__main__.py",
+      "lines": 5,
+      "public": [],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/acceptance_review.py",
+      "lines": 34,
+      "public": [
+        "main"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/agent_runtime.py",
+      "lines": 104,
+      "public": [
+        "RuntimeContext.instructions",
+        "RuntimeContext.history",
+        "RuntimeLaunchPlan.overrides",
+        "RuntimeLaunchPlan.validate",
+        "RuntimeLaunchPolicy.prepare",
+        "ExpertPolicy.available",
+        "ExpertPolicy.prepare",
+        "ExpertPolicy.unchanged",
+        "ExpertPolicy.output_schema",
+        "AgentRuntime.start",
+        "AgentRuntime.run",
+        "AgentRuntime.steer",
+        "AgentRuntime.interrupt",
+        "AgentRuntime.close",
+        "runtime_factory"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/agent_sessions.py",
+      "lines": 157,
+      "public": [
+        "AgentSessions.metadata",
+        "AgentSessions.update",
+        "AgentSessions.create",
+        "AgentSessions.list",
+        "AgentSessions.search",
+        "AgentContext.instructions",
+        "AgentContext.history",
+        "Collaboration.tools",
+        "Collaboration.validate_scope",
+        "Collaboration.configure",
+        "Collaboration.call",
+        "Collaboration.delegate"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "Collaboration.tools/delegate": "lg-director native task proposal plus author-confirmed bounded specialist call; source DSH session id and persistent result.",
+        "Collaboration.validate_scope": "Registered working directory, exact source preview/signature and no formal-adoption tool."
+      },
+      "remaining": "Legacy role session metadata/import, cross-session discussion search, discussion note filing and automatic multi-specialist synthesis remain incomplete. Native DSH owns conversations; this plugin does not reproduce Python sessions."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/anthropic_bridge.py",
+      "lines": 892,
+      "public": [
+        "translate_request",
+        "translate_stream",
+        "AnthropicBridge.open_client",
+        "AnthropicBridge.response_events",
+        "AnthropicBridge.repair_tool_arguments",
+        "AnthropicBridge.validate_final_schema",
+        "AnthropicBridge.events",
+        "AnthropicBridge.codex_args",
+        "AnthropicBridge.model_catalog"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/app_server.py",
+      "lines": 84,
+      "public": [
+        "launch",
+        "main"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/approvals.py",
+      "lines": 48,
+      "public": [
+        "ApprovalBroker.request",
+        "ApprovalBroker.resolve",
+        "ApprovalBroker.cancel"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/auth_ui.py",
+      "lines": 352,
+      "public": [
+        "run_auth",
+        "_Prompt.run",
+        "choice_application",
+        "radiolist_dialog",
+        "input_dialog",
+        "message_dialog",
+        "yes_no_dialog",
+        "manage_auth",
+        "profile_label"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend.py",
+      "lines": 1086,
+      "public": [
+        "EventJournal.public_record",
+        "EventJournal.append",
+        "EventJournal.read",
+        "ProcessHost.set_task",
+        "ProcessHost.begin_work",
+        "ProcessHost.end_work",
+        "ProcessHost.append",
+        "ProcessHost.run_command",
+        "ProcessHost.stop_workflow_process",
+        "Backend.emit",
+        "Backend.session",
+        "Backend.open",
+        "Backend.schedule",
+        "Backend.announce_operation",
+        "Backend.publish_operation_receipts",
+        "Backend.natural_task",
+        "Backend.author_control",
+        "Backend.run",
+        "Backend.cancel",
+        "Backend.dispatch",
+        "Backend.workflow",
+        "Backend.import_run",
+        "Backend.review_acceptance",
+        "Backend.creative",
+        "Backend.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_analysis.py",
+      "lines": 130,
+      "public": [
+        "prepare",
+        "start"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_events.py",
+      "lines": 105,
+      "public": [
+        "service_event",
+        "active_runs",
+        "snapshot_items"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_history.py",
+      "lines": 94,
+      "public": [
+        "collect_snapshot",
+        "prepare_snapshot",
+        "SnapshotPages.freeze",
+        "SnapshotPages.page",
+        "SnapshotPages.clear"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_protocol.py",
+      "lines": 142,
+      "public": [
+        "contract",
+        "validate"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_runs.py",
+      "lines": 62,
+      "public": [
+        "public_manifest",
+        "list_runs",
+        "prepare_run"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-books and lg-workflows: public history listing, snapshot preview/import/read and candidate inspection. Private logs and process control are excluded.",
+      "remaining": "Legacy executable recovery and stage/artifact handling."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_stdio.py",
+      "lines": 85,
+      "public": [
+        "serve",
+        "main"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_studio.py",
+      "lines": 40,
+      "public": [
+        "call"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/backend_tasks.py",
+      "lines": 134,
+      "public": [
+        "settled_worker",
+        "publish",
+        "preview",
+        "start",
+        "select",
+        "sources"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/book_analysis.py",
+      "lines": 532,
+      "public": [
+        "_AnalysisContract.reference",
+        "_AnalysisContract.fingerprint",
+        "_AnalysisContract.assert_current",
+        "BookAnalysisStore.snapshot",
+        "BookAnalysisStore.candidate_snapshot",
+        "BookAnalysisStore.volume_snapshot",
+        "BookAnalysisStore.current_snapshot",
+        "BookAnalysisStore.save",
+        "BookAnalysisStore.list",
+        "BookAnalysisStore.context",
+        "fingerprint",
+        "schema_path",
+        "source_spans",
+        "resolve_evidence",
+        "response_schema",
+        "validate_report",
+        "ChapterAnalysisService.analyze"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "BookAnalysisStore.snapshot/fingerprint/list": "lg-books reproduces chapter snapshots and Python SHA-256, consulting the planning service for selected directions within the existing database transaction. It reads current and supported legacy locations for CharacterArc and EventsLibrary.",
+        "validate_report": "Pinned legacy base and category-specific stored card schemas, unique keys, exact document/version/quotes, Canonical conflicts and manuscript versus selected-option evidence are validated before graph publication.",
+        "ChapterAnalysisService.analyze": "Five scoped specialists generate candidate reports with host-resolved evidence and instance cards; the original Python consumer validated all five."
+      },
+      "remaining": "General chapter analysis outside the candidate workflow, other consumers and volume analysis."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/book_assets.py",
+      "lines": 173,
+      "public": [
+        "print_plan",
+        "manifest_path",
+        "organized",
+        "asset_root",
+        "resolve_artifact",
+        "organize_book"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/book_home.py",
+      "lines": 295,
+      "public": [
+        "header_content",
+        "render_home_header",
+        "snapshot",
+        "graph_lines",
+        "panel_lines",
+        "render_home",
+        "panel_entries",
+        "home_details"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/book_overview.py",
+      "lines": 48,
+      "public": [
+        "validate_overview",
+        "read_overview",
+        "save_overview",
+        "overview_context"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/book_presentation.py",
+      "lines": 160,
+      "public": [
+        "clean_label",
+        "people",
+        "outline_sections",
+        "outline_chapters",
+        "chapter_label",
+        "source_detail"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/bookshelf.py",
+      "lines": 138,
+      "public": [
+        "remember_location",
+        "restore_location",
+        "Bookshelf.initialize",
+        "Bookshelf.discover",
+        "Bookshelf.books",
+        "Bookshelf.check_book",
+        "Bookshelf.create"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/bounded_reviews.py",
+      "lines": 211,
+      "public": [
+        "ExpertModel.generate",
+        "BoundedReviews.available",
+        "BoundedReviews.begin",
+        "BoundedReviews.prepare",
+        "BoundedReviews.unchanged",
+        "BoundedReviews.work",
+        "BoundedReviews.execute",
+        "BoundedReviews.result",
+        "BoundedReviews.finish",
+        "BoundedReviews.settle_interrupted"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/catalog.py",
+      "lines": 66,
+      "public": [
+        "load_json_catalog",
+        "load_skills",
+        "load_subagents",
+        "load_task_modes",
+        "load_workflows",
+        "find_mode",
+        "catalog_file"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/chapter_sync.py",
+      "lines": 251,
+      "public": [
+        "ChapterSync.status",
+        "ChapterSync.export",
+        "ChapterSync.diff",
+        "ChapterSync.import_file"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "ChapterSync.status/diff": "lg-books native chapter-file-preview reads a registered chapter, its scene blocks, file and baseline. lg-workbench shows the changed passages, both versions and conflicts.",
+        "ChapterSync.export/import_file": "chapter-file-apply creates or refreshes a tracked working file, backs up replaced text, validates both sides and commits all author-confirmed manuscript revisions, full-text entries, baseline and receipt in one SQLite transaction for import.",
+        "ChapterSync._recovery/_committed/_finish_import": "lg-books verifies v1 pending journals against chapter identity, previous and active versions, content digests and origin. Author-confirmed recovery resumes a proven pre-commit operation or reconciles an existing commit, recording the original file hash and native receipt. Legacy metadata is preserved.",
+        "Structural chapter/scene changes": "lg-planning registers each affected chapter in the planning transaction. lg-books publishes or preserves its file independently. Planning history supports retrying an individual pending chapter after restart.",
+        "ProjectStore._sync_chapter_file after manuscript edit/accept": "A committed author version has a durable pending receipt. lg-books creates or refreshes the whole chapter file only when safe, retains external edits and recovers a pending mirror without generating a version. lg-workbench shows the outcome and retry action."
+      },
+      "remaining": "Automatic story.json refresh remains outstanding. Native baselines are stored in SQLite."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/cli_backend.py",
+      "lines": 234,
+      "public": [
+        "options",
+        "creative_params",
+        "ConsoleClient.event",
+        "ConsoleClient.answer",
+        "ConsoleClient.start",
+        "ConsoleClient.workflow",
+        "ConsoleClient.creative",
+        "run_workflow",
+        "run_agent",
+        "dispatch_story",
+        "analysis_params",
+        "run_analysis",
+        "run_studio",
+        "dispatch_run"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/codex_events.py",
+      "lines": 266,
+      "public": [
+        "normalize_item",
+        "engine_event",
+        "CodexEvents.begin",
+        "CodexEvents.finish",
+        "CodexEvents.bind",
+        "CodexEvents.item",
+        "CodexEvents.task"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/codex_history.py",
+      "lines": 145,
+      "public": [
+        "CodexHistoryReader.close",
+        "CodexHistoryReader.send",
+        "CodexHistoryReader.request",
+        "CodexHistoryReader.owned",
+        "CodexHistoryReader.list",
+        "CodexHistoryReader.read"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/codex_policy.py",
+      "lines": 78,
+      "public": [
+        "WritingLaunchPlan.overrides",
+        "WritingLaunchPlan.validate",
+        "WritingLaunchPolicy.prepare",
+        "validate_writing_config"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/codex_reviews.py",
+      "lines": 245,
+      "public": [
+        "CodexReviews.available",
+        "CodexReviews.restore",
+        "CodexReviews.begin",
+        "CodexReviews.call",
+        "CodexReviews.revoke",
+        "CodexReviews.drain",
+        "CodexReviews.pending"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/codex_runtime.py",
+      "lines": 214,
+      "public": [
+        "CodexRuntime.runtime",
+        "CodexRuntime.on_request",
+        "CodexRuntime.thread_id",
+        "CodexRuntime.turn_id",
+        "CodexRuntime.closed",
+        "CodexRuntime.control_socket",
+        "CodexRuntime.control_socket",
+        "CodexRuntime.start",
+        "CodexRuntime.set_retirement_handler",
+        "CodexRuntime.run",
+        "CodexRuntime.steer",
+        "CodexRuntime.interrupt",
+        "CodexRuntime.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/config.py",
+      "lines": 397,
+      "public": [
+        "ensure_agent_config",
+        "LGConfig.credentials_configured",
+        "LGConfig.require_api_auth",
+        "LGConfig.uses_anthropic",
+        "LGConfig.uses_responses",
+        "LGConfig.model_label",
+        "LGConfig.model_for_mode",
+        "LGConfig.model_for_profile",
+        "project_config_path",
+        "user_config_path",
+        "load_config"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/conversation_store.py",
+      "lines": 195,
+      "public": [
+        "ConversationStore.path",
+        "ConversationStore.create",
+        "ConversationStore.read",
+        "ConversationStore.append",
+        "ConversationStore.list",
+        "ConversationStore.title",
+        "ConversationStore.rename",
+        "ConversationStore.choices",
+        "ConversationStore.context",
+        "ConversationStore.legacy_items",
+        "ConversationStore.import_history"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/core_adapter.py",
+      "lines": 820,
+      "public": [
+        "ensure_code_workspace",
+        "CoreStatus.available",
+        "CodexStageExecutor.inspect",
+        "CodexStageExecutor.run",
+        "CodexExecAdapter.run",
+        "inspect_core",
+        "discover_core_commands",
+        "run_model_turn",
+        "run_model_turn_stub"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/creative_decisions.py",
+      "lines": 349,
+      "public": [
+        "guard_kind",
+        "snapshot",
+        "snapshots",
+        "context_snapshot",
+        "review_context",
+        "save_options",
+        "selection_preview",
+        "select_option",
+        "withdrawal_preview",
+        "withdraw"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "snapshot": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "snapshots": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "context_snapshot": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "save_options": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "selection_preview": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "select_option": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "withdrawal_preview": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions",
+        "withdraw": "lg-planning: decision-schema.js / decisions.js / service.js; author preview and exact-version transitions"
+      },
+      "remaining": [
+        "review_context: projected adoption review and legacy candidate gates",
+        "guard_kind: current manuscript route rejects managed kinds; broader document API migration pending"
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/creative_review.py",
+      "lines": 57,
+      "public": [
+        "command_preview",
+        "review_creative"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/credentials.py",
+      "lines": 214,
+      "public": [
+        "checked_name",
+        "environment_dir",
+        "read_profiles",
+        "save_profile",
+        "add_auth_parser",
+        "dispatch_auth"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/dashboard.py",
+      "lines": 133,
+      "public": [
+        "model_name",
+        "render_status_bar",
+        "render_dashboard"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/definitions.py",
+      "lines": 229,
+      "public": [
+        "DefinitionRegistry.skills",
+        "DefinitionRegistry.agents",
+        "DefinitionRegistry.skill",
+        "DefinitionRegistry.agent"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-skills exposes all 15 original literary method identities as editable native DSH skills and task-compatible specialist methods. lg-agents supplies role definitions and bounded task contracts. Legacy registry file formats and general runtime orchestration remain separate."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/desktop.py",
+      "lines": 111,
+      "public": [
+        "inventory",
+        "control",
+        "main"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/desktop_books.py",
+      "lines": 80,
+      "public": [
+        "books",
+        "main"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/doctor.py",
+      "lines": 243,
+      "public": [
+        "DoctorCheck.to_dict",
+        "DoctorReport.ok",
+        "DoctorReport.exit_code",
+        "run_doctor",
+        "probe_provider"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/events.py",
+      "lines": 71,
+      "public": [
+        "RunEvent.create",
+        "RunEvent.to_dict"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/execution_adapter.py",
+      "lines": 107,
+      "public": [
+        "execution_adapter",
+        "native_stage_config",
+        "NativeStageExecutor.run",
+        "NativeStageAdapter.run"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/exporter.py",
+      "lines": 253,
+      "public": [
+        "export_project",
+        "render_export",
+        "markdown_to_text",
+        "write_docx"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-export: all six reading export targets and Markdown, TXT and DOCX via a registered-book read transaction and native DSH fileActions.",
+      "remaining": "Historical CLI explicit host output path and automatic book/exports destination are not exposed. Author chooses a local download or native Save As. Chapter file import/export is tracked under chapter_sync.py."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/first_home.py",
+      "lines": 85,
+      "public": [
+        "render_first_home"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/generation_sources.py",
+      "lines": 133,
+      "public": [
+        "canonical_sha",
+        "text_sha",
+        "make_observation",
+        "make_receipt",
+        "bind_generation_sources",
+        "check_metadata",
+        "version_metadata",
+        "inherited_receipt"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-context receipt + lg-agents task signature + lg-books adoption check; legacy receipt import, source review/impact propagation pending"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/home_cache.py",
+      "lines": 145,
+      "public": [
+        "cache_path",
+        "source_signature",
+        "read_snapshot",
+        "save_snapshot",
+        "quick_snapshot"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/init_project.py",
+      "lines": 95,
+      "public": [
+        "init_workspace"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "init_workspace": "lg-books initialize.js: native empty-book schema/templates/assets + DSH configEditor registry; legacy runtime scaffolding intentionally not created; new books get the legacy default five-category supervision policy and old interrupted creations resume using their original receipt."
+      }
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/intent_router.py",
+      "lines": 224,
+      "public": [
+        "proposal",
+        "is_continue",
+        "constraints",
+        "routing_schema",
+        "catalog",
+        "interpret",
+        "chapter_numbers",
+        "resolve"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "catalog/resolve": "lg-director exposes enabled specialist tasks and proposes exact scoped inputs validated by lg-agents; author confirms preview before execution. Native sessions can inspect required chapter candidate report categories and propose a single scoped specialist analysis.",
+        "interpret": "Natural language interpretation stays in DSH native Agent/tool loop; no separate router model."
+      },
+      "remaining": "Legacy discussion/control/adopt/restore/new-chapter inference, clarification state and whole Director planning/synthesis are not fully mapped. Proposals do not grant execution or adoption."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/knowledge.py",
+      "lines": 380,
+      "public": [
+        "KnowledgeContext.found_count",
+        "KnowledgeContext.to_prompt_text",
+        "KnowledgeContext.to_metadata",
+        "KnowledgeGateway.search",
+        "discover_library_root"
+      ],
+      "status": "partially_migrated",
+      "plugin": "lg-library",
+      "mapping": {
+        "KnowledgeGateway.search": "src/search.js search",
+        "discover_library_root": "src/paths.js roots (explicit config or book-local only)"
+      },
+      "remaining": [
+        "KnowledgeContext prompt and metadata integration with literary tasks",
+        "Legacy raw fallback intentionally excluded by repository data boundary"
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/knowledge_catalog.py",
+      "lines": 23,
+      "public": [
+        "catalog"
+      ],
+      "status": "partially_migrated",
+      "plugin": "lg-library",
+      "mapping": {
+        "catalog": "src/search.js catalog (fixed index availability)"
+      },
+      "remaining": [
+        "Category-specific inventory and counts"
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/legacy_sessions.py",
+      "lines": 121,
+      "public": [
+        "identifier",
+        "imported_id",
+        "project_history",
+        "LegacySessions.homes",
+        "LegacySessions.list",
+        "LegacySessions.snapshot"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/literary_tasks.py",
+      "lines": 389,
+      "public": [
+        "prepare",
+        "clarified_options",
+        "read",
+        "validate_current",
+        "_BoundedAdapter.run",
+        "start",
+        "advance"
+      ],
+      "status": "partially_migrated",
+      "migration": {
+        "bounded revision workflow": "lg-workflows persists frozen scope, fixed step operation ids, call/cost ceilings, candidate-review-author feedback sequence, idempotent recovery and stop/no-progress gates; lg-execution owns the only model ledger.",
+        "chapter body workflow": "lg-agents draft-chapter and lg-workflows kind:chapter draft complete current chapter-body candidates, then review exact candidate and revise selected feedback. Empty chapters supported; creation requirements carried into reviews; no child-scene concatenation or automatic adoption.",
+        "ordered scene drafting": "lg-workflows kind:scenes freezes an author-ordered same-chapter batch of approved empty scenes, previews each real request, gates continuation on author decisions, carries a bounded adopted excerpt and recovers the original paid step.",
+        "selected direction to chapter": "An approved work/part/chapter option can be handed directly to a scoped chapter workflow. Writer and reviewer receive its complete text. Both continued dispatch and adoption verify its current source and selection.",
+        "chapter direction workflow": "A native chapter workflow persists the original ideas request, three generated options, author-confirmed planning selection and subsequent draft, review and revision under one budget.",
+        "ordered chapter drafting": "Native 2–6 chapter sequence, per-chapter instructions and preflight, author-gated execution, pinned adopted ending, restart and candidate recovery."
+      },
+      "remaining": "General task orchestration and supervision across arbitrary workflows, legacy execution recovery and original artifact adoption are incomplete."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/live_agent.py",
+      "lines": 430,
+      "public": [
+        "dynamic_tools_sha256",
+        "CodexSession.start",
+        "CodexSession.request",
+        "CodexSession.run",
+        "CodexSession.steer",
+        "CodexSession.wait_for_turn",
+        "CodexSession.interrupt",
+        "CodexSession.stop_execution",
+        "CodexSession.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/live_view.py",
+      "lines": 63,
+      "public": [],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/logging_utils.py",
+      "lines": 36,
+      "public": [
+        "utc_now",
+        "ensure_log_dir",
+        "write_text",
+        "write_json",
+        "append_agent_log"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/main.py",
+      "lines": 1482,
+      "public": [
+        "_CLIArgumentParser.parse_args",
+        "main",
+        "build_parser",
+        "interactive_loop",
+        "print_status",
+        "print_doctor",
+        "print_skills",
+        "print_agents",
+        "print_modes"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/managed_documents.py",
+      "lines": 14,
+      "public": [
+        "guard_kind"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/manuscript_view.py",
+      "lines": 56,
+      "public": [
+        "read",
+        "save",
+        "create"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/mcp_approval.py",
+      "lines": 121,
+      "public": [
+        "operation_details",
+        "project_fingerprint",
+        "ApprovingMCP.call_tool"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/memory.py",
+      "lines": 111,
+      "public": [
+        "MemoryContext.found_count",
+        "MemoryContext.to_prompt_text",
+        "read_memory_context"
+      ],
+      "status": "native_read_context_implemented",
+      "mapping": "lg-context/src/notes.js: fixed memory files and bounded .learnings; explicit author opt-in; no write/export"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/narrative_execution.py",
+      "lines": 184,
+      "public": [
+        "prepare",
+        "run"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/narrative_knowledge.py",
+      "lines": 320,
+      "public": [
+        "snapshot",
+        "snapshots",
+        "propose",
+        "confirmation_preview",
+        "confirm",
+        "withdrawal_preview",
+        "withdraw"
+      ],
+      "status": "native_core_implemented_integration_pending",
+      "plugin": "lg-memory",
+      "mapping": {
+        "snapshot": "src/knowledge.js plus service.js preview/apply/record/list",
+        "snapshots": "src/knowledge.js plus service.js preview/apply/record/list",
+        "propose": "src/knowledge.js plus service.js preview/apply/record/list",
+        "confirmation_preview": "src/knowledge.js plus service.js preview/apply/record/list",
+        "confirm": "src/knowledge.js plus service.js preview/apply/record/list",
+        "withdrawal_preview": "src/knowledge.js plus service.js preview/apply/record/list",
+        "withdraw": "src/knowledge.js plus service.js preview/apply/record/list"
+      },
+      "remaining": [
+        "Automatic literary task context assembly and original workflow callers are not yet migrated",
+        "Desktop click validation pending"
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/narrative_view.py",
+      "lines": 99,
+      "public": [
+        "project"
+      ],
+      "status": "native_core_implemented_integration_pending",
+      "plugin": "lg-memory",
+      "mapping": {
+        "project": "src/view.js knowledgeView"
+      },
+      "remaining": [
+        "Execution-time isolation from other tools/history must be implemented by role/context/execution plugins",
+        "Desktop click validation pending"
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native.py",
+      "lines": 197,
+      "public": [
+        "native_binary",
+        "writing_settings",
+        "writing_args",
+        "launch_native"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native_delegation.py",
+      "lines": 96,
+      "public": [
+        "NativeDelegations.prepare",
+        "NativeDelegations.tool_result",
+        "NativeDelegations.result",
+        "NativeDelegations.execute",
+        "NativeDelegations.settle_interrupted",
+        "NativeDelegations.restore"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native_events.py",
+      "lines": 49,
+      "public": [
+        "NativeEvents.assistant_delta",
+        "NativeEvents.assistant_completed",
+        "NativeEvents.tool_started",
+        "NativeEvents.tool_completed",
+        "NativeEvents.review_task"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native_model.py",
+      "lines": 73,
+      "public": [
+        "NativeModel.generate"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native_runtime.py",
+      "lines": 236,
+      "public": [
+        "NativeRuntime.start",
+        "NativeRuntime.validate_checkpoint",
+        "NativeRuntime.save",
+        "NativeRuntime.run",
+        "NativeRuntime.steer",
+        "NativeRuntime.interrupt",
+        "NativeRuntime.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/native_tools.py",
+      "lines": 67,
+      "public": [
+        "NativeTools.start",
+        "NativeTools.call",
+        "NativeTools.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/novel_editor.py",
+      "lines": 122,
+      "public": [
+        "read_chapter",
+        "save_part",
+        "browse_novel"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/operation_receipts.py",
+      "lines": 197,
+      "public": [
+        "binding_fingerprint",
+        "lookup",
+        "operation_scope",
+        "record_transaction"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/outline_editor.py",
+      "lines": 101,
+      "public": [
+        "browse_outlines",
+        "outline_files",
+        "save_outline_file",
+        "edit_outline_file"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/output_schema.py",
+      "lines": 34,
+      "public": [
+        "validate_local_schema",
+        "read_schema",
+        "validate_output"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/output_writer.py",
+      "lines": 107,
+      "public": [
+        "write_workflow_output",
+        "write_outline_output"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/paths.py",
+      "lines": 22,
+      "public": [
+        "product_root",
+        "core_codex_root",
+        "data_file"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/preferences.py",
+      "lines": 101,
+      "public": [
+        "personal_path",
+        "read_preferences",
+        "save_preferences",
+        "book_path",
+        "effective_preferences",
+        "preference_instructions",
+        "edit_preferences"
+      ],
+      "status": "partially_migrated",
+      "migration": {
+        "personal_path / read_preferences / book_path": "lg-author reads bounded allowlisted legacy personal/book files, then prefers native profile/book SQLite records",
+        "save_preferences / effective_preferences": "lg-author service provides scoped atomic versioned saves, explicit empty override vs inheritance, idempotent receipts and history",
+        "preference_instructions": "lg-agents shared author adapter includes effective values in actual model input, cost/signature and candidate metadata; unused default adds no overhead; writing preferences excluded from memory/reference tasks",
+        "edit_preferences": "lg-author client provides personal/book forms, preview and history; model selection remains in DSH/lg-execution settings"
+      },
+      "remaining": [
+        "Desktop installation/click acceptance of the preference panel and native model-picker navigation."
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/process_identity.py",
+      "lines": 74,
+      "public": [
+        "darwin_process_owner"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/project_browser.py",
+      "lines": 152,
+      "public": [
+        "evidence_text",
+        "analysis_text",
+        "project_entries",
+        "browse_project"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/project_store.py",
+      "lines": 2557,
+      "public": [
+        "ProjectRegistry.register",
+        "ProjectRegistry.list",
+        "ProjectRegistry.remove",
+        "ProjectStore.initialized",
+        "ProjectStore.initialize",
+        "ProjectStore.project_info",
+        "ProjectStore.summary",
+        "ProjectStore.integrity_check",
+        "ProjectStore.rename_project",
+        "ProjectStore.create_document",
+        "ProjectStore.get_document",
+        "ProjectStore.list_documents",
+        "ProjectStore.task_catalog",
+        "ProjectStore.update_document",
+        "ProjectStore.create_version",
+        "ProjectStore.edit_active_document",
+        "ProjectStore.edit_chapter_documents",
+        "ProjectStore.list_versions",
+        "ProjectStore.get_version",
+        "ProjectStore.accept_version",
+        "ProjectStore.reject_version",
+        "ProjectStore.restore_version",
+        "ProjectStore.save_decision_options",
+        "ProjectStore.select_decision_option",
+        "ProjectStore.withdraw_decision",
+        "ProjectStore.decision_selection_preview",
+        "ProjectStore.decision_withdrawal_preview",
+        "ProjectStore.decision_snapshot",
+        "ProjectStore.list_decision_snapshots",
+        "ProjectStore.decision_context",
+        "ProjectStore.decision_review_context",
+        "ProjectStore.generation_source_review",
+        "ProjectStore.source_impact",
+        "ProjectStore.propose_knowledge",
+        "ProjectStore.confirm_knowledge",
+        "ProjectStore.withdraw_knowledge",
+        "ProjectStore.knowledge_snapshot",
+        "ProjectStore.list_knowledge_snapshots",
+        "ProjectStore.knowledge_confirmation_preview",
+        "ProjectStore.knowledge_withdrawal_preview",
+        "ProjectStore.knowledge_view",
+        "ProjectStore.search_documents",
+        "ProjectStore.add_fact",
+        "ProjectStore.set_fact",
+        "ProjectStore.get_fact",
+        "ProjectStore.list_facts",
+        "ProjectStore.promote_fact",
+        "ProjectStore.fact_sources",
+        "ProjectStore.archive_fact",
+        "ProjectStore.fact_history",
+        "ProjectStore.propose_fact",
+        "ProjectStore.get_proposal",
+        "ProjectStore.list_proposals",
+        "ProjectStore.accept_proposal",
+        "ProjectStore.proposal_source_status",
+        "ProjectStore.reject_proposal",
+        "ProjectStore.create_scene",
+        "ProjectStore.get_scene",
+        "ProjectStore.list_scenes",
+        "ProjectStore.update_scene_card",
+        "ProjectStore.set_scene_plan",
+        "ProjectStore.approve_scene",
+        "ProjectStore.mark_scene_drafted",
+        "ProjectStore.add_timeline_entry",
+        "ProjectStore.update_timeline_entry",
+        "ProjectStore.list_timeline",
+        "ProjectStore.add_foreshadowing",
+        "ProjectStore.resolve_foreshadowing",
+        "ProjectStore.list_foreshadowing",
+        "ProjectStore.replace_review_issues",
+        "ProjectStore.list_review_issues",
+        "ProjectStore.context_snapshot"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "ProjectStore.add_fact": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.set_fact": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.get_fact": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.list_facts": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.promote_fact": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.fact_sources": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.archive_fact": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.fact_history": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.propose_fact": "lg-memory facts/service author API; generated extraction batches add exact-version evidence, proposal digest, atomic receipts and stale-source adoption refusal; lg-agents MemoryAgent performs one bounded extract-memory call",
+        "ProjectStore.get_proposal": "lg-memory facts/service author API; generated extraction batches add exact-version evidence, proposal digest, atomic receipts and stale-source adoption refusal; lg-agents MemoryAgent performs one bounded extract-memory call",
+        "ProjectStore.list_proposals": "lg-memory facts/service author API; generated extraction batches add exact-version evidence, proposal digest, atomic receipts and stale-source adoption refusal; lg-agents MemoryAgent performs one bounded extract-memory call",
+        "ProjectStore.accept_proposal": "lg-memory facts/service author API; generated extraction batches add exact-version evidence, proposal digest, atomic receipts and stale-source adoption refusal; lg-agents MemoryAgent performs one bounded extract-memory call",
+        "ProjectStore.proposal_source_status": "lg-memory facts/service author API; generated extraction batches add exact-version evidence, proposal digest, atomic receipts and stale-source adoption refusal; lg-agents MemoryAgent performs one bounded extract-memory call",
+        "ProjectStore.reject_proposal": "lg-memory: facts.js / service.js author preview and transaction API",
+        "ProjectStore.add_timeline_entry": "lg-memory: chronology.js / service.js",
+        "ProjectStore.update_timeline_entry": "lg-memory: chronology.js / service.js",
+        "ProjectStore.list_timeline": "lg-memory: chronology.js / service.js",
+        "ProjectStore.add_foreshadowing": "lg-memory: chronology.js / service.js",
+        "ProjectStore.resolve_foreshadowing": "lg-memory: chronology.js / service.js",
+        "ProjectStore.list_foreshadowing": "lg-memory: chronology.js / service.js",
+        "ProjectStore.propose_knowledge": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.confirm_knowledge": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.withdraw_knowledge": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.knowledge_snapshot": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.list_knowledge_snapshots": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.knowledge_confirmation_preview": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.knowledge_withdrawal_preview": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.knowledge_view": "lg-memory: knowledge.js / view.js / service.js",
+        "ProjectStore.save_decision_options": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.select_decision_option": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.withdraw_decision": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.decision_selection_preview": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.decision_withdrawal_preview": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.decision_snapshot": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.list_decision_snapshots": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.decision_context": "lg-planning: versioned directions, selection/withdrawal, exact source checks and context",
+        "ProjectStore.create_scene": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectStore.get_scene": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectStore.list_scenes": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectStore.set_scene_plan": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectStore.approve_scene": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectStore.mark_scene_drafted": "lg-planning: scenes.js / service.js; pending plan separated from approved plan; author preview and history",
+        "ProjectRegistry.register": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectRegistry.list": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.initialized": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.initialize": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.project_info": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.summary": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.integrity_check": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.get_document": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.list_documents": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.list_versions": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.get_version": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry",
+        "ProjectStore.update_document": "lg-books: native initialization, registered-book services and bounded document version API; DSH config replaces old registry"
+      },
+      "remaining": [
+        "ProjectRegistry.remove",
+        "ProjectStore.rename_project",
+        "ProjectStore.create_document",
+        "ProjectStore.task_catalog",
+        "ProjectStore.create_version",
+        "ProjectStore.edit_active_document",
+        "ProjectStore.edit_chapter_documents",
+        "ProjectStore.accept_version",
+        "ProjectStore.reject_version",
+        "ProjectStore.restore_version",
+        "ProjectStore.decision_review_context",
+        "ProjectStore.generation_source_review",
+        "ProjectStore.source_impact",
+        "ProjectStore.search_documents",
+        "ProjectStore.update_scene_card",
+        "ProjectStore.replace_review_issues",
+        "ProjectStore.list_review_issues",
+        "ProjectStore.context_snapshot"
+      ],
+      "partialMapping": {
+        "ProjectStore.context_snapshot": "lg-context includes explicit documents, memories, selected direction and scene card; automatic prior-prose ranking pending",
+        "ProjectStore.update_scene_card": "lg-planning supports design fields, word limits, tags preserved, approval invalidation; arbitrary custom metadata editing pending",
+        "ProjectStore.create_document": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.create_version": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.edit_active_document": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.accept_version": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.reject_version": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.restore_version": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.search_documents": "lg-books documents API + lg-workbench documents UI: generic materials, exact versions and previews, candidate/adoption/history restore; dedicated managed kinds use their plugins, legacy approval gates/import-export/full FTS equivalence pending",
+        "ProjectStore.replace_review_issues": "lg-review persists version-bound findings in existing table; retains older reports and explicit author status rather than silently superseding all document findings; legacy supervision pipelines pending",
+        "ProjectStore.list_review_issues": "lg-review report/list/read exposes planning and manuscript versioned reports with author status/history; legacy unbound issue browser and full supervision pipelines pending"
+      }
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/prompt_builder.py",
+      "lines": 122,
+      "public": [
+        "build_stage_prompt"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/provider_transport.py",
+      "lines": 105,
+      "public": [
+        "ResponsesBridge.open_client",
+        "ResponsesBridge.response_events",
+        "ResponsesBridge.validated_events",
+        "provider_bridge"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/providers.py",
+      "lines": 154,
+      "public": [
+        "provider_id",
+        "validate_model",
+        "validate_endpoint",
+        "profile_settings",
+        "normalize_profile"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/reference_contracts.py",
+      "lines": 133,
+      "public": [
+        "catalog",
+        "ReferenceContract.methods",
+        "ReferenceContract.apply",
+        "ReferenceContract.finalize",
+        "card_schema",
+        "methods",
+        "apply_contract",
+        "finalize_cards"
+      ],
+      "status": "partial_mapping",
+      "mapping": {
+        "catalog / methods / card_schema": "lg-library src/contracts.json + contracts.js retain five category perspectives and strict field validation",
+        "apply_contract / finalize_cards": "lg-agents planReference and lg-library validateAnalysis/saveAnalysis generate one evidence-bound author-reviewed card; completeness explicitly does not imply semantic grounding"
+      },
+      "remaining": [
+        "Batch/whole-volume BookAnalysisStore integration and semantic quality evaluation across all five categories."
+      ]
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/review_policy.py",
+      "lines": 110,
+      "public": [
+        "LiteraryReviewPolicy.available",
+        "LiteraryReviewPolicy.output_schema",
+        "LiteraryReviewPolicy.prepare",
+        "LiteraryReviewPolicy.unchanged"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/run_browser.py",
+      "lines": 47,
+      "public": [
+        "run_details",
+        "browse_runs"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/run_store.py",
+      "lines": 401,
+      "public": [
+        "process_owner",
+        "utc_now",
+        "RunStore.create",
+        "RunStore.append_event",
+        "RunStore.write_stage",
+        "RunStore.write_generation_sources",
+        "RunStore.write_stage_prompt",
+        "RunStore.write_stage_schema",
+        "RunStore.read_stage",
+        "RunStore.finalize",
+        "RunStore.read_stage_metadata",
+        "RunStore.assert_resumable",
+        "RunStore.resume_lock",
+        "RunStore.load",
+        "RunStore.handle",
+        "RunStore.adopt",
+        "RunStore.list_runs",
+        "RunStore.read_events"
+      ],
+      "status": "partially_migrated",
+      "migration": {
+        "bounded revision workflow": "lg-workflows persists frozen scope, fixed step operation ids, call/cost ceilings, candidate-review-author feedback sequence, idempotent recovery and stop/no-progress gates; lg-execution owns the only model ledger.",
+        "chapter body workflow": "lg-agents draft-chapter and lg-workflows kind:chapter draft complete current chapter-body candidates, then review exact candidate and revise selected feedback. Empty chapters supported; creation requirements carried into reviews; no child-scene concatenation or automatic adoption.",
+        "ordered scene drafting": "lg-workflows kind:scenes freezes an author-ordered same-chapter batch of approved empty scenes, previews each real request, gates continuation on author decisions, carries a bounded adopted excerpt and recovers the original paid step.",
+        "selected direction to chapter": "An approved work/part/chapter option can be handed directly to a scoped chapter workflow. Writer and reviewer receive its complete text. Both continued dispatch and adoption verify its current source and selection.",
+        "chapter direction workflow": "A native chapter workflow persists the original ideas request, three generated options, author-confirmed planning selection and subsequent draft, review and revision under one budget.",
+        "RunStore.load/list_runs/read_events": "lg-books reads legacy v2 manifests and streams public events. lg-workflows saves versioned, confirmed public snapshots with verified manuscript-version links.",
+        "ordered chapter drafting": "Native 2–6 chapter sequence, per-chapter instructions and preflight, author-gated execution, pinned adopted ending, restart and candidate recovery."
+      },
+      "remaining": "General task orchestration and supervision across arbitrary workflows, legacy execution recovery and original artifact adoption are incomplete."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/runtime_context.py",
+      "lines": 60,
+      "public": [
+        "LiteraryContext.instructions",
+        "LiteraryContext.history",
+        "writing_instructions"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/runtime_identity.py",
+      "lines": 114,
+      "public": [
+        "runtime_identity",
+        "verify_manifest"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/runtime_manifest.py",
+      "lines": 73,
+      "public": [
+        "file_sha256",
+        "read_runtime_identity"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/session_runtime.py",
+      "lines": 95,
+      "public": [
+        "operation_policy",
+        "permissions",
+        "SessionRuntime.read",
+        "SessionRuntime.update",
+        "SessionRuntime.acquire",
+        "SessionRuntime.select_engine",
+        "SessionRuntime.release"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/slash_commands.py",
+      "lines": 157,
+      "public": [
+        "category_for",
+        "uses_model",
+        "command_catalog",
+        "matching_commands",
+        "CommandUsage.record",
+        "CommandUsage.favorites"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/slime_animation.py",
+      "lines": 241,
+      "public": [
+        "pose_at",
+        "frame_index",
+        "face_pixels",
+        "frame_pixels",
+        "prepare_frames",
+        "slime_mark",
+        "compact_slime_mark"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/source_impact.py",
+      "lines": 269,
+      "public": [
+        "analyze"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-impact queries direct declared sources, confirmed decisions/cognition, owned edit bases, native context/scene plans/reviews, document-only chronology links and output-bound legacy document receipts. Legacy decision/scene observation projections and full forward generation source review remain pending."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/source_review.py",
+      "lines": 218,
+      "public": [
+        "review"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/stage_input.py",
+      "lines": 25,
+      "public": [
+        "prepare_stage_input"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-agents task contracts and author request + optional lg-context; multi-stage guidance/schema/graph pipeline pending"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/startup.py",
+      "lines": 147,
+      "public": [
+        "save_frame",
+        "first_frame",
+        "restore_terminal"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/story_cli.py",
+      "lines": 1038,
+      "public": [
+        "add_story_commands",
+        "dispatch_story_command"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/story_context.py",
+      "lines": 225,
+      "public": [
+        "render_story_context",
+        "render_story_context_with_sources",
+        "render_scene_card"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-context + literaryPlanning: bounded actual excerpts, explicit document selection, direction and scene card, author/character/reader policy; automatic relevance and prior-prose selection pending"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/story_index.py",
+      "lines": 193,
+      "public": [
+        "validate_graph",
+        "build_index",
+        "refresh_index",
+        "save_artifact_index",
+        "artifact_graph"
+      ],
+      "status": "partially_migrated",
+      "mapping": {
+        "validate_graph/build_index": "lg-books validates version-bound graph groups and scoped edges, source hashes on registered book artifact sidecars, character documents, current character facts, timeline entries, scene plans, outlines and chapter prose. lg-dashboard offers on-demand browsing, search and evidence.",
+        "refresh_index": "Explicit rebuild binds source and existing cache fingerprints. Chapter CharacterArc/EventsLibrary reports are projected only after identity, source, schema and evidence validation. Pure selected-plan events are marked planned."
+      },
+      "remaining": "Registration of new artifact indices, attaching graph annotations to newly generated/edited versions, and automatic cache refresh."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/story_review.py",
+      "lines": 358,
+      "public": [
+        "ConsistencyReport.errors",
+        "ConsistencyReport.warnings",
+        "run_consistency_check",
+        "chapter_quality_report"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-review hosts consistency and chapter quality reports with source-bound history and author decisions. Chapter quality is available as a read-only preview or a saved report.",
+      "migration": {
+        "run_consistency_check": "Native lg-review.consistency; selected chapter/scene or whole book; reports preserve old history instead of replacement; exact evidence and stale-source handling; actual API and browser author flow verified.",
+        "chapter_quality_report": "Native lg-review quality-preview / quality. Four legacy-vs-native synthetic chapters matched word count, paragraph count, dialogue ratio, hook signal, scene and accepted counts, and issue categories. Active chapter plus ordered adopted scene cards; reports preserve history, guard inconsistent adoption state and expose the exact ending source."
+      }
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/story_workflow.py",
+      "lines": 1130,
+      "public": [
+        "polish_profile_fingerprint",
+        "StoryTaskResult.ok",
+        "_PreparedStoryInput.generation_sources",
+        "StoryWorkflowService.curate_document",
+        "StoryWorkflowService.plan_scene",
+        "StoryWorkflowService.draft_scene",
+        "StoryWorkflowService.revise_document",
+        "_EventEmitter.emit"
+      ],
+      "status": "partially_migrated",
+      "migration": {
+        "StoryWorkflowService.draft_scene": "lg-agents draft-scene + lg-planning approved receipt + lg-context + lg-books candidate; only current empty scene and approved plan; legacy full drafting/supervision/whole-chapter workflow pending",
+        "StoryWorkflowService.revise_document": "lg-agents polish handles exact selected version/range and optional selected lg-review issues; workbench persists candidate only; source candidate gates retained and author acceptance rechecks feedback. Full legacy revision modes, generated memory proposals/story-index/supervision pipelines pending."
+      }
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/studio.py",
+      "lines": 441,
+      "public": [
+        "review_source",
+        "review_reports_schema",
+        "profile",
+        "dashboard",
+        "register_tools"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/studio_cli.py",
+      "lines": 39,
+      "public": [
+        "add_parser",
+        "read_arguments",
+        "confirmation",
+        "dispatch"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/studio_operations.py",
+      "lines": 41,
+      "public": [
+        "prepare",
+        "invoke"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/supervision.py",
+      "lines": 229,
+      "public": [
+        "review_decisions",
+        "unresolved_conflicts",
+        "adjudicate_review",
+        "configure_supervision",
+        "supervision_policy",
+        "chapter_for",
+        "candidate_reports",
+        "review_for_acceptance",
+        "publish_accepted_reports"
+      ],
+      "status": "partially_migrated",
+      "mapping": "lg-books reads per-book policy and validates existing candidate analyses, evidence, selected decisions and immutable adjudications inside the manuscript adoption transaction. lg-workbench previews, records author false-positive decisions and independently confirms adoption. Native and historical Python receipts verified in both directions. Accepted reports are published by category from the version receipt, with source/target checks, original backups and independent restart recovery. All five modern payloads matched legacy Python and loaded as current. Native specialists can generate all five required candidate report categories and replace stale owned reports with backups. The dashboard shows the saved chapter categories and can explicitly enable the original default policy on an existing book; newly initialized books receive that same policy.",
+      "remaining": "Volume supervision and legacy candidate types with separate source contracts."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/task_cli.py",
+      "lines": 107,
+      "public": [
+        "add_parsers",
+        "dispatch"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/task_scope.py",
+      "lines": 238,
+      "public": [
+        "stage_task",
+        "normalize_definition",
+        "bind_task",
+        "check_operation",
+        "scope_prompt",
+        "scope_summary"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/terminal_backend.py",
+      "lines": 190,
+      "public": [
+        "TerminalBackendClient.readonly",
+        "TerminalBackendClient.runtime",
+        "TerminalBackendClient.thread_id",
+        "TerminalBackendClient.start",
+        "TerminalBackendClient.run",
+        "TerminalBackendClient.steer",
+        "TerminalBackendClient.workflow",
+        "TerminalBackendClient.analysis_preview",
+        "TerminalBackendClient.analysis",
+        "TerminalBackendClient.studio",
+        "TerminalBackendClient.resume_workflow",
+        "TerminalBackendClient.list_runs",
+        "TerminalBackendClient.read_run",
+        "TerminalBackendClient.creative",
+        "TerminalBackendClient.import_run",
+        "TerminalBackendClient.interrupt",
+        "TerminalBackendClient.set_permissions",
+        "TerminalBackendClient.close"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/terminal_input.py",
+      "lines": 1367,
+      "public": [
+        "BookReaderLexer.lex_document",
+        "HistoryControl.mouse_handler",
+        "input_style",
+        "LiteraryInput.view_text",
+        "LiteraryInput.edit_text",
+        "LiteraryInput.ask",
+        "LiteraryInput.close_dialog",
+        "LiteraryInput.enter_browse",
+        "LiteraryInput.show_details",
+        "LiteraryInput.set_task",
+        "LiteraryInput.stream_message",
+        "LiteraryInput.append",
+        "LiteraryInput.clear",
+        "LiteraryInput.set_history",
+        "LiteraryInput.scroll_history",
+        "LiteraryInput.show_home",
+        "LiteraryInput.begin_work",
+        "LiteraryInput.end_work",
+        "LiteraryInput.cancel_process",
+        "LiteraryInput.stop_workflow_process",
+        "LiteraryInput.run_command",
+        "LiteraryInput.run",
+        "LiteraryInput.prompt"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/terminal_view.py",
+      "lines": 221,
+      "public": [
+        "clip",
+        "command_columns",
+        "choice_rows",
+        "compact_content",
+        "render_conversation"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/thinking_orb.py",
+      "lines": 74,
+      "public": [
+        "working_dots",
+        "terminal_frame"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/ui.py",
+      "lines": 67,
+      "public": [],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/usage_ledger.py",
+      "lines": 136,
+      "public": [
+        "UsageLedger.start_capture",
+        "UsageLedger.record",
+        "UsageLedger.summary",
+        "UsageLedger.label_thread"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/workflow.py",
+      "lines": 48,
+      "public": [
+        "run_workflow"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/workflow_control.py",
+      "lines": 247,
+      "public": [
+        "WorkflowControl.active",
+        "WorkflowControl.reset",
+        "WorkflowControl.status",
+        "WorkflowControl.endpoint",
+        "WorkflowControl.run",
+        "WorkflowControl.stop",
+        "WorkflowControl.retry",
+        "WorkflowControl.cancel_requests",
+        "WorkflowControl.retire_endpoint",
+        "WorkflowControl.close",
+        "control_request"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/workflow_io.py",
+      "lines": 111,
+      "public": [
+        "public_workflow_event",
+        "public_workflow_result",
+        "read_story_request",
+        "apply_story_request",
+        "WorkflowStream.feed",
+        "WorkflowStream.end",
+        "feed_request"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/workflow_runner.py",
+      "lines": 795,
+      "public": [
+        "ModelAdapter.run",
+        "WorkflowExecutionResult.ok",
+        "WorkflowRunner.run",
+        "WorkflowRunner.resume"
+      ],
+      "status": "partially_migrated",
+      "migration": {
+        "bounded revision workflow": "lg-workflows persists frozen scope, fixed step operation ids, call/cost ceilings, candidate-review-author feedback sequence, idempotent recovery and stop/no-progress gates; lg-execution owns the only model ledger.",
+        "chapter body workflow": "lg-agents draft-chapter and lg-workflows kind:chapter draft complete current chapter-body candidates, then review exact candidate and revise selected feedback. Empty chapters supported; creation requirements carried into reviews; no child-scene concatenation or automatic adoption.",
+        "ordered scene drafting": "lg-workflows kind:scenes freezes an author-ordered same-chapter batch of approved empty scenes, previews each real request, gates continuation on author decisions, carries a bounded adopted excerpt and recovers the original paid step.",
+        "selected direction to chapter": "An approved work/part/chapter option can be handed directly to a scoped chapter workflow. Writer and reviewer receive its complete text. Both continued dispatch and adoption verify its current source and selection.",
+        "chapter direction workflow": "A native chapter workflow persists the original ideas request, three generated options, author-confirmed planning selection and subsequent draft, review and revision under one budget.",
+        "ordered chapter drafting": "Native 2–6 chapter sequence, per-chapter instructions and preflight, author-gated execution, pinned adopted ending, restart and candidate recovery."
+      },
+      "remaining": "General task orchestration and supervision across arbitrary workflows, legacy execution recovery and original artifact adoption are incomplete."
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/working_animation.py",
+      "lines": 30,
+      "public": [
+        "choose_word",
+        "loading_text"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/workspace_library.py",
+      "lines": 462,
+      "public": [
+        "library",
+        "entry",
+        "writing_context"
+      ],
+      "status": "pending_mapping"
+    },
+    {
+      "source": "LiteraryAgent/lg-cli/lg_cli/writing_mcp.py",
+      "lines": 306,
+      "public": [
+        "create_server",
+        "main"
+      ],
+      "status": "pending_mapping"
+    }
+  ]
+}

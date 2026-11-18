@@ -1,0 +1,457 @@
+{
+  "schema": "lg.abc.results.v1",
+  "date": "2026-11-11",
+  "status": "completed_no_clear_C_advantage",
+  "conclusion": "Holdout B/C prose comparison not estimable: no paired successful outputs. No evidence to choose C as default.",
+  "requests": {
+    "authorization": 96,
+    "used": 41,
+    "pilotExcludedFromEfficacy": 8,
+    "validComparison": 33,
+    "paidJudges": 0,
+    "httpRetries": 0
+  },
+  "usage": {
+    "knownTotal": 205374,
+    "unknownRequests": 4,
+    "unknownConservativeReservation": 101540,
+    "notActualTotalOrMoney": true,
+    "pilotKnownTokens": 64991,
+    "validKnownTokens": 140383
+  },
+  "freezeHash": "86de3ca46bcbda37b0109839c37161e1f1ad4cd254bae906e8f92f5f0f6b6916",
+  "reviewHash": "7640d4c537c048e66e2f73559c6ffe296f78e452c737e748a384369ea690c3e4",
+  "reviewerIndependent": false,
+  "authorReviewComplete": false,
+  "armSummary": {
+    "A": {
+      "outputs": 4,
+      "attempts": 4,
+      "requests": 8,
+      "knownTokens": 31884,
+      "unknownRequests": 0,
+      "unknownReservation": 0,
+      "elapsedSeconds": 46.73
+    },
+    "B": {
+      "outputs": 2,
+      "attempts": 4,
+      "requests": 12,
+      "knownTokens": 56472,
+      "unknownRequests": 2,
+      "unknownReservation": 54756,
+      "elapsedSeconds": 80.54
+    },
+    "C": {
+      "outputs": 2,
+      "attempts": 4,
+      "requests": 13,
+      "knownTokens": 52027,
+      "unknownRequests": 2,
+      "unknownReservation": 46784,
+      "elapsedSeconds": 144.33
+    }
+  },
+  "cells": [
+    {
+      "cell": "v2-cal-1-A",
+      "caseId": "cal-1",
+      "split": "calibration",
+      "arm": "A",
+      "sourceHash": "3daa270dca5e7b5bb0e08d499c6544fbbe327dfb17757d74e0ad697658b83132",
+      "completed": true,
+      "requests": 2,
+      "knownTokens": 8762,
+      "unknownUsage": 0,
+      "elapsedMs": 11682.300584,
+      "firstDraftHan": 599,
+      "finalHan": 580,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": null,
+      "quality": [
+        2,
+        2,
+        1
+      ],
+      "qualityTotal": 5,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-cal-1-B",
+      "caseId": "cal-1",
+      "split": "calibration",
+      "arm": "B",
+      "sourceHash": "3daa270dca5e7b5bb0e08d499c6544fbbe327dfb17757d74e0ad697658b83132",
+      "completed": true,
+      "requests": 4,
+      "knownTokens": 24402,
+      "unknownUsage": 0,
+      "elapsedMs": 25796.956707999998,
+      "firstDraftHan": 456,
+      "finalHan": 543,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 4,
+      "quality": [
+        1,
+        1,
+        2
+      ],
+      "qualityTotal": 4,
+      "adoption": 1,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 1
+    },
+    {
+      "cell": "v2-cal-1-C",
+      "caseId": "cal-1",
+      "split": "calibration",
+      "arm": "C",
+      "sourceHash": "3daa270dca5e7b5bb0e08d499c6544fbbe327dfb17757d74e0ad697658b83132",
+      "completed": false,
+      "requests": 3,
+      "knownTokens": 8861,
+      "unknownUsage": 1,
+      "elapsedMs": 85394.728708,
+      "firstDraftHan": null,
+      "finalHan": null,
+      "unknownUsageReservation": 26644,
+      "failures": [
+        {
+          "phase": "draft",
+          "code": "TRANSPORT"
+        }
+      ],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 3,
+      "quality": null,
+      "qualityTotal": null,
+      "adoption": 0,
+      "constraintStatuses": [
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-cal-2-A",
+      "caseId": "cal-2",
+      "split": "calibration",
+      "arm": "A",
+      "sourceHash": "984043aec5c90e5b4513a9f4a0ccb809f36d88cc641e0e31a4a23f9b6f663a9f",
+      "completed": true,
+      "requests": 2,
+      "knownTokens": 7949,
+      "unknownUsage": 0,
+      "elapsedMs": 11880.128583,
+      "firstDraftHan": 579,
+      "finalHan": 571,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": null,
+      "quality": [
+        1,
+        2,
+        1
+      ],
+      "qualityTotal": 4,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-cal-2-B",
+      "caseId": "cal-2",
+      "split": "calibration",
+      "arm": "B",
+      "sourceHash": "984043aec5c90e5b4513a9f4a0ccb809f36d88cc641e0e31a4a23f9b6f663a9f",
+      "completed": true,
+      "requests": 4,
+      "knownTokens": 24489,
+      "unknownUsage": 0,
+      "elapsedMs": 26811.243875,
+      "firstDraftHan": 477,
+      "finalHan": 475,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 8,
+      "quality": [
+        1,
+        1,
+        1
+      ],
+      "qualityTotal": 3,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-cal-2-C",
+      "caseId": "cal-2",
+      "split": "calibration",
+      "arm": "C",
+      "sourceHash": "984043aec5c90e5b4513a9f4a0ccb809f36d88cc641e0e31a4a23f9b6f663a9f",
+      "completed": true,
+      "requests": 4,
+      "knownTokens": 19769,
+      "unknownUsage": 0,
+      "elapsedMs": 24699.759958,
+      "firstDraftHan": 518,
+      "finalHan": 459,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 6,
+      "quality": [
+        1,
+        1,
+        2
+      ],
+      "qualityTotal": 4,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-new-1-A",
+      "caseId": "new-1",
+      "split": "holdout",
+      "arm": "A",
+      "sourceHash": "2f9d97342e6d59daf858deb0428c98e3d27371aca1fd09295a42bae9fc653171",
+      "completed": true,
+      "requests": 2,
+      "knownTokens": 7525,
+      "unknownUsage": 0,
+      "elapsedMs": 11069.008,
+      "firstDraftHan": 494,
+      "finalHan": 462,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": null,
+      "quality": [
+        1,
+        1,
+        1
+      ],
+      "qualityTotal": 3,
+      "adoption": 1,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "minor",
+        "pass",
+        "minor"
+      ],
+      "additionalSeriousIssues": 1
+    },
+    {
+      "cell": "v2-new-1-B",
+      "caseId": "new-1",
+      "split": "holdout",
+      "arm": "B",
+      "sourceHash": "2f9d97342e6d59daf858deb0428c98e3d27371aca1fd09295a42bae9fc653171",
+      "completed": false,
+      "requests": 2,
+      "knownTokens": 3862,
+      "unknownUsage": 1,
+      "elapsedMs": 15225.37225,
+      "firstDraftHan": null,
+      "finalHan": null,
+      "unknownUsageReservation": 27740,
+      "failures": [
+        {
+          "phase": "planning",
+          "code": "MALFORMED_RESPONSE"
+        }
+      ],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 4,
+      "quality": null,
+      "qualityTotal": null,
+      "adoption": 0,
+      "constraintStatuses": [
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-new-1-C",
+      "caseId": "new-1",
+      "split": "holdout",
+      "arm": "C",
+      "sourceHash": "2f9d97342e6d59daf858deb0428c98e3d27371aca1fd09295a42bae9fc653171",
+      "completed": false,
+      "requests": 1,
+      "knownTokens": 0,
+      "unknownUsage": 1,
+      "elapsedMs": 6577.913750000001,
+      "firstDraftHan": null,
+      "finalHan": null,
+      "unknownUsageReservation": 20140,
+      "failures": [
+        {
+          "phase": "analysis",
+          "code": "MALFORMED_RESPONSE"
+        }
+      ],
+      "toolSchemaRejections": 0,
+      "analysisFindings": null,
+      "quality": null,
+      "qualityTotal": null,
+      "adoption": 0,
+      "constraintStatuses": [
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-new-2-A",
+      "caseId": "new-2",
+      "split": "holdout",
+      "arm": "A",
+      "sourceHash": "3c5e60dadcecfc939f7da94ab439153bc4ebfd87c60a138ff659366c9adcdddb",
+      "completed": true,
+      "requests": 2,
+      "knownTokens": 7648,
+      "unknownUsage": 0,
+      "elapsedMs": 12093.981042,
+      "firstDraftHan": 559,
+      "finalHan": 552,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 0,
+      "analysisFindings": null,
+      "quality": [
+        1,
+        2,
+        1
+      ],
+      "qualityTotal": 4,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-new-2-B",
+      "caseId": "new-2",
+      "split": "holdout",
+      "arm": "B",
+      "sourceHash": "3c5e60dadcecfc939f7da94ab439153bc4ebfd87c60a138ff659366c9adcdddb",
+      "completed": false,
+      "requests": 2,
+      "knownTokens": 3719,
+      "unknownUsage": 1,
+      "elapsedMs": 12710.94375,
+      "firstDraftHan": null,
+      "finalHan": null,
+      "unknownUsageReservation": 27016,
+      "failures": [
+        {
+          "phase": "planning",
+          "code": "MALFORMED_RESPONSE"
+        }
+      ],
+      "toolSchemaRejections": 0,
+      "analysisFindings": 5,
+      "quality": null,
+      "qualityTotal": null,
+      "adoption": 0,
+      "constraintStatuses": [
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable",
+        "not_assessable"
+      ],
+      "additionalSeriousIssues": 0
+    },
+    {
+      "cell": "v2-new-2-C",
+      "caseId": "new-2",
+      "split": "holdout",
+      "arm": "C",
+      "sourceHash": "3c5e60dadcecfc939f7da94ab439153bc4ebfd87c60a138ff659366c9adcdddb",
+      "completed": true,
+      "requests": 5,
+      "knownTokens": 23397,
+      "unknownUsage": 0,
+      "elapsedMs": 27656.120084,
+      "firstDraftHan": 560,
+      "finalHan": 536,
+      "unknownUsageReservation": 0,
+      "failures": [],
+      "toolSchemaRejections": 1,
+      "analysisFindings": 4,
+      "quality": [
+        1,
+        2,
+        1
+      ],
+      "qualityTotal": 4,
+      "adoption": 2,
+      "constraintStatuses": [
+        "pass",
+        "pass",
+        "pass",
+        "pass",
+        "pass"
+      ],
+      "additionalSeriousIssues": 0
+    }
+  ]
+}

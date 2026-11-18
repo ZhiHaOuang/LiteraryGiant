@@ -1,0 +1,161 @@
+{
+  "schema": "lg.main-agent.quality.v1",
+  "frozenBeforeModelCalls": true,
+  "casesSHA256": "ff438dea9e04de62d83cfcca1e517fcd50bcb26c6a20074a01f83a37015e7381",
+  "jobs": [
+    {
+      "case": "read-01",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-01",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-02",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-02",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-03",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-03",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-04",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-04",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-05",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-05",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-06",
+      "arm": "candidate",
+      "repeat": 1
+    },
+    {
+      "case": "read-06",
+      "arm": "baseline",
+      "repeat": 1
+    },
+    {
+      "case": "read-01",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case": "read-01",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-02",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-02",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case": "read-03",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case": "read-03",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-04",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-04",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case": "read-05",
+      "arm": "candidate",
+      "repeat": 2
+    },
+    {
+      "case": "read-05",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-06",
+      "arm": "baseline",
+      "repeat": 2
+    },
+    {
+      "case": "read-06",
+      "arm": "candidate",
+      "repeat": 2
+    }
+  ],
+  "maxRequests": 120,
+  "maxCNY": 3,
+  "perTaskMaxRequests": 10,
+  "automaticRetry": false,
+  "model": {
+    "provider": "deepseek-account",
+    "model": "deepseek-flash",
+    "reasoningEffort": "off",
+    "maxTokens": 6000
+  },
+  "qualityGate": {
+    "allCandidateRequiredItems": true,
+    "pairwiseRegressionAllowed": false,
+    "unresolvedRiskBlocksIntegration": true,
+    "aggregateScoreCannotOffsetRegression": true,
+    "dimensions": [
+      "correctness",
+      "completeness",
+      "source_support",
+      "scope",
+      "explicit_workflow",
+      "completion",
+      "side_effects"
+    ]
+  },
+  "efficiencyGate": "Evaluate only after quality passes; report every pair and all resource regressions; no best-of.",
+  "limits": "Six authored synthetic tasks, two repetitions. Not an external benchmark, literary quality judgement, long-context endurance or platform certification. Incomplete runs stay in the denominator.",
+  "pricingSource": "https://api-docs.deepseek.com/zh-cn/quick_start/pricing/",
+  "priceCNYPerMillion": {
+    "input": 2,
+    "cacheRead": 0.04,
+    "cacheWrite": 2,
+    "output": 8
+  }
+}

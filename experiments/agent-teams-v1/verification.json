@@ -1,0 +1,439 @@
+{
+  "schema": "lg.agent-teams.validation.v1",
+  "date": "2026-11-11",
+  "provider": "deepseek-account",
+  "model": "deepseek-flash",
+  "reasoning": "off",
+  "maxTokens": 6000,
+  "httpRetries": 0,
+  "requestLimit": 100,
+  "usedRequests": 100,
+  "remainingRequests": 0,
+  "freeTests": {
+    "repository": 34,
+    "installedAppNativeRuntime": 4,
+    "sidebarTargeted": 133
+  },
+  "runs": [
+    {
+      "id": "1-full-1794361657313",
+      "revision": "v1",
+      "case": 1,
+      "mode": "full",
+      "nativeCollaborationComplete": false,
+      "modelRequests": 10,
+      "probeAttempts": 11,
+      "han": null,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": null,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "failed",
+          "promptHash": "318fce38d4b32b5d28d1c1244552b7c5ea60bfb4b73e39f0b6fceedf8153173d",
+          "method": true,
+          "error": "成员执行结束：error"
+        }
+      ]
+    },
+    {
+      "id": "1-full-1794361825161",
+      "revision": "v1",
+      "case": 1,
+      "mode": "full",
+      "nativeCollaborationComplete": true,
+      "modelRequests": 14,
+      "probeAttempts": 14,
+      "han": 421,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": false,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "4c469ab4aa31c5aebc0de5cf636946509609ca32636ae03a7ad7ea37a1436dbc",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "completed",
+          "promptHash": "d3dc59e99138ce484a9688e7988b376cb6c511f23ebc0f62edd9f9ff3ca330ac",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "writing",
+          "status": "completed",
+          "promptHash": "cdd2af1ca21730a139ef0464b63c7594c43e50a713431ed2a2cfedbc26ff3f59",
+          "method": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "1-no-method-1794361934676",
+      "revision": "v1",
+      "case": 1,
+      "mode": "no-method",
+      "nativeCollaborationComplete": false,
+      "modelRequests": 10,
+      "probeAttempts": 10,
+      "han": null,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": null,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "159aa47dd7c8d18880a4d0906fc94c15af69c913335403aec96f4176b5ca56e8",
+          "method": false,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "failed",
+          "promptHash": "79a3679bf5982848159dee5a110ab73ccc392f1eb74d7f34e97254fbf159536b",
+          "method": false,
+          "error": "成员执行结束：error"
+        }
+      ]
+    },
+    {
+      "id": "1-no-method-1794362071764",
+      "revision": "v1",
+      "case": 1,
+      "mode": "no-method",
+      "nativeCollaborationComplete": true,
+      "modelRequests": 14,
+      "probeAttempts": 14,
+      "han": 1199,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": false,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "159aa47dd7c8d18880a4d0906fc94c15af69c913335403aec96f4176b5ca56e8",
+          "method": false,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "completed",
+          "promptHash": "79a3679bf5982848159dee5a110ab73ccc392f1eb74d7f34e97254fbf159536b",
+          "method": false,
+          "error": null
+        },
+        {
+          "role": "writing",
+          "status": "completed",
+          "promptHash": "f04ebc261ced38999e684679dabc4cd8b6bca8d066ce2853d5736acc71648423",
+          "method": false,
+          "error": null
+        }
+      ],
+      "lengthMeasurement": "entire artifact.text, including headings and author notes",
+      "posthocProseAudit": {
+        "han": 675,
+        "lengthPassed": true,
+        "method": "Split at explicit 《写作中做的取舍》 heading, remove self-reported length title, count Unicode Script=Han",
+        "task": "task-996e7090-5f35-4dd5-9e2c-ff8af87c3557",
+        "automatedProductBehavior": false,
+        "deliveryIssue": "Author notes mixed into prose field; original field length result retained"
+      }
+    },
+    {
+      "id": "1-writing-only-1794362219407",
+      "revision": "v1",
+      "case": 1,
+      "mode": "writing-only",
+      "nativeCollaborationComplete": true,
+      "modelRequests": 6,
+      "probeAttempts": 6,
+      "han": 719,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": false,
+      "roles": [
+        {
+          "role": "writing",
+          "status": "completed",
+          "promptHash": "cdd2af1ca21730a139ef0464b63c7594c43e50a713431ed2a2cfedbc26ff3f59",
+          "method": true,
+          "error": null
+        }
+      ]
+    },
+    {
+      "id": "2-full-1794362293939",
+      "revision": "v1",
+      "case": 2,
+      "mode": "full",
+      "nativeCollaborationComplete": false,
+      "modelRequests": 10,
+      "probeAttempts": 10,
+      "han": null,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": null,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "4c469ab4aa31c5aebc0de5cf636946509609ca32636ae03a7ad7ea37a1436dbc",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "failed",
+          "promptHash": "d3dc59e99138ce484a9688e7988b376cb6c511f23ebc0f62edd9f9ff3ca330ac",
+          "method": true,
+          "error": "成员执行失败：MALFORMED_RESPONSE"
+        }
+      ]
+    },
+    {
+      "id": "2-full-1794363069051",
+      "revision": "v2",
+      "case": 2,
+      "mode": "full",
+      "nativeCollaborationComplete": false,
+      "modelRequests": 14,
+      "probeAttempts": 15,
+      "han": null,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": null,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "4c469ab4aa31c5aebc0de5cf636946509609ca32636ae03a7ad7ea37a1436dbc",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "failed",
+          "promptHash": "703b920ac4d3e87b46bc8923a7f85ae1da674f3f0b7d3a28d99df09279d13a19",
+          "method": true,
+          "error": "成员执行失败：UNKNOWN"
+        }
+      ]
+    },
+    {
+      "id": "2-full-1794363176074",
+      "revision": "v2.1",
+      "case": 2,
+      "mode": "full",
+      "nativeCollaborationComplete": true,
+      "modelRequests": 15,
+      "probeAttempts": 15,
+      "han": 640,
+      "requiredHan": [
+        500,
+        700
+      ],
+      "lengthPassed": true,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed",
+          "promptHash": "4c469ab4aa31c5aebc0de5cf636946509609ca32636ae03a7ad7ea37a1436dbc",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "planning",
+          "status": "completed",
+          "promptHash": "b468450944182aa0c54a4668c7cbaa6943bece223c4ba0e8958835fe2115f44b",
+          "method": true,
+          "error": null
+        },
+        {
+          "role": "writing",
+          "status": "completed",
+          "promptHash": "fc2552d1baa2f1d02d31905a8b50c08d00f4b9e5bbc47ffa840eca245f27dc6d",
+          "method": true,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "usage": {
+    "requests": 100,
+    "budget": {
+      "id": "author-100-20261111",
+      "limit": 100,
+      "used": 100,
+      "closed": false
+    },
+    "roles": [
+      {
+        "role": "coordinator",
+        "requests": 55,
+        "inputTokens": 232077,
+        "outputTokens": 16070,
+        "tokens": 248147,
+        "knownUsage": 55,
+        "failed": 0,
+        "pending": 0,
+        "requestShare": 0.55,
+        "tokenShare": 0.26318904339728505
+      },
+      {
+        "role": "analysis",
+        "requests": 20,
+        "inputTokens": 294908,
+        "outputTokens": 24706,
+        "tokens": 319614,
+        "knownUsage": 20,
+        "failed": 0,
+        "pending": 0,
+        "requestShare": 0.2,
+        "tokenShare": 0.33898819214570336
+      },
+      {
+        "role": "planning",
+        "requests": 17,
+        "inputTokens": 259509,
+        "outputTokens": 12456,
+        "tokens": 271965,
+        "knownUsage": 15,
+        "failed": 2,
+        "pending": 0,
+        "requestShare": 0.17,
+        "tokenShare": 0.2884508303043866
+      },
+      {
+        "role": "writing",
+        "requests": 8,
+        "inputTokens": 97815,
+        "outputTokens": 5306,
+        "tokens": 103121,
+        "knownUsage": 8,
+        "failed": 0,
+        "pending": 0,
+        "requestShare": 0.08,
+        "tokenShare": 0.10937193415262497
+      }
+    ]
+  },
+  "actualDailyApp": {
+    "installed": true,
+    "verified": true,
+    "pluginCount": 24,
+    "modelRequests": 7,
+    "titleRequests": 1,
+    "memberRoles": [
+      "analysis"
+    ],
+    "completed": true,
+    "pendingRequests": 0,
+    "ledgerIntegrity": "ok",
+    "checks": [
+      "role prompts and method drafts expanded",
+      "actual 100/100 ledger and shares visible",
+      "latest candidate and source version expanded",
+      "native main-child task graph visible after projection repair",
+      "390 story records visible",
+      "Anna entity and evidence expanded",
+      "chapter summary expanded"
+    ],
+    "remainingIssues": [
+      "two quotes for a one-quote request",
+      "coordinator misreported 7 requests as 3; historical answer retained"
+    ],
+    "followupFix": "ledger snapshot plus honest-reporting prompt; offline verified only"
+  },
+  "limitations": [
+    "No blinded author evaluation",
+    "No causal evidence of method benefit",
+    "V1 with-method and direct prose violate length; no-method prose is 675 Han but its text field also contains notes",
+    "V2.1 one complete three-role sample: 640 Han",
+    "No canonical adoption or story-data extraction integration",
+    "Model pretraining knowledge cannot be filtered",
+    "Final reporting prompt repair has no further live-model validation; 100-request limit exhausted"
+  ],
+  "installedRuntimePreflight": {
+    "officialCliOfflineInstall": true,
+    "isolatedProfile": "web",
+    "defaultStateDirectory": true,
+    "existingPluginCount": 23,
+    "fullPluginCollaboration": {
+      "paidRequests": 0,
+      "fixtureRequests": 15,
+      "titleRequests": 1,
+      "meteredRequests": 15,
+      "roles": [
+        {
+          "role": "analysis",
+          "status": "completed"
+        },
+        {
+          "role": "planning",
+          "status": "completed"
+        },
+        {
+          "role": "writing",
+          "status": "completed"
+        }
+      ],
+      "toolErrors": 0,
+      "checks": [
+        "full existing plugin set installed",
+        "native automatic parent delivery",
+        "role prompts present",
+        "member tool scope restricted",
+        "full artifacts returned",
+        "candidate only"
+      ]
+    },
+    "apiChecks": [
+      "unauthorized 401",
+      "three role prompts and method drafts",
+      "93 actual requests attributed once",
+      "role shares sum to one",
+      "full candidate and deterministic 640 Han",
+      "source versions current",
+      "book filter excludes unrelated usage",
+      "55 knowledge records from isolated sample book"
+    ],
+    "dailyProfileChanged": false,
+    "modelCalls": 0,
+    "deepseekAccountRecordPresentInDailyHome": true,
+    "credentialValuesLogged": false
+  },
+  "effectivenessAudit": {
+    "status": "not_established",
+    "comparisonType": "development debugging and exploratory comparison",
+    "missing": [
+      "post-fix matched-version controls",
+      "single-agent staged-workflow control",
+      "matched total inference budget",
+      "independent holdout cases and repeated runs",
+      "blind author evaluation"
+    ],
+    "correction": "1199 was full text-field size, not pure prose length; pure prose 675 Han"
+  }
+}

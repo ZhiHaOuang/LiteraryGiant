@@ -1,0 +1,47 @@
+{
+  "apps/cli/lib/bin.js": {
+    "same": true,
+    "project": "bc25f54b623b9ca507f1508d5c0ed2e201ab4a0c4ad102621bd9cf552e46d84a",
+    "host": "bc25f54b623b9ca507f1508d5c0ed2e201ab4a0c4ad102621bd9cf552e46d84a"
+  },
+  "packages/core/agent-loop/src/agent.ts": {
+    "same": true,
+    "project": "ad9ee0778c0a93dec40363f88b53f442add9b033837b9ff049675a1ada3df61f",
+    "host": "ad9ee0778c0a93dec40363f88b53f442add9b033837b9ff049675a1ada3df61f"
+  },
+  "packages/core/tools/src/batch.ts": {
+    "same": true,
+    "project": "5451e17f844cea8a56b8bf6dfadbf357d3081c4796d0b1046b761a82e4d8e355",
+    "host": "5451e17f844cea8a56b8bf6dfadbf357d3081c4796d0b1046b761a82e4d8e355"
+  },
+  "packages/core/system-prompt/src/index.ts": {
+    "same": true,
+    "project": "b144df20ea25b674ff40faf28d6beda05e184b7e98c64b2da37154af77520596",
+    "host": "b144df20ea25b674ff40faf28d6beda05e184b7e98c64b2da37154af77520596"
+  },
+  "packages/llm/llm-deepseek/src/serialize.ts": {
+    "same": true,
+    "project": "b79c87ff2977805f5de1dec65fca6dd16414909bd5a0e9e7bb6e7ddbc8fa3406",
+    "host": "b79c87ff2977805f5de1dec65fca6dd16414909bd5a0e9e7bb6e7ddbc8fa3406"
+  },
+  "packages/core/agent-loop/lib/index.js": {
+    "same": true,
+    "project": "8a78b197d52367ce89fee72b2a0b1095274c50ccf04bd0ff3dafc240d6e7ce99",
+    "host": "8a78b197d52367ce89fee72b2a0b1095274c50ccf04bd0ff3dafc240d6e7ce99"
+  },
+  "packages/core/tools/lib/index.js": {
+    "same": true,
+    "project": "1889cbf718d64518dd83245d4dba1e1f080b2c5326259c3ed5b1be7a7666a2bd",
+    "host": "1889cbf718d64518dd83245d4dba1e1f080b2c5326259c3ed5b1be7a7666a2bd"
+  },
+  "packages/core/system-prompt/lib/index.js": {
+    "same": true,
+    "project": "b4d72a2d94a1aba49fe6a406d695ec4d345a2e72e434afbf6d30ad7402e33d88",
+    "host": "b4d72a2d94a1aba49fe6a406d695ec4d345a2e72e434afbf6d30ad7402e33d88"
+  },
+  "packages/llm/llm-deepseek/lib/index.js": {
+    "same": true,
+    "project": "5ab11a605b13a5f4b147f516a78771e8dd5b318f035e6c658de7d750dd8a051b",
+    "host": "5ab11a605b13a5f4b147f516a78771e8dd5b318f035e6c658de7d750dd8a051b"
+  }
+}

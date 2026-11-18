@@ -1,0 +1,211 @@
+--- a/src/harness-compat.ts
++++ b/src/harness-compat.ts
+@@ -35,7 +35,10 @@
+ type Queue = (parent: Agent, childId: SessionId, content: ContentBlock[], source: MessageSource, signal: AbortSignal) => Promise<MessageId>
+ type Deliver = (parent: Agent, childId: SessionId, content: ContentBlock[], source: MessageSource, signal: AbortSignal, delivery: 'queue' | 'steer') => Promise<MessageId>
+ type Send = (sender: Agent, targetId: SessionId, content: ContentBlock[], options: { signal: AbortSignal }) => Promise<MessageId>
++type HostDelivery = (sender: Agent, targetId: SessionId, content: ContentBlock[], options: { source: MessageSource; signal: AbortSignal; delivery: 'queue' | 'steer' }) => Promise<MessageId>
++
+ interface RuntimeBoundary {
++  deliverHostMessage?: HostDelivery
+   followup?: Followup
+   registerContinuableSetup?: (setup: LegacySetup) => () => void
+   sendMessage?: Send
+@@ -72,7 +75,9 @@
+   const host = runtime as unknown as CreationBoundary
+   if (typeof host.startActivation === 'function') {
+     const { persona: _persona, toolFilter: _filter, ...request } = spec.request
+-    const activation = await host.startActivation.call(runtime, { ...spec, request, delivery: 'parent' })
++    const activation = typeof boundary(runtime).deliverHostMessage === 'function'
++      ? await runtime.startActivation({ provider: spec.provider, label: spec.label, signal: spec.signal, ...request, delivery: 'parent' })
++      : await host.startActivation.call(runtime, { ...spec, request, delivery: 'parent' })
+     // Preserve native settlement as the missing-report/error fallback on both
+     // fresh and resumed activations. mailbox.ts deduplicates successful reports.
+     void activation.result.catch(() => undefined)
+@@ -92,7 +97,9 @@
+       if (typeof original !== 'function') continue
+       const descriptor = Object.getOwnPropertyDescriptor(runtime, key)
+       const guarded = async (...args: unknown[]): Promise<unknown> => {
+-        const request = key === 'start' ? args[1] : (args[0] as MemberStartSpec).request
++        const request = key === 'start' ? args[1]
++          : key === 'startActivation' && typeof boundary(ctx.subagents).deliverHostMessage === 'function'
++            ? args[0] : (args[0] as MemberStartSpec).request
+         check((request as MemberStartSpec['request']).parent)
+         return Reflect.apply(original, ctx.subagents, args)
+       }
+@@ -252,7 +259,7 @@
+     })
+     return
+   }
+-  if ((typeof runtime[hostPromptQueue] !== 'function' && typeof runtime[hostPromptDeliver] !== 'function') || typeof runtime.sendMessage !== 'function') {
++  if ((typeof runtime.deliverHostMessage !== 'function' && typeof runtime[hostPromptQueue] !== 'function' && typeof runtime[hostPromptDeliver] !== 'function') || typeof runtime.sendMessage !== 'function') {
+     return unsupported('missing continuable setup and modern host queue')
+   }
+   const installed = new WeakSet<Agent>()
+@@ -316,6 +323,7 @@
+ ): Promise<MessageId> {
+   const host = boundary(runtime)
+   const source = agentTeamsSource({ kind: 'agent-teams' }, observedSessionFormatVersion(parent))
++  if (typeof host.deliverHostMessage === 'function') return host.deliverHostMessage.call(runtime, parent, childId, content, { source, signal, delivery: 'queue' })
+   if (typeof host.followup === 'function') {
+     return host.followup.call(runtime, parent, childId, content, { source, signal })
+   }
+@@ -333,6 +341,7 @@
+ ): Promise<MessageId> {
+   const host = boundary(runtime)
+   const source = agentTeamsSource({ kind: 'agent-teams' }, observedSessionFormatVersion(live ?? parent))
++  if (typeof host.deliverHostMessage === 'function') return host.deliverHostMessage.call(runtime, parent, childId, content, { source, signal, delivery: 'steer' })
+   const deliver = host[hostPromptDeliver]
+   if (typeof deliver === 'function') return deliver.call(runtime, parent, childId, content, source, signal, 'steer')
+   if (typeof host.sendMessage === 'function') return host.sendMessage.call(runtime, parent, childId, content, { signal })
+@@ -353,15 +362,17 @@
+ ): void {
+   const runtime = ctx.subagents
+   const host = boundary(runtime)
++  const modern = host.deliverHostMessage
+   const legacy = host.followup
+   const queue = host[hostPromptQueue]
+   const deliver = host[hostPromptDeliver]
+   const send = host.sendMessage
+-  if (typeof legacy !== 'function' && ((typeof queue !== 'function' && typeof deliver !== 'function') || typeof send !== 'function')) {
++  if (typeof modern !== 'function' && typeof legacy !== 'function' && ((typeof queue !== 'function' && typeof deliver !== 'function') || typeof send !== 'function')) {
+     return unsupported('cannot install complete retired-member guard')
+   }
+   ctx.effect(() => {
+     const descriptors = new Map<PropertyKey, PropertyDescriptor | undefined>([
++      ['deliverHostMessage', Object.getOwnPropertyDescriptor(host, 'deliverHostMessage')],
+       ['followup', Object.getOwnPropertyDescriptor(host, 'followup')],
+       [hostPromptQueue, Object.getOwnPropertyDescriptor(host, hostPromptQueue)],
+       [hostPromptDeliver, Object.getOwnPropertyDescriptor(host, hostPromptDeliver)],
+@@ -373,6 +384,10 @@
+         throw new SubagentError(`AgentTeams member "${targetId}" was retired and cannot be resumed`, 'NOT_RESUMABLE')
+       }
+     }
++    const guardedModern: HostDelivery = async (sender, targetId, content, options) => {
++      await check(sender, targetId)
++      return modern!.call(runtime, sender, targetId, content, options)
++    }
+     const guardedLegacy: Followup = async (parent, childId, content, options) => {
+       await check(parent, childId)
+       return legacy!.call(runtime, parent, childId, content, options)
+@@ -389,6 +404,7 @@
+       await check(parent, childId)
+       return deliver!.call(runtime, parent, childId, content, source, signal, delivery)
+     }
++    if (typeof modern === 'function') host.deliverHostMessage = guardedModern
+     if (typeof legacy === 'function') host.followup = guardedLegacy
+     if (typeof queue === 'function') host[hostPromptQueue] = guardedQueue
+     if (typeof deliver === 'function') host[hostPromptDeliver] = guardedDeliver
+@@ -403,6 +419,7 @@
+     }
+     return () => {
+       active = false
++      if (typeof modern === 'function') restore('deliverHostMessage', guardedModern)
+       if (typeof legacy === 'function') restore('followup', guardedLegacy)
+       if (typeof queue === 'function') restore(hostPromptQueue, guardedQueue)
+       if (typeof deliver === 'function') restore(hostPromptDeliver, guardedDeliver)
+--- a/src/members.ts
++++ b/src/members.ts
+@@ -808,7 +808,7 @@
+     const model = (child as Agent & { model?: { select(selection: Readonly<ModelSelection>): void } }).model
+     const nativeModel = typeof model?.select === 'function' ? model : undefined
+     nativeModel?.select(selectionRef.current)
+-    const disposeSelection = installModelSelection(childCtx, selectionRef)
++    const disposeSelection = installModelSelection(childCtx)
+     const fallback = selection.fallback
+     let switched = false
+     const recoveryLifetime = new AbortController()
+@@ -1008,7 +1008,7 @@
+   const provider = ctx.subagents.getProvider(config.provider)
+   if (provider === undefined) {
+     throw new Error(
+-      `agent-teams: no subagent provider "${config.provider}" is registered (available: ${ctx.subagents.list().join(', ') || 'none'}) — `
++      `agent-teams: no subagent provider "${config.provider}" is registered — `
+       + 'check that the subagent provider row (e.g. subagent-spawn) is mounted in the composition',
+     )
+   }
+--- a/scripts/harness-compat-tdd.mjs
++++ b/scripts/harness-compat-tdd.mjs
+@@ -49,10 +49,11 @@
+     agentProvider: 'primary', agentModel: 'model',
+   } }
+   const agent = {
+-    id: 'member-id', status: 'idle', whenIdle: async () => {},
++    id: 'member-id', status: 'idle', whenIdle: async () => {}, cancel() { this.cancelled = true }, followup(message) { this.continuation = message },
+     options: { provider: 'primary', model: 'model', reasoningEffort: effort },
+     session: { header: { cwd: workspace, parentSession: 'captain' }, ownEvents: () => inherited ? [] : [descriptor] },
+   }
++  agent.model = { select(value) { agent.selectedModel = value } }
+   agent.ctx = scope() // Harness 0.1.5 no longer exposes Context.agent.
+   return agent
+ }
+@@ -65,7 +66,7 @@
+ }
+ 
+ async function requestSelection(agent) {
+-  let config = { provider: 'inherited', model: 'parent-model', reasoningEffort: 'low' }
++  let config = agent.selectedModel ?? { provider: 'inherited', model: 'parent-model', reasoningEffort: 'low' }
+   for (const request of agent.ctx.listeners.get('agent/request') ?? []) {
+     const previous = config
+     config = await request({ agent }, async () => previous)
+@@ -76,6 +77,7 @@
+ await test('native SubagentRuntime keeps its receiver through FIFO delivery and retirement guard', async t => {
+   const host = new Context()
+   host.provide('workingDirectory', {})
++  host.provide('sessionProjections', { async register() { return { stateOf() { return {} } } } })
+   const fiber = host.plugin(SubagentRuntime)
+   t.after(() => fiber.dispose())
+   await fiber.await()
+@@ -105,6 +107,11 @@
+   }
+   const accepted = []
+   const manager = {
++    async deliverHostMessage(parent, id, body, options) {
++      assert.equal(this, manager)
++      accepted.push({ path: options.delivery, parent, id, body, source: options.source })
++      return 'accepted'
++    },
+     async followup(parent, id, body, options) {
+       assert.equal(this, manager)
+       accepted.push({ path: 'followup', parent, id, body, source: options.source })
+@@ -127,7 +134,7 @@
+   else runtime.continuations = manager
+   const captain = { id: 'captain', session: { header: {} } }
+   const ctx = scope({ subagents: runtime })
+-  const methodKey = typeof runtime.followup === 'function' ? 'followup' : typeof runtime[deliverKey] === 'function' ? deliverKey : queueKey
++  const methodKey = typeof runtime.deliverHostMessage === 'function' ? 'deliverHostMessage' : typeof runtime.followup === 'function' ? 'followup' : typeof runtime[deliverKey] === 'function' ? deliverKey : queueKey
+   const before = Object.getOwnPropertyDescriptor(runtime, methodKey)
+   guardSubagentDelivery(ctx, async (_sender, id) => id === 'retired')
+   assert.equal(await queueMemberPrompt(runtime, captain, 'active', content, signal), 'accepted')
+@@ -187,13 +194,13 @@
+     provider: 'selected', model: 'selected-model', reasoningEffort: 'high',
+   }, async () => {
+     ctx.emit('agent/session-start', { agent, source: 'startup' })
+-    assert.equal(agent.ctx.listeners.get('agent/request').size, 1)
++    assert.equal(agent.ctx.listeners.get('agent/pre-step').size, 2)
+     ctx.emit('agent/session-start', { agent, source: 'compact' })
+-    assert.equal(agent.ctx.listeners.get('agent/request').size, 1)
++    assert.equal(agent.ctx.listeners.get('agent/pre-step').size, 2)
+     assert.deepEqual(await selection(agent), { provider: 'selected', model: 'selected-model', reasoningEffort: 'high' })
+   })
+   ctx.dispose()
+-  assert.equal(agent.ctx.listeners.get('agent/request').size, 0)
++  assert.equal(agent.ctx.listeners.get('agent/pre-step').size, 0)
+   assert.equal(agent.ctx.listeners.get('agent/error').size, 0)
+   agent.ctx.dispose()
+ })
+@@ -269,9 +276,11 @@
+       assert.equal(delegated, 1)
+     } else {
+       const handler = [...agent.ctx.listeners.get('agent/request-error')][0]
+-      assert.deepEqual(await handler({ agent, signal, failure: { code: 'AUTH' } }, async () => undefined), { kind: 'retry' })
+-      // Harness retries inside the SAME step, without assembling the prompt
+-      // again. The accepted fallback must replace the captured request route.
++      assert.equal(await handler({ agent, signal, failure: { code: 'AUTH' } }, async () => undefined), undefined)
++      assert.equal(agent.cancelled, true)
++      assert.ok(agent.continuation)
++      // The current host cancels the old step and queues a continuation.
++      // Its durable model selection must already name the fallback route.
+       assert.deepEqual(await requestSelection(agent), { provider: 'backup', model: 'backup-model' })
+     }
+   })

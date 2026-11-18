@@ -1,0 +1,58 @@
+{
+  "tasks": 24,
+  "pairs": 12,
+  "requestCount": 119,
+  "receiptCNY": 0.48656807999999996,
+  "missingUsage": 0,
+  "budgetClosed": true,
+  "totals": {
+    "baseline": {
+      "requests": 75,
+      "tools": 64,
+      "toolErrors": 1,
+      "tokens": 221635,
+      "CNY": 0.332486,
+      "wallMs": 219894,
+      "members": 12
+    },
+    "candidate": {
+      "requests": 44,
+      "tools": 32,
+      "toolErrors": 0,
+      "tokens": 127029,
+      "CNY": 0.15408208,
+      "wallMs": 110727,
+      "members": 2
+    }
+  },
+  "candidateReductionPercent": {
+    "requests": 41.333333333333336,
+    "tokens": 42.68549642430122,
+    "CNY": 53.657573551969094,
+    "wallMs": 49.6452836366613
+  },
+  "resourceIncreasePairs": {
+    "requests": [
+      "read-06-r2"
+    ],
+    "tools": [
+      "read-06-r2"
+    ],
+    "tokens": [
+      "read-06-r1",
+      "read-06-r2"
+    ],
+    "CNY": [
+      "read-06-r2"
+    ],
+    "wallMs": [
+      "read-06-r2"
+    ]
+  },
+  "qualityStatus": "NOT_ACCEPTED; semantic review is required and aggregate efficiency does not override confirmed failures",
+  "sourceAndPromptMatched": true,
+  "noFutureSentinelInRequests": true,
+  "sourceWorkspacesUnchanged": true,
+  "frozenCandidateUnchanged": true,
+  "ledgerMatchesAllTracedRequests": true
+}
