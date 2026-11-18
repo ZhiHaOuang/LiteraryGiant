@@ -1,0 +1,192 @@
+/* ══ Stacked bars (components/StackedBars.tsx) ═══ */
+/* LG: Bencho ink/slab/edge/font map directly to DSH tokens. --c, --i,
+   --stb-r and --stb-rr are local per-segment geometry, not theme globals. */
+.lgd-stacked-bars.stb {
+  --stb-c1: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 100%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-c2: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 78%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-c3: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 60%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-c4: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 44%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-c5: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 32%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-c6: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 22%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-alert: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 100%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-soft: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 72%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-mute: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 52%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-faint: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 32%, var(--dsw-alias-bg-layer-1, #ffffff));
+  --stb-w6: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 6%, transparent);
+  --stb-w12: color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 12%, transparent);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 20px;
+  background: var(--dsw-alias-bg-layer-1, #ffffff);
+  color: var(--dsw-alias-label-primary, #17181a);
+  font-family: var(--ds-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+  font-size: 13px;
+  min-width: 0;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.lgd-stacked-bars.stb[data-colour="on"] {
+  --stb-c1: #9d7bf5; --stb-c2: #5b8def; --stb-c3: #9ab8db;
+  --stb-c4: #f2c46d; --stb-c5: #74dcae; --stb-c6: #e57bb8;
+  --stb-alert: #e5484d;
+}
+[data-stroke="on"] .lgd-stacked-bars.stb { box-shadow: 0 0 0 1px var(--dsw-alias-border-l2, #dedede); }
+
+/* header: icon tile, title, Day / Week */
+.lgd-stacked-bars .stb-head { display: flex; align-items: center; gap: 12px; }
+.lgd-stacked-bars .stb-titles { flex: 1; min-width: 0; }
+.lgd-stacked-bars .stb-title { font-size: 14px; font-weight: 500; letter-spacing: -0.01em; line-height: 18px; }
+.lgd-stacked-bars .stb-sub { font-size: 12px; color: var(--stb-mute); line-height: 16px; font-variant-numeric: tabular-nums; }
+.lgd-stacked-bars .stb-seg-ctl { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 2px; border-radius: 10px; background: var(--stb-w6); }
+.lgd-stacked-bars .stb-thumb { position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px); border-radius: 8px; background: var(--dsw-alias-bg-layer-1, #ffffff); transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lgd-stacked-bars .stb-seg-ctl[data-mode="Week"] .stb-thumb { transform: translateX(100%); }
+.lgd-stacked-bars.stb .stb-tab { position: relative; appearance: none; border: 0; background: none; padding: 0 10px; height: 28px; font: inherit; font-size: 12px; font-weight: 500; color: var(--stb-mute); cursor: pointer; border-radius: 8px; transition: color 160ms ease, scale 160ms cubic-bezier(0.22, 1, 0.36, 1); }
+.lgd-stacked-bars.stb .stb-tab[data-on] { color: var(--dsw-alias-label-primary, #17181a); }
+.lgd-stacked-bars.stb .stb-tab:hover { background: transparent; }
+.lgd-stacked-bars.stb .stb-tab:hover:not([data-on]) { color: var(--stb-soft); }
+.lgd-stacked-bars .stb-tab:active { scale: 0.96; }
+.lgd-stacked-bars .stb-tab:focus-visible { outline: 2px solid var(--dsw-alias-button-primary-fill, #d8795c); outline-offset: 0; }
+
+/* the one figure */
+.lgd-stacked-bars .stb-figure { display: flex; align-items: baseline; gap: 8px; margin-bottom: -4px; }
+.lgd-stacked-bars .stb-num { font-size: 30px; font-weight: 500; letter-spacing: -0.03em; line-height: 32px; font-variant-numeric: tabular-nums; }
+.lgd-stacked-bars .stb-unit { font-size: 13px; color: var(--stb-mute); }
+
+/* Price flow's pop in: each character rises a touch from below, out
+   of a slight blur and from nothing, a hair past its mark — left to
+   right, 70ms apart */
+.lgd-stacked-bars .stb-digit { display: inline-block; }
+.lgd-stacked-bars .stb-digit[data-pop] { animation: lgd-stb-pop 500ms cubic-bezier(0.34, 1.45, 0.64, 1) both; animation-delay: calc(var(--i, 0) * 70ms); }
+@media (prefers-reduced-motion: reduce) {
+  .lgd-stacked-bars .stb-digit[data-pop] { animation: none; }
+  .lgd-stacked-bars.stb * { transition: none !important; }
+}
+.lgd-stacked-bars.stb[data-reduced] * { animation: none !important; transition: none !important; }
+
+/* the plot: absolutely placed columns, each segment its own rounded box */
+.lgd-stacked-bars .stb-plot { position: relative; width: 100%; touch-action: none; cursor: crosshair; }
+.lgd-stacked-bars .stb-base { position: absolute; left: 0; right: 0; height: 1px; background: var(--stb-w12); }
+.lgd-stacked-bars .stb-col { position: absolute; top: 0; bottom: 0; }
+.lgd-stacked-bars .stb-bar,
+.lgd-stacked-bars .stb-esc {
+  position: absolute; left: 0; right: 0; border-radius: var(--stb-r);
+  transition:
+    height 600ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 14ms),
+    bottom 600ms cubic-bezier(0.22, 1, 0.36, 1) calc(var(--i) * 14ms),
+    background-color 160ms ease;
+}
+.lgd-stacked-bars .stb-bar { background-color: var(--c); }
+.lgd-stacked-bars .stb-esc { background-color: var(--stb-alert); }
+
+/* Mono: escalated is full ink, hatched, so it never reads as Identity */
+.lgd-stacked-bars.stb[data-colour="off"] .stb-esc { background-image: repeating-linear-gradient(-45deg, transparent 0 1.5px, var(--dsw-alias-bg-layer-1, #ffffff) 1.5px 3px); }
+
+/* scrubbing: the others step back by mixing toward the slab */
+.lgd-stacked-bars.stb[data-scrub] .stb-col:not([data-on]) .stb-bar { background-color: color-mix(in srgb, var(--c) 38%, var(--dsw-alias-bg-layer-1, #ffffff)); }
+.lgd-stacked-bars.stb[data-scrub] .stb-col:not([data-on]) .stb-esc { background-color: color-mix(in srgb, var(--stb-alert) 38%, var(--dsw-alias-bg-layer-1, #ffffff)); }
+.lgd-stacked-bars .stb-ring { position: absolute; top: 0; left: 0; box-sizing: border-box; border: 1.5px solid var(--stb-mute); border-radius: var(--stb-rr); pointer-events: none; opacity: 0; transition: opacity 160ms ease; }
+.lgd-stacked-bars.stb[data-scrub] .stb-ring { opacity: 1; }
+
+/* the tooltip: beside the column, gliding on a spring */
+.lgd-stacked-bars .stb-tip {
+  position: absolute; top: 0; left: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 4px; padding: 8px 10px; border-radius: 10px; background: var(--dsw-alias-bg-layer-1, #ffffff);
+  /* filled like the card, parted from the bars by a soft grey hairline */
+  border: 1px solid color-mix(in srgb, var(--dsw-alias-label-primary, #17181a) 10%, var(--dsw-alias-bg-layer-1, #ffffff));
+  font-size: 12px; line-height: 16px; pointer-events: none; opacity: 0; transition: opacity 160ms ease;
+}
+.lgd-stacked-bars.stb[data-scrub] .stb-tip { opacity: 1; }
+.lgd-stacked-bars .stb-tip-head,
+.lgd-stacked-bars .stb-tip-row { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
+.lgd-stacked-bars .stb-tip-head { justify-content: space-between; color: var(--stb-mute); margin-bottom: 2px; }
+.lgd-stacked-bars .stb-tip b { font-weight: 500; font-variant-numeric: tabular-nums; color: var(--dsw-alias-label-primary, #17181a); }
+.lgd-stacked-bars .stb-tip-row span { flex: 1; color: var(--stb-soft); }
+.lgd-stacked-bars .stb-tip-row b { font-weight: 400; }
+.lgd-stacked-bars .stb-tip-row i { flex: none; width: 8px; height: 8px; border-radius: 2px; background-color: var(--c); }
+.lgd-stacked-bars .stb-tip-row[data-esc] i { background-color: var(--stb-alert); }
+.lgd-stacked-bars.stb[data-colour="off"] .stb-tip-row[data-esc] i { background-image: repeating-linear-gradient(-45deg, transparent 0 1.5px, var(--dsw-alias-bg-layer-1, #ffffff) 1.5px 3px); }
+
+/* one tiny footer: first and last date */
+.lgd-stacked-bars .stb-axis { display: flex; justify-content: space-between; margin-top: -8px; font-size: 11px; line-height: 14px; color: var(--stb-faint); font-variant-numeric: tabular-nums; }
+@keyframes lgd-stb-pop {
+  from { transform: translateY(0.18em); opacity: 0; filter: blur(2px); }
+  to { transform: none; opacity: 1; filter: blur(0); }
+}
+
+/* LG preview wrapper; the original usage chart remains the default. */
+.lgt-bencho-preview { min-width:0; }
+.lgt-bencho-preview>small { display:block; text-align:right; margin-bottom:4px; }
+.lgt-chart-demo-switch { display:flex; justify-content:flex-end; margin:6px 0; }
+
+/* Actual Agent totals: two independently scaled stacks per Agent, one baseline.
+   Input boxes grow up; Output boxes grow down. Never render zero as a segment. */
+.lgd-stacked-bars.stb-agent { padding:0;gap:12px;border-radius:0;background:transparent; }
+.lgd-stacked-bars.stb-agent .stb-agent-chart { position:relative;padding-left:38px; }
+.lgd-stacked-bars.stb-agent .stb-plot { touch-action:pan-y; }
+.lgd-stacked-bars.stb-agent .stb-agent-side { position:absolute;left:0;display:flex;flex-direction:column;gap:3px;font-size:10px;color:var(--dsw-alias-label-secondary); }
+.lgd-stacked-bars.stb-agent .stb-agent-input { top:0; }
+.lgd-stacked-bars.stb-agent .stb-agent-output { top:133px; }
+.lgd-stacked-bars.stb-agent .stb-agent-side small { font-size:10px; }
+.lgd-stacked-bars.stb-agent .stb-bar { transition:height 600ms cubic-bezier(.22,1,.36,1) calc(var(--i)*14ms),bottom 600ms cubic-bezier(.22,1,.36,1) calc(var(--i)*14ms),top 600ms cubic-bezier(.22,1,.36,1) calc(var(--i)*14ms),background-color 160ms ease; }
+.lgd-stacked-bars.stb-agent .stb-base { background:var(--dsw-alias-border-l2,#dedede); }
+.lgd-stacked-bars.stb-agent .stb-ring { border-style:dashed;z-index:2; }
+.lgd-stacked-bars.stb-agent .stb-selection { display:none;position:absolute;left:-3px;right:-3px;border:1.5px solid var(--stb-mute);border-radius:var(--stb-rr);pointer-events:none; }
+.lgd-stacked-bars.stb-agent .stb-col[data-selected] .stb-selection { display:block; }
+.lgd-stacked-bars.stb-agent .stb-hit { position:absolute;inset:0;width:100%;height:100%;max-width:none;padding:0;min-height:0;border:0;border-radius:0;background:transparent; }
+.lgd-stacked-bars.stb-agent .stb-hit:hover { background:transparent; }
+.lgd-stacked-bars.stb-agent .stb-zero { position:absolute;width:100%;text-align:center;color:var(--stb-mute);font-size:10px;line-height:12px; }
+.lgd-stacked-bars.stb-agent .stb-tip { z-index:3;top:0;box-shadow:0 2px 8px #0001; }
+.lgd-stacked-bars.stb-agent .stb-tip-row span { min-width:0;overflow:hidden;text-overflow:ellipsis; }
+.lgd-stacked-bars.stb-agent .stb-tip-head { gap:6px;flex-wrap:wrap; }
+.lgd-stacked-bars.stb-agent .stb-tip-note { color:var(--stb-mute);font-size:10px;line-height:13px; }
+.lgd-stacked-bars.stb-agent .stb-agent-labels { display:grid;gap:0;margin-top:8px; }
+.lgd-stacked-bars.stb-agent .stb-agent-labels button { display:flex;flex-direction:column;align-items:center;gap:6px;padding:0;border:0;border-radius:0;background:transparent;font-size:12px;font-weight:400;min-width:0;white-space:nowrap; }
+.lgd-stacked-bars.stb-agent .stb-agent-labels i { display:block;width:60%;max-width:46px;height:4px;border-radius:1px; }
+/* Time buckets keep the original 21-bars/300px demo's ~7px width and 2.5px radius. */
+.lgd-stacked-bars.stb-agent .stb-time-axis { margin-top:10px;font-size:10px;gap:10px; }
+.lgd-stacked-bars.stb-agent .stb-hit { left:-3px;right:-3px;width:calc(100% + 6px); }
+.lgd-stacked-bars.stb-agent .stb-tip { max-height:260px; }
+
+/* Five simultaneous groups: half total, half four roles. Baselines stay aligned. */
+.lgt-time-groups{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:38px;min-width:0;position:relative}
+.lgt-member-timelines{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:28px;min-width:0}
+.lgt-time-groups>.stb-group{padding-right:0;border-right:0}
+.lgd-stacked-bars.stb-group{min-width:0;gap:10px;container-type:inline-size;container-name:lgt-group}
+.lgd-stacked-bars.stb-group[data-scale] .lgt-bars-head{margin-left:38px}
+.lgd-stacked-bars.stb-group .lgt-bars-head{min-width:0;height:20px;font-size:12px;font-weight:500;white-space:nowrap;justify-content:center}
+.lgd-stacked-bars.stb-group .stb-agent-chart{padding-left:0}
+.lgd-stacked-bars.stb-group[data-scale] .stb-agent-chart{padding-left:38px}
+.lgd-stacked-bars.stb-group .stb-tip{z-index:6}
+.lgd-stacked-bars.stb-group .stb-tip[aria-hidden="true"]{display:none}
+.lgd-stacked-bars.stb-group .stb-tip-range{color:var(--stb-mute);font-size:10px;line-height:14px;white-space:normal;margin-bottom:3px}
+.lgd-stacked-bars.stb-group:has(.stb-tip[aria-hidden="false"]){z-index:5}
+/* One shared baseline; only breathing room separates the five groups. */
+.lgt-time-groups::before{content:'';position:absolute;left:38px;right:0;top:142px;height:1px;background:var(--dsw-alias-border-l2,#dedede);pointer-events:none}
+.lgt-time-groups .lgd-stacked-bars.stb-agent .stb-base{background:transparent}
+/* Compact role-colored labels, without borders; type stays fixed on resize. */
+.lgd-stacked-bars.stb-group .lgt-bars-head>span{display:inline-flex;align-items:center;justify-content:center;min-width:0;max-width:100%;height:20px;box-sizing:border-box;padding:2px 6px;line-height:16px;border:0;border-radius:6px;background:color-mix(in srgb,var(--stb-heading) 20%,transparent);color:var(--dsw-alias-label-primary);font-size:12px;font-weight:500}
+
+.lgt-timeline-shell{container-name:lgt-timeline;container-type:inline-size;min-width:0}
+
+/* Keep all five plots on one row: reduce detail rather than adding rows. */
+@container lgt-timeline (max-width:700px){
+ .lgt-time-groups{gap:24px}
+ .lgt-member-timelines{gap:12px}
+}
+@container lgt-timeline (max-width:440px){
+ .lgt-time-groups{gap:18px}
+ .lgt-member-timelines{gap:10px}
+}
+@container lgt-timeline (max-width:320px){
+ .lgt-time-groups{gap:16px}
+ .lgt-member-timelines{gap:8px}
+ .lgd-stacked-bars.stb-group[data-scale] .stb-agent-chart{padding-left:0}
+ .lgd-stacked-bars.stb-group[data-scale] .lgt-bars-head{margin-left:0}
+ .lgd-stacked-bars.stb-group .stb-agent-side{display:none}
+ .lgt-time-groups::before{left:0}
+}
+.lgd-stacked-bars.stb-group .lgt-heading-text{display:block;min-width:0;overflow:hidden;white-space:nowrap;line-height:16px}
+.lgd-stacked-bars.stb-group .lgt-heading-text[data-clipped]{mask-image:linear-gradient(to right,#000 calc(100% - 12px),transparent)}

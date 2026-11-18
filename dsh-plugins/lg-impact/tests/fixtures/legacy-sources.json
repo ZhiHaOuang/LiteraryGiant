@@ -1,0 +1,38 @@
+{
+  "generation_sources": {
+    "schema": "lg.generation-sources.v1",
+    "mode": "native",
+    "run_id": "test-legacy-impact",
+    "coverage": "partial",
+    "observations": [
+      {
+        "tool": "read_document",
+        "payload_sha256": "c6c22510a3b46852646cef490c85756a3a320d4faa2e86964359e4a7b63c46e4",
+        "refs": [
+          {
+            "kind": "document",
+            "document_id": 1,
+            "version_id": 1,
+            "exposure": "content"
+          }
+        ],
+        "coverage": "partial"
+      },
+      {
+        "tool": "project_memory",
+        "payload_sha256": "a257308dbd7ada0b59b4b8ae3e71dfffe04d361865f3ac13c00d53944dca385a",
+        "refs": [
+          {
+            "kind": "document",
+            "document_id": 1,
+            "version_id": 1,
+            "exposure": "index"
+          }
+        ],
+        "coverage": "partial"
+      }
+    ],
+    "unknown_reasons": []
+  },
+  "generation_output_sha256": "ac3e4fd93cb26c7e365a5e98dffad772198fbf39ea8fa5f4cdd08e09fd8076ec"
+}

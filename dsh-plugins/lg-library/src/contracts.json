@@ -1,0 +1,247 @@
+{
+  "INSTANCE_CARD_TYPES": {
+    "EventsLibrary": "event_instance_card",
+    "PayoffAngst": "payoff_instance_card",
+    "CharacterArc": "character_arc_instance_card",
+    "EmotionRhythm": "emotion_rhythm_instance_card",
+    "Worldview": "worldview_instance_card"
+  },
+  "COMMON_QUALITY_PATHS": [
+    "portable_core",
+    "implementation_details",
+    "fusion_hooks"
+  ],
+  "LIBRARY_QUALITY_PATHS": {
+    "EventsLibrary": [
+      "scene_context.before_state",
+      "scene_context.immediate_goal",
+      "scene_context.active_obstacle",
+      "scene_context.stakes",
+      "scene_context.available_resources",
+      "causal_chain",
+      "turning_point.event",
+      "turning_point.why_it_changes_direction",
+      "turning_point.new_information_or_resource",
+      "after_state.overall_change",
+      "after_state.relationship_change",
+      "after_state.power_change",
+      "after_state.goal_change",
+      "after_state.new_hook"
+    ],
+    "PayoffAngst": [
+      "emotional_setup.pressure_evidence",
+      "emotional_setup.reader_expectation",
+      "emotional_setup.character_awareness",
+      "emotional_setup.avoidability",
+      "emotional_setup.delay_beats",
+      "emotional_setup.release_beat",
+      "emotional_setup.payoff_visibility",
+      "emotional_setup.residual_emotion",
+      "emotional_setup.failure_conditions"
+    ],
+    "CharacterArc": [
+      "arc_path.initial_belief",
+      "arc_path.initial_behavior",
+      "arc_path.arc_nodes",
+      "arc_path.failed_choices",
+      "arc_path.turning_choice",
+      "arc_path.new_behavior",
+      "arc_path.relationship_confirmation",
+      "arc_path.regression_risk"
+    ],
+    "EmotionRhythm": [
+      "emotion_beats"
+    ],
+    "Worldview": [
+      "rule_application.rule_statement",
+      "rule_application.enforcement",
+      "rule_application.cost",
+      "rule_application.exception",
+      "rule_application.exploit",
+      "rule_application.affected_groups",
+      "rule_application.event_examples"
+    ]
+  },
+  "INSTANCE_CARD_PROMPT_SCHEMAS": {
+    "EventsLibrary": {
+      "scene_context": {
+        "before_state": "",
+        "immediate_goal": "",
+        "active_obstacle": "",
+        "stakes": "",
+        "available_resources": []
+      },
+      "causal_chain": [
+        {
+          "step": 1,
+          "action": "",
+          "cause": "",
+          "effect": "",
+          "decision_owner": ""
+        }
+      ],
+      "turning_point": {
+        "event": "",
+        "why_it_changes_direction": "",
+        "new_information_or_resource": ""
+      },
+      "after_state": {
+        "overall_change": "",
+        "relationship_change": "",
+        "power_change": "",
+        "goal_change": "",
+        "new_hook": ""
+      }
+    },
+    "PayoffAngst": {
+      "emotional_setup": {
+        "pressure_evidence": [],
+        "reader_expectation": "",
+        "character_awareness": "reader_only/character_only/shared/uncertain",
+        "avoidability": "",
+        "delay_beats": [],
+        "release_beat": "",
+        "payoff_visibility": "private/public/relational/systemic/uncertain",
+        "residual_emotion": "",
+        "failure_conditions": []
+      }
+    },
+    "CharacterArc": {
+      "arc_path": {
+        "initial_belief": "",
+        "initial_behavior": "",
+        "arc_nodes": [
+          {
+            "phase": "",
+            "pressure": "",
+            "choice": "",
+            "consequence": ""
+          }
+        ],
+        "failed_choices": [],
+        "turning_choice": "",
+        "new_behavior": "",
+        "relationship_confirmation": "",
+        "regression_risk": ""
+      }
+    },
+    "EmotionRhythm": {
+      "emotion_beats": [
+        {
+          "beat_index": 1,
+          "reader_emotion": "",
+          "intensity": "1-5",
+          "information_state": "",
+          "tension_delta": "-2 to 2",
+          "release_delta": "0 to 2",
+          "hook_type": ""
+        }
+      ]
+    },
+    "Worldview": {
+      "rule_application": {
+        "rule_statement": "",
+        "enforcement": "",
+        "cost": "",
+        "exception": "",
+        "exploit": "",
+        "affected_groups": [],
+        "event_examples": [
+          {
+            "chunk_id": "",
+            "application": ""
+          }
+        ]
+      }
+    }
+  },
+  "libraries": {
+    "EventsLibrary": {
+      "perspective": "事件如何被触发、执行，并造成外部局势变化",
+      "excluded_perspectives": [
+        "不解释读者为什么爽",
+        "不展开人物长期成长",
+        "不作为全书情绪曲线"
+      ],
+      "focus_fields": [
+        "event_trigger",
+        "event_action_sequence",
+        "event_consequence",
+        "state_change"
+      ]
+    },
+    "PayoffAngst": {
+      "perspective": "压力、延迟与释放如何制造读者回报或疼痛",
+      "excluded_perspectives": [
+        "不记录完整事件顺序",
+        "不展开人物长期弧线",
+        "不作为情绪曲线主条目"
+      ],
+      "focus_fields": [
+        "pressure_setup",
+        "delay_mechanism",
+        "release_or_damage_action",
+        "reader_reward_or_pain",
+        "required_emotional_setup"
+      ]
+    },
+    "CharacterArc": {
+      "perspective": "角色状态、行动能力与关系功能如何跨阶段变化",
+      "excluded_perspectives": [
+        "不写成事件列表",
+        "不把单次爽点当人物弧",
+        "不代替情绪节奏"
+      ],
+      "focus_fields": [
+        "arc_scope",
+        "initial_state",
+        "external_pressure",
+        "turning_choice",
+        "final_state",
+        "arc_function",
+        "relationship_consequence"
+      ]
+    },
+    "EmotionRhythm": {
+      "perspective": "压力如何累积、延迟、释放、反转并形成后续情绪钩子",
+      "excluded_perspectives": [
+        "不复述具体事件流程",
+        "不代替人物完整成长",
+        "不把一次事件结果当完整节奏"
+      ],
+      "focus_fields": [
+        "rhythm_scope",
+        "emotion_start",
+        "tension_accumulation",
+        "delay_method",
+        "release_position",
+        "post_release_hook",
+        "reader_state_change"
+      ]
+    },
+    "Worldview": {
+      "perspective": "稳定规则、资源、身份权限、权力结构与代价如何反复约束故事",
+      "excluded_perspectives": [
+        "不把一次剧情事件当稳定规则",
+        "不记录纯氛围设定",
+        "不代替事件机制"
+      ],
+      "focus_fields": [
+        "stable_rule",
+        "rule_scope",
+        "resource_or_permission",
+        "constraint",
+        "enforcement_mechanism",
+        "cost",
+        "affected_choices",
+        "repeatability",
+        "resource_distribution_logic",
+        "cost_model",
+        "who_benefits",
+        "who_is_constrained",
+        "story_conflicts_enabled"
+      ]
+    }
+  },
+  "source": "Jormungandr/abstractmodel/instance_cards.py; Library/AbstractLibrary/library_index.json"
+}

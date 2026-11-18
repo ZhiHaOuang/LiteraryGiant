@@ -1,0 +1,185 @@
+[
+  {
+    "name": "lg-direction-expander",
+    "title": "扩展创作方向",
+    "description": "从一句设想展开读者期待、人物欲望和有代价的选择。",
+    "tasks": [
+      "ideas",
+      "scene-plan"
+    ],
+    "technique": "先说明读者在等待什么，以及主角眼下想得到什么。把外部压力落到一次必须作出的选择。若任务需要多个方向，让它们改变行动、代价和兑现方式。用一句可发生在下一章的事件检验各方向，保留作者尚未决定的问题。",
+    "session": "需要保存方向时，查看 literary_plan 中的既有选择，通过 literary_propose_task 提议 ideas，或用 literary_propose_plan 提交待选方案。"
+  },
+  {
+    "name": "lg-worldview-designer",
+    "title": "世界规则设计",
+    "description": "设计资源、势力和能力限制如何改变人物行动。",
+    "tasks": [
+      "ideas",
+      "scene-plan",
+      "plan-review"
+    ],
+    "technique": "从本次冲突出发，写清谁控制一项稀缺资源、谁执行规则、破例的代价由谁承担。用同一场遭遇检验规则怎样帮助一方并限制另一方。标明来自既有设定的依据，将新增规则列为待选设想。",
+    "session": "可用 literary_memory 核对已确认规则和设想。需要保存新的设计方向时，通过 literary_propose_task 提议 ideas，并指定 worldbuilding 角色。"
+  },
+  {
+    "name": "lg-character-arc-designer",
+    "title": "人物弧光",
+    "description": "用压力下的选择检验人物欲望、误信和关系变化。",
+    "tasks": [
+      "ideas",
+      "scene-plan",
+      "plan-review",
+      "manuscript-review"
+    ],
+    "technique": "说明人物当下的欲望、使其回避某事的旧伤，以及他相信但可能错的一件事。让对手也有可理解的目的。设计一个选择，使人物必须在两项在意的东西之间取舍，并写出关系如何因此改变。把后续成长落在一次与先前不同的行动上。",
+    "session": "可用 literary_memory 查询角色在指定故事位置的认知。需要保存方向时，通过 literary_propose_task 提议 ideas，选择 character 角色。"
+  },
+  {
+    "name": "lg-conflict-engine",
+    "title": "冲突升级",
+    "description": "用代价、暴露程度和关系损失组织逐步升级的冲突。",
+    "tasks": [
+      "ideas",
+      "scene-plan",
+      "draft-scene",
+      "draft-chapter",
+      "plan-review"
+    ],
+    "technique": "写出双方互不相容的目标。从第一次试探开始，逐拍说明行动、阻力和新代价。每次升级改变一个具体条件，例如秘密被谁看见、承诺能否撤回或盟友要承担什么。最后的逆转要有前面可指出的铺垫，胜利也留下后果。",
+    "session": "可用 literary_plan 核对当前计划。形成新方向或场景计划时，通过 literary_propose_task 分别提议 ideas 或 scene-plan。"
+  },
+  {
+    "name": "lg-outline-planner",
+    "title": "大纲规划",
+    "description": "将卷的承诺、近几章的转折和伏笔回收对应起来。",
+    "tasks": [
+      "ideas",
+      "scene-plan",
+      "plan-review",
+      "draft-chapter"
+    ],
+    "technique": "先定本卷要兑现的承诺，列出已有铺垫及其可能回收位置。远处保留方向，近处落实到人物做什么选择，以及信息、关系、处境或危险发生什么变化。逐章检查因果承接和节奏疏密。标记作者修改前文后需要复核的节点。",
+    "session": "用 literary_plan 的 window 查看当前规划窗口，核对已选方向和伏笔。需要落地时，按作者选定的章、场景分别提议计划。"
+  },
+  {
+    "name": "lg-scene-planner",
+    "title": "场景规划",
+    "description": "从入场状态推到可审阅的场景计划和离场状态。",
+    "tasks": [
+      "scene-plan",
+      "plan-review",
+      "ideas"
+    ],
+    "technique": "写清入场时谁想达成什么、谁或什么形成阻力。用因果相接的动作安排至少一次有后果的选择。注明哪项信息由谁获知、情绪在哪里转向、离场时什么已经改变。新增设定单列为提案，给出供作者核对的场景计划。",
+    "session": "用 literary_plan 读取场景卡、当前计划及版本标记。通过 literary_propose_task 提议 scene-plan，或用 literary_propose_plan 提交待审计划。"
+  },
+  {
+    "name": "lg-chapter-writer",
+    "title": "章节起草",
+    "description": "按已定计划将场景写成行动、选择和可感知的后果。",
+    "tasks": [
+      "draft-scene",
+      "draft-chapter"
+    ],
+    "technique": "先定位本场起点、视角人物、必须发生的变化和作者指定停点。将提纲转为可见动作和有目的的对白，每一段推动阻力、选择、关系或信息变化。延续已有物品位置和人物认知。收笔前核对字数、禁用措辞及结尾要求，给出完整任务范围内的候选正文。",
+    "session": "用 literary_tasks 读取精确版本和选区。通过 literary_propose_task 提议 draft-chapter 或已批准计划的 draft-scene，候选由作者在编辑台审阅。"
+  },
+  {
+    "name": "lg-manuscript-editor",
+    "title": "定向修订",
+    "description": "按照指定编辑模式修改选区并核对人物、事件及范围。",
+    "tasks": [
+      "polish",
+      "manuscript-review",
+      "review"
+    ],
+    "technique": "辨明作者要求的是语病、节奏、对白、意象、冲突、视角、文风、轻修或主动重写。先圈出必须保留的人物决定、事件顺序、事实和语气，再在选区内处理指定问题。逐项核对替换后的原文，用改前和改后的具体文字确认每项变化。",
+    "session": "用 literary_tasks 的 source 获取选定版本、起止位置和标记。需要生成候选时，通过 literary_propose_task 提议 polish，附上原任务范围。"
+  },
+  {
+    "name": "lg-story-bible-curator",
+    "title": "设定复核",
+    "description": "核对正式事实、设想和冲突证据，准备作者裁决。",
+    "tasks": [
+      "extract-memory",
+      "plan-review",
+      "manuscript-review"
+    ],
+    "technique": "将每条陈述与出处、版本及状态对应，区分已确认事实、未来计划、角色信念和作者设想。遇到同键异值时列出双方依据及各自的有效时间，标出需作者裁决之处。给出最小的新增、修订或归档建议。",
+    "session": "用 literary_memory 查记录。可用 literary_remember 提交待审事实，或通过 literary_propose_task 提议 extract-memory；正式事实由作者在故事记忆面板确认。"
+  },
+  {
+    "name": "lg-continuity-checker",
+    "title": "连续性核对",
+    "description": "用成对证据核对时间、物品、能力边界与角色所知。",
+    "tasks": [
+      "review",
+      "manuscript-review",
+      "plan-review",
+      "polish"
+    ],
+    "technique": "先定位可核对的两处陈述或动作，引用各自的版本与句段。按事件时间、揭示顺序及视角人物所知核对是否确实互斥。回忆、转述、否定和误信都可能解释表面矛盾。对证据不足的地方提出待核问题，给出最小修复建议。",
+    "session": "可用 literary_memory 查询角色或读者在指定位置已知的内容。需留存报告时通过 literary_propose_task 提议 manuscript-review 或 plan-review，用编号原文支持每项判断。"
+  },
+  {
+    "name": "lg-style-controller",
+    "title": "文风与对白",
+    "description": "核对视角、句长、对白作用与作者文风，保留事件。",
+    "tasks": [
+      "polish",
+      "draft-scene",
+      "draft-chapter",
+      "manuscript-review",
+      "review"
+    ],
+    "technique": "根据作者偏好和当前段落确认视角、叙述距离与语气。看对白中人物想使对方做什么，哪些信息可以由动作或停顿承担。调整句长和停顿以配合动作速度，保留说话者差异。改后逐句核对原事件和人物决定，区分个人风格与事实错误。",
+    "session": "通过 literary_tasks 读取正文范围。需要改稿时用 literary_propose_task 提议 polish 并选 style 角色，由作者比较候选。"
+  },
+  {
+    "name": "lg-reference-retriever",
+    "title": "文学资料检索",
+    "description": "围绕当前文学问题挑选少量有出处的结构或技法材料。",
+    "tasks": [
+      "analyze-reference",
+      "scene-plan",
+      "ideas"
+    ],
+    "technique": "先把需求写成具体问题，如伏笔如何回收、关系如何转折。根据问题选择少量资料，附引用标识和匹配理由。分开材料所展示的结构与原作独有的措辞、人物和场面，说明迁移到本书时还缺什么条件。",
+    "session": "用 literary_search 检索已登记作品的资料，用 literary_reference 核实所选引用。需要分析卡时，通过 literary_propose_task 提议 analyze-reference 并携带选定引用。"
+  },
+  {
+    "name": "lg-reference-abstractor",
+    "title": "文学方法抽象",
+    "description": "把参考材料提炼为可迁移的结构、适用条件和限制。",
+    "tasks": [
+      "analyze-reference",
+      "ideas",
+      "scene-plan"
+    ],
+    "technique": "先指出材料中可定位的结构证据，再用中性语言说明触发条件、人物选择、读者预期及结果。将通用机制与来源专名、情节细节和独特表达分开。给出一个适用于本书的使用条件，以及一个会使该方法失效的反例。",
+    "session": "用 literary_reference 核对资料。通过 literary_propose_task 提议 analyze-reference，待审分析卡由作者在 Library 面板批准。"
+  },
+  {
+    "name": "lg-memory-updater",
+    "title": "提取故事记忆",
+    "description": "从已采用正文提取有原文证据、可长期复用的事实提案。",
+    "tasks": [
+      "extract-memory"
+    ],
+    "technique": "以已采用的精确版本为来源，逐条提取会影响后文的变化，例如物品归属、人物关系或已发生的事件。引用足以支撑该项的原文，区分人物说法、愿望和可确认事实。遇到已有记录冲突时保留两边证据，留下作者判断。",
+    "session": "用 literary_tasks 读取已采用版本，使用 literary_propose_task 提议 extract-memory。需要手工提出单条线索时用 literary_remember，确认与撤回在故事记忆面板进行。"
+  },
+  {
+    "name": "lg-failure-logger",
+    "title": "失败复核",
+    "description": "记录起草或审阅中可复现的问题、证据及下一次检查。",
+    "tasks": [
+      "review",
+      "manuscript-review",
+      "plan-review"
+    ],
+    "technique": "记录作者原要求、目标版本、期待结果和实际出现的偏差，区分输入遗漏、模型输出不符和文学判断分歧。只引用能定位的问题，标明已经尝试过的修复。给出下一次最小修正及可观察的验收条件，保留失败和未确定之处。",
+    "session": "可查看原任务收据和审阅报告。需留存正文或规划问题时，用 literary_propose_task 提议相应审阅任务；在对话中明确说明仍缺的证据。"
+  }
+]

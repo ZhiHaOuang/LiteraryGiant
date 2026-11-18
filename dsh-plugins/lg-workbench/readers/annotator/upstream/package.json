@@ -1,0 +1,61 @@
+{
+  "name": "dsh-md-annotator",
+  "version": "0.9.0",
+  "description": "基于 The Better Sidebar 的 Markdown 预览、源码编辑与批注插件",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": {
+      "default": "./lib/index.js"
+    },
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "scripts": {
+    "build": "node scripts/bundle.mjs",
+    "prepack": "node scripts/bundle.mjs",
+    "test": "node test/smoke.mjs && node test/unit.mjs && node test/integration.mjs && node test/host.mjs",
+    "pack": "pnpm pack --pack-destination dist",
+    "clean": "node -e \"const fs=require('fs');for(const f of fs.readdirSync('.')){if(f.endsWith('.tgz'))fs.unlinkSync(f)}\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/3361805598-gif/dsh-md-annotator"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "markdown",
+    "annotation",
+    "deepseek-harness"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web"
+    }
+  },
+  "license": "MIT",
+  "author": "lawyer_cui",
+  "peerDependencies": {
+    "dsh-better-sidebar": ">=0.19.1 <0.20.0"
+  },
+  "peerDependenciesMeta": {
+    "dsh-better-sidebar": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "schema": "lg.book-analysis.v1",
+  "project_id": "test-book",
+  "chapter": "doc-1",
+  "library": "CharacterArc",
+  "run_id": "legacy-CharacterArc",
+  "fingerprint": "525786839f3739db407d275e3289361e72c03a9df7f69ad0016495d5542f5832",
+  "base_fingerprint": "e4dc8c6b9e5e2a56995b055929f49dc54604e95aa1fac5e54f452967d324a7f4",
+  "report": {
+    "summary": "核对钥匙交接。",
+    "entries": [
+      {
+        "key": "key",
+        "label": "钥匙交接",
+        "analysis": "持有者可能变化。",
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 9,
+            "quote": "铜钥匙交给守灯人"
+          }
+        ]
+      }
+    ],
+    "findings": [
+      {
+        "kind": "canon_conflict",
+        "explanation": "与仍然持有钥匙的正式设定可能冲突。",
+        "fact_id": 1,
+        "fact_quote": "持有铜钥匙",
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 9,
+            "quote": "铜钥匙交给守灯人"
+          }
+        ]
+      }
+    ]
+  }
+}

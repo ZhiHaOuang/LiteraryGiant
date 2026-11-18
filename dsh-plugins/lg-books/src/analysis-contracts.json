@@ -1,0 +1,864 @@
+{
+  "base": {
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+      "summary",
+      "entries",
+      "findings"
+    ],
+    "properties": {
+      "summary": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 2000
+      },
+      "entries": {
+        "type": "array",
+        "maxItems": 8,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "key",
+            "label",
+            "analysis",
+            "evidence"
+          ],
+          "properties": {
+            "key": {
+              "type": "string",
+              "minLength": 1
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "analysis": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1200
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/evidence"
+              }
+            },
+            "instance_card": {
+              "type": "object"
+            }
+          }
+        }
+      },
+      "findings": {
+        "type": "array",
+        "maxItems": 10,
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "explanation",
+            "evidence",
+            "fact_id",
+            "fact_quote"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "canon_conflict",
+                "style",
+                "question"
+              ]
+            },
+            "explanation": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "evidence": {
+              "type": "array",
+              "minItems": 1,
+              "maxItems": 5,
+              "items": {
+                "$ref": "#/$defs/evidence"
+              }
+            },
+            "fact_id": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "fact_quote": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "$defs": {
+      "evidence": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "document_id",
+          "version_id",
+          "quote"
+        ],
+        "properties": {
+          "document_id": {
+            "type": "integer"
+          },
+          "version_id": {
+            "type": "integer"
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 1000
+          }
+        }
+      }
+    }
+  },
+  "cards": {
+    "CharacterArc": {
+      "fingerprint": "507afcae80dd423dc456f15d526876f479c9557012bcab57bd896e9bd60e157b",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "portable_core",
+          "implementation_details",
+          "source_locked_details",
+          "fusion_hooks",
+          "arc_path",
+          "schema_version",
+          "card_type",
+          "grounding_mode",
+          "derivation_warnings",
+          "card_quality"
+        ],
+        "properties": {
+          "portable_core": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "implementation_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_locked_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "fusion_hooks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "arc_path": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "initial_belief",
+              "initial_behavior",
+              "arc_nodes",
+              "failed_choices",
+              "turning_choice",
+              "new_behavior",
+              "relationship_confirmation",
+              "regression_risk"
+            ],
+            "properties": {
+              "initial_belief": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "initial_behavior": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "arc_nodes": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "phase",
+                    "pressure",
+                    "choice",
+                    "consequence"
+                  ],
+                  "properties": {
+                    "phase": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "pressure": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "choice": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "consequence": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  }
+                }
+              },
+              "failed_choices": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "turning_choice": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "new_behavior": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "relationship_confirmation": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "regression_risk": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          },
+          "schema_version": {
+            "const": "narrative_instance_card.v1"
+          },
+          "card_type": {
+            "const": "character_arc_instance_card"
+          },
+          "grounding_mode": {
+            "const": "llm_grounded"
+          },
+          "derivation_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "card_quality": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "EventsLibrary": {
+      "fingerprint": "e44a72995fbcf3f57b5dcbea48414ee71afe631aa20d56c3a955422387b6171e",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "portable_core",
+          "implementation_details",
+          "source_locked_details",
+          "fusion_hooks",
+          "scene_context",
+          "causal_chain",
+          "turning_point",
+          "after_state",
+          "schema_version",
+          "card_type",
+          "grounding_mode",
+          "derivation_warnings",
+          "card_quality"
+        ],
+        "properties": {
+          "portable_core": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "implementation_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_locked_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "fusion_hooks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "scene_context": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "before_state",
+              "immediate_goal",
+              "active_obstacle",
+              "stakes",
+              "available_resources"
+            ],
+            "properties": {
+              "before_state": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "immediate_goal": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "active_obstacle": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "stakes": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "available_resources": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "causal_chain": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "step",
+                "action",
+                "cause",
+                "effect",
+                "decision_owner"
+              ],
+              "properties": {
+                "step": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "action": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "cause": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "effect": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "decision_owner": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              }
+            }
+          },
+          "turning_point": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "event",
+              "why_it_changes_direction",
+              "new_information_or_resource"
+            ],
+            "properties": {
+              "event": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "why_it_changes_direction": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "new_information_or_resource": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          },
+          "after_state": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "overall_change",
+              "relationship_change",
+              "power_change",
+              "goal_change",
+              "new_hook"
+            ],
+            "properties": {
+              "overall_change": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "relationship_change": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "power_change": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "goal_change": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "new_hook": {
+                "type": "string",
+                "maxLength": 2000
+              }
+            }
+          },
+          "schema_version": {
+            "const": "narrative_instance_card.v1"
+          },
+          "card_type": {
+            "const": "event_instance_card"
+          },
+          "grounding_mode": {
+            "const": "llm_grounded"
+          },
+          "derivation_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "card_quality": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "PayoffAngst": {
+      "fingerprint": "7aea2261eb0c1215203ce5d0bffa94a7f3a69aa8a6350d036b05bb5828041aa9",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "portable_core",
+          "implementation_details",
+          "source_locked_details",
+          "fusion_hooks",
+          "emotional_setup",
+          "schema_version",
+          "card_type",
+          "grounding_mode",
+          "derivation_warnings",
+          "card_quality"
+        ],
+        "properties": {
+          "portable_core": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "implementation_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_locked_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "fusion_hooks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "emotional_setup": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "pressure_evidence",
+              "reader_expectation",
+              "character_awareness",
+              "avoidability",
+              "delay_beats",
+              "release_beat",
+              "payoff_visibility",
+              "residual_emotion",
+              "failure_conditions"
+            ],
+            "properties": {
+              "pressure_evidence": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "reader_expectation": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "character_awareness": {
+                "type": "string",
+                "enum": [
+                  "reader_only",
+                  "character_only",
+                  "shared",
+                  "uncertain"
+                ]
+              },
+              "avoidability": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "delay_beats": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "release_beat": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "payoff_visibility": {
+                "type": "string",
+                "enum": [
+                  "private",
+                  "public",
+                  "relational",
+                  "systemic",
+                  "uncertain"
+                ]
+              },
+              "residual_emotion": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "failure_conditions": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "schema_version": {
+            "const": "narrative_instance_card.v1"
+          },
+          "card_type": {
+            "const": "payoff_instance_card"
+          },
+          "grounding_mode": {
+            "const": "llm_grounded"
+          },
+          "derivation_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "card_quality": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "EmotionRhythm": {
+      "fingerprint": "36c0bf133d78ba456ffdd03cd494978c7f59e3fba4d6b40b98f463d007b30999",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "portable_core",
+          "implementation_details",
+          "source_locked_details",
+          "fusion_hooks",
+          "emotion_beats",
+          "schema_version",
+          "card_type",
+          "grounding_mode",
+          "derivation_warnings",
+          "card_quality"
+        ],
+        "properties": {
+          "portable_core": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "implementation_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_locked_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "fusion_hooks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "emotion_beats": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "beat_index",
+                "reader_emotion",
+                "intensity",
+                "information_state",
+                "tension_delta",
+                "release_delta",
+                "hook_type"
+              ],
+              "properties": {
+                "beat_index": {
+                  "type": "integer",
+                  "minimum": 1
+                },
+                "reader_emotion": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "intensity": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 5
+                },
+                "information_state": {
+                  "type": "string",
+                  "maxLength": 2000
+                },
+                "tension_delta": {
+                  "type": "integer",
+                  "minimum": -2,
+                  "maximum": 2
+                },
+                "release_delta": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 2
+                },
+                "hook_type": {
+                  "type": "string",
+                  "maxLength": 2000
+                }
+              }
+            }
+          },
+          "schema_version": {
+            "const": "narrative_instance_card.v1"
+          },
+          "card_type": {
+            "const": "emotion_rhythm_instance_card"
+          },
+          "grounding_mode": {
+            "const": "llm_grounded"
+          },
+          "derivation_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "card_quality": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "Worldview": {
+      "fingerprint": "effafb76a5eb90f77f7e70350e5abbc89639f1ce19a621c6118b6a554377bbdf",
+      "schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "portable_core",
+          "implementation_details",
+          "source_locked_details",
+          "fusion_hooks",
+          "rule_application",
+          "schema_version",
+          "card_type",
+          "grounding_mode",
+          "derivation_warnings",
+          "card_quality"
+        ],
+        "properties": {
+          "portable_core": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "implementation_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_locked_details": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "fusion_hooks": {
+            "type": "array",
+            "maxItems": 32,
+            "items": {
+              "type": "string"
+            }
+          },
+          "rule_application": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "rule_statement",
+              "enforcement",
+              "cost",
+              "exception",
+              "exploit",
+              "affected_groups",
+              "event_examples"
+            ],
+            "properties": {
+              "rule_statement": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "enforcement": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "cost": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "exception": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "exploit": {
+                "type": "string",
+                "maxLength": 2000
+              },
+              "affected_groups": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "string"
+                }
+              },
+              "event_examples": {
+                "type": "array",
+                "maxItems": 32,
+                "items": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "chunk_id",
+                    "application"
+                  ],
+                  "properties": {
+                    "chunk_id": {
+                      "type": "string",
+                      "maxLength": 2000
+                    },
+                    "application": {
+                      "type": "string",
+                      "maxLength": 2000
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "schema_version": {
+            "const": "narrative_instance_card.v1"
+          },
+          "card_type": {
+            "const": "worldview_instance_card"
+          },
+          "grounding_mode": {
+            "const": "llm_grounded"
+          },
+          "derivation_warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "card_quality": {
+            "type": "object"
+          }
+        }
+      }
+    }
+  }
+}

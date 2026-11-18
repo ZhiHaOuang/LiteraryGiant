@@ -1,0 +1,20 @@
+/* Native Message bubble animation flight trajectory. Copyright 2026 Nwflower, MIT; see LICENSE-dsh-claude-style. */
+@keyframes lgt-message-flight {
+  0% { transform: translateY(var(--dsh-claude-enter-row)) scale(0.6); }
+  6.25% { transform: translateY(25.79px) scale(0.632); }
+  12.5% { transform: translateY(20.88px) scale(0.702); }
+  18.75% { transform: translateY(15.19px) scale(0.783); }
+  25% { transform: translateY(9.88px) scale(0.859); }
+  31.25% { transform: translateY(5.55px) scale(0.921); }
+  37.5% { transform: translateY(2.37px) scale(0.966); }
+  43.75% { transform: translateY(0.28px) scale(0.996); }
+  50% { transform: translateY(-0.9px) scale(1.013); }
+  56.25% { transform: translateY(-1.43px) scale(1.02); }
+  62.5% { transform: translateY(-1.51px) scale(1.022); }
+  68.75% { transform: translateY(-1.34px) scale(1.019); }
+  75% { transform: translateY(-1.05px) scale(1.015); }
+  81.25% { transform: translateY(-0.75px) scale(1.011); }
+  87.5% { transform: translateY(-0.47px) scale(1.007); }
+  93.75% { transform: translateY(-0.25px) scale(1.004); }
+  100% { transform: none; }
+}

@@ -1,0 +1,30 @@
+{
+  "name": "lg-execution",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bounded literary model execution with durable budget reservations",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=24.9",
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/schemastery": "~3.19.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "name": "lg-agent-preflight",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "engines": {
+    "node": ">=24.9",
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/schemastery": "~3.19.0",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-llm": "0.2.2-rc.1"
+  }
+}

@@ -1,0 +1,1371 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://literarygiant.local/contracts/story-data/1.1.0",
+  "title": "LG 书级故事记录 1.1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.1.0"
+    },
+    "id": {
+      "$ref": "#/$defs/id"
+    },
+    "type": {
+      "enum": [
+        "entity",
+        "world_rule",
+        "scene",
+        "event",
+        "state",
+        "relation",
+        "knowledge",
+        "revelation",
+        "thread",
+        "plan",
+        "portrait",
+        "analysis",
+        "requirement",
+        "role_assignment"
+      ]
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100,
+      "description": "短语或名称，不拼接多个无关信息。"
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 800,
+      "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+    },
+    "basis": {
+      "enum": [
+        "text",
+        "character_statement",
+        "inference",
+        "author"
+      ]
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "book",
+            "chapter",
+            "scene",
+            "entity",
+            "region",
+            "arc"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 300,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "kind",
+        "description",
+        "targets"
+      ]
+    },
+    "story_time": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "all",
+            "unknown",
+            "relative",
+            "interval",
+            "range"
+          ]
+        },
+        "label": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 200,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "after_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "before_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "coordinate": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "axis": {
+              "$ref": "#/$defs/id"
+            },
+            "unit": {
+              "enum": [
+                "minute",
+                "hour",
+                "day"
+              ]
+            },
+            "start_min": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            },
+            "start_max": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            },
+            "end_min": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            },
+            "end_max": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            }
+          },
+          "required": [
+            "axis",
+            "unit",
+            "start_min",
+            "start_max",
+            "end_min",
+            "end_max"
+          ]
+        },
+        "offset": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "anchor_event": {
+              "$ref": "#/$defs/id"
+            },
+            "anchor_point": {
+              "enum": [
+                "start",
+                "end"
+              ]
+            },
+            "min": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            },
+            "max": {
+              "type": "number",
+              "minimum": -1000000000,
+              "maximum": 1000000000
+            },
+            "unit": {
+              "enum": [
+                "minute",
+                "hour",
+                "day"
+              ]
+            }
+          },
+          "required": [
+            "anchor_event",
+            "anchor_point",
+            "min",
+            "max",
+            "unit"
+          ]
+        }
+      },
+      "required": [
+        "kind",
+        "label",
+        "after_event",
+        "before_event"
+      ]
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "document_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "version_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "paragraph": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "quote": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 500,
+            "description": "指定段落中逐字存在的原文，不允许省略号改写。"
+          }
+        },
+        "required": [
+          "document_id",
+          "version_id",
+          "sha256",
+          "paragraph",
+          "quote"
+        ]
+      },
+      "maxItems": 16
+    },
+    "author_note": {
+      "type": "string",
+      "minLength": 0,
+      "maxLength": 800,
+      "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+    },
+    "links": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "relation": {
+            "enum": [
+              "before",
+              "causes",
+              "enables",
+              "obstructs",
+              "supports",
+              "contradicts",
+              "reveals",
+              "pays_off",
+              "part_of",
+              "motivates",
+              "simultaneous",
+              "overlaps"
+            ]
+          },
+          "target": {
+            "$ref": "#/$defs/id"
+          },
+          "explanation": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 300,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          }
+        },
+        "required": [
+          "relation",
+          "target",
+          "explanation"
+        ]
+      },
+      "maxItems": 24
+    },
+    "payload": {
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "type",
+    "title",
+    "summary",
+    "basis",
+    "scope",
+    "story_time",
+    "evidence",
+    "author_note",
+    "links",
+    "payload"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "entity"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/entity"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "world_rule"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/world_rule"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "scene"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/scene"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "event"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/event"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "state"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/state"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "relation"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/relation"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "knowledge"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/knowledge"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "revelation"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/revelation"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "thread"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/thread"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "plan"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/plan"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "portrait"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/portrait"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "analysis"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/analysis"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "requirement"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/requirement"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "type": {
+            "const": "role_assignment"
+          }
+        },
+        "required": [
+          "type"
+        ]
+      },
+      "then": {
+        "properties": {
+          "payload": {
+            "$ref": "#/$defs/role_assignment"
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9:_-]{0,119}$",
+      "description": "作品内稳定 ID；引用同一实体必须复用 ID。"
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "document_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "version_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "paragraph": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "quote": {
+          "type": "string",
+          "minLength": 4,
+          "maxLength": 500,
+          "description": "指定段落中逐字存在的原文，不允许省略号改写。"
+        }
+      },
+      "required": [
+        "document_id",
+        "version_id",
+        "sha256",
+        "paragraph",
+        "quote"
+      ]
+    },
+    "entity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "entity_kind": {
+          "enum": [
+            "character",
+            "group",
+            "place",
+            "object",
+            "concept"
+          ]
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "短语或名称，不拼接多个无关信息。"
+        },
+        "aliases": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80,
+            "description": "短语或名称，不拼接多个无关信息。"
+          },
+          "maxItems": 20
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 800,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        }
+      },
+      "required": [
+        "entity_kind",
+        "name",
+        "aliases",
+        "description"
+      ]
+    },
+    "world_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "statement": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "domain": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "短语或名称，不拼接多个无关信息。"
+        },
+        "conditions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "exceptions": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        }
+      },
+      "required": [
+        "statement",
+        "domain",
+        "conditions",
+        "exceptions"
+      ]
+    },
+    "scene": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pov": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "narrator": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "短语或名称，不拼接多个无关信息。"
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "participants": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        },
+        "purpose": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "opening": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "ending": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        }
+      },
+      "required": [
+        "pov",
+        "narrator",
+        "location",
+        "participants",
+        "purpose",
+        "opening",
+        "ending"
+      ]
+    },
+    "event": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "actors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        },
+        "location": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "action": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "outcome": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "motivation": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "scene": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "actors",
+        "location",
+        "action",
+        "outcome",
+        "motivation",
+        "scene"
+      ]
+    },
+    "state": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "facet": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "短语或名称，不拼接多个无关信息。"
+        },
+        "value": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "previous_record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "trigger_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "subject",
+        "facet",
+        "value",
+        "previous_record",
+        "trigger_event"
+      ]
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "object": {
+          "$ref": "#/$defs/id"
+        },
+        "relation": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 80,
+          "description": "短语或名称，不拼接多个无关信息。"
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "trigger_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "subject",
+        "object",
+        "relation",
+        "description",
+        "trigger_event"
+      ]
+    },
+    "knowledge": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "holder": {
+          "$ref": "#/$defs/id"
+        },
+        "proposition": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "stance": {
+          "enum": [
+            "believes",
+            "doubts",
+            "denies",
+            "uncertain"
+          ]
+        },
+        "acquired_by": {
+          "enum": [
+            "experience",
+            "told",
+            "read",
+            "inference",
+            "unknown"
+          ]
+        },
+        "trigger_event": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "topic": {
+          "$ref": "#/$defs/id"
+        },
+        "previous_record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "holder",
+        "proposition",
+        "stance",
+        "acquired_by",
+        "trigger_event"
+      ]
+    },
+    "revelation": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "proposition": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "presentation": {
+          "enum": [
+            "narration",
+            "statement",
+            "hint",
+            "correction",
+            "reveal"
+          ]
+        },
+        "speaker": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "about_record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "proposition",
+        "presentation",
+        "speaker",
+        "about_record"
+      ]
+    },
+    "thread": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "question": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "thread_kind": {
+          "enum": [
+            "conflict",
+            "mystery",
+            "foreshadowing",
+            "relationship",
+            "goal"
+          ]
+        },
+        "progress": {
+          "enum": [
+            "possible",
+            "open",
+            "resolved",
+            "abandoned"
+          ]
+        },
+        "setup_records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        },
+        "planned_payoff": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "actual_payoff": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "question",
+        "thread_kind",
+        "progress",
+        "setup_records",
+        "planned_payoff",
+        "actual_payoff"
+      ]
+    },
+    "plan": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "level": {
+          "enum": [
+            "book",
+            "arc",
+            "chapter",
+            "scene"
+          ]
+        },
+        "parent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/id"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "objective": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 30
+        },
+        "expected_changes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "constraints": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "reveal": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "withhold": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "selection": {
+          "enum": [
+            "option",
+            "selected",
+            "cancelled"
+          ]
+        },
+        "realized_events": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "level",
+        "parent",
+        "objective",
+        "steps",
+        "expected_changes",
+        "constraints",
+        "reveal",
+        "withhold",
+        "selection",
+        "realized_events"
+      ]
+    },
+    "portrait": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "aspect": {
+          "enum": [
+            "desire",
+            "value",
+            "fear",
+            "behavior",
+            "voice",
+            "contradiction",
+            "growth"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "counterevidence": {
+          "type": "string",
+          "minLength": 0,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        }
+      },
+      "required": [
+        "subject",
+        "aspect",
+        "description",
+        "counterevidence"
+      ]
+    },
+    "analysis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dimension": {
+          "enum": [
+            "summary",
+            "rhythm",
+            "emotion",
+            "style",
+            "theme",
+            "logic"
+          ]
+        },
+        "assessment": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 1600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "limitations": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 240,
+            "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+          },
+          "maxItems": 12
+        },
+        "about": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "dimension",
+        "assessment",
+        "limitations",
+        "about"
+      ]
+    },
+    "requirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "category": {
+          "enum": [
+            "style",
+            "viewpoint",
+            "constraint",
+            "preference"
+          ]
+        },
+        "instruction": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 600,
+          "description": "完整中文句子，说明一个明确判断；不写 Markdown 标题。"
+        },
+        "strength": {
+          "enum": [
+            "must",
+            "prefer"
+          ]
+        },
+        "targets": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/id"
+          },
+          "maxItems": 20
+        }
+      },
+      "required": [
+        "category",
+        "instruction",
+        "strength",
+        "targets"
+      ]
+    },
+    "role_assignment": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "subject": {
+          "$ref": "#/$defs/id"
+        },
+        "prominence": {
+          "enum": [
+            "core",
+            "major",
+            "supporting",
+            "minor",
+            "unknown"
+          ]
+        },
+        "roles": {
+          "type": "array",
+          "uniqueItems": true,
+          "maxItems": 10,
+          "items": {
+            "enum": [
+              "protagonist",
+              "antagonist",
+              "mentor",
+              "ally",
+              "other"
+            ]
+          }
+        }
+      },
+      "required": [
+        "subject",
+        "prominence",
+        "roles"
+      ]
+    }
+  }
+}

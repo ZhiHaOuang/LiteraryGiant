@@ -1,0 +1,26 @@
+{
+  "name": "literarygiant-plugins",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test lg-dashboard/tests/*.test.mjs lg-books/tests/*.test.mjs lg-execution/tests/*.test.mjs lg-agents/tests/*.test.mjs lg-library/tests/*.test.mjs lg-memory/tests/*.test.mjs lg-context/tests/*.test.mjs lg-planning/tests/*.test.mjs tests/*.test.mjs lg-review/tests/*.test.mjs lg-workflows/tests/*.test.mjs lg-author/tests/*.test.mjs lg-tool-policy/tests/*.test.mjs lg-director/tests/*.test.mjs lg-impact/tests/*.test.mjs lg-skills/tests/*.test.mjs"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "4.1.0",
+    "@deepseek-ai/dsh-tools": "0.2.2-rc.1",
+    "@deepseek-ai/dsh-util-workspace-path": "0.2.2-rc.1",
+    "@deepseek-ai/schemastery": "3.19.0",
+    "@opencode-ai/models": "0.0.87",
+    "ajv": "8.20.0",
+    "esbuild": "0.28.2",
+    "fflate": "0.8.2",
+    "react": "18.3.1"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-scope": "0.2.2-rc.1"
+  },
+  "dependencies": {
+    "framer-motion": "14.12.0"
+  }
+}

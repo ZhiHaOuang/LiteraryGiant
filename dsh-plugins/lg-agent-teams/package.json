@@ -1,0 +1,41 @@
+{
+  "name": "lg-agent-teams",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json",
+    "./presets": "./presets/index.js"
+  },
+  "description": "DSH 文学协作：分析、规划、创作，按需委派并保留候选与用量",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/schemastery": "^3.18.2",
+    "lg-books": "0.1.0"
+  },
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0",
+    "node": ">=24.9"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "prompts",
+    "methods",
+    "cordis.patch.yml",
+    "README.md",
+    "NOTICE",
+    "LICENSE-dsh-context",
+    "presets"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "lg.story-data.read.v1",
+  "type": "object",
+  "required": [
+    "api_version",
+    "data_revision",
+    "book_id",
+    "chapters",
+    "entities"
+  ],
+  "properties": {
+    "api_version": {
+      "const": "lg.story-data.read.v1"
+    },
+    "data_revision": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "book_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "chapters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "title"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "entities": {
+      "type": "array"
+    }
+  },
+  "oneOf": [
+    {
+      "type": "object",
+      "required": [
+        "records",
+        "catalog",
+        "counts",
+        "directory",
+        "total",
+        "offset",
+        "limit",
+        "runs"
+      ],
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/record"
+          }
+        },
+        "catalog": {
+          "type": "object"
+        },
+        "counts": {
+          "type": "object"
+        },
+        "directory": {
+          "type": "object"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "offset": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "limit": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        },
+        "runs": {
+          "type": "array"
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "records",
+        "events",
+        "timeline",
+        "character",
+        "coverage_notice"
+      ],
+      "properties": {
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/record"
+          }
+        },
+        "events": {
+          "type": "array"
+        },
+        "timeline": {
+          "type": "object",
+          "required": [
+            "groups",
+            "unplaced",
+            "relations",
+            "warnings"
+          ],
+          "properties": {
+            "groups": {
+              "type": "array"
+            },
+            "unplaced": {
+              "type": "array"
+            },
+            "relations": {
+              "type": "array"
+            },
+            "warnings": {
+              "type": "array"
+            }
+          }
+        },
+        "character": {
+          "type": [
+            "object",
+            "null"
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "counts",
+        "total",
+        "coverage",
+        "quality",
+        "capabilities",
+        "limits"
+      ],
+      "properties": {
+        "counts": {
+          "type": "object"
+        },
+        "total": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "coverage": {
+          "type": "object",
+          "required": [
+            "chapters",
+            "total_chapters",
+            "registered_chapters",
+            "note"
+          ],
+          "properties": {
+            "chapters": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "id",
+                  "title",
+                  "sequence",
+                  "version_id",
+                  "record_count",
+                  "status"
+                ],
+                "properties": {
+                  "record_count": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "sequence": {
+                    "type": "integer",
+                    "minimum": 1
+                  },
+                  "status": {
+                    "enum": [
+                      "registered",
+                      "unreviewed"
+                    ]
+                  }
+                }
+              }
+            },
+            "total_chapters": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "registered_chapters": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "note": {
+              "type": "string"
+            }
+          }
+        },
+        "quality": {
+          "type": "object",
+          "required": [
+            "candidate",
+            "confirmed",
+            "source_issues",
+            "dependency_issues",
+            "unplaced_events",
+            "unknown_state_time",
+            "unrated_characters",
+            "scoped_roles",
+            "possible_duplicates"
+          ],
+          "properties": {
+            "source_issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "dependency_issues": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unplaced_events": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unknown_state_time": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "unrated_characters": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "scoped_roles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "candidate": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "confirmed": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "possible_duplicates": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "name",
+                  "ids",
+                  "decision"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "ids": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  "decision": {
+                    "const": "unresolved"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "capabilities": {
+          "type": "object"
+        },
+        "limits": {
+          "type": "object"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "record": {
+      "type": "object",
+      "required": [
+        "id",
+        "type",
+        "payload",
+        "evidence",
+        "scope",
+        "story_time",
+        "revision",
+        "approval",
+        "freshness",
+        "related_changed"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "payload": {
+          "type": "object"
+        },
+        "evidence": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "document_id",
+              "version_id",
+              "sha256",
+              "paragraph",
+              "quote"
+            ]
+          }
+        },
+        "revision": {
+          "type": "string"
+        },
+        "approval": {
+          "enum": [
+            "candidate",
+            "confirmed",
+            "rejected",
+            "withdrawn"
+          ]
+        },
+        "freshness": {
+          "enum": [
+            "current",
+            "stale",
+            "invalid",
+            "unavailable"
+          ]
+        },
+        "related_changed": {
+          "type": "array"
+        }
+      }
+    }
+  }
+}

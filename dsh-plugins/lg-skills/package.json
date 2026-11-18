@@ -1,0 +1,32 @@
+{
+  "name": "lg-skills",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "LiteraryGiant methods for DSH skill invocation and literary specialists",
+  "exports": {
+    ".": "./index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "methods.js",
+    "catalog.json",
+    "README.md",
+    "cordis.patch.yml"
+  ],
+  "engines": {
+    "node": ">=24.9",
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "@deepseek-ai/schemastery": "3.19.0",
+    "@deepseek-ai/dsh-skill": "0.2.2-rc.1"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}

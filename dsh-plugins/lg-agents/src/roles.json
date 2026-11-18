@@ -1,0 +1,127 @@
+[
+  {
+    "id": "director",
+    "name": "DirectorAgent",
+    "role": "总导演，负责拆任务、选择 workflow、分配子任务、整合结果。",
+    "quality_criteria": [
+      "clear mode choice",
+      "bounded scope",
+      "ordered handoff",
+      "final output reconciles conflicts"
+    ]
+  },
+  {
+    "id": "reference",
+    "name": "ReferenceAgent",
+    "role": "负责检索 Reference Library，并抽象可迁移结构，禁止照搬原文。",
+    "quality_criteria": [
+      "source ids present",
+      "no copied prose",
+      "patterns usable"
+    ]
+  },
+  {
+    "id": "worldbuilding",
+    "name": "WorldbuildingAgent",
+    "role": "负责世界观、势力、规则、资源、等级、地理和系统边界。",
+    "quality_criteria": [
+      "rules generate conflict",
+      "limits explicit",
+      "costs meaningful"
+    ]
+  },
+  {
+    "id": "character",
+    "name": "CharacterAgent",
+    "role": "负责人物弧光、关系网、动机、成长、创伤、误会、反转。",
+    "quality_criteria": [
+      "motives actionable",
+      "relationships tense",
+      "growth tested"
+    ]
+  },
+  {
+    "id": "plot",
+    "name": "PlotAgent",
+    "role": "负责主线、分卷、章节、冲突升级、伏笔和回收。",
+    "quality_criteria": [
+      "each chapter moves",
+      "hooks concrete",
+      "payoffs tracked"
+    ]
+  },
+  {
+    "id": "chapter-writer",
+    "name": "ChapterWriterAgent",
+    "role": "负责按大纲写章节正文。",
+    "quality_criteria": [
+      "conflict present",
+      "emotion shifts",
+      "hook strong",
+      "no padding"
+    ]
+  },
+  {
+    "id": "scene-planner",
+    "name": "ScenePlannerAgent",
+    "role": "负责把章节节点转化为可审批的场景卡和因果节拍，不提前写正文。",
+    "quality_criteria": [
+      "causal beats",
+      "clear scene turn",
+      "information boundaries explicit",
+      "no prose before approval",
+      "no automatic canon changes"
+    ]
+  },
+  {
+    "id": "manuscript-editor",
+    "name": "ManuscriptEditorAgent",
+    "role": "负责按明确模式生成可对比的候选修订，不覆盖当前接受版本。",
+    "quality_criteria": [
+      "revision mode respected",
+      "canon preserved",
+      "change log concrete",
+      "candidate remains inactive"
+    ]
+  },
+  {
+    "id": "continuity",
+    "name": "ContinuityAgent",
+    "role": "负责查矛盾、断线、设定冲突、战力膨胀和时间线问题。",
+    "quality_criteria": [
+      "evidence cited",
+      "severity clear",
+      "minimal repair"
+    ]
+  },
+  {
+    "id": "style",
+    "name": "StyleAgent",
+    "role": "负责文风、节奏、对白、爽感密度、叙事口吻。",
+    "quality_criteria": [
+      "voice stable",
+      "momentum high",
+      "dialogue functional"
+    ]
+  },
+  {
+    "id": "critic",
+    "name": "CriticAgent",
+    "role": "负责质量评估，指出弱点，提出修改方案。",
+    "quality_criteria": [
+      "specific weaknesses",
+      "actionable repair",
+      "no vague taste-only critique"
+    ]
+  },
+  {
+    "id": "memory",
+    "name": "MemoryAgent",
+    "role": "维护以本书数据库为准的长期记忆，补充资料按用途归入 ReferenceLibrary/bible/，不得静默修改 Canonical。",
+    "quality_criteria": [
+      "canon clear",
+      "no silent overwrite",
+      "timeline and relationships updated"
+    ]
+  }
+]

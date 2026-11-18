@@ -1,0 +1,26 @@
+/* Adapt the native workspace tree, preserving its state, menus and drag handlers. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] {
+  height:28px; margin-top:8px; margin-bottom:2px; gap:6px; background:transparent;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-title"] {
+  font-size:12px; line-height:18px; font-weight:500; color:var(--dsw-alias-label-secondary);
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-chevron"] {
+  display:inline-flex !important; order:0; opacity:.6; flex:none;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-project-text"] { order:1; flex:1; min-width:0; }
+body[data-dsh-claude-style] [data-lg-book-link]:hover [data-dsh-claude-part~="row-title"] { color:var(--dsw-alias-button-primary-fill,#d97757); }
+[data-lg-book-link]:focus-visible { outline:2px solid var(--dsw-alias-button-primary-fill,#d97757); outline-offset:2px; border-radius:3px; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"] { display:inline-flex; order:2; opacity:1; visibility:visible; margin-left:auto; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) { opacity:1; position:relative; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) svg { visibility:hidden; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger])::after { content:''; position:absolute; left:50%; top:50%; width:12px; height:12px; transform:translate(-50%,-50%); background:var(--dsw-alias-label-secondary); mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 3v10M3 8h10' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; pointer-events:none; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] {
+  padding-inline-start:calc(22px + var(--dsh-workspace-indent,0px)); height:28px; gap:4px;
+}
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] [data-dsh-claude-part~="row-title"] { font-size:13px; font-weight:400; }
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] { display:inline-flex !important; position:static; visibility:visible; width:10px; flex:none; }
+
+/* Restore the reference screenshot's leading idle circle; occupied status slots keep their native icon. */
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"]:empty::after,
+body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] > [data-slot]:empty::after { content:""; }

@@ -1,0 +1,103 @@
+{
+  "source": "https://github.com/3361805598-gif/dsh-md-annotator",
+  "commit": "75f7f4d7c7cad205ed7cda7b687774e0db8a4254",
+  "license": "MIT",
+  "files": [
+    {
+      "path": "preview.html",
+      "sha256": "fb8f5a25f5863f91c875834f42382e0f5e90a7e8d428c03eda67ec534fa69876"
+    },
+    {
+      "path": "build.mjs",
+      "sha256": "a787a61ab8990817900fb631aa77318df2d6629c1e77efcbb44a4ff9009007fa"
+    },
+    {
+      "path": "bridge.js",
+      "sha256": "09997b75acd5db251454e958e5eab6ae828bfd4411ccbdf4861a242d4aff275a"
+    },
+    {
+      "path": "readonly-toolbar.js",
+      "sha256": "5fe886d7098dcc4c6ddc899129f2ec8ea0178c39775ee0eff4b6d793c5bdf6bc"
+    },
+    {
+      "path": "frame.css",
+      "sha256": "5823d1bafc84ee71d0e378251936f08fd3bac00d05117a59f909092ac0e552a5"
+    },
+    {
+      "path": "README.md",
+      "sha256": "f46a64452b4cdf4a69ff40d0a982f9ff810b336aaae4626cb4dc6dd68e8454b1"
+    },
+    {
+      "path": "LICENSE-Annotator",
+      "sha256": "050a181e690b7453dd0a8e404c0e7763d31dc27a1058da877ddbacbbd08683b2"
+    },
+    {
+      "path": "LICENSE-React",
+      "sha256": "52412d7bc7ce4157ea628bbaacb8829e0a9cb3c58f57f99176126bc8cf2bfc85"
+    },
+    {
+      "path": "verify.mjs",
+      "sha256": "fd874029da2ea5c06a045ddb47e022df8d68773c7f789fdc64d44b524e178e2a"
+    },
+    {
+      "path": "upstream/lib/src/documents.js",
+      "sha256": "9a9b00c83c091ddc56ca6d2ba2770accee0094e0cd281440b0f65e07d8581266"
+    },
+    {
+      "path": "upstream/lib/src/files.js",
+      "sha256": "3c287483b87d2dd88cf1ef0ffef52c9397c5504a5b723e1f5e326baf52235c72"
+    },
+    {
+      "path": "upstream/lib/src/sidebar.js",
+      "sha256": "a0ceaa28b1855bde46e2e4be73c3b4c507f5a50c284c1e170eaf1ce73306f9d4"
+    },
+    {
+      "path": "upstream/lib/src/store.js",
+      "sha256": "a51de2519342b1f72918361f562ce8c59133c6b28b70edd30a4367d76d30df76"
+    },
+    {
+      "path": "upstream/lib/src/viewer.js",
+      "sha256": "7dafd530902e9ca46a39897c5be730080592f07905f636d4245b19ac11c6c593"
+    },
+    {
+      "path": "upstream/lib/src/panel.js",
+      "sha256": "acb1f61e511d650ece0717a8fb44fad4f27f0265c032b3f419910f0c6704c2b6"
+    },
+    {
+      "path": "upstream/lib/src/blocks.js",
+      "sha256": "fc836400389f154fb54360a0c6f8c8a7dbb26284448faedb03bd547800be5222"
+    },
+    {
+      "path": "upstream/lib/src/selection.js",
+      "sha256": "ee96413a113d60a859df3d59b0607aec28047372e136e9c3a1abc39b6c5d51c5"
+    },
+    {
+      "path": "upstream/lib/src/toolbar.js",
+      "sha256": "ad2dff972a35ca84db1a1d78e472d7b570defda68f525880b51e2520c44ee579"
+    },
+    {
+      "path": "upstream/lib/src/parser.js",
+      "sha256": "e8a7689622b7fc2ac433df0dcf1bdc04847a7e6f357898f480b06e47d955d057"
+    },
+    {
+      "path": "upstream/lib/src/styles.js",
+      "sha256": "b7072f06a3aa8744ff2e8c8d59e1e13e413d26640101427d877968b914e9ecd1"
+    },
+    {
+      "path": "upstream/lib/src/entry.js",
+      "sha256": "31c5895951ad946ff978ceb17e0becc2486cf9d6c13fb54bf2887c57334cc816"
+    },
+    {
+      "path": "upstream/LICENSE",
+      "sha256": "050a181e690b7453dd0a8e404c0e7763d31dc27a1058da877ddbacbbd08683b2"
+    },
+    {
+      "path": "upstream/README.md",
+      "sha256": "097eb449ff3dfad77a987de3b274446889369639dcba057ad5544401e63ef16f"
+    },
+    {
+      "path": "upstream/package.json",
+      "sha256": "d19ff01510deec70784e6d6624216b75e2c2c0772375152a4cbd8200308e031e"
+    }
+  ]
+}

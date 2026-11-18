@@ -1,0 +1,8 @@
+Context token estimation derived from dsh-context 0.82.1,
+copyright 2025 bowenliang123, Apache-2.0.
+Modified for LiteraryGiant on 2026-11-11: self-contained pure-function bundle,
+numeric request-context capture, bounded tool and skill names, role/source
+classification, including loaded skill content returned by the skill tool.
+Upstream source: https://github.com/bowenliang123/dsh-context
+See LICENSE-dsh-context. The build imports the pinned sibling source snapshot;
+the installed plugin does not require dsh-context at runtime.

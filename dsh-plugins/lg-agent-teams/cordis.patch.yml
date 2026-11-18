@@ -1,0 +1,7 @@
+- insert:
+    - id: lg-agent-teams
+      name: lg-agent-teams
+      config:
+        budgetMode: usage
+    - id: lg-agent-presets
+      name: lg-agent-teams/presets

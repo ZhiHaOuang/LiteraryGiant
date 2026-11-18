@@ -1,0 +1,42 @@
+{
+  "name": "lg-export",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Download a registered novel or its story records through DSH file actions",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "src",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=24.9",
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "lg-books": "0.1.0"
+  },
+  "dependencies": {
+    "fflate": "0.8.2"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-file-actions"
+      ]
+    }
+  }
+}

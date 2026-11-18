@@ -1,0 +1,47 @@
+{
+  "name": "lg-dashboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Novel dashboard: book overview, manuscript statistics and chapter progress",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json",
+    "./icon": "./icon.svg",
+    "./locale/*.json": "./locale/*.json"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "icon.svg",
+    "locale",
+    "README.md",
+    "NOTICE",
+    "LICENSE-dsh-context",
+    "LICENSE-models-dev",
+    "LICENSE-dsh-workspace-path",
+    "LICENSE-dsh-claude-style",
+    "LICENSE-bencho"
+  ],
+  "engines": {
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "lg-books": "0.1.0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-locale"
+      ]
+    }
+  }
+}

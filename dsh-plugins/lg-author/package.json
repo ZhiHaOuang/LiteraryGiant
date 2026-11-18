@@ -1,0 +1,12 @@
+{
+  "name": "lg-author",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Profile and book author preferences with explicit inheritance and task input receipts",
+  "exports": { ".": "./index.js", "./client": "./client.js", "./package.json": "./package.json" },
+  "files": ["index.js", "src", "client.js", "cordis.patch.yml", "README.md"],
+  "engines": { "node": ">=24.9", "dsh": ">=0.2.2-rc.1 <0.2.3-0" },
+  "peerDependencies": { "@deepseek-ai/cordis": "~4.1.0", "@deepseek-ai/schemastery": "~3.19.0", "lg-books": "0.1.0" },
+  "dsh": { "bundle": { "patch": "./cordis.patch.yml" }, "client": { "platform": "web", "inject": ["@deepseek-ai/dsh-client-ui-slots", "@deepseek-ai/dsh-client-locale"] } }
+}

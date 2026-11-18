@@ -1,0 +1,15 @@
+# Optional dedicated file-task policy; requires dsh-ops and lg-tool-policy.
+# This narrows tools, not filesystem permissions. Keep the host sandbox configured.
+- id: dsh-ops
+  config:
+    standard:
+      enabled: true
+      hideOfficialTools: false
+      dynamicTools: false
+      bash: false
+      hidePwsh: false
+      extraGuidance: "When reading several independent text files, use ops_read_files once with their paths. Keep edits exact and verify the result."
+- id: lg-tool-policy
+  config:
+    enabled: true
+    allow: [edit]

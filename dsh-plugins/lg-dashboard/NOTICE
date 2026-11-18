@@ -1,0 +1,14 @@
+UI layout, styles and usage aggregation derived from dsh-context 0.82.1,
+copyright 2025 bowenliang123, Apache-2.0.
+Modified for LiteraryGiant on 2026-11-08: scoped CSS, global and book dashboards,
+book attribution, offline price snapshot, chapter and review navigation.
+Upstream source: https://github.com/bowenliang123/dsh-context
+See LICENSE-dsh-context. The build imports the pinned sibling source snapshot.
+
+Companion flight keyframes adapted from dsh-claude-style Message bubble animation,
+copyright 2026 Nwflower, MIT. See LICENSE-dsh-claude-style.
+
+StackedBars component and CSS supplied from Bencho, copyright (c) 2026 Lorenzo Cabra,
+MIT. Source/licence: https://bencho.dev/licence . See LICENSE-bencho.
+LG modifications: scoped DSH theme mapping, responsive geometry, reduced motion,
+keyboard inspection, optional preview with an unchanged current-chart fallback.

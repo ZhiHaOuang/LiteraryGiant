@@ -1,0 +1,146 @@
+{
+  "entity": {
+    "label": "实体档案",
+    "fields": [
+      "entity_kind",
+      "name",
+      "aliases",
+      "description"
+    ]
+  },
+  "world_rule": {
+    "label": "世界设定",
+    "fields": [
+      "statement",
+      "domain",
+      "conditions",
+      "exceptions"
+    ]
+  },
+  "scene": {
+    "label": "场景",
+    "fields": [
+      "pov",
+      "narrator",
+      "location",
+      "participants",
+      "purpose",
+      "opening",
+      "ending"
+    ]
+  },
+  "event": {
+    "label": "事件",
+    "fields": [
+      "actors",
+      "location",
+      "action",
+      "outcome",
+      "motivation",
+      "scene"
+    ]
+  },
+  "state": {
+    "label": "人物与物品状态",
+    "fields": [
+      "subject",
+      "facet",
+      "value",
+      "previous_record",
+      "trigger_event"
+    ]
+  },
+  "relation": {
+    "label": "关系变化",
+    "fields": [
+      "subject",
+      "object",
+      "relation",
+      "description",
+      "trigger_event",
+      "previous_record"
+    ]
+  },
+  "knowledge": {
+    "label": "人物认知",
+    "fields": [
+      "holder",
+      "proposition",
+      "stance",
+      "acquired_by",
+      "trigger_event",
+      "topic",
+      "previous_record"
+    ]
+  },
+  "revelation": {
+    "label": "读者信息揭示",
+    "fields": [
+      "proposition",
+      "presentation",
+      "speaker",
+      "about_record"
+    ]
+  },
+  "thread": {
+    "label": "情节线与伏笔",
+    "fields": [
+      "question",
+      "thread_kind",
+      "progress",
+      "setup_records",
+      "planned_payoff",
+      "actual_payoff"
+    ]
+  },
+  "plan": {
+    "label": "创作规划",
+    "fields": [
+      "level",
+      "parent",
+      "objective",
+      "steps",
+      "expected_changes",
+      "constraints",
+      "reveal",
+      "withhold",
+      "selection",
+      "realized_events"
+    ]
+  },
+  "portrait": {
+    "label": "人物侧写",
+    "fields": [
+      "subject",
+      "aspect",
+      "description",
+      "counterevidence"
+    ]
+  },
+  "analysis": {
+    "label": "分析与概括",
+    "fields": [
+      "dimension",
+      "assessment",
+      "limitations",
+      "about"
+    ]
+  },
+  "requirement": {
+    "label": "作者要求",
+    "fields": [
+      "category",
+      "instruction",
+      "strength",
+      "targets"
+    ]
+  },
+  "role_assignment": {
+    "label": "人物叙事身份",
+    "fields": [
+      "subject",
+      "prominence",
+      "roles"
+    ]
+  }
+}

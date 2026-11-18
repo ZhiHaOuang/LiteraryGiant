@@ -1,0 +1,6 @@
+- insert:
+    - id: lg-tool-policy
+      name: lg-tool-policy
+      config:
+        enabled: false
+        allow: []
