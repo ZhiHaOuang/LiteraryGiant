@@ -1,0 +1,665 @@
+{
+  "schema": "lg.story-data.batch.v1",
+  "contract_hash": "5b108d04ea4fccb92eafe24d7349830ac225aa94b93d49eb06a3cb0d40bd5f03",
+  "book_id": "test-book",
+  "branch": "main",
+  "operation": "fixture:all-types",
+  "run": {
+    "id": "fixture:all-types",
+    "producer": "author",
+    "method": "人工编写的合成示例，非模型质量证据"
+  },
+  "coverage": [
+    {
+      "document_id": 1,
+      "version_id": 1,
+      "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+      "status": "complete",
+      "note": "合成正文样例"
+    },
+    {
+      "document_id": 3,
+      "version_id": 3,
+      "sha256": "93a21bb81c0e32ef4b1bfdd4c34ea8220efd46649d7450baca03a7676c8f398b",
+      "status": "complete",
+      "note": "合成正文样例"
+    },
+    {
+      "document_id": 5,
+      "version_id": 5,
+      "sha256": "772340614d4643de080bd112579e5730ff0a787ebaea41d4bbe9a2784f84126b",
+      "status": "complete",
+      "note": "合成正文样例"
+    }
+  ],
+  "records": [
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "person:lin",
+        "type": "entity",
+        "title": "林澈",
+        "summary": "林澈。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 1,
+            "quote": "林澈是守灯人。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "entity_kind": "character",
+          "name": "林澈",
+          "aliases": [
+            "守灯人"
+          ],
+          "description": "负责海岛灯塔的人物。"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "person:yuan",
+        "type": "entity",
+        "title": "阿远",
+        "summary": "阿远。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 3,
+            "version_id": 3,
+            "sha256": "93a21bb81c0e32ef4b1bfdd4c34ea8220efd46649d7450baca03a7676c8f398b",
+            "paragraph": 2,
+            "quote": "船夫阿远"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "entity_kind": "character",
+          "name": "阿远",
+          "aliases": [
+            "船夫"
+          ],
+          "description": "接过铜钥匙的船夫。"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "rule:tide",
+        "type": "world_rule",
+        "title": "涨潮时灯塔熄灭",
+        "summary": "涨潮时灯塔熄灭。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 3,
+            "quote": "海岛的灯塔每逢涨潮便熄灭。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "statement": "灯塔每逢涨潮便熄灭。",
+          "domain": "海岛灯塔",
+          "conditions": [
+            "涨潮时。"
+          ],
+          "exceptions": []
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "scene:letter",
+        "type": "scene",
+        "title": "守灯人收到来信",
+        "summary": "守灯人收到来信。",
+        "basis": "inference",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 1,
+            "quote": "林澈是守灯人。"
+          },
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 2,
+            "quote": "却仍保留这封信。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "pov": "person:lin",
+          "narrator": "第三人称叙述",
+          "location": null,
+          "participants": [
+            "person:lin"
+          ],
+          "purpose": "展示人物的失落与未解疑问。",
+          "opening": "林澈守灯。",
+          "ending": "她仍保留来信。"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "event:injury",
+        "type": "event",
+        "title": "林澈摔伤",
+        "summary": "林澈摔伤。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 3,
+            "version_id": 3,
+            "sha256": "93a21bb81c0e32ef4b1bfdd4c34ea8220efd46649d7450baca03a7676c8f398b",
+            "paragraph": 1,
+            "quote": "林澈摔伤右臂。"
+          }
+        ],
+        "author_note": "",
+        "links": [
+          {
+            "relation": "before",
+            "target": "event:healing",
+            "explanation": "愈合发生在摔伤三日后。"
+          }
+        ],
+        "payload": {
+          "actors": [
+            "person:lin"
+          ],
+          "location": null,
+          "action": "林澈摔倒并伤及右臂。",
+          "outcome": "她的右臂受伤。",
+          "motivation": "",
+          "scene": null
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "event:healing",
+        "type": "event",
+        "title": "伤口愈合",
+        "summary": "伤口愈合。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 5,
+            "version_id": 5,
+            "sha256": "772340614d4643de080bd112579e5730ff0a787ebaea41d4bbe9a2784f84126b",
+            "paragraph": 1,
+            "quote": "林澈的伤口愈合。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "actors": [
+            "person:lin"
+          ],
+          "location": null,
+          "action": "伤口在三日后愈合。",
+          "outcome": "伤口已经愈合。",
+          "motivation": "",
+          "scene": null
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "state:injured",
+        "type": "state",
+        "title": "右臂受伤期间",
+        "summary": "右臂受伤期间。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "interval",
+          "label": "摔伤后至愈合前",
+          "after_event": "event:injury",
+          "before_event": "event:healing"
+        },
+        "evidence": [
+          {
+            "document_id": 3,
+            "version_id": 3,
+            "sha256": "93a21bb81c0e32ef4b1bfdd4c34ea8220efd46649d7450baca03a7676c8f398b",
+            "paragraph": 1,
+            "quote": "林澈摔伤右臂。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "subject": "person:lin",
+          "facet": "身体状态",
+          "value": "右臂受伤。",
+          "previous_record": null,
+          "trigger_event": "event:injury"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "relation:key",
+        "type": "relation",
+        "title": "林澈将钥匙交给阿远",
+        "summary": "林澈将钥匙交给阿远。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 3,
+            "version_id": 3,
+            "sha256": "93a21bb81c0e32ef4b1bfdd4c34ea8220efd46649d7450baca03a7676c8f398b",
+            "paragraph": 2,
+            "quote": "她把铜钥匙交给船夫阿远。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "subject": "person:lin",
+          "object": "person:yuan",
+          "relation": "物品交接",
+          "description": "林澈将铜钥匙交给阿远；不能据此直接确认两人互相信任。",
+          "trigger_event": null
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "knowledge:death",
+        "type": "knowledge",
+        "title": "林澈相信父亲已死",
+        "summary": "林澈相信父亲已死。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 2,
+            "quote": "林澈相信父亲已死"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "holder": "person:lin",
+          "proposition": "父亲已经死亡。",
+          "stance": "believes",
+          "acquired_by": "unknown",
+          "trigger_event": null
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "revelation:alive",
+        "type": "revelation",
+        "title": "读者得知父亲醒来",
+        "summary": "读者得知父亲醒来。",
+        "basis": "text",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 5,
+            "version_id": 5,
+            "sha256": "772340614d4643de080bd112579e5730ff0a787ebaea41d4bbe9a2784f84126b",
+            "paragraph": 2,
+            "quote": "父亲在对岸的医馆醒来；林澈并不知道。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "proposition": "父亲在医馆醒来，林澈尚不知道。",
+          "presentation": "reveal",
+          "speaker": null,
+          "about_record": "knowledge:death"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "thread:father",
+        "type": "thread",
+        "title": "父亲真实处境",
+        "summary": "父亲真实处境。",
+        "basis": "inference",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 5,
+            "version_id": 5,
+            "sha256": "772340614d4643de080bd112579e5730ff0a787ebaea41d4bbe9a2784f84126b",
+            "paragraph": 2,
+            "quote": "林澈并不知道。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "question": "林澈何时得知父亲的处境？",
+          "thread_kind": "mystery",
+          "progress": "open",
+          "setup_records": [
+            "knowledge:death",
+            "revelation:alive"
+          ],
+          "planned_payoff": "",
+          "actual_payoff": []
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "plan:crossing",
+        "type": "plan",
+        "title": "下一章前往对岸",
+        "summary": "下一章前往对岸。",
+        "basis": "author",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [],
+        "author_note": "合成样例作者明确指定。",
+        "links": [],
+        "payload": {
+          "level": "chapter",
+          "parent": null,
+          "objective": "让林澈主动追查来信。",
+          "steps": [
+            "决定渡海。",
+            "寻找船夫。"
+          ],
+          "expected_changes": [
+            "从等待转为行动。"
+          ],
+          "constraints": [
+            "暂不相认。"
+          ],
+          "reveal": [],
+          "withhold": [
+            "父亲的具体位置。"
+          ],
+          "selection": "option",
+          "realized_events": []
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "portrait:letter",
+        "type": "portrait",
+        "title": "保留旧信的倾向",
+        "summary": "保留旧信的倾向。",
+        "basis": "inference",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 1,
+            "version_id": 1,
+            "sha256": "6447e709361ec19e00e883df35910fbd72ea0a6e48d5d6011db0e30561c0bba0",
+            "paragraph": 2,
+            "quote": "林澈相信父亲已死，却仍保留这封信。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "subject": "person:lin",
+          "aspect": "contradiction",
+          "description": "相信亲人已死，却仍保留来信，可能存在未放下的牵挂。",
+          "counterevidence": "仅一处表现，不能据此确定她在所有关系中的行为。"
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "analysis:rhythm",
+        "type": "analysis",
+        "title": "短句形成信息落差",
+        "summary": "短句形成信息落差。",
+        "basis": "inference",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [
+          {
+            "document_id": 5,
+            "version_id": 5,
+            "sha256": "772340614d4643de080bd112579e5730ff0a787ebaea41d4bbe9a2784f84126b",
+            "paragraph": 2,
+            "quote": "父亲在对岸的医馆醒来；林澈并不知道。"
+          }
+        ],
+        "author_note": "",
+        "links": [],
+        "payload": {
+          "dimension": "rhythm",
+          "assessment": "父亲醒来与林澈不知并置，使读者暂时比人物掌握更多信息。",
+          "limitations": [
+            "只分析本段，不能代表全书节奏。"
+          ],
+          "about": [
+            "revelation:alive"
+          ]
+        }
+      }
+    },
+    {
+      "expected_revision": null,
+      "record": {
+        "schema_version": "1.0.0",
+        "id": "requirement:voice",
+        "type": "requirement",
+        "title": "保持克制叙述",
+        "summary": "保持克制叙述。",
+        "basis": "author",
+        "scope": {
+          "kind": "book",
+          "description": "合成样例书",
+          "targets": []
+        },
+        "story_time": {
+          "kind": "unknown",
+          "label": "正文未给出精确时间",
+          "after_event": null,
+          "before_event": null
+        },
+        "evidence": [],
+        "author_note": "合成样例作者明确指定。",
+        "links": [],
+        "payload": {
+          "category": "style",
+          "instruction": "使用克制的第三人称叙述。",
+          "strength": "prefer",
+          "targets": []
+        }
+      }
+    }
+  ]
+}

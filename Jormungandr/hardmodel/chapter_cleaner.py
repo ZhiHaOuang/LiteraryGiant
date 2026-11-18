@@ -862,7 +862,11 @@ class RawNovelBook:
                 normalized,
             )
         )
-        explicit_reader_meta = self._has_soft_meta_noise_signal(normalized) or bool(
+        # Candidate discovery is deliberately broad; it is not deletion evidence.
+        # “山顶上架起瞭望镜” and “三大家族的支持者” are ordinary narration.
+        reader_probe = re.sub(r"大家族", "家族", normalized)
+        reader_probe = re.sub(r"(?<!书)上架(?![，。！？；：:\s]|$)", "架设", reader_probe)
+        explicit_reader_meta = self._has_soft_meta_noise_signal(reader_probe) or bool(
             re.search(
                 r"(?:"
                 r"(?:记得|拜托|赶紧|有票的).{0,24}(?:收藏|订阅|月票|推荐票|投票|打赏|支持正版)|"
