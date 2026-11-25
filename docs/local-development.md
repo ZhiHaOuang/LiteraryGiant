@@ -155,3 +155,16 @@ tar -xzf private-migration.tar.gz -C LiteraryGiant-private-20261018
 先读包内 `RESTORE.txt` 与 `MANIFEST.json`。`workspace/` 中是原仓库的相对路径，可将选定作品复制到本地 clone 的对应位置；不要把整个包直接覆盖进去。数据库经过备份且不附 WAL/SHM；部分记录保留旧机器绝对路径，不自动改写数据库或合并作品。在本地以真实新路径打开已恢复作品，再核对正文、版本、候选、参考资料和历史。
 
 `conversations/` 是可访问的项目可见消息导出。让本地 Codex 先读公开交接摘要，再按任务读取相关历史；不要把导出复制为 `~/.codex` 的认证/数据库，也不要假定它可以直接 `resume` 当前网页会话。原数据仍保留在服务器。
+
+
+## 工作区界面调整（2026-11-18）
+
+当前阅读入口为 `dsh-plugins/lg-reading-review`，原 `lg-workbench` 插件已按作者要求删除。阅读设置、正文编辑和批注界面使用英文；原 `/api/lg/reading-notes` 和版本绑定批注表不变。规划、工作流仍使用的上下文／资料选择器、采用预览和监督组件移到 `lg-review/src`，其他插件只更新必要的导入和打开版本入口。原阅读对照实验、资料编辑和章节文件面板随旧编辑台退役；底层 Books 能力与用户数据保留。
+
+`lg-brand/src/desktop-style.css` 管理 LG 的侧栏、聊天与原生菜单密度。DSH `ui-sidebar` 仅公开现有 `sidebarPanels.setPinned` 操作；LG 初始化时把次要入口放入原生 More，仍允许作者重新固定。没有新增导航、菜单或聊天框架。主入口保留 New session、Search、Plugins、Global Dashboard、Reading review 和 More。
+
+本机 profile 的依赖与 bundles 均由 `lg-workbench` 更新为 `lg-reading-review`，使用现有 `/Applications/LiteraryGiant.app`。旧插件和 profile 加载配置备份在 `.dsh-dev/app-backups/20261118-workspace-cleanup/`；此备份不参与运行。
+
+验证：实际项目相关单元测试 132 项通过（侧栏 115、插件 17），ui-sidebar 类型检查与打包、LG 客户端构建、Host／Client 整体 build:check 均通过。LitIsLand 桌面验证覆盖 More、英文阅读、版本批注、候选保存不改变正文、未保存批注阻止切页、连续分栏关闭、菜单 26px 行高／8px 圆角、暗色及窄窗；原 App 的侧栏、现有聊天、菜单和英文阅读入口已检查。未调用模型 API、未修改真实作品正文或批注。
+
+扩大检查的限制：隔离副本的 LG 全套测试为 440 通过、9 失败，其中 8 项缺少现有 dsh-tools 所需的 dsh-llm 依赖，1 项缺少副本中的 make_story_data_contract.py；隔离副本的整体类型检查还报告了未修改模块的类型错误，未计为通过；这些错误是否由隔离副本的构建输出不同步导致尚未确认。实际项目整体类型检查已单独通过，未为本次 UI 任务修改这些无关模块。

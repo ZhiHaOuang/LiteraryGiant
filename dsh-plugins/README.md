@@ -10,11 +10,11 @@
 | `dsh-context` | 0.82.1 | 上下文统计、面板与可见性 |
 | `dsh-ops` | 0.5.0 | 工具执行与运行时扩展 |
 | `dsh-ai4scholar` | 0.6.6 | 文献工作台、结果列表与详情分栏 |
-| `dsh-reading-workbench` | 0.2.0 | 本地书架、分页阅读、划线批注 |
 | `lg-brand` | 0.1.0 | LG 自有最小 UI 插件 |
 | `lg-books` | 0.1.0 | 作品读取、统计、版本事务与作者 API |
+| [`lg-storydata`](lg-storydata/README.md) | 0.1.0 | 左栏故事数据控制台、协议目录、分书用量，以及人物、情节和环境 Main 的审查与修订 |
 | `lg-dashboard` | 0.1.0 | 小说概况、字数、章节、人物和待审计数 |
-| `lg-workbench` | 0.1.0 | 章节/场景编辑、版本比较、候选预览与采用 |
+| [`lg-reading-review`](lg-reading-review/README.md) | 0.1.0 | 章节阅读与编辑、版本审阅和批注 |
 | `lg-execution` | 0.1.0 | 单次模型调用、超时取消、持久预算和重复请求保护 |
 | `lg-agent-teams` | 0.1.0 | LG 主／分析／规划／创作四个 Native 预设，按需协作、候选与用量；独立 App 宿主验证通过，日常重启加载 |
 | `lg-agents` | 0.1.0 | 专家配置、选区润色、整章候选及编号原文证据审阅 |
@@ -39,8 +39,6 @@ Claude-style 快照采用 npm provenance 对应的 commit。公开快照省略�
 
 AI4Scholar 从锁定的源码构建，阅读工作台入口为 [Workbench.tsx](dsh-ai4scholar/src/client/Workbench.tsx)。准备环境、构建和本地链接命令见 [DSH 开发入口](../docs/dsh-local-app.md#ai4scholar-文献工作台)。
 
-阅读工作台的书架与阅读器入口为 [WorkbenchPage.tsx](dsh-reading-workbench/src/client/panel/WorkbenchPage.tsx)。构建及书库位置见 [阅读工作台接入说明](../docs/dsh-local-app.md#reading-workbench-阅读工作台)。
-
 ## lg-brand：最小 UI 插件例子
 
 Host 保持极简；Client 源码与发布产物分开：
@@ -57,7 +55,7 @@ React 由 DSH Client 共享模块提供。插件不保存作品状态、不调�
 
 文学功能的最新职责、验收和未完成范围见 [插件迁移](../docs/dsh-plugin-migration.md)。早期 bridge/tools 方案由独立 DSH 插件迁移目标替代，新的作品与编辑路径不调用旧后端。
 
-开发：使用项目准备的 Node 24，先 `npm ci --ignore-scripts`，再 `npm run build`、`npm test`。构建器生成各 LG 插件根目录的 `client.js`，这些产物由本地构建生成。React 由 DSH 提供。安装包可用 `npm pack ./lg-books ./lg-dashboard ./lg-workbench ./lg-execution ./lg-agents ./lg-library ./lg-memory ./lg-context ./lg-planning ./lg-review ./lg-workflows ./lg-author ./lg-tool-policy ./lg-director ./lg-impact ./lg-skills ./lg-export --pack-destination ../.dsh-dev/plugin-packages` 生成，再通过 DSH CLI 的 `plugin --profile <profile> add --save-exact <tgz...>` 安装。
+开发：使用项目准备的 Node 24，先 `npm ci --ignore-scripts`，再 `npm run build`、`npm test`。构建器生成各 LG 插件根目录的 `client.js`，这些产物由本地构建生成。React 由 DSH 提供。安装包可用 `npm pack ./lg-books ./lg-storydata ./lg-dashboard ./lg-reading-review ./lg-execution ./lg-agents ./lg-library ./lg-memory ./lg-context ./lg-planning ./lg-review ./lg-workflows ./lg-author ./lg-tool-policy ./lg-director ./lg-impact ./lg-skills ./lg-export --pack-destination ../.dsh-dev/plugin-packages` 生成，再通过 DSH CLI 的 `plugin --profile <profile> add --save-exact <tgz...>` 安装。
 
 本地链接的 OPS 必须与宿主共用 `dsh-scope`，所以开发目录根清单显式把该包声明为 peer。否则本目录安装的测试依赖可能提供另一份作用域模块，导致 Agent 启动报 `Publication scope must match its registration context`。这不修改 OPS 源码；归档安装和本地链接的解析规则不同。可用实际宿主验证，不发起模型调用：
 

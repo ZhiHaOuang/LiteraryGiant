@@ -1,5 +1,66 @@
 # 开发交接 — 2026-10-18
 
+## 2026-11-25：移除独立 Reading 插件
+
+按作者要求删除 Reading 的 100 个版本管理文件及其独立依赖、构建产物；清除来源清单、安装说明和 lg-brand 侧栏配置中的对应条目。日常 App 使用原生卸载入口移除包依赖、锁文件条目和 Cordis bundle，额外清除 pnpm 遗留的本地链接。作者另行确认删除独立书库副本、进度与批注，已移除 `~/.literarygiant-dsh/reading-workbench/`；未备份这份已明确不要的数据。
+
+保留 Reading Review、Books、Library 和其他插件。本轮没有修改 DSH 框架。LitIsLand 构建及 16 项既有测试通过；原 App 可执行文件使用隔离配置验证 Dashboard、Reading Review 章节页、插件列表及旧健康接口返回 404，页面错误为 0。同步后实际项目构建与 17 项测试通过（当前阅读审阅另有新增的既有测试），差异检查通过。原 App 已正常退出并重开，确认 Reading 不再安装，Reading Review 仍显示原书 100 章及原有 2 条批注，Global Dashboard 正常。未调用模型，未提交或推送。
+
+## 2026-11-19 故事数据控制台
+
+原 lg-outline 更名为 [lg-storydata](../dsh-plugins/lg-storydata/README.md)。日常 App 左栏「故事数据」提供总览和分书使用两个只读视图。总览汇总可读的已登记作品（含归档），展示人物协议目录、字段和审查规则。分书可按模块、二级类别查看当前条目。结构化模块按 entries 条数计，通用摘要按一条计；原始提取记录按当前版本的类型和审查状态单列。
+
+本机日常 App 实测 4 本可读作品，当前 Main 共 11 条，提取记录共 411 条。样例书含罗兰 10 条人物资料，使用 8 组、40 个二级类别中的 7 组、9 类，另有 1 条情节摘要。新接口为 `/api/lg/storydata`，原 Dashboard 读取和 Teams 审查继续兼容。隔离与实际项目相关测试各通过 87 项。正文存储与版本写入仍由 lg-books 管理。
+
+## 2026-11-19：lg-outline 与 Agent Teams 的单情节 Main 验收
+
+桌面插件管理器已通过本仓库链接启用 lg-outline。日常 App 正常重启后两个插件开关均为 on，Teams 和预设组件均为 Running。进入已登记作品的 LG 主会话，可要求分析指定情节、更新人物和情节 Main、独立审查后提交。使用方法见 [Agent Teams](../dsh-plugins/lg-agent-teams/README.md)。
+
+第一章广场暂缓审判的验收在样例书 SQLite 一致性副本中完成。提议成员和审查成员分别在独立 DSH 子会话中运行。工具从阅读记录绑定档案旧版本，从原文绑定文档、版本、段落和逐字引文。审查任务检查原文、候选与旧档案，主会话凭审查任务 ID 提交整批。驳回、越权调用和旧版本冲突均有测试。此次实验固定了主会话的派发流程，提议和审查的文学内容由本机 Qwen 14B 分别生成。日常自然语言请求的自主选工具成功率仍待测。
+
+首轮因模型填错旧版本被拦截，现由宿主绑定。独立审查曾驳回对人物动机的概括，修订时收窄到当场行动与命令，保留驳回记录；修订提交前另有一次关联格式错误被拦截。最终只在副本写入两条已审摘要。人物条目接近原文摘录，审查理由仍较笼统。三轮共 8 次本机推理。项目与隔离各 63 项回归通过；浏览器用实际 Dashboard StoryData、Books 与 Outline 路由打开人物卡、关联情节并返回。原书 Main 0 条，副本 2 条；两者正文版本摘要相同，Canonical 计数均为 0。实验收据与界面截图仅保存在本机 LitIsLand 的 outline-teams-e31yleol 实验目录。
+
+
+## 2026-11-18：Dashboard 紧凑两栏、无滚动书籍表、像素一致热力图
+
+Agent两栏仅在 lg-dashboard 容器560px以下竖排，移除原900px容器／700px视口提前竖排规则；同一断点隐藏整个 companion-slot，扩宽自动恢复。卡片内容240px以下收紧主头像、缩小小图并隐藏其日期、压缩六人头像及名称，避免保持双栏时左侧内容溢出。
+
+Book Progress状态筛选直接复用lgd-segment三按钮Active／Archived／All，Add book也使用相同底框。移除滚动容器，fixed table布局；按卡片1000／760／500／360px逐步隐藏最近活动和候选、采用／费用／状态、章节、字数。书名超长省略且title保留，书名与Archive／Remove始终可用。现有新建／归档／恢复／移出确认流程保留；桌面回归由select切换更新为分段按钮。
+
+Activity原fr分数格宽和cqw分数间距会在像素栅格上交替取整，造成视觉粗细不一。ResizeObserver根据可用宽度和devicePixelRatio计算整设备像素的统一格宽和间距，月份与网格共享尺寸，多余宽度两侧均分；缩放／resize重新计算，维持53周、正方形与无横向滚动。
+
+LitIsLand/dashboard-responsive-20261118隔离构建。真实组件＋作者API回归通过归档／恢复／移出／添加、取消／错误及1000／800／600／390／280px表格无滚动；热力图1200／720／390／280px数值验证格宽与间距一致、设备像素对齐、星期位置、英文、切指标和点日期。App独立profile用窗口内合成团队数据＋现有只读preview统计验证1040／820／640px双栏、500／390px竖排隐藏人物、扩宽恢复，左侧子区域无溢出。初次测试补齐真实四角色及有效timeline后复验，临界窄栏溢出已修。哈希保护同步后项目构建、实际App入口（不注入隔离CSS）及git diff --check通过。备份.dsh-dev/backups/dashboard-responsive-20261118/rollback.py；预览.dsh-dev/ui-previews/dashboard-responsive-20261118/。无真实作品／统计修改、模型调用或日常App退出；刷新／重开Dashboard加载。
+
+## 2026-11-18：Activity 英文日历布局与宽度自适应
+
+移除 Earlier／Newer 导航及组件分页状态，保持 heatmapWindow 默认最近53周，时间范围不受顶部统计筛选影响。日期范围改英文完整年份，月份用 Jan 等英文缩写，星期 Mon／Wed／Fri／Sun 对齐第1／3／5／7行；指标、等待提示和图例全部英文。移除720px最小宽度及横向滚动容器，53列minmax(0,1fr)、间距与圆角随容器收缩，保留正方形；weekday contain:size 避免窄屏字体撑高日历。420px以下隔月显示标签避免拥挤。主题橙色、每日悬停详情、指标切换与点击日期筛选保留。
+
+LitIsLand/activity-fit-20261118隔离开发构建；7项数据回归通过。真实组件Electron夹具验证1200／720／390／280px无横向溢出、371格正方形、星期中心对齐、英文调用者中文locale、去分页、指标切换与日期选择；初次窄屏标签撑高问题修复后通过。哈希保护同步2源码＋2测试文件，项目构建与实际App独立profile入口1400／850／600px验证通过，git diff --check通过。备份.dsh-dev/backups/activity-fit-20261118/rollback.py，截图.dsh-dev/ui-previews/activity-fit-20261118/。无真实数据变更或日常App退出；刷新／重新打开Dashboard加载。
+
+## 2026-11-18：文学 Agent 统计切换框居中
+
+team-panel.css 仅将 lgt-monitor-controls 的 justify-content 从 space-between 改为 center，四个页签整体居中，大小及配色不变。LitIsLand/agent-tabs-center-20261118 隔离构建及项目构建通过；独立 App 测试窗口用空团队展示数据验证 1400／850／600px 中心偏差小于 1px。最小测试 profile 无 teams 服务，使用窗口内 fetch 替身，不改真实统计。旧 CSS 和 bundle 备份在 .dsh-dev/backups/agent-tabs-center-20261118/。刷新／重新打开 Dashboard 加载。
+
+## 2026-11-18：Book Progress 与 workspace 联动、操作样式
+
+修复上一轮 shelf.sync 只创建 active workspace、归档／移出仍留侧栏登记的问题。现在仅针对 archivedProjects／removedProjects 的明确路径撤销原生 workspace 登记；不删除作品目录或会话日志，不影响其他 workspace。原生重新创建不会找回旧会话归属，因此在移除前将标题及 sessionIds 保存至插件配置 shelvedWorkspaces；恢复／重新添加后按原顺序 attachSession，成功后清除关联备份。保存失败不移除登记，同步失败返回 workspaceErrors，并在 Book Progress 显示重试。启动和刷新会补齐旧归档／移出状态。
+
+Book Progress 去掉 Search books 与排序工具行，状态筛选移至标题右侧 Add book 旁；按最近活动排序。表头／作品名／数据／操作居中，Archive（归档列表为 Restore）与 Remove 使用现有 lgd-segment 紧凑底框，悬停／当前确认操作为主题橙色，保留书名确认与忙时锁定。确认文案说明侧栏入口同步隐藏及文件保留。
+
+先在 LitIsLand/book-workspace-sync-20261118 实验：10 项定向后端回归通过，覆盖归档／移出／恢复／添加、会话关联保存恢复、重启、无关 workspace 保留、保存与登记删除失败重试、作品文件摘要不变。Electron 真实组件＋真实作者 API 验证新增／归档／移出／取消／错误／390px、无搜索行和单元格居中。旧测试 profile 引用已不存在的 lg-workbench，未改产品插件，改用全新 credential-free 最小 profile；此前临时修改的两个旧测试依赖链接已恢复。真实 App 验证侧栏入口实时移除／恢复及重启持久化；哈希保护同步项目后重新构建，并以实际项目插件路径再次通过宿主验证。git diff --check 通过。
+
+备份 .dsh-dev/backups/book-workspace-sync-20261118/rollback.py；预览 .dsh-dev/ui-previews/book-workspace-sync-20261118/。只使用合成测试作品，未操作真实作品、调用模型、退出日常 App 或提交／推送。需保存编辑后完整重启日常 App 加载后端更新。
+
+## 2026-11-18：Book Progress 书籍新增、归档与移出
+
+全局作品进度抽为book-progress.jsx，保留进度／用量列并新增右上“新增书籍”、新建／添加已有LG目录两种表单、进行中／已归档／全部筛选，每行提供归档／恢复／移出书架。新建复用create-preview token与稳定operation确认流程；移出明确只移除登记，作品文件、数据库及对话保留，可重新添加。操作需显示作品名并确认，忙时防重复提交，失败保留表单与错误。原书级导航保留。归档仍可打开，待审汇总不再列归档作品；全局历史归属／统计仍包含已登记归档作品。
+
+lg-books配置新增archivedProjects／removedProjects；createBookManagement串行保存目录成员状态，校验当前path与project id及confirmed，不修改作品内容。默认list排除归档，shelf返回含archived标识的登记作品供管理页筛选；removed路径被扫描忽略，避免刷新自动加回，add清除其归档／移出状态。registered按规范路径校验（兼容macOS /var→/private/var），移出后不再授权原书服务读取；已有workspace与会话不删除。状态在宿主配置持久保存，写入失败不先更新内存。
+
+LitIsLand/book-management-20261118隔离开发；8项后端测试覆盖真实API、新建幂等、确认／错误ID拒绝、配置失败、并发添加、刷新／重启持久化、归档／恢复／移出／重新添加及全部原作品文件摘要不变。Electron真实React组件＋真实作者API验证全流程、取消、错误、390px；初始夹具React重复副本已通过固定测试React解析解决，不改产品依赖。真实Cordis宿主profile另验证配置保存、App重启后归档／移出仍生效及Book Progress归档列表。测试只用LitIsLand临时作品，没有操作真实作品。哈希保护同步10文件后构建及同8项通过，实际项目App入口加载前后端通过；测试profile已恢复项目链接。
+
+预览.dsh-dev/ui-previews/book-management-20261118/；回退.dsh-dev/backups/book-management-20261118/rollback.py，--check通过。保留已有工作树改动，无模型调用、删除文件、日常App退出、提交或推送。本轮新增后端接口，日常App请保存编辑后完整重启加载。
+
 ## 2026-11-17：人物 Card／List／Pack 三视图
 
 故事三要素选中后，其余两项缩为64px（窄屏74px）标题＋统计卡，隐藏说明／主题并移到选中板块上方。人物默认Card view，每页6人、宽屏三列小头像矩形卡；List横向列出，Pack使用同一组卡片节点收拢旋转，左右六项栏目说明可打开当前人物的对应栏目。卡叠可前后选人，返回列表保留视图选择；现有搜索、排序、候选／阶段身份、来源与详情接口保持。人物内容区上限490px，视图区域336px；窄屏内部滚动，修复Pack卡叠与说明区相互覆盖。

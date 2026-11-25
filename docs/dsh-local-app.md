@@ -24,18 +24,11 @@ DSH_HOME="$HOME/.literarygiant-dsh" ELECTRON_RUN_AS_NODE=1 \
 
 修改源码后重新构建，再重开 App 加载。进工作台查看界面不需要模型凭据，付费文献来源使用在设置页另行配置的 AI4Scholar API Key。
 
-## Reading Workbench 阅读工作台
+## Reading Review 章节阅读审阅
 
-`dsh-reading-workbench` 0.2.0 的 MIT 源码位于 `dsh-plugins/dsh-reading-workbench/`。从仓库根目录安装依赖并构建。构建会运行客户端加载和宿主契约检查。
+当前章节阅读与审阅使用 [`lg-reading-review`](../dsh-plugins/lg-reading-review/README.md)，直接读取 LG 作品及版本。日常 App 的阅读入口使用该插件，旧独立 Reading 插件已退出日常配置。
 
-```sh
-python3 scripts/dsh.py --dir ../dsh-plugins/dsh-reading-workbench install --frozen-lockfile --ignore-scripts
-python3 scripts/dsh.py --dir ../dsh-plugins/dsh-reading-workbench run build
-```
-
-在桌面「插件 → 添加插件」填写 `link:` 加项目内插件目录的绝对路径，启用后重启 App。侧栏入口为 **阅读 / Reading**。导入一本书会创建该插件书库里的副本，阅读进度和批注也保存在这里。项目的 bundle 配置用宿主 `dshHomePath()` 将书库放在当前 DSH home 的 `reading-workbench/`，日常 App 对应 `~/.literarygiant-dsh/reading-workbench/`。
-
-## 最新交付状态（2026-11-07 收尾）
+## 2026-11-07 交付记录
 
 日常 App 已补齐全部 23 个源码链接插件，并在实际桌面逐项验证运行。入口与当前限制见 [交付与体验](dsh-delivery-20261107.md)。本页此前“16 个链接、七个待补装”是历史状态，已完成。当前整套 tgz 为 `.dsh-dev/plugin-packages/20261107-legacy-chapters/`，17 包共 207 文件；摘要见 `legacyChapterAdoptionValidation.archives`。本机日常 App 使用源码链接，DMG 仍为原宿主包，未内嵌这些新插件。
 
@@ -93,7 +86,7 @@ Claude 风格插件会自行替换侧栏品牌，因此使用它已有的配置�
 
 这条 patch 位于 LG 的 `profiles/desktop/cordis.patch.yml`；该插件的品牌图片位于 LG home 下的 `dsh-claude-style/brand/mark.png`。`lg-brand` 则通过原生 slots 提供关闭该主题后的品牌显示。主题与动画插件可能覆盖同一画面区域，“运行中”不表示所有装饰同时可见。
 
-插件安装到本机 profile，**不包含在 DMG 内**。当前除五个学习插件和 lg-brand，已添加 lg-books、lg-dashboard、lg-workbench、lg-execution、lg-agents、lg-library、lg-memory、lg-context、lg-planning、lg-review，共 16 个本地链接；均依赖项目目录继续存在。换机器先准备构建产物与依赖，再注册新路径，或安装已生成的 tgz。新模型执行器默认预算为 0，模型路由和凭据仍须在本机配置；本次真实模型验证使用独立 LitIsLand profile，桌面配置尚未迁入该验证凭据。现有 App 二进制来自上一次打包，本次未重新生成 DMG。
+插件安装到本机 profile，**不包含在 DMG 内**。当时除五个学习插件和 lg-brand，已添加 lg-books、lg-dashboard、lg-workbench、lg-execution、lg-agents、lg-library、lg-memory、lg-context、lg-planning、lg-review，共 16 个本地链接；均依赖项目目录继续存在。换机器先准备构建产物与依赖，再注册新路径，或安装已生成的 tgz。新模型执行器默认预算为 0，模型路由和凭据仍须在本机配置；本次真实模型验证使用独立 LitIsLand profile，桌面配置尚未迁入该验证凭据。现有 App 二进制来自上一次打包，本次未重新生成 DMG。
 
 维护插件时先完全退出此 App，从仓库根目录使用自己的 home 和打包 CLI，避免操作官方 profile。例如：
 
