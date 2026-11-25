@@ -89,16 +89,6 @@
       "files": 107,
       "sourceSha256": "c8c997200264eba05256b6fc62c01fa3665ab34fc219616ab9410f1fc5d461c7",
       "omittedDemoVideos": []
-    },
-    {
-      "path": "dsh-plugins/dsh-reading-workbench",
-      "repository": "https://github.com/keyboard-leo/dsh-reading-workbench",
-      "commit": "0780abab8201c1b1dd7297dbbdc4cbc15248a92a",
-      "version": "0.2.0",
-      "files": 100,
-      "sourceSha256": "7bd4b3b09ebfd330dce51df0d87c855872b291f3cf6ed38a15d62bb89e34aeb9",
-      "omittedDemoVideos": [],
-      "sourceSelection": "v0.2.0 with LG data-root binding in cordis.patch.yml"
     }
   ]
 }
