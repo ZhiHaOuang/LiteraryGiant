@@ -140,3 +140,5 @@ root 作用域的 `sidebar.panellist.actions` list 有注册项时，导航区�
 无。
 
 </details>
+
+`sidebarPanels.setPinned(id, pinned)` 服务使用侧栏的原生固定状态。插件可配置次要入口的初始显隐，同时复用侧栏渲染。隐藏入口仍可从「更多」进入，用户可再次固定。
