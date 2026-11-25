@@ -9,11 +9,15 @@ import css from './ConversationRoot.module.css'
  * @param props - Optional Session sources and authorized header slots.
  * @returns The persistent header with any selected Session's title and views.
  */
-export function ConversationHeader({ sessionId, useSession, useConversation, renderSlot }: ConversationHeaderProps) {
+export function ConversationHeader({ sessionId, pageChrome, useSession, useConversation, renderSlot }: ConversationHeaderProps) {
   const session = useSession(s => s)
   const conversation = useConversation(s => s)
   const blank = session === undefined || conversation === undefined
     || (session.blank && conversationPhase(session, conversation) === 'blank')
+  if (pageChrome?.actions) return pageChrome.actions(<div className={css.pageActions}>
+    <div className={css.pageActions} data-conversation-header-leading="">{renderSlot('conversation.header.leading', {})}</div>
+    {sessionId !== undefined && renderSlot('conversation.session.header', { hideChrome: blank, pageChrome })}
+  </div>)
   return (
     <header className={clsx(css.header, blank && css.headerBlank)} data-window-drag>
       <div className={css.headerLeading} data-conversation-header-leading="">
@@ -22,8 +26,8 @@ export function ConversationHeader({ sessionId, useSession, useConversation, ren
       {sessionId === undefined
         // The empty title row keeps the blank-Session header height, so the
         // Hero centers its input card at the same offset before a Session exists.
-        ? <div className={css.titleRow} />
-        : renderSlot('conversation.session.header', { hideChrome: blank })}
+        ? <div className={css.titleRow}/>
+        : renderSlot('conversation.session.header', { hideChrome: blank, pageChrome })}
     </header>
   )
 }

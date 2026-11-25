@@ -10,7 +10,7 @@ export interface ConversationPanelInjected {
 }
 type Props = PropsRuntime<'main'> & PropsRenderSlots<'main.conversation'> & ConversationPanelInjected
 
-export function ConversationPanel({ page, retainSession, SessionProvider, renderSlot }: Props) {
+export function ConversationPanel({ page, pageChrome, retainSession, SessionProvider, renderSlot }: Props) {
   const id = page?.target.sessionId
   const sessionId = typeof id === 'string' ? id as SessionId : undefined
   const [reference, setReference] = useState<SessionReference>()
@@ -23,9 +23,9 @@ export function ConversationPanel({ page, retainSession, SessionProvider, render
     return () => { next.release() }
   }, [sessionId, retainSession])
   if (sessionId === undefined) {
-    const content = renderSlot('main.conversation', {})
+    const content = renderSlot('main.conversation', { pageChrome })
     return page === undefined ? content : <SessionProvider session={undefined}>{content}</SessionProvider>
   }
   if (reference?.sessionId !== sessionId) return null
-  return <SessionProvider session={reference}>{renderSlot('main.conversation', {})}</SessionProvider>
+  return <SessionProvider session={reference}>{renderSlot('main.conversation', { pageChrome })}</SessionProvider>
 }

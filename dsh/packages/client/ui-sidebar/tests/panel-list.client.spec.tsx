@@ -1,3 +1,4 @@
+import { provideContextMenus } from './context-menu.ts'
 // @vitest-environment jsdom
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 /** Global panel rows and DOM focus through the production slot renderer. */
@@ -52,6 +53,7 @@ async function bench(collapsed = false, track?: TrackProductEvent) {
   await runtime.mount({
     inject: ['slots'],
     apply(ctx: Context) {
+      provideContextMenus(ctx)
       ctx.provide('shortcuts', { catalog: createSnapshotStore([]) } as never)
       ctx.provide('layout', layout)
       ctx.provide('uiWorkspace', { startSession: vi.fn() } as never)

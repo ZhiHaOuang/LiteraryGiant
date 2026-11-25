@@ -36,6 +36,10 @@ export function registerSessionMenus(ctx: Context, actions: Actions): void {
     ctx.remoteAccess.source('session', target.sessionId, action).getSnapshot()
   const archived = (target: ContextMenuTargetMap['session']): boolean =>
     ctx.workspaces.list.getSnapshot().archivedSessionIds.includes(target.sessionId)
+  const pageLabel = ctx.locale.bind('layout.pages')
+  register('open', 50, [], target => [{ id: 'open', label: pageLabel('openIn'), children: [{
+    id: 'split', label: pageLabel('splitView'), run: () => { ctx.uiWorkspace.openSession(target.sessionId, 'split') },
+  }] }])
   register('pin', 100, ['workspace/pinSession', 'workspace/unpinSession'], (target) => {
     const pinned = ctx.workspaces.list.getSnapshot().pinnedSessionIds.includes(target.sessionId)
     if (archived(target) || !allowed(target, pinned ? 'workspace/unpinSession' : 'workspace/pinSession')) return []

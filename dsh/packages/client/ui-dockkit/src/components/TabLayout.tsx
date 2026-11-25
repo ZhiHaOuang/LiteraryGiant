@@ -14,6 +14,8 @@ import css from './dockkit.module.css'
 
 /** Host policy for lazily retaining a tab body without reparenting it. */
 export interface TabRetention {
+  /** Optional host-owned header; native tab strips remain the default. */
+  readonly renderPaneHeader?: (pane: PaneNode) => ReactNode
   /** Whether a visited body survives hiding; omitted means visibility-mounted. */
   readonly keepMounted?: (tab: TabRecord) => boolean
   /** Whether this layout's Session is on screen; defaults to true. */
@@ -38,7 +40,7 @@ interface TabHostProps extends LayoutProps {
 }
 
 /** A tab's ancestors stay identical across selection, pane moves and floating. */
-function TabHost({ state, callbacks, intents, tab, pane, column, floats, focusRequest, offsets, keepMounted,
+function TabHost({ state, callbacks, intents, tab, pane, column, floats, focusRequest, offsets, keepMounted, renderPaneHeader,
   active = true }: TabHostProps): ReactNode {
   const floating = pane.host === 'float'
   const selected = floating || pane.activeTabId === tab.id
@@ -93,15 +95,15 @@ function TabHost({ state, callbacks, intents, tab, pane, column, floats, focusRe
         style={rect === undefined ? undefined : floatStyle(rect, lifted !== undefined)}
         onPointerDown={() => { if (floating) floats.raise(pane.id) }}
         onClick={() => { if (!floating && state.activePaneId !== pane.id) callbacks.onFocusPane(pane.id) }}>
+        <div ref={body} className={clsx(css.tabHostBody, floating ? css.floatBody : css.paneBody)}>
+          {visited && (retained || (active && selected)) ? <TabBody tab={tab} renderTab={callbacks.renderTab} /> : null}
+          {!floating && <PaneDropHints pane={pane} callbacks={callbacks} />}
+        </div>
         <div className={css.tabHostHeader}>
           {selected && (floating
             ? <FloatHeader paneId={pane.id} tab={tab} labels={callbacks.labels} intents={intents}
               renderTabTitle={callbacks.renderTabTitle} canCloseTab={callbacks.canCloseTab} drag={floats.drag} />
-            : <TabStrip state={state} pane={pane} callbacks={callbacks} offsets={offsets} />)}
-        </div>
-        <div ref={body} className={clsx(css.tabHostBody, floating ? css.floatBody : css.paneBody)}>
-          {visited && (retained || (active && selected)) ? <TabBody tab={tab} renderTab={callbacks.renderTab} /> : null}
-          {!floating && <PaneDropHints pane={pane} callbacks={callbacks} />}
+            : renderPaneHeader !== undefined ? renderPaneHeader(pane) : <TabStrip state={state} pane={pane} callbacks={callbacks} offsets={offsets} />)}
         </div>
         {floating && <div className={css.floatResize} data-dockkit-float-resize={pane.id}
           onPointerDown={(event) => { floats.drag('resize', pane.id, event) }} />}
@@ -149,7 +151,11 @@ export function TabLayout(props: LayoutProps): ReactNode {
       })}
       {panes.filter(pane => pane.tabs.length === 0).map(pane => (
         <div key={pane.id} className={css.emptyTabHost} data-dockkit-empty style={{ gridColumn: panes.indexOf(pane) * 2 + 1, gridRow: 1 }}>
-          <TabPanel state={state} pane={pane} callbacks={callbacks} />
+          {props.renderPaneHeader === undefined ? <TabPanel state={state} pane={pane} callbacks={callbacks} /> :
+            <section className={css.tabHost} onPointerDown={() => callbacks.onFocusPane(pane.id)}>
+              {props.renderPaneHeader(pane)}
+              <div className={css.empty}>{callbacks.labels.emptyPane}</div>
+            </section>}
         </div>
       ))}
       {root.kind === 'split' && <div className={clsx(css.divider, css.tabLayoutDivider)}

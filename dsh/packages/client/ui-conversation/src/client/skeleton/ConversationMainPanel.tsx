@@ -36,7 +36,7 @@ export function ConversationMainPanel(props: ConversationSlotProps) {
 
   return (
     <div className={css.root} data-phase={phase}>
-      {renderSlot('conversation.header', {})}
+      {renderSlot('conversation.header', { pageChrome: props.pageChrome })}
       {renderFactorySlot('conversation.content', {
         variant: 'main',
         phase,

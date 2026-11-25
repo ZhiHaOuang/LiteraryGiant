@@ -147,6 +147,7 @@ function mount(
     entryActions?: boolean
     /** Isolate header capability checks from the composer's required layout observers. */
     headerOnly?: boolean
+    sharedHeader?: boolean
   } = {},
 ) {
   const sessionId = 'sessionId' in options ? options.sessionId : SID
@@ -224,12 +225,13 @@ function mount(
       return opts?.fallback ?? null
     }
     if (key === 'conversation.header') {
-      return <ConversationHeader {...runtimeProps} renderSlot={renderSlot as never} />
+      return <ConversationHeader {...runtimeProps} pageChrome={options.sharedHeader?{actions:children=><div data-testid="page-actions">{children}</div>}:undefined} renderSlot={renderSlot as never} />
     }
     if (key === 'conversation.session.header') {
       return (
         <ConversationSessionHeader
           hideChrome={(owner as Pick<ConversationSessionHeaderSlotProps, 'hideChrome'>).hideChrome}
+          pageChrome={(owner as Pick<ConversationSessionHeaderSlotProps, 'pageChrome'>).pageChrome}
           sessionId={SID}
           SessionProvider={({ children }) => children}
           useSession={useSession}
@@ -1074,4 +1076,27 @@ describe('ConversationRoot resident composer', () => {
     const b = mount(sessionSnapshotOf({ blank: true }))
     expect(b.view.container.querySelector('[data-width-handle]')).toBeNull()
   })
+})
+
+
+describe('shared page title row',()=>{
+ it('keeps session actions and the native view picker together without a second header',()=>{
+  const b=mount(sessionSnapshotOf({blank:false}),undefined,undefined,{sharedHeader:true,entryActions:true,headerOnly:true})
+  expect(b.view.container.querySelector('header')).toBeNull()
+  expect(b.view.queryByRole('tablist')).toBeNull()
+  const row=b.view.getByTestId('page-actions')
+  expect(within(row).getByTestId('view-conversation.session.header.actions')).toBeTruthy()
+  expect(within(row).getByTestId('view-conversation.session.header.utilities')).toBeTruthy()
+  expect(within(row).getByTestId('view-conversation.session.header.corner')).toBeTruthy()
+  fireEvent.click(within(row).getByRole('button',{name:zh['session.moreViews']}))
+  expect(b.actionsOwner().entries.map(e=>e.id)).toEqual(['chat','trajectory'])
+  act(()=>b.actionsOwner().onOpen('trajectory'))
+  expect(b.store.store.getSnapshot().view).toBe('trajectory')
+ })
+ it('retains view buttons when the optional view-customization plugin is absent',()=>{
+  const b=mount(sessionSnapshotOf({blank:false}),undefined,undefined,{sharedHeader:true,headerOnly:true})
+  fireEvent.click(b.view.getByRole('tab',{name:'Trajectory'}))
+  expect(b.store.store.getSnapshot().view).toBe('trajectory')
+  expect(b.view.container.querySelector('header')).toBeNull()
+ })
 })

@@ -521,7 +521,7 @@ describe('ui-schedule browser half', () => {
     const panel = ctx.slots.entries('sidebar.panellist')[0]!
     expect(panel.options.id).toBe('schedules')
     ctx.locale.setLocale('en')
-    expect(resolveSlotLabel(panel.options.label)).toBe('Automation tasks')
+    expect(resolveSlotLabel(panel.options.label)).toBe('Automation Tasks')
     ctx.locale.setLocale('zh')
     expect(resolveSlotLabel(panel.options.label)).toBe('自动化任务')
     const face = injectedFace(entry, undefined as never) as TaskManagerInjected

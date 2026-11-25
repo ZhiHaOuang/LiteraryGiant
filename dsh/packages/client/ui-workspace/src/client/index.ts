@@ -69,6 +69,26 @@ export type {
 } from './contract/slots.ts'
 export type { WorkspaceKey } from './locales.ts'
 
+declare module '@deepseek-ai/cordis' {
+  interface Events {
+    /**
+     * Let a product owning a Workspace persist its name through its domain service.
+     * @mode waterfall
+     * @param workspaceId - Workspace selected in the native rename dialog.
+     * @param title - Trimmed user-supplied name.
+     * @param next - Rename an ordinary Workspace through the native controller.
+     */
+    'uiWorkspace/rename'(workspaceId: WorkspaceId, title: string, next: () => Promise<void>): Promise<void>
+    /**
+     * Let a product owning a Workspace remove its domain registration as well.
+     * @mode waterfall
+     * @param workspaceId - Workspace confirmed in the native removal dialog.
+     * @param next - Remove an ordinary Workspace through the native controller.
+     */
+    'uiWorkspace/delete'(workspaceId: WorkspaceId, next: () => Promise<void>): Promise<void>
+  }
+}
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface GlobalStandardProps {
     /** Selector hook over the pure Workspace Controller snapshot. */
@@ -297,8 +317,8 @@ export function apply(ctx: Context): void {
     searchResultLimit: sessions.searchResultLimit,
     requestSessionRename,
     notifyArchivedNotOpenable: () => { notify({ kind: 'archivedNotOpenable' }) },
-    renameWorkspace: async (workspaceId, title) => { await workspaces.rename(workspaceId, title) },
-    deleteWorkspace: async (workspaceId) => { await workspaces.delete(workspaceId) },
+    renameWorkspace: (workspaceId, title) => ctx.waterfall('uiWorkspace/rename', workspaceId, title, async () => { await workspaces.rename(workspaceId, title) }),
+    deleteWorkspace: workspaceId => ctx.waterfall('uiWorkspace/delete', workspaceId, async () => { await workspaces.delete(workspaceId) }),
     insertWorkspaceBefore: async (workspaceId, beforeWorkspaceId) => {
       await workspaces.insertBefore(workspaceId, beforeWorkspaceId)
     },

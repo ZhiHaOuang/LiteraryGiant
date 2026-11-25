@@ -6,6 +6,7 @@ import { LocaleRuntime } from '@deepseek-ai/dsh-client-locale/client'
 import type { WorkspaceSnapshot } from '@deepseek-ai/dsh-api-workspace-controller/client'
 import { SessionId } from '@deepseek-ai/dsh-session/types'
 import { registerSessionMenus } from '../src/client/session-actions/context-menus.tsx'
+import { pagesEn, pagesZh } from '../../ui-layout/src/client/page-locales.ts'
 import { en, zh } from '../src/client/locales.ts'
 
 function bench() {
@@ -16,6 +17,8 @@ function bench() {
   ctx.provide('contextMenus', { register: registry.register.bind(registry) } as never)
   const locale = new LocaleRuntime(ctx)
   ctx.provide('locale', locale)
+  locale.register('layout.pages', { en: pagesEn, zh: pagesZh })
+  ctx.provide('uiWorkspace', { openSession: vi.fn() } as never)
   locale.register('workspace', { en, zh }); locale.setLocale('en')
   const list = createSnapshotStore<WorkspaceSnapshot>({
     items: [], pinnedSessionIds: [], archivedSessionIds: [], state: 'idle', phase: 'ready', error: null,
@@ -43,6 +46,7 @@ it('preserves built-in order, groups, icons, command identities, and captured ac
   const views = menu.source.getSnapshot()
   expect(views.map(({ id, label, icon, commandId, separatorBefore, afterContent }) =>
     [id, label, icon !== undefined, commandId, separatorBefore, afterContent])).toEqual([
+    ['session.open/open', 'Open in', false, undefined, undefined, undefined],
     ['session.pin/pin', 'Pin session', true, undefined, undefined, undefined],
     ['session.rename/rename', 'Rename', true, 'session.rename', undefined, undefined],
     ['session.fork/fork', 'Fork session', true, 'session.fork', undefined, undefined],
@@ -58,7 +62,7 @@ it('preserves built-in order, groups, icons, command identities, and captured ac
   expect(b.actions.archiveSession).toHaveBeenCalledWith('background')
   const unpin = b.open()
   b.list.set({ ...b.list.getSnapshot(), pinnedSessionIds: [b.target.value.sessionId] })
-  expect(unpin.source.getSnapshot()[0]).toMatchObject({ label: 'Unpin session' })
+  expect(unpin.source.getSnapshot().find(item => item.id === 'session.pin/pin')).toMatchObject({ label: 'Unpin session' })
   unpin.select('session.pin/pin')
   expect(b.actions.unpinSession).toHaveBeenCalledWith('background')
   const restore = b.open()
@@ -79,13 +83,13 @@ it('reacts to permission and locale updates, prevents withdrawn actions, and dis
   b.access('session/fork').set(false)
   b.access('workspace/archiveSession').set(false)
   b.access('workspace/pinSession').set(false)
-  expect(menu.source.getSnapshot().map(item => item.id)).toEqual(['session.id/copy'])
+  expect(menu.source.getSnapshot().map(item => item.id)).toEqual(['session.open/open', 'session.id/copy'])
   menu.select('session.rename/rename')
   expect(b.actions.requestSessionRename).not.toHaveBeenCalled()
   b.locale.setLocale('zh')
-  expect(menu.source.getSnapshot()[0]?.label).toBe('复制 Session ID')
+  expect(menu.source.getSnapshot().find(item => item.id === 'session.id/copy')?.label).toBe('复制 Session ID')
   b.access('session/rename').set(true)
-  expect(menu.source.getSnapshot()[0]?.label).toBe('重命名')
+  expect(menu.source.getSnapshot().find(item => item.id === 'session.rename/rename')?.label).toBe('重命名')
   await b.fiber.dispose()
   expect(menu.source.getSnapshot()).toEqual([])
   b.access('session/rename').set(false)
@@ -93,5 +97,15 @@ it('reacts to permission and locale updates, prevents withdrawn actions, and dis
   menu.select('session.id/copy')
   expect(b.actions.copySessionId).not.toHaveBeenCalled()
   expect(menu.source.getSnapshot()).toEqual([])
+  menu.dispose()
+})
+
+it('opens the captured session in split view without changing archive/pin state', async () => {
+  const b = bench()
+  await b.fiber.await()
+  const menu = b.open()
+  menu.select('session.open/open/split')
+  expect(b.ctx.get('uiWorkspace')!.openSession).toHaveBeenCalledWith('background', 'split')
+  expect(b.actions.archiveSession).not.toHaveBeenCalled()
   menu.dispose()
 })

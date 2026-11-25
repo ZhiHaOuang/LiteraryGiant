@@ -140,3 +140,5 @@ These limits define what the shell owns versus what its occupants own; they are 
 None.
 
 </details>
+
+The `sidebarPanels.setPinned(id, pinned)` service uses the native launcher state. Plugins can configure initial secondary entries without replacing sidebar rendering; hidden entries remain available in More and users can pin them again.

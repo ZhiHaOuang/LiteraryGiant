@@ -1,5 +1,6 @@
 /** Registers the sidebar shell and global panel navigation. */
 import type {} from '@deepseek-ai/dsh-client-product-analytics/client'
+import type {} from '@deepseek-ai/dsh-client-ui-context-menu/client'
 import type { Context as ClientContext } from '@deepseek-ai/cordis'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 import { resolveSlotLabel } from '@deepseek-ai/dsh-client-ui-slots'
@@ -11,7 +12,7 @@ import type {} from '@deepseek-ai/dsh-client-ui-renderer/client'
 // Type-only: pulls the Session root standard-props merge.
 import type {} from '@deepseek-ai/dsh-client-ui-session/client'
 import type { SidebarPanelMetadata, SidebarRootInjected, SidebarSectionInjected } from './contract/slots.ts'
-import { createPanelPins } from './panel-pins.ts'
+import { createPanelPins, type PanelPins } from './panel-pins.ts'
 import { HeaderLeadingControls } from './HeaderLeadingControls.tsx'
 import { SidebarRoot } from './SidebarRoot.tsx'
 import { PanelIcon } from './PanelIcon.tsx'
@@ -30,10 +31,23 @@ const SIDEBAR_SECTION_INJECT: SidebarSectionInjected = {
   hooks: { sectionScroller: (_standard, { useSectionScroller }) => useSectionScroller },
 }
 
+declare module '@deepseek-ai/cordis' {
+  interface Context {
+    /** Native sidebar launcher choices; hidden entries remain available in More. */
+    sidebarPanels: Pick<PanelPins, 'setPinned'>
+  }
+}
+
 declare module '@deepseek-ai/dsh-client-ui-slots' {
   interface LocaleNamespaceMap {
     /** Sidebar controls and global panel copy. */
     sidebar: SidebarKey
+  }
+}
+
+declare module '@deepseek-ai/dsh-client-ui-context-menu/client' {
+  interface ContextMenuTargetMap {
+    mainPanel: { readonly id: MainPanelId; readonly label: string }
   }
 }
 
@@ -45,7 +59,7 @@ interface WorkspaceNavigation {
 }
 
 /** Services required by the sidebar plugin. */
-export const inject = ['slots', 'layout', 'uiWorkspace', 'locale', 'shortcuts']
+export const inject = ['slots', 'layout', 'uiWorkspace', 'locale', 'shortcuts', 'contextMenus']
 
 /** Registers the sidebar shell and its service callbacks.
  * @param ctx - Client root context.
@@ -53,6 +67,15 @@ export const inject = ['slots', 'layout', 'uiWorkspace', 'locale', 'shortcuts']
 export function apply(ctx: ClientContext): void {
   const workspaceNavigation = ctx.get('uiWorkspace') as unknown as WorkspaceNavigation
   ctx.effect(() => ctx.locale.register(NS, { zh, en, ja, es, fr, de, ru, pt }), 'ui-sidebar: dictionaries')
+  const pageLabel = ctx.locale.bind('layout.pages')
+  ctx.effect(() => ctx.contextMenus.register({
+    id: 'mainPanel.open', target: 'mainPanel', order: 50,
+    observe: () => [ctx.locale],
+    resolve: target => [{ id: 'open', label: pageLabel('openIn'), children: [{
+      id: 'split', label: pageLabel('splitView'),
+      run: () => { ctx.layout.selectPanel(target.id, { title: target.label, placement: 'split' }) },
+    }] }],
+  }), 'ui-sidebar: open panel in split view')
   const panels = createSnapshotStore<readonly SidebarPanelMetadata[]>([])
   const syncPanels = (): void => {
     const next = ctx.slots.entriesOfSlot('sidebar.panellist').map(({ options }) => {
@@ -70,6 +93,7 @@ export function apply(ctx: ClientContext): void {
   ctx.effect(() => ctx.slots.subscribe('sidebar.panellist', syncPanels), 'ui-sidebar: panel entries')
   ctx.effect(() => ctx.locale.subscribe(syncPanels), 'ui-sidebar: panel labels')
   const panelPins = createPanelPins()
+  ctx.provide('sidebarPanels', { setPinned: panelPins.setPinned })
   const entryActions = {
     getSnapshot: () => ctx.slots.entriesOfSlot('sidebar.panellist.actions').length > 0,
     subscribe: (listener: () => void) => ctx.slots.subscribe('sidebar.panellist.actions', listener),

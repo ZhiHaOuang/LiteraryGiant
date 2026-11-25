@@ -1,3 +1,4 @@
+import { pagesEn, pagesZh } from '../../ui-layout/src/client/page-locales.ts'
 // @vitest-environment jsdom
 import { apply as applyMenus, inject as injectMenus } from '@deepseek-ai/dsh-client-ui-context-menu/client'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
@@ -47,6 +48,7 @@ async function createRuntime(): Promise<SlotTestRuntime> {
   const directoryPicker = {}
   runtime.remote.provideNamespaces({ directoryPicker })
   const locale = new LocaleRuntime(runtime.ctx)
+  locale.register('layout.pages', { en: pagesEn, zh: pagesZh })
   runtime.ctx.provide('locale', locale)
   runtime.slots.installLocale(locale)
   await runtime.mount({ inject: [...injectMenus], apply: applyMenus })
@@ -123,7 +125,7 @@ describe('session rename through the assembled browser', () => {
     fireEvent.click(trigger)
     await view.findByRole('menuitem', { name: '置顶会话' })
     expect(view.getAllByRole('menuitem').map(item => item.textContent)).toEqual([
-      '置顶会话', '重命名', '分叉会话', '复制 Session ID', 'Export action', 'Last action', '归档会话',
+      '打开方式', '置顶会话', '重命名', '分叉会话', '复制 Session ID', 'Export action', 'Last action', '归档会话', '分栏打开',
     ])
     expect(view.getAllByRole('separator')).toHaveLength(3)
     const last = view.getByRole('menuitem', { name: 'Last action' })

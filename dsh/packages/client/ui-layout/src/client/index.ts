@@ -29,7 +29,7 @@ import { ThemePresenter } from './theme-presenter.ts'
 // OwnerShare contracts below are the render-side halves registrants compose
 // against; the frame components and the store factory are package-internal.
 export { LayoutController } from './service.ts'
-export type { PageOptions, PageOwnerProps } from './pages.ts'
+export type { PageOptions, PageOwnerProps, PageChrome } from './pages.ts'
 export type { ILayout, MainPanelId, PanelInfo } from './service.ts'
 
 /** Selector hook over root-scoped panel selection. */
@@ -211,7 +211,7 @@ export function apply(ctx: ClientContext): void {
         'shell.leading': { kind: 'single', scope: 'root' },
       },
       store,
-      inject: (): AppFrameInjected => ({ hooks: { foldedLandscape, pages: layout.pages.source }, pageActions: layout.pages.intents, updatePage: (id, options) => layout.pages.update(id, options), lockPage: (id, locked) => layout.pages.lock(id, locked), pageLabels: ctx.locale.bind('layout.pages'), movePage: id => layout.pages.moveToOtherPane(id) }),
+      inject: (): AppFrameInjected => ({ hooks: { foldedLandscape, pages: layout.pages.source }, pageActions: layout.pages.intents, updatePage: (id, options) => layout.pages.update(id, options), lockPage: (id, locked) => layout.pages.lock(id, locked), pageLabels: ctx.locale.bind('layout.pages'), closePane: id => layout.pages.closePane(id) }),
     }, AppFrame)
     const disposeShortcut = ctx.shortcuts.register({
       id: 'sidebar.left.toggle' as ShortcutCommandId, label: () => t('toggle'), aliases: ['sidebar', 'toggle left sidebar'],

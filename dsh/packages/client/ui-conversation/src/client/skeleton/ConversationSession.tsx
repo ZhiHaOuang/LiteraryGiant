@@ -22,10 +22,10 @@ export type ConversationSessionHeaderProps = ConversationSessionHeaderSlotProps
 type ViewsMoreMenuProps =
   Omit<ConversationViewActionsOwnerProps, 'onDismiss'>
   & Pick<ConversationSessionHeaderSlotProps, 'renderSlot'>
-  & { readonly label: string; readonly current: boolean }
+  & { readonly label: string; readonly current: boolean; readonly selectedLabel?: string | undefined }
 
 /** The View tab row's More launcher; its menu rows come from `conversation.session.header.views.actions`. */
-function ViewsMoreMenu({ label, current, entries, onOpen, onPinnedChange, renderSlot }: ViewsMoreMenuProps) {
+function ViewsMoreMenu({ label, current, selectedLabel, entries, onOpen, onPinnedChange, renderSlot }: ViewsMoreMenuProps) {
   const [open, setOpen] = useState(false)
   const onDismiss = (): void => { setOpen(false) }
   return (
@@ -34,7 +34,7 @@ function ViewsMoreMenu({ label, current, entries, onOpen, onPinnedChange, render
         <Tooltip label={label} portal>
           <Button size="sm" className={clsx(css.viewsMore, current && css.viewsMoreActive)} aria-label={label} aria-haspopup="menu" aria-expanded={open}
             onClick={() => { setOpen(value => !value) }}>
-            <IconEllipsisOutlineRegular size={13} />
+            {selectedLabel ?? <IconEllipsisOutlineRegular size={13} />}
           </Button>
         </Tooltip>
       )}>
@@ -106,7 +106,7 @@ function equalBreadcrumbs(left: readonly Breadcrumb[], right: readonly Breadcrum
  * @returns Session navigation controls, with title and tabs after conversation starts.
  */
 export function ConversationSessionHeader({
-  sessionId, hideChrome, useSessions, useConversationViews, useStore,
+  sessionId, hideChrome, pageChrome, useSessions, useConversationViews, useStore,
   renderSlot, renderFactorySlot, open, useContextMenu, selectView, setPinned, t, useEntryPins, useEntryActions,
 }: ConversationSessionHeaderProps) {
   const { getTriggerProps } = useContextMenu()
@@ -142,6 +142,21 @@ export function ConversationSessionHeader({
     return { visibleTabs, moreTabs: tabs.filter(tab => !visibleIds.has(tab.id)) }
   }, [tabs, unpinned, hasEntryActions, visibleViewLimit])
   const currentInMore = moreTabs.some(tab => tab.id === active?.id)
+  if (pageChrome?.actions) return <>
+    {!hideChrome && <>
+      <div className={css.pageActions}>{renderSlot('conversation.session.header.actions', {})}</div>
+      {showTabs && hasEntryActions && <ViewsMoreMenu label={t('session.moreViews')} current={false} selectedLabel={active?.label}
+        entries={tabs.map(tab => ({id:tab.id,label:tab.label,pinned:!unpinned.includes(tab.id),active:tab.id===active?.id}))}
+        onOpen={selectView} onPinnedChange={setPinned} renderSlot={renderSlot}/>}
+      {showTabs && !hasEntryActions && <div className={css.pageActions} role="tablist">
+        {tabs.map(tab => <Button key={tab.id} size="sm" role="tab" aria-selected={tab.id===active?.id}
+          onClick={() => selectView(tab.id)}>{tab.label}</Button>)}
+      </div>}
+      {renderSlot('conversation.session.header.utilities', {})}
+      {renderFactorySlot('contextMenu.button', {target:{kind:'sessionHeader',value:{sessionId}},label:t('header.more'),className:css.headerMenuButton,size:'sm'})}
+    </>}
+    <div className={css.pageActions} data-conversation-header-corner="">{renderSlot('conversation.session.header.corner', {})}</div>
+  </>
   return (
     <>
       <div className={css.titleRow}>

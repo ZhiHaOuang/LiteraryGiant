@@ -58,7 +58,7 @@ function localBuildVersion(): string | undefined {
 type PanelRowProps =
   Pick<SidebarPanelMetadata, 'id' | 'label'>
   & Pick<SidebarSectionOwnerProps, 'wide'>
-  & Pick<PropsRuntime<'sidebar'>, 'usePanelInfo'>
+  & Pick<PropsRuntime<'sidebar'>, 'usePanelInfo' | 'useContextMenu'>
   & Pick<InjectFace<SidebarRootInjected>, 'selectPanel' | 'trackEntryClick' | 'setPinned'>
   & { readonly unpinLabel: string; readonly unpinTooltip: string; readonly canUnpin: boolean }
   & PropsRenderFactories
@@ -71,9 +71,10 @@ function officialEntry(id: string): 'plugin' | 'cron' | undefined {
 
 /** Each panel row subscribes only to its own selection state. */
 function PanelRow({
-  id, label, wide, unpinLabel, unpinTooltip, canUnpin, usePanelInfo, selectPanel, setPinned, trackEntryClick, renderFactorySlot,
+  id, label, wide, unpinLabel, unpinTooltip, canUnpin, usePanelInfo, useContextMenu, selectPanel, setPinned, trackEntryClick, renderFactorySlot,
 }: PanelRowProps) {
   const active = usePanelInfo(info => info.activePanelId === id)
+  const { getTriggerProps } = useContextMenu()
   return (
     <div className={clsx(css.panelEntry, wide && css.panelEntryWide, active && css.panelEntryActive)}>
       <Tooltip label={label} delayMs={500} disabled={wide}>
@@ -81,6 +82,7 @@ function PanelRow({
           type="button"
           className={css.panelRow}
           aria-label={label}
+          {...getTriggerProps({kind: 'mainPanel', value: {id, label}})}
           aria-current={active ? 'page' : undefined}
           onClick={() => {
             const entry = officialEntry(id)
@@ -163,6 +165,7 @@ export function SidebarRoot({
   useEntryActions,
   useShortcuts,
   usePanelInfo,
+  useContextMenu,
   t,
   renderSlot,
   renderFactorySlot,
@@ -420,6 +423,7 @@ export function SidebarRoot({
                   canUnpin={hasEntryActions && id !== FIXED_PANEL_ID}
                   setPinned={setPinned}
                   usePanelInfo={usePanelInfo}
+                  useContextMenu={useContextMenu}
                   selectPanel={selectPanel}
                   trackEntryClick={trackEntryClick}
                   renderFactorySlot={renderFactorySlot}

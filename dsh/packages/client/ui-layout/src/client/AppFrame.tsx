@@ -123,7 +123,7 @@ export function AppFrame({
   useSessions,
   usePanelInfo,
   useFoldedLandscape,
-  usePages, pageActions, updatePage, lockPage, pageLabels, movePage,
+  usePages, pageActions, updatePage, lockPage, pageLabels, closePane,
   actions,
   renderSlot,
   t,
@@ -269,8 +269,8 @@ export function AppFrame({
     drawer,
   }), [renderSlot, sidebarCollapsed, sidebarWidth, drawer])
   const main = useMemo(() => (
-    <MainPages usePages={usePages} pageActions={pageActions} updatePage={updatePage} lockPage={lockPage} pageLabels={pageLabels} movePage={movePage} renderSlot={renderSlot} useSessions={useSessions} />
-  ), [usePages, pageActions, updatePage, lockPage, pageLabels, movePage, renderSlot, useSessions])
+    <MainPages usePages={usePages} pageActions={pageActions} updatePage={updatePage} lockPage={lockPage} pageLabels={pageLabels} closePane={closePane} renderSlot={renderSlot} useSessions={useSessions} />
+  ), [usePages, pageActions, updatePage, lockPage, pageLabels, closePane, renderSlot, useSessions])
   const overlays = useMemo(() => renderSlot('shell.overlay', {}), [renderSlot])
   // The leading seat serves drawers and fully hidden macOS sidebars.
   // Windows native captions keep their controls in the caption row instead.

@@ -1,3 +1,4 @@
+import { provideContextMenus } from './context-menu.ts'
 // @vitest-environment jsdom
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 /**
@@ -43,6 +44,7 @@ async function bench(options: { locale?: 'en' } = {}) {
   runtime.ctx.provide('shortcuts', { catalog: createSnapshotStore([]) } as never)
   runtime.ctx.provide('layout', { toggleSidebar: vi.fn() })
   runtime.ctx.provide('uiWorkspace', { startSession: vi.fn() } as never)
+  provideContextMenus(runtime.ctx)
   const locale = new LocaleRuntime(runtime.ctx)
   locale.register('common', { zh: commonZh, en: commonEn })
   if (options.locale === 'en') locale.setLocale('en')

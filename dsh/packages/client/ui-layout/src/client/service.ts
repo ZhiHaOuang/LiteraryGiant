@@ -89,7 +89,10 @@ export class LayoutController implements ILayout {
       throw new Error(`layout.selectPanel: main panel "${panelId}" is not registered`)
     }
     this.navigation.abort()
-    if (panelId === null && options !== undefined) this.lastSession = options
+    if (panelId === null && options !== undefined) {
+      const { placement: _placement, ...remembered } = options
+      this.lastSession = remembered
+    }
     this.selecting = true
     try { this.pages.open(panelId, options ?? (panelId === null ? this.lastSession : undefined)) }
     finally { this.selecting = false }

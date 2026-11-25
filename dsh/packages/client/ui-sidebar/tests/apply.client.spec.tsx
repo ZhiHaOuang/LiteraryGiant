@@ -1,3 +1,4 @@
+import { provideContextMenus } from './context-menu.ts'
 import { createSnapshotStore } from '@deepseek-ai/dsh-client-store'
 /** Sidebar shell slot registration and its Session/layout callbacks. */
 import { Context, type Fiber } from '@deepseek-ai/cordis'
@@ -33,6 +34,7 @@ async function bench(declare = true) {
   await owner.await()
   if (ctx === undefined) throw new Error('the sidebar fixture owner did not activate')
   await ctx.plugin(SlotRegistry).await()
+  provideContextMenus(ctx)
   const layout = { toggleSidebar: vi.fn(), selectPanel: vi.fn() }
   const uiWorkspace = { startSession: vi.fn() }
   ctx.provide('shortcuts', { catalog: createSnapshotStore([]) } as never)
@@ -59,7 +61,7 @@ describe('ui-sidebar apply', () => {
   })
 
   it('declares only the services it uses', () => {
-    expect(inject).toEqual(['slots', 'layout', 'uiWorkspace', 'locale', 'shortcuts'])
+    expect(inject).toEqual(['slots', 'layout', 'uiWorkspace', 'locale', 'shortcuts', 'contextMenus'])
   })
 
   it('registers the shell and declares its child seats', async () => {
@@ -87,6 +89,10 @@ describe('ui-sidebar apply', () => {
     const injected = (b.slots.entries('sidebar')[0]!.inject as () => SidebarRootInjected)()
     expect(Object.keys(injected)).toEqual(['startSession', 'toggleSidebar', 'selectPanel', 'setPinned', 'trackEntryClick', 'hooks'])
     expect(injected.hooks.panels.getSnapshot()).toEqual([])
+    expect(injected.hooks.entryPins.getSnapshot()).toEqual([])
+    await b.ctx.plugin({ inject: ['sidebarPanels'], apply: scope => { scope.sidebarPanels.setPinned('secondary-panel', false) } }).await()
+    expect(injected.hooks.entryPins.getSnapshot()).toEqual(['secondary-panel'])
+    injected.setPinned('secondary-panel', true)
     expect(injected.hooks.entryPins.getSnapshot()).toEqual([])
     expect(injected.hooks.entryActions.getSnapshot()).toBe(false)
     expect(b.slots.entries('main')).toEqual([])
@@ -193,4 +199,13 @@ describe('ui-sidebar apply', () => {
     expect(b.slots.spec('sidebar.panellist')).toBeUndefined()
     expect(b.slots.entries('main')).toHaveLength(0)
   })
+})
+
+it('opens the captured sidebar panel through the native split submenu', async () => {
+  const b = await bench()
+  await b.ctx.plugin({ inject: [...inject], apply }).await()
+  const menu = b.ctx.get('contextMenus')!.resolve({ kind: 'mainPanel', value: { id: 'dashboard' as MainPanelId, label: 'Global Dashboard' } })
+  menu.select('mainPanel.open/open/split')
+  expect(b.layout.selectPanel).toHaveBeenCalledWith('dashboard', { title: 'Global Dashboard', placement: 'split' })
+  menu.dispose()
 })

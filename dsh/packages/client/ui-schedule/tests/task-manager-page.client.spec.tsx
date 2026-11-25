@@ -554,7 +554,7 @@ describe('Task manager catalog', () => {
 
   it('lists cross-session active records by target time without unsupported actions', () => {
     mount()
-    expect(screen.getByRole('heading', { level: 1, name: 'Automation tasks' })).toBeDefined()
+    expect(screen.getByRole('heading', { level: 1, name: 'Automation Tasks' })).toBeDefined()
     expect(taskNames()).toEqual(['Send summary', 'Review release', 'Check metrics'])
     expect(screen.queryByText(alpha)).toBeNull()
     expect(screen.queryByText(beta)).toBeNull()

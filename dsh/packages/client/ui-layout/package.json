@@ -57,7 +57,9 @@
     "@deepseek-ai/cordis": "workspace:~",
     "react": "^18.2.0",
     "@deepseek-ai/dsh-client-shortcuts": "workspace:*",
-    "@deepseek-ai/dsh-client-ui-dockkit": "workspace:*"
+    "@deepseek-ai/dsh-client-ui-dockkit": "workspace:*",
+    "@deepseek-ai/dsh-client-ui-primitives": "workspace:*",
+    "react-dom": "^18.2.0"
   },
   "files": [
     "locale/*.json",

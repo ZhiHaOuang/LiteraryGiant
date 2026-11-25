@@ -177,6 +177,9 @@
 }
 
 .tabHostHeader {
+  /* Native drag regions follow DOM order even when scrolled content is clipped.
+     Keep the header after the body in the DOM, but above it in the layout. */
+  order: -1;
   flex: none;
 }
 

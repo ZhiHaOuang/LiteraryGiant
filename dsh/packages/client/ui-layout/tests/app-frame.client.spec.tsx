@@ -103,7 +103,7 @@ function mountFrame(windowWidth = frameWidth, content?: AppFrameProps['renderSlo
       useStore={useStore}
       usePages={usePages} pageActions={pages.intents}
       updatePage={(id,options)=>pages.update(id,options)} lockPage={(id,locked)=>pages.lock(id,locked)}
-      pageLabels={key=>key} movePage={id=>pages.moveToOtherPane(id)}
+      pageLabels={key=>key} closePane={id=>pages.closePane(id)}
       actions={instance.actions}
       renderSlot={renderSlot}
       useSessions={useSessions}

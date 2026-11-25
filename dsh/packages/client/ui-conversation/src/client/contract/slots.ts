@@ -13,7 +13,7 @@ import type {
   InjectFace, PropsLocale, PropsRenderFactories, PropsRenderSlots, PropsRuntime, PropsStore,
 } from '@deepseek-ai/dsh-client-ui-slots'
 import type { SessionPendingInteraction } from '@deepseek-ai/dsh-client-ui-session/client'
-import type {} from '@deepseek-ai/dsh-client-ui-layout/client'
+import type { PageOwnerProps } from '@deepseek-ai/dsh-client-ui-layout/client'
 import type { SessionId, SessionSeq } from '@deepseek-ai/dsh-session/types'
 import type { WorkspaceId } from '@deepseek-ai/dsh-workspace/types'
 import type { ComposerBlock } from './composer-blocks.ts'
@@ -226,7 +226,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
       keyProps: { [Id in UserTextId]: { node: UserTextNode<Id> } }
     }
     /** Conversation shell beneath its root-scoped main-panel entry. */
-    'main.conversation': { kind: 'single'; scope: 'session-maybe' }
+    'main.conversation': { kind: 'single'; scope: 'session-maybe'; owner: Pick<PageOwnerProps, 'pageChrome'> }
     /** Strict per-Session Conversation body. */
     'conversation.session': {
       kind: 'single'
@@ -234,7 +234,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
       owner: { view?: string }
     }
     /** Resident navigation container, including when no Session is selected. */
-    'conversation.header': { kind: 'single'; scope: 'session-maybe' }
+    'conversation.header': { kind: 'single'; scope: 'session-maybe'; owner: Pick<PageOwnerProps, 'pageChrome'> }
     /** Strict per-Session title, actions, and View navigation. */
     'conversation.session.header': {
       kind: 'single'
@@ -242,6 +242,7 @@ declare module '@deepseek-ai/dsh-client-ui-slots' {
       owner: {
         /** Parent-owned visibility shared with the header container styling. */
         hideChrome: boolean
+        pageChrome?: PageOwnerProps['pageChrome']
       }
     }
     /** Optional replacement for one Session breadcrumb title; overlays must portal because the title area clips overflow. */

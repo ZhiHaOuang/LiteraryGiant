@@ -42,7 +42,7 @@ export interface UiWorkspace {
    * Select a Session and show its Conversation as one UI navigation action.
    * @param target - known Session identity or durable direct-parent subagent address to display.
    */
-  openSession(target: SessionTarget): void
+  openSession(target: SessionTarget, placement?: 'split'): void
   /**
    * Connect a Workspace and open its Session unless a later navigation supersedes it.
    * @param workspaceId - target Workspace.
@@ -296,8 +296,8 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     }
   }
 
-  openSession(target: SessionTarget): void {
-    this.replaceMain(target, this.lifetime.signal, 'reveal')
+  openSession(target: SessionTarget, placement?: 'split'): void {
+    this.replaceMain(target, this.lifetime.signal, 'reveal', undefined, placement)
   }
 
   openWorkspace(
@@ -531,6 +531,7 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     signal: AbortSignal,
     panel: 'reveal' | 'preserve',
     beforeOpen?: (sessionId: SessionId) => void,
+    placement?: 'split',
   ): void {
     signal.throwIfAborted()
     const reference = this.sessions.retain(target, { source: 'mainView' })
@@ -556,7 +557,7 @@ class UiWorkspaceService extends Service implements UiWorkspace {
     this.mainReference = reference
     previous?.release()
     if (panel === 'reveal' || this.ctx.layout.panelInfo.getSnapshot().activePanelId === null) {
-      this.ctx.layout.selectPanel(null, { key: reference.sessionId, target: { sessionId: reference.sessionId } })
+      this.ctx.layout.selectPanel(null, { placement, key: reference.sessionId, target: { sessionId: reference.sessionId } })
     }
   }
 

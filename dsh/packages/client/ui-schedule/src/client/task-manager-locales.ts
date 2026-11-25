@@ -46,8 +46,8 @@ export const en = {
   'host.frequency.monthly': 'Every month',
   'host.frequency.advanced': 'Custom',
 
-  'panel': 'Automation tasks',
-  'title': 'Automation tasks',
+  'panel': 'Automation Tasks',
+  'title': 'Automation Tasks',
   'new.action': 'New',
   'list.label': 'Task catalog',
   'list.nextPrefix': 'Next scheduled time: ',
