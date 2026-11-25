@@ -42,7 +42,7 @@
 }
 
 
-.lgg-page { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif; }
+.lgg-page { --lgg-card-gap:9px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC",sans-serif; }
 
 .lgg-usage { flex: 1 1 auto; display: flex; flex-direction: column; margin-bottom: 0; min-width: 0; box-sizing: border-box; }
 .lgg-usage-plot { --lgg-usage-axis-top-inset: 13px; flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: 42px minmax(0, 1fr) 42px; grid-template-rows: minmax(56px, 1fr) auto; gap: 6px; }
@@ -76,7 +76,7 @@
 .lgg-page .lgd-section-head h2 { gap:6px; }
 .lgd-section-head svg { flex:none; color:var(--dsw-alias-label-secondary); }
 .lgg-metrics { margin-bottom:12px; }
-.lgg-page .lgg-metrics .lgd-metric { background:var(--dsw-alias-bg-layer-1); border:1px solid var(--dsw-alias-border-l2); border-radius:8px; padding:8px; gap:2px; align-items:center; text-align:center; }
+.lgg-page .lgg-metrics .lgd-metric { background:var(--dsw-alias-bg-layer-1); border:1px solid var(--dsw-alias-border-l2); border-radius:var(--lgd-panel-radius); padding:8px; gap:2px; align-items:center; text-align:center; }
 body:not([data-ds-dark-theme]) .lgg-metrics .lgd-metric { box-shadow:var(--dsw-shadow-lv1),var(--dsw-shadow-lv1-blur); }
 .lgg-page .lgg-metrics .lgd-metric b { font-size:20px; line-height:26px; font-weight:600; color:var(--dsw-alias-label-primary); }
 .lgg-page .lgg-metrics .lgd-metric>span { font-weight:600; }
@@ -112,3 +112,10 @@ body[data-dsh-claude-motion=reduced] .lgg-usage .lgg-usage-bar,body[data-dsh-cla
 .lgd-page.lgg-page>.lgd-topbar{padding-top:calc(20px + var(--lgd-chrome-clearance,0px));min-height:calc(62px + var(--lgd-chrome-clearance,0px))}
 .lgg-period{flex-wrap:wrap;justify-content:flex-end}.lgg-period button{white-space:nowrap}
 .lgg-filter-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+
+.lgg-header-period .lgg-period { flex-wrap:nowrap; }
+.lgg-header-period .lgg-period-compact { display:none; }
+@container (max-width:520px) {
+ .lgd-page-actions.lgg-header-period .lgg-period { display:none; }
+ .lgg-header-period .lgg-period-compact { display:block; }
+}

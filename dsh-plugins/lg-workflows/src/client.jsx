@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ContextPicker } from '../../lg-workbench/src/context-picker.jsx'
-import { ReferencePicker } from '../../lg-workbench/src/reference-picker.jsx'
+import { ContextPicker } from '../../lg-review/src/context-picker.jsx'
+import { ReferencePicker } from '../../lg-review/src/reference-picker.jsx'
 import { SequencePicker, CandidateDecision, sceneStepLabel } from './sequence-panel.jsx'
 import {ChapterPicker} from './chapter-picker.jsx'
 import {IdeaOptions} from './idea-options.jsx'
@@ -143,7 +143,7 @@ function Workflow({returnTo,getEditor,remember}) {
       </article>)}
       {candidate&&(queue||flow.definition.chapters)&&<CandidateDecision key={flow.id+':'+candidate.selected.id+':'+candidate.selected.state} path={path} candidate={candidate} range={flow.steps.at(-1)?.plan.wordRange} request={request} disabled={locked||flow.status==='closed'||flow.status==='stopped'} onBusy={setBusy} onDone={showFromServer}/> }
       {candidate&&!queue&&!flow.definition.chapters&&<details><summary>最新候选 v{candidate.selected.version_number}（当前正文未自动采用）</summary><pre>{candidate.selected.content}</pre></details>}
-      {candidate&&getEditor()&&<button disabled={locked} onClick={openCandidate}>在文学编辑台打开此版本</button>}
+      {candidate&&getEditor()&&<button disabled={locked} onClick={openCandidate}>Open in Reading Review</button>}
       {checks&&<aside><h3>整章候选规则检查</h3><CheckResult result={checks} selection={selectedChecks} onSelect={canRepair?setSelectedChecks:undefined} disabled={locked}/>
         {canRepair&&checks.passed===false&&<button disabled={locked||!selectedChecks.length} onClick={()=>work(()=>prepareStep({version:checks.target.version,checks:selectedChecks}))}>预览按勾选规则改稿</button>}
       </aside>}
@@ -171,8 +171,8 @@ export function apply(ctx) {
   function Panel() {
     const [target]=useState(()=>returnTo)
     useEffect(()=>{if(returnTo===target)returnTo=null},[target])
-    return <Workflow returnTo={target} remember={value=>{returnTo=value}} getEditor={()=>ctx.get('literaryWorkbench')}/>
+    return <Workflow returnTo={target} remember={value=>{returnTo=value}} getEditor={()=>ctx.get('literaryReading')}/>
   }
   ctx.slots.inject('main',()=>ctx.slots.register({name:'main',key:'lg-workflows'},Panel))
-  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-workflows',order:21,label:()=>'文学工作流'},()=> <span aria-hidden="true">⇢</span>))
+  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-workflows',order:21,label:()=>'Literary Workflows'},()=> <span aria-hidden="true">⇢</span>))
 }

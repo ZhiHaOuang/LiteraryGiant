@@ -1,0 +1,24 @@
+.lgg-book-buttons{display:flex;align-items:center;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.lgg-book-buttons button{white-space:nowrap}
+.lgg-book-form{margin:10px 0;padding:12px;border:1px solid var(--dsw-alias-border-l2);border-radius:8px;background:var(--dsw-alias-bg-layer-1);font-size:12px}
+.lgg-book-form fieldset{border:0;margin:0;padding:0;min-width:0;display:flex;flex-direction:column;gap:10px}
+.lgg-book-form label{display:flex;flex-direction:column;gap:5px}
+.lgg-book-form input{width:100%;box-sizing:border-box}
+.lgg-book-form small{color:var(--dsw-alias-label-secondary);line-height:1.5}
+.lgg-book-confirm{display:flex;flex-direction:column;gap:5px;overflow-wrap:anywhere}
+.lgg-book-header-actions{display:inline-flex;align-items:center;gap:6px;flex-wrap:wrap}
+.lgg-page .lgg-book-progress th,.lgg-page .lgg-book-progress td{vertical-align:middle;text-align:center}
+.lgg-page .lgg-book-progress .lgg-book-link{text-align:center;vertical-align:middle}
+.lgg-book-row-actions{align-items:center;white-space:nowrap;vertical-align:middle}
+.lgd-page .lgg-book-row-actions button:hover:enabled{background:var(--dsw-alias-button-primary-fill,#d8795c);color:var(--dsw-alias-label-primary-foreground,#fff)}
+/* Keep the primary book link and management controls; omit secondary columns before they crowd. */
+.lgg-book-table{min-width:0;width:100%}
+.lgg-page .lgg-book-table table{table-layout:fixed;width:100%}
+.lgg-page .lgg-book-table :is(th,td){padding:8px 5px;overflow:hidden;text-overflow:ellipsis}
+.lgg-book-table [data-column="book"]{width:24%}
+.lgg-book-table [data-column="manage"]{width:124px}
+.lgg-page .lgg-book-table .lgg-book-link{max-width:100%;width:100%}
+@container lgd-card (max-width:1000px){.lgg-book-table [data-column="activity"],.lgg-book-table [data-column="candidates"]{display:none}}
+@container lgd-card (max-width:760px){.lgg-book-table [data-column="accepted"],.lgg-book-table [data-column="cost"],.lgg-book-table [data-column="status"]{display:none}.lgg-book-table [data-column="book"]{width:auto}}
+@container lgd-card (max-width:500px){.lgg-book-table [data-column="chapters"]{display:none}}
+@container lgd-card (max-width:360px){.lgg-book-table [data-column="words"]{display:none}}

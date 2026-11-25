@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-import { ContextPicker } from '../../lg-workbench/src/context-picker.jsx'
+import { ContextPicker } from '../../lg-review/src/context-picker.jsx'
 async function request(endpoint,input,signal) {
  const response=await fetch(`api/lg/${endpoint}`,{method:'POST',signal,headers:{'content-type':'application/json'},body:JSON.stringify(input)})
  const result=await response.json();if(!result.ok)throw new Error(result.error);return result.value

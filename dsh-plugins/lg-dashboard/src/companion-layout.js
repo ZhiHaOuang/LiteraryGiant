@@ -1,13 +1,40 @@
-// Only 2–3 bubbles: try widths in 4px steps, preferring fewer, fuller lines.
-// Each lane must contain a candidate avatar center for its pointer.
-export function fitBubbleWidths(texts,width,anchors,gap=10,measureLines){
- const n=texts.length,available=Math.max(n,width-gap*(n-1)),budget=Math.floor(available/4)
+// Cached advances estimate wrapping; the final browser pass owns exact line breaks.
+export function measureBubbleText(text,measure){
+ const tokens=[]
+ for(const part of text.match(/[A-Za-z0-9]+(?:[.'’-][A-Za-z0-9]+)*|[^\r\n]|\n/gu)??[]){
+  if(tokens.length&&(/^[，。！？、；：）》」』】〕〉,.!?;:%”’]/u.test(part)||/[（《「『【〔〈“‘]$/u.test(tokens.at(-1))))tokens[tokens.length-1]+=part
+  else tokens.push(part)
+ }
+ const advances=tokens.map(token=>({token,width:measure(token),chars:Array.from(token,measure)}))
+ return {width:measure(text),linesAt(width){
+  const ink=Math.max(1,width-14);let lines=1,used=0
+  for(const item of advances){
+   if(item.token==='\n'){lines++;used=0;continue}
+   if(/^\s+$/u.test(item.token)){if(used)used=Math.min(ink,used+item.width);continue}
+   for(const advance of item.width<=ink?[item.width]:item.chars){
+    if(used&&used+advance>ink){lines++;used=0}
+    used+=advance
+   }
+  }
+  return lines
+ }}
+}
+
+// Only 2–3 lanes. Bound the search to 192 cells, with pixel precision in narrow cards.
+// Line estimates use cached text metrics, never DOM reads or writes.
+export function fitBubbleWidths(texts,width,anchors,gap=6,measureLines){
+ const n=texts.length
+ if(!n)return []
+ const available=Math.max(n,width-gap*(n-1)),budget=Math.max(n,Math.min(192,Math.floor(available))),unit=available/budget
  const cache=texts.map(()=>new Map())
- const minimum=Math.max(1,Math.min(16,Math.floor(budget/n))),states=[new Map([[0,{cost:0,widths:[]}]])]
+ // A short reply only reserves its natural width, leaving room for long sentences.
+ const minimum=texts.map(text=>Math.max(1,Math.min(Math.ceil(Math.min(64,text+14)/unit),Math.floor(budget/n))))
+ const states=[new Map([[0,{cost:0,widths:[]}]])]
  for(let i=0;i<n;i++){
   const next=new Map()
-  for(const [used,state] of states[i])for(let cells=minimum;cells<=budget-used-minimum*(n-i-1);cells++){
-   const w=cells*4,start=used*4+i*gap,end=start+w
+  const reserved=minimum.slice(i+1).reduce((sum,cells)=>sum+cells,0)
+  for(const [used,state] of states[i])for(let cells=i===n-1?budget-used:minimum[i];cells<=budget-used-reserved;cells++){
+   const w=cells*unit,start=used*unit+i*gap,end=start+w
    if(anchors[i]?.length&&!anchors[i].some(x=>x>=start+4&&x<=end-4))continue
    const ink=Math.max(1,w-14)
    if(!cache[i].has(w))cache[i].set(w,measureLines?measureLines(i,w):Math.max(1,Math.ceil(texts[i]/ink)))

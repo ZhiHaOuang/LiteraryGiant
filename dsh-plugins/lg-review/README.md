@@ -19,3 +19,5 @@
 正文入口使用 manuscript-review，target 为 section: manuscript、id、version_id、token 和 start/end（JavaScript UTF-16 范围，不允许切开代理对）。报告证据记录绝对字符位置；历史报告保留原版本。勾选问题后将报告绑定的精确选区传给 polish；报告过期、问题已处理或来源改变时拒绝改稿／采用。作者仍可对旧报告记录判断。
 
 章节质量报告通过 quality-preview 只读预览，通过 quality 保存可重放的报告。入口在文学编辑台的当前章正文版本。按实际场景顺序合计章节与已采用的场景卡正文，显示旧版估算字数、非空段数、引号对白占比、章末标记和场景采用数。章末原文保留文档、版本和字符位置。改变来源后旧报告显示过期，作者处理理由保存在历史中。
+
+The former workbench’s shared context/reference pickers, acceptance preview and supervision UI now live in `src/`. Planning and workflows bundle these existing helpers directly. Manuscript reading and editing are provided by `lg-reading-review`; the workbench plugin is retired.

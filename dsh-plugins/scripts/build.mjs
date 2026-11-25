@@ -6,7 +6,7 @@ if (!process.argv[2] || process.argv[2] === 'lg-agent-teams') {
     outfile:'lg-agent-teams/src/context-pricing.js', bundle:true, format:'esm', platform:'node', target:'es2022',
     banner:{js:'// Generated from dsh-context 0.82.1. See ../NOTICE and ../LICENSE-dsh-context.'}, legalComments:'eof'})
 }
-for (const [id, source] of [['lg-dashboard', 'client.jsx'], ['lg-agents','client.jsx'], ['lg-brand', 'client.js'], ['lg-workbench', 'client.jsx'], ['lg-library', 'client.jsx'], ['lg-memory', 'client.jsx'], ['lg-planning', 'client.jsx'], ['lg-workflows', 'client.jsx'], ['lg-author', 'client.jsx'], ['lg-director', 'client.jsx'], ['lg-impact', 'client.jsx'], ['lg-export', 'client.jsx']]) {
+for (const [id, source] of [['lg-storydata', 'client.jsx'], ['lg-dashboard', 'client.jsx'], ['lg-agents','client.jsx'], ['lg-brand', 'client.js'], ['lg-reading-review', 'client.jsx'], ['lg-library', 'client.jsx'], ['lg-memory', 'client.jsx'], ['lg-planning', 'client.jsx'], ['lg-workflows', 'client.jsx'], ['lg-author', 'client.jsx'], ['lg-director', 'client.jsx'], ['lg-impact', 'client.jsx'], ['lg-export', 'client.jsx']]) {
   if (process.argv[2] && process.argv[2] !== id) continue
   const plugins = id === 'lg-dashboard' ? [{
     name: 'lg-offline-prices',

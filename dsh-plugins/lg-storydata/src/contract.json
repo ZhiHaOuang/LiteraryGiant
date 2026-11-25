@@ -1,0 +1,294 @@
+{
+  "$id": "urn:lg:outline:change:v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "book_id",
+    "beat",
+    "changes"
+  ],
+  "properties": {
+    "schema": {
+      "const": "lg.outline.change.v1"
+    },
+    "book_id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 160
+    },
+    "beat": {
+      "type": "string",
+      "pattern": "\\S",
+      "maxLength": 200
+    },
+    "changes": {
+      "type": "array",
+      "maxItems": 24,
+      "items": {
+        "$ref": "#/$defs/change"
+      }
+    }
+  },
+  "$defs": {
+    "id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$"
+    },
+    "section": {
+      "enum": [
+        "people",
+        "plot",
+        "world"
+      ]
+    },
+    "positive": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 9007199254740991
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "document_id",
+        "version_id",
+        "sha256",
+        "paragraph",
+        "quote"
+      ],
+      "properties": {
+        "document_id": {
+          "$ref": "#/$defs/positive"
+        },
+        "version_id": {
+          "$ref": "#/$defs/positive"
+        },
+        "sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "paragraph": {
+          "$ref": "#/$defs/positive"
+        },
+        "quote": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 500
+        }
+      }
+    },
+    "change": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "section",
+        "title",
+        "module",
+        "expected_revision",
+        "text",
+        "basis",
+        "links",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/id"
+        },
+        "section": {
+          "$ref": "#/$defs/section"
+        },
+        "title": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 80
+        },
+        "module": {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9-]{0,39}@[1-9][0-9]{0,4}\\.[a-z][a-z0-9-]{0,39}$"
+        },
+        "expected_revision": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "text": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 800
+        },
+        "basis": {
+          "enum": [
+            "text",
+            "inference"
+          ]
+        },
+        "links": {
+          "type": "array",
+          "maxItems": 16,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/id"
+          }
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/evidence"
+          }
+        },
+        "entries": {
+          "type": "array",
+          "maxItems": 24,
+          "items": {
+            "$ref": "#/$defs/characterEntry"
+          }
+        }
+      }
+    },
+    "characterEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "key",
+        "facet",
+        "value",
+        "tags",
+        "scope",
+        "nature",
+        "sources"
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/id"
+        },
+        "facet": {
+          "type": "string",
+          "pattern": "^[a-z][a-z-]{0,39}$"
+        },
+        "value": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 160
+        },
+        "scope": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 160
+        },
+        "tags": {
+          "type": "array",
+          "maxItems": 6,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "pattern": "\\S",
+            "maxLength": 24
+          }
+        },
+        "nature": {
+          "enum": [
+            "observation",
+            "belief",
+            "public-claim",
+            "appraisal",
+            "plan",
+            "interpretation",
+            "intention"
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 8,
+          "uniqueItems": true,
+          "items": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 8
+          }
+        },
+        "stance": {
+          "enum": [
+            "believes",
+            "doubts",
+            "denies",
+            "uncertain"
+          ]
+        },
+        "span": {
+          "enum": [
+            "scene",
+            "phase",
+            "long-term"
+          ]
+        },
+        "status": {
+          "enum": [
+            "active",
+            "blocked",
+            "paused",
+            "achieved",
+            "abandoned"
+          ]
+        },
+        "importance": {
+          "enum": [
+            "core",
+            "major",
+            "supporting",
+            "minor",
+            "unknown"
+          ]
+        },
+        "target": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 160
+        },
+        "direction": {
+          "enum": [
+            "outgoing",
+            "incoming",
+            "mutual"
+          ]
+        },
+        "visibility": {
+          "enum": [
+            "public",
+            "private",
+            "unknown"
+          ]
+        },
+        "event_id": {
+          "$ref": "#/$defs/id"
+        },
+        "time": {
+          "type": "string",
+          "pattern": "\\S",
+          "maxLength": 160
+        },
+        "target_id": {
+          "$ref": "#/$defs/id"
+        },
+        "related_event_id": {
+          "$ref": "#/$defs/id"
+        },
+        "event_relation": {
+          "enum": [
+            "before",
+            "after",
+            "triggers",
+            "enables",
+            "impedes",
+            "revises"
+          ]
+        }
+      }
+    }
+  }
+}

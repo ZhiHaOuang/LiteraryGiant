@@ -5,6 +5,7 @@ import globalStyles from './global.css'
 import React, { useEffect, useRef, useState } from 'react'
 import zh from '../locale/zh.json'
 import en from '../locale/en.json'
+import {BookTitle} from './book-title.jsx'
 import { StoryIndex } from './story-index.jsx'
 import {Icon} from './icons.jsx'
 import { PendingVersions } from './pending-versions.jsx'
@@ -12,7 +13,7 @@ import {StoryData} from './story-data.jsx'
 import styles from './style.css'
 import {Card,Composition,ChapterChart,number,palette} from './charts.jsx'
 
-export const inject = ['slots', 'locale', 'layout']
+export const inject = ['slots', 'locale', 'layout', 'contextMenus']
 const CHAPTERS_PER_PAGE=10
 
 import {requestBooks} from './api.js'
@@ -37,7 +38,9 @@ function BookSupervision({ book, disabled, t }) {
   </section>
 }
 
-function Dashboard({ t,getEditor,initialBook,initialChapter,initialDiscover,ctx,onShelf,shelf,reloadShelf }) {
+function Dashboard({ t,getEditor,initialBook,initialChapter,initialDiscover,shelf,reloadShelf,slotProps }) {
+  const {pageChrome,page:hostPage,updatePage}=slotProps
+  const title = t('title')
   const books = shelf.books
   const [selected, setSelected] = useState('')
   const [data, setData] = useState(null)
@@ -77,10 +80,23 @@ function Dashboard({ t,getEditor,initialBook,initialChapter,initialDiscover,ctx,
   }
   useEffect(() => { void load(initialBook,initialDiscover); return () => active.current?.abort() }, [initialBook,initialChapter,initialDiscover])
   useEffect(()=>{
+    const current=shelf.books.find(book=>book.path===selected&&!book.error)
+    if(current)setData(value=>value&&value.name!==current.name?{...value,name:current.name}:value)
+    else if(selected){active.current?.abort();setData(null);setError('此作品已移出书架，请返回 Global Dashboard。')}
+  },[shelf,selected])
+  useEffect(()=>{
     if(expanded===null)return
     const frame=requestAnimationFrame(()=>chapterBrowser.current?.querySelector('.lgd-chapter-open .lgd-chapter-head')?.scrollIntoView({block:'nearest'}))
     return()=>cancelAnimationFrame(frame)
   },[expanded,page])
+
+  useEffect(()=>{
+    if(hostPage && hostPage.title!==title)updatePage?.({title})
+  },[title,hostPage?.title,updatePage])
+  function renamed(saved) {
+    setData(current=>current?.id===saved.id&&current.path===saved.path?{...current,...saved}:current)
+    window.dispatchEvent(new Event('lg-books-changed'))
+  }
 
   const chapters = data?.chapters.filter(chapter => (!pendingOnly||chapter.pendingVersions>0)&&chapter.title.toLowerCase().includes(query.toLowerCase())) ?? []
   const totalPages = Math.max(1, Math.ceil(chapters.length / CHAPTERS_PER_PAGE))
@@ -93,23 +109,23 @@ function Dashboard({ t,getEditor,initialBook,initialChapter,initialDiscover,ctx,
     setQuery('');setPendingOnly(false);setPage(Math.floor(data.chapters.findIndex(c=>c.id===chapter.id)/CHAPTERS_PER_PAGE));setExpanded(chapter.id)
     requestAnimationFrame(()=>chapterBrowser.current?.scrollIntoView({block:'nearest'}))
   }
+  const headerActions=<div className="lgd-header-actions lgd-page-actions">
+      <button disabled={busy} onClick={()=>load(selected,true)}>{busy?t('loading'):t('refresh')}</button></div>
   return <main className="lgd-page lgd-book-page">
     <style>{styles}</style>
-    <header className="lgd-header lgd-topbar" data-window-drag><h1>{t('title')}</h1>
-      <div className="lgd-header-actions"><button onClick={onShelf}>‹ {ctx.locale.getLocale?.().active==='zh'?'全局 Dashboard':'Global Dashboard'}</button>
-      <button disabled={busy} onClick={()=>load(selected,true)}>{busy?t('loading'):t('refresh')}</button></div></header><div className="lgd-canvas">
+    {pageChrome?.actions ? pageChrome.actions(headerActions) : <header className="lgd-header lgd-topbar" data-window-drag><h1>{title}</h1>{headerActions}</header>}<div className="lgd-canvas">
     {error&&<p role="alert" className="lgd-error">{error}</p>}
     {books.filter(book=>book.error).map(book=><p className="lgd-error" key={book.path}>{book.path}: {book.error}</p>)}
-    {!data&&!busy&&!error&&<section className="lgd-empty"><BookIcon size={36}/><h2>{t('empty')}</h2><p>{t('emptyHint')}</p><button onClick={onShelf}>‹ {ctx.locale.getLocale?.().active==='zh'?'全局 Dashboard':'Global Dashboard'}</button></section>}
+    {!data&&!busy&&!error&&<section className="lgd-empty"><BookIcon size={36}/><h2>{t('empty')}</h2><p>{t('emptyHint')}</p></section>}
     {busy&&<p role="status" className="lgd-muted">{t('loading')}</p>}
     {data&&<>
       <div className="lgd-overview-grid">
-        <Card icon="data" title={t('bookStats')} meta={t('activeData')}>
+        <Card icon="data" title={t('bookStats')} meta={t('activeData')} secondaryMeta>
           <div className="lgd-metrics">{[['words',data.words],['chapters',data.chapters.length],['candidates',data.counts.candidates],['facts',data.counts.facts]].map(([label,value],i)=><div className="lgd-metric" key={label}><b style={{color:palette[i]}}>{number(value)}</b><span>{t(label)}</span></div>)}</div>
           <div className="lgd-ledgers"><div><div className="lgd-ledger-title"><b>{t('manuscript')}</b><strong>{number(data.words)}</strong></div><div className="lgd-chips"><span><i style={{background:palette[0]}}/>{t('acceptedWords')} <b>{number(data.acceptedWords)}</b></span><span><i style={{background:palette[1]}}/>{t('draftWords')} <b>{number(Math.max(0,data.words-data.acceptedWords))}</b></span></div></div>
           <div><div className="lgd-ledger-title"><b>{t('needsAttention')}</b><strong>{number(data.counts.issues)}</strong></div><div className="lgd-chips"><span><i style={{background:palette[2]}}/>{t('proposals')} <b>{number(data.counts.proposals)}</b></span><span><i style={{background:palette[3]}}/>{t('foreshadowing')} <b>{number(data.counts.foreshadowing)}</b></span></div></div></div>
         </Card>
-        <Card icon="book" title={t('overview')} className="lgd-book-info"><h3>{data.name}</h3><p className="lgd-synopsis">{data.overview||t('noOverview')}</p><details className="lgd-location"><summary>{t('bookLocation')}</summary><small>{data.path}</small></details></Card>
+        <Card icon="book" title={t('overview')} className="lgd-book-info"><BookTitle book={data} t={t} onSaved={renamed}/><p className="lgd-synopsis">{data.overview||t('noOverview')}</p><details className="lgd-location"><summary>{t('bookLocation')}</summary><small>{data.path}</small></details></Card>
       </div>
       <StoryData key={data.path+':story-data'} path={data.path}/>
       <div className="lgd-columns">
@@ -117,7 +133,7 @@ function Dashboard({ t,getEditor,initialBook,initialChapter,initialDiscover,ctx,
         <Composition icon="gauge" title={t('chapterCoverage')} rows={coverage} total={data.chapters.length} label={t('chapterUnit')} t={t}/>
       </div>
       <div className="lgd-columns lgd-main-columns">
-        <div className="lgd-column lgd-progress-reference"><Card icon="book" title={t('currentManuscript')} meta={t('wordsHint')}><div className="lgd-progress-number"><strong>{number(data.acceptedWords)} <small>/ {number(data.words)} {t('wordUnit')}</small></strong><span><b>{data.words?Math.round(data.acceptedWords/data.words*100):0}%</b> {t('adoptionRate')}</span></div>
+        <div className="lgd-column lgd-progress-reference"><Card icon="book" title={t('currentManuscript')} meta={t('wordsHint')} secondaryMeta><div className="lgd-progress-number"><strong>{number(data.acceptedWords)} <small>/ {number(data.words)} {t('wordUnit')}</small></strong><span><b>{data.words?Math.round(data.acceptedWords/data.words*100):0}%</b> {t('adoptionRate')}</span></div>
           <div className="lgd-progress-track">{wordRows.map((row,i)=><i key={row.label} style={{width:(data.words?row.value/data.words*100:0)+'%',background:palette[i]}}/>)}</div><div className="lgd-chips">{wordRows.map((row,i)=><span key={row.label}><i style={{background:palette[i]}}/>{row.label} <b>{number(row.value)}</b></span>)}</div></Card>
           <ChapterChart key={data.path} chapters={data.chapters} t={t} onChoose={chooseChapter}/>
           <BookSupervision key={data.path} book={data} t={t} disabled={busy}/>
@@ -161,15 +177,14 @@ function DashboardRoot({ctx,t,slotProps,navigation,legacy}) {
   const [choosing,setChoosing]=useState(false)
   const {shelf,error,busy:shelfLoading,reload:reloadShelf,accept:setShelf}=useShelf()
   const showGlobal=()=>navigation.openGlobal()
-  const home=()=>{showGlobal();void reloadShelf()}
   if(error)return <div role="alert"><p>{error}</p><button disabled={shelfLoading} onClick={reloadShelf}>{t('retry')}</button></div>
   if(!shelf)return null
   if(!shelf.booksPath||!shelf.libraryPath||shelf.error||choosing)return <DirectoryChooser ctx={ctx} initial={shelf} onLoaded={s=>{setShelf(s);setChoosing(false);showGlobal()}} onCancel={shelf.booksPath&&shelf.libraryPath&&!shelf.error?()=>setChoosing(false):undefined}/>
   if(!view)return <GlobalDashboard ctx={ctx} slotProps={slotProps} shelf={shelf} shelfLoading={shelfLoading} onRefresh={reloadShelf} onChangeRoot={()=>setChoosing(true)}
     onOpenBook={(path,chapter)=>navigation.openBook(path,chapter)}/>
-  return <div className="lgg-book-shell"><style>{globalStyles}</style><Dashboard key={view.path??'manage'} ctx={ctx} onShelf={home} shelf={shelf} reloadShelf={reloadShelf}
+  return <div className="lgg-book-shell"><style>{globalStyles}</style><Dashboard slotProps={slotProps} key={view.path??'manage'} shelf={shelf} reloadShelf={reloadShelf}
     t={t} initialBook={view.path} initialChapter={view.chapter} initialDiscover={view.discover}
-    getEditor={()=>ctx.get('literaryWorkbench')}/>
+    getEditor={()=>ctx.get('literaryReading')}/>
 </div>
 }
 
@@ -185,8 +200,14 @@ export function apply(ctx) {
   }
   const navigation={
     openGlobal:()=>openPage({scope:'pane',key:'default',title:'Global Dashboard',target:{}}),
-    openBook:(path,chapter)=>openPage({scope:'pane',key:path,title:`${path.split('/').filter(Boolean).at(-1)} · Dashboard`,target:{path,chapter,discover:true}}),
+    openBook:(path,chapter,placement)=>openPage({placement,scope:'pane',key:path,title:t('title'),target:{path,chapter,discover:true}}),
   }
+  ctx.effect(()=>ctx.contextMenus.register({id:'lg-dashboard.open-book',target:'workspace',order:50,
+    observe:()=>[ctx.locale],
+    resolve:target=>[{id:'open',label:ctx.locale.getLocale?.().active==='zh'?'打开方式':'Open in',children:[{
+      id:'split',label:ctx.locale.getLocale?.().active==='zh'?'分栏打开':'Split view',run:()=>navigation.openBook(target.path,undefined,'split'),
+    }]}],
+  }),'lg-dashboard: open book in split view')
   const showGlobal=()=>navigation.openGlobal()
   ctx.effect(()=>bindBookshelfEntry(document,showGlobal),'lg-dashboard: bookshelf home')
   ctx.provide('literaryDashboard',navigation)
@@ -194,5 +215,5 @@ export function apply(ctx) {
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'lg-dashboard', locale: 'lg-dashboard' }, props =>
     <DashboardRoot navigation={navigation} legacy={legacy} ctx={ctx} t={t} slotProps={props}/>))
   ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-dashboard',
-    order: 15, locale: 'lg-dashboard', label: () => ctx.locale.getLocale?.().active==='zh'?'书架总览':'Bookshelf' }, BookshelfIcon))
+    order: 15, locale: 'lg-dashboard', label: () => 'Global Dashboard' }, BookshelfIcon))
 }

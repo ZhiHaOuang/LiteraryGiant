@@ -50,7 +50,7 @@ export function makeOverviewUsage(kit: ViewKit): (props: OverviewUsageProps) => 
       if (maxCost <= 0) return '—'
       return percent === 0 ? '0' : formatCost((maxCost * percent) / 100, props.currency)
     }
-    useLayoutEffect(()=>{const el=plot.current;if(!el)return;const measure=()=>setSize({width:el.clientWidth,height:el.clientHeight});measure();const observer=new ResizeObserver(measure);observer.observe(el);return()=>observer.disconnect()},[empty,window.length])
+    useLayoutEffect(()=>{const el=plot.current;if(!el)return;const measure=()=>{const width=el.clientWidth,height=el.clientHeight;setSize(current=>current.width===width&&current.height===height?current:{width,height})};measure();const observer=new ResizeObserver(measure);observer.observe(el);return()=>observer.disconnect()},[empty,window.length])
     const tipWidth=Math.min(180,size.width),columnWidth=(size.width-6*(columns.length-1))/Math.max(1,columns.length)
     useEffect(()=>{
       if(at===null||!columns[at]){was.current=null;ringX.set(0);ringY.set(0);ringH.set(0);tipX.set(0);return}

@@ -1,5 +1,9 @@
 {
-  "title": "小说控制台",
+  "renameBook": "更改书名",
+  "bookName": "书名",
+  "saveName": "保存",
+  "cancelName": "取消",
+  "title": "Novel Dashboard",
   "book": "当前作品",
   "choose": "选择作品",
   "path": "作品目录的绝对路径",
@@ -57,7 +61,7 @@
   "index.saved": "已保存",
   "index.backup": "原索引备份",
   "meta": {
-    "title": "小说控制台",
+    "title": "Novel Dashboard",
     "description": "从小说内容查看简介、字数、章节、人物、事实与伏笔。"
   },
   "index.unannotated": "当前版本尚无标注",

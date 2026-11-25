@@ -1,3 +1,4 @@
+import {characterPortraits,compareSource} from './presentation-fields.js'
 import {references} from './validate.js'
 import catalog from './catalog.json' with {type:'json'}
 
@@ -50,18 +51,6 @@ export function sourceLocations(documents,chapters){
  }))
 }
 
-function compareSource(a,b){
- const left=a.display.source,right=b.display.source
- const chapter=(left?.chapter??Infinity)-(right?.chapter??Infinity)
- if(chapter)return chapter
- const l=left?.document_order??[],r=right?.document_order??[]
- for(let i=0;i<Math.max(l.length,r.length);i++){
-  const delta=(l[i]??-1)-(r[i]??-1)
-  if(delta)return delta
- }
- return (left?.paragraph??Infinity)-(right?.paragraph??Infinity)||0
-}
-
 export function presentStoryRecords(records,locations){
  const counts=new Map(),names=new Map(records.filter(r=>r.type==='entity').map(r=>[r.id,r.payload.name]))
  const roles=characterRoles(records)
@@ -97,6 +86,10 @@ export function presentStoryRecords(records,locations){
    ...(record.type==='world_rule'?{reader_visibility:{state:(revelations.get(record.id)??[]).some(r=>r.presentation!=='hint')?'revealed':'unmarked',revelations:revelations.get(record.id)??[]}}:{}),
    ...(record.type==='entity'&&p.entity_kind==='character'?{character_role:roles.get(record.id)??{prominence:'unknown',status:'unrated',approval:null,roles:[],assignments:[]}}:{})}}
  })
+ const portraits=characterPortraits(presented)
+ for(const person of presented){
+  if(person.display.character_role)person.display.character_portrait=portraits.get(person.id)??null
+ }
  // Do not collapse records with the same label. Distinguish even identical excerpts deterministically.
  const duplicates=new Map()
  for(const record of presented){
@@ -110,13 +103,24 @@ export function presentStoryRecords(records,locations){
  return presented
 }
 
+function prominenceIndex(record,sort){
+ const role=record.display?.character_role
+ let level=role?.prominence??'unknown'
+ // The explicit rating sort follows the card's visible stage rating when its scopes agree.
+ if(sort==='importance'&&role?.status==='scoped'&&role.assignments.length){
+  const first=role.assignments[0].prominence
+  if(role.assignments.every(r=>r.prominence===first))level=first
+ }
+ return prominenceOrder.indexOf(level)
+}
+
 export function sortStoryRecords(records,sort='recommended',type=''){
  const entityOrder=(a,b)=>entityKinds.indexOf(a.payload.entity_kind)-entityKinds.indexOf(b.payload.entity_kind)
  return [...records].sort((a,b)=>{
   const name=()=>compareText(a.display.title,b.display.title)||compareText(a.id,b.id)
   if(sort==='name')return name()
   if(type==='entity'&&['recommended','importance','references'].includes(sort)){
-   const importance=sort==='references'?0:prominenceOrder.indexOf(a.display.character_role?.prominence??'unknown')-prominenceOrder.indexOf(b.display.character_role?.prominence??'unknown')
+   const importance=sort==='references'?0:prominenceIndex(a,sort)-prominenceIndex(b,sort)
    const rank=entityOrder(a,b)||importance||b.display.related_count-a.display.related_count
    if(rank)return rank
   }

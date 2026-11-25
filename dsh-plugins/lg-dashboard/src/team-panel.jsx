@@ -6,10 +6,10 @@ import {AgentSparkline,Companions} from './team-roster.jsx'
 import {dateKeys,localDay} from './global-data.js'
 import {previewUsageDays} from './roster-data.js'
 import {agentCatalog} from './team-data.js'
-import coordinatorAvatar from './assets/coordinator-avatar.png'
-import analysisAvatar from './assets/analysis-avatar.png'
-import planningAvatar from './assets/planning-avatar.png'
-import writingAvatar from './assets/writing-avatar.png'
+import coordinatorAvatar from './assets/display/coordinator-avatar.png'
+import analysisAvatar from './assets/display/analysis-avatar.png'
+import planningAvatar from './assets/display/planning-avatar.png'
+import writingAvatar from './assets/display/writing-avatar.png'
 const avatars={coordinator:coordinatorAvatar,analysis:analysisAvatar,planning:planningAvatar,writing:writingAvatar}
 const names={coordinator:'主 Agent',analysis:'分析',planning:'规划',writing:'创作'}
 const statuses={starting:'准备中',running:'执行中',completed:'候选已完成',failed:'失败',cancelled:'已取消',interrupted:'已中断'}

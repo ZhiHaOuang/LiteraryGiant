@@ -7,14 +7,15 @@ const {_electron:electron}=await import(process.env.LG_PLAYWRIGHT_MODULE)
 const stage=process.env.LG_DASHBOARD_TEST_ROOT,out=process.env.LG_PREVIEW_DIR
 assert.ok(stage&&out&&existsSync(stage+'/.dashboard-test-profile'))
 await mkdir(out,{recursive:true})
-await build({entryPoints:[fileURLToPath(new URL('./dialogue-layout-fixture.jsx',import.meta.url))],outfile:out+'/dialogue-fixture.js',bundle:true,format:'iife',platform:'browser',loader:{'.css':'text','.png':'dataurl'},nodePaths:[process.env.LG_REACT_MODULE_DIR,process.env.LG_REACT_DOM_MODULE_DIR].filter(Boolean)})
+await build({entryPoints:[fileURLToPath(new URL('./dialogue-layout-fixture.jsx',import.meta.url))],outfile:out+'/dialogue-fixture.js',bundle:true,format:'iife',platform:'browser',loader:{'.css':'text','.png':'dataurl'},alias:{react:process.env.LG_REACT_MODULE_DIR+'/react','react-dom':process.env.LG_REACT_DOM_MODULE_DIR+'/react-dom'}})
 await writeFile(out+'/dialogue-fixture.html','<!doctype html><meta charset="utf-8"><div id="root"></div><script src="dialogue-fixture.js"></script>')
-let app
+let app,win
 try{
  app=await electron.launch({executablePath:process.env.LG_APP_EXECUTABLE,args:['--user-data-dir='+stage+'/userData'],env:{...process.env,DSH_HOME:stage+'/home'}})
+ await app.firstWindow()
  const next=app.waitForEvent('window')
  await app.evaluate(({BrowserWindow},file)=>{const w=new BrowserWindow({width:800,height:600,webPreferences:{backgroundThrottling:false}});void w.loadFile(file)},out+'/dialogue-fixture.html')
- const win=await next;win.setDefaultTimeout(15000);const errors=[];win.on('pageerror',e=>errors.push(e.message))
+ win=await next;win.setDefaultTimeout(15000);const errors=[];win.on('pageerror',e=>(errors.push(e.message),console.log('RENDER ERROR:',e.message)))
  const card=win.locator('.lgt-companions'),visible='.lgt-comic-bubble:not([data-hidden]):not(.lgt-bubble-measure)'
  const check=async count=>{
   await win.waitForFunction(({visible,count})=>document.querySelectorAll(visible).length===count,{visible,count});await win.waitForTimeout(600)
@@ -53,6 +54,14 @@ try{
  await card.screenshot({path:out+'/balanced-three.png'})
  await win.evaluate(()=>document.querySelector('.lgd-page').style.width='360px');await check(3)
  await card.screenshot({path:out+'/balanced-three-narrow.png'})
+ await win.evaluate(()=>document.querySelector('.lgd-page').style.width='228px')
+ await win.getByRole('button',{name:'Asymmetric dialogue'}).click()
+ await win.waitForFunction(()=>[...document.querySelectorAll('.lgt-comic-bubble:not(.lgt-bubble-measure)')].some(e=>e.textContent.startsWith('我偶尔想你')))
+ await check(3)
+ const asymmetric=await card.locator(visible).evaluateAll(els=>els.map(el=>({width:el.offsetWidth,lines:(el.offsetHeight-10)/14,text:el.textContent})))
+ assert.ok(asymmetric[0].text.startsWith('我偶尔想你')&&asymmetric[0].width>=100&&asymmetric[0].lines<=3,JSON.stringify(asymmetric))
+ assert.ok(asymmetric.slice(1).every(b=>b.width<40&&b.lines===1),JSON.stringify(asymmetric))
+ await card.screenshot({path:out+'/balanced-asymmetric.png'})
  await win.evaluate(()=>{const page=document.querySelector('.lgd-page');page.style.width='280px';page.style.height='500px'})
  await win.getByRole('button',{name:'Long dialogue'}).click()
  await win.waitForFunction(()=>[...document.querySelectorAll('.lgt-comic-bubble:not(.lgt-bubble-measure)')].some(e=>e.textContent.includes('再多等待')))
@@ -79,4 +88,5 @@ try{
  await win.emulateMedia({reducedMotion:'reduce'});await win.waitForTimeout(400)
  assert.equal(await card.locator(visible).count(),0);assert.deepEqual(errors,[])
  console.log('PASS: available-space clipping, stable avatar anchor, full long text when space permits, preplanned height, weighted two/three-lane widths, centered bubbles, aligned tails, two permanent avatar groups, independent speech lanes, gray third line, equal frame padding, narrow no overlap, reduced motion, zero page errors.')
-}finally{if(app)await app.close()}
+}catch(error){if(win){console.log(await win.evaluate(()=>({url:location.href,ready:document.readyState,html:document.body.innerHTML.slice(0,1000)})));await win.screenshot({path:out+'/dialogue-failure.png'})}throw error}
+finally{if(app)await app.close()}

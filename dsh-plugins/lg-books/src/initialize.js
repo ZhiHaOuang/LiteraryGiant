@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { DatabaseSync } from 'node:sqlite'
 import { digest } from './manuscript.js'
 import { describeBook, openBook } from './read.js'
+import { bookName } from './book-title.js'
 import { ensurePolicy } from './supervision-policy.js'
 import templates from './templates.json' with { type: 'json' }
 function statOrNull(path) {
@@ -12,14 +13,14 @@ function statOrNull(path) {
 const schema = readFileSync(new URL('./schema.sql', import.meta.url), 'utf8')
 function target(path, name) {
   if (typeof path !== 'string' || !isAbsolute(path)) throw new Error('新作品需要绝对目录。')
-  if (typeof name !== 'string' || !name.trim() || name.length > 200) throw new Error('请填写 1–200 字的作品名称。')
+  const title = bookName(name)
   const normalized = resolve(path), parent = realpathSync(dirname(normalized)), root = join(parent, basename(normalized))
   if (root === parent) throw new Error('不能将文件系统根目录作为作品。')
   const stat = lstatSync(parent)
   if (!stat.isDirectory()) throw new Error('作品的上级目录必须存在。')
   const existing = statOrNull(root)
   if (existing && (existing.isSymbolicLink() || !existing.isDirectory())) throw new Error('作品目录不能是符号链接或普通文件。')
-  return { path: root, name: name.trim(), parent: { dev: stat.dev, ino: stat.ino } }
+  return { path: root, name: title, parent: { dev: stat.dev, ino: stat.ino } }
 }
 function safe(root, relative) {
   let path = root

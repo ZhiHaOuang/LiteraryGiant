@@ -51,9 +51,9 @@ export function StoryModuleDeck({section,onSection,stats,loaded,children}){
    return <section key={item.id} data-section={item.id} data-expanded={expanded} className={'lgd-card lgd-story-module'+(expanded?' lgd-module-expanded':'')}>
     <div className="lgd-module-summary">
      <button type="button" id={control} data-section={item.id} className="lgd-module-trigger" aria-labelledby={control+'-title'} aria-expanded={expanded} aria-controls={expanded?panel:undefined} onClick={()=>{pendingFocus.current=item.id;onSection(expanded?'':item.id)}}/>
-     <h2 className="lgd-module-title"><Icon name={item.icon}/><span id={control+'-title'}>{item.title}</span><span className="lgd-module-chevron" aria-hidden="true">{expanded?'⌃':'⌄'}</span></h2>
+     <h2 className="lgd-module-title"><Icon name={item.icon}/><span id={control+'-title'}>{item.title}</span></h2>
      <span className="lgd-module-description">{item.description}</span>
-     <span className="lgd-module-stats">{stats[item.id].map(([label,count])=><span key={label}><span className="lgd-module-stat-label">{label}</span><strong>{loaded?number(count):'—'}</strong></span>)}</span>
+     {(!expanded||item.id!=='people')&&<span className="lgd-module-stats">{stats[item.id].map(([label,count])=><span key={label}><span className="lgd-module-stat-label">{label}</span><strong>{loaded?number(count):'—'}</strong></span>)}</span>}
      <span className="lgd-module-topics">{item.topics.map(title=><span key={title}>{title}</span>)}</span>
     </div>
     {expanded&&<div id={panel} role="region" aria-labelledby={control+'-title'} className="lgd-story-data lgd-story-detail">{children}</div>}

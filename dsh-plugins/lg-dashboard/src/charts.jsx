@@ -3,12 +3,12 @@ import React, { useState } from 'react'
 
 export const number = value => Number(value ?? 0).toLocaleString()
 export const palette = ['var(--lgd-primary, #327dff)', 'var(--lgd-accent, var(--dsw-alias-brand-primary, #d97757))', '#8b50ff', '#18b49b']
-export function Card({title,meta,children,className='',icon='book'}) {
-  return <section className={'lgd-card '+className}><div className="lgd-section-head"><h2><Icon name={icon}/>{title}</h2>{meta&&<span className="lgd-meta">{meta}</span>}</div>{children}</section>
+export function Card({title,meta,secondaryMeta=false,children,className='',icon='book'}) {
+  return <section className={'lgd-card '+className}><div className="lgd-section-head"><h2><Icon name={icon}/><span className="lgd-card-title" title={typeof title==='string'?title:undefined}>{title}</span></h2>{meta&&<div className={'lgd-meta'+(secondaryMeta?' lgd-meta-secondary':'')}>{meta}</div>}</div>{children}</section>
 }
 export function Composition({title,rows,total,label,t,icon='data'}) {
   let offset=0
-  return <Card title={title} icon={icon} meta={t('activeData')}>
+  return <Card title={title} icon={icon} meta={t('activeData')} secondaryMeta>
     <div className="lgd-composition"><div className="lgd-ring">
       <svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="39" fill="none" stroke="var(--lgd-track)" strokeWidth="10"/>
         {rows.map((row,i)=>{const share=total>0?row.value/total*100:0;const start=offset;offset+=share;return share>0&&<circle key={row.label} cx="50" cy="50" r="39" pathLength="100" fill="none" stroke={palette[i]} strokeWidth="10" strokeDasharray={`${share} ${100-share}`} strokeDashoffset={-start} transform="rotate(-90 50 50)"/>})}</svg>

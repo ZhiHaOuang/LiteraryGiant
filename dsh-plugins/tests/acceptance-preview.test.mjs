@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { reviewAcceptance } from '../lg-workbench/src/api.js'
+import { reviewAcceptance } from '../lg-review/src/api.js'
 
 test('author previews retain the candidate identity and fail closed without a review receipt',async t=>{
   const candidate={path:'/test/book',document:2,version:9,token:'chapter',action:'accept',operation:'preview-operation'}

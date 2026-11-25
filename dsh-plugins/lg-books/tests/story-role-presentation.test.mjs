@@ -7,6 +7,7 @@ import {createStoryFixture} from './story-data-fixture.mjs'
 import {readStoryData,importStoryData} from '../src/story-data/store.js'
 import {readStoryTime} from '../src/story-data/queries.js'
 import {presentStoryRecords,sortStoryRecords} from '../src/story-data/presentation.js'
+import {characterPortraits} from '../src/story-data/presentation-fields.js'
 
 function fixture(){
  const root=mkdtempSync(join(process.env.LG_STORY_TEST_ROOT??tmpdir(),'lg-role-view-')),batch=createStoryFixture(root)
@@ -40,6 +41,25 @@ test('scoped or uncertain-time roles stay inspectable without becoming whole-boo
  assert.equal(profile.status,'scoped')
 })
 
+test('explicit character rating sort uses consistent scoped labels before reference counts and pagination',()=>{
+ const {root,batch,make}=fixture()
+ const scoped=(id,level)=>{
+  const role=make(id,level)
+  role.scope={kind:'arc',description:'第一卷',targets:[]}
+  delete role.approval;delete role.freshness;delete role.related_changed
+  return {record:role,expected_revision:null}
+ }
+ importStoryData(root,{...batch,operation:'scoped-sort',run:{...batch.run,id:'scoped-sort'},records:[
+  scoped('person:yuan','core'),scoped('person:lin','supporting'),
+ ]})
+ const page=readStoryData(root,{type:'entity',entity_kind:'character',sort:'importance',limit:1})
+ assert.equal(page.records[0].id,'person:yuan')
+ assert.equal(page.records[0].display.character_role.status,'scoped')
+ const conflicting=scoped('person:yuan','minor');conflicting.record.id='role:later'
+ importStoryData(root,{...batch,operation:'conflicting-sort',run:{...batch.run,id:'conflicting-sort'},records:[conflicting]})
+ assert.equal(readStoryData(root,{type:'entity',entity_kind:'character',sort:'importance',limit:1}).records[0].id,'person:lin')
+})
+
 test('contradictory global ratings stay unresolved; visible confirmed ratings precede candidates',()=>{
  const {root,make}=fixture(),core=make('person:lin','core','role:core'),minor=make('person:lin','minor','role:minor')
  let profile=projected(root,[core,minor]).find(r=>r.id==='person:lin').display.character_role
@@ -66,4 +86,31 @@ test('real v1.1 records drive both book and temporal entity lists; cutoff exclud
  assert.equal(readStoryTime(root,{include_candidates:true}).entities[0].id,'person:yuan')
  assert.equal(readStoryData(root,{type:'entity',through_chapter:2}).records.find(r=>r.id==='person:yuan').display.character_role.prominence,'unknown')
  assert.equal(readStoryTime(root).entities.length,0)
+})
+
+test('a card features a visible current portrait of this exact character',()=>{
+ const {root}=fixture(),rows=readStoryData(root,{limit:200}).records
+ const lin=rows.find(r=>r.id==='person:lin'),yuan=rows.find(r=>r.id==='person:yuan')
+ const original=rows.find(r=>r.type==='portrait')
+ const behavior={...original,id:'portrait:behavior',payload:{...original.payload,aspect:'behavior',description:'遇到逆风仍会出船。'}}
+ const choose=entries=>presentStoryRecords([lin,yuan,...entries],new Map()).slice(0,2).map(r=>r.display.character_portrait)
+ assert.equal(choose([original,behavior])[0].description,behavior.payload.description)
+ assert.equal(choose([behavior,{...original,approval:'confirmed'}])[0].description,original.payload.description)
+ for(const patch of [{approval:'rejected'},{approval:'withdrawn'},{freshness:'stale'},{related_changed:['person:lin']}]){
+  assert.deepEqual(choose([{...original,...patch}]),[null,null])
+ }
+ assert.equal(choose([behavior])[1],null)
+ const hidden=readStoryData(root,{type:'entity',confirmed_only:true})
+ assert.ok(hidden.records.every(r=>!r.display.character_portrait))
+})
+
+test('short labels retain their subject, source and review status and omit ambiguous titles',()=>{
+ const person={id:'l',payload:{name:'林澈',aliases:['守灯人'],entity_kind:'character'}}
+ const portrait=(id,title,extra={})=>({id,title,type:'portrait',freshness:'current',related_changed:[],approval:'candidate',
+  payload:{subject:'l',aspect:'value',description:'保留来信。'},...extra})
+ const summarize=rows=>characterPortraits(rows,[person]).get('l').traits
+ assert.deepEqual(summarize([portrait('a','守灯人的谨慎与克制')]),[
+  {record_id:'a',label:'谨慎',approval:'candidate'},{record_id:'a',label:'克制',approval:'candidate'}])
+ assert.deepEqual(summarize([portrait('b','林澈的克制',{approval:'confirmed'}),portrait('a','林澈的谨慎与克制')]).map(t=>t.label),['克制','谨慎'])
+ assert.deepEqual(summarize([portrait('a','邻人的谨慎'),portrait('b','林澈的谨慎与克制',{freshness:'stale'}),portrait('c','林澈的谨慎是假象')]),[])
 })

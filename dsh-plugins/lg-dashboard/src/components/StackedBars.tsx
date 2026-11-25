@@ -3,6 +3,7 @@ import {animate, motion, useMotionValue, useReducedMotion} from 'framer-motion';
 import {agentStacks,INPUT_HEIGHT,OUTPUT_HEIGHT,BASE_LIFT} from './agent-stacks.js';
 import {short,percent,seconds,roleColors} from '../team-data.js';
 import {timelineCapacity,timeTooltip,timelinePairs,coarsenTimeline} from './time-stacks.js';
+import {createResizeSettler} from '../resize-settle.js';
 // Bencho Stacked bars, copyright (c) 2026 Lorenzo Cabra, MIT. See ../../LICENSE-bencho.
 // The supplied demo, including its original explanatory comments, is retained in StackedBarsDemo.tsx.
 
@@ -36,8 +37,16 @@ export function StackedBars({timeline:sourceTimeline,groupRole='all',title='Summ
  const root=useRef<HTMLDivElement|null>(null),plot=useRef<HTMLDivElement|null>(null);
  const [tipWidth,setTipWidth]=useState(250),[width,setWidth]=useState(300),[seen,setSeen]=useState(false),[at,setAt]=useState<string|null>(null),[pinned,setPinned]=useState<string|null>(null);
  const selected=pinned?.split(':')[0];
- useEffect(()=>{onCapacity?.(timelineCapacity(width))},[width,onCapacity]);
- const timeline=useMemo(()=>coarsenTimeline(sourceTimeline,timelineCapacity(width)),[sourceTimeline,width]);
+ const capacity=timelineCapacity(width);
+ const capacityUpdate=useRef<ReturnType<typeof createResizeSettler>|null>(null);
+ // Resize locally with existing buckets; request a new resolution once the width settles.
+ useEffect(()=>{
+  if(!onCapacity)return;
+  const update=createResizeSettler(window,onCapacity);capacityUpdate.current=update;
+  return()=>{update.dispose();capacityUpdate.current=null};
+ },[onCapacity]);
+ useEffect(()=>{capacityUpdate.current?.schedule(capacity)},[capacity,onCapacity]);
+ const timeline=useMemo(()=>coarsenTimeline(sourceTimeline,capacity),[sourceTimeline,capacity]);
  const pairs=useMemo(()=>timelinePairs(timeline,groupRole,mode),[timeline,groupRole,mode]);
  useEffect(()=>{setPinned(null);setAt(null)},[timeline?.from,timeline?.to]);
  const osReduced=useReducedMotion(),[themeReduced,setThemeReduced]=useState(false),reduced=osReduced||themeReduced;

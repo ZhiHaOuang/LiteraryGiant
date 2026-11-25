@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { createHash } from 'node:crypto'
 import { readBook, describeBook, containedFile } from '../src/read.js'
+import { renameBook } from '../src/book-title.js'
 import { wordCount } from '../src/summary.js'
 import { createBook } from './fixture.mjs'
 
@@ -65,4 +66,37 @@ test('unrecognized paths cannot create a new database', () => {
   const root=mkdtempSync(join(tmpdir(),'lg-empty-'))
   assert.throws(()=>describeBook(root))
   assert.deepEqual(readdirSync(root),[])
+})
+
+test('renaming preserves book identity, chapter versions and unrelated manifest fields', () => {
+  const {root,db}=setup(), file=join(root,'.literarygiant/project.json')
+  const original=JSON.parse(readFileSync(file,'utf8'))
+  writeFileSync(file,JSON.stringify({...original,authorNote:'保留'}))
+  const before=readBook(root), input={projectId:before.id,expectedName:before.name,name:'  海上来信  '}
+  try {
+    for(const name of [' ', '名'.repeat(201)]) assert.throws(()=>renameBook(root,{...input,name}),/作品名称/)
+    assert.throws(()=>renameBook(root,{...input,projectId:'other'}),/作品标识/)
+    const saved=renameBook(root,input)
+    assert.deepEqual(describeBook(root),{id:before.id,path:before.path,name:'海上来信'})
+    assert.equal(JSON.parse(readFileSync(file,'utf8')).authorNote,'保留')
+    assert.equal(readBook(root).revision,before.revision)
+    assert.equal(db.prepare("SELECT value FROM project_meta WHERE key='project_name'").get().value,saved.name)
+    assert.throws(()=>renameBook(root,{...input,name:'过期修改'}),/书名已变化/)
+    db.prepare("UPDATE project_meta SET value=? WHERE key='project_name'").run(before.name)
+    assert.deepEqual(renameBook(root,input),saved)
+    assert.equal(db.prepare("SELECT value FROM project_meta WHERE key='project_name'").get().value,saved.name)
+  } finally {db.close()}
+})
+
+test('a failed SQLite commit restores the original title and a retry succeeds', () => {
+  const {root,db}=setup(), before=describeBook(root), file=join(root,'.literarygiant/project.json')
+  const original=readFileSync(file,'utf8'), input={projectId:before.id,expectedName:before.name,name:'新书名'}
+  try {
+    db.exec('PRAGMA journal_mode=DELETE; BEGIN')
+    db.prepare('SELECT value FROM project_meta').get()
+    assert.throws(()=>renameBook(root,input),/locked|busy/i)
+    assert.equal(readFileSync(file,'utf8'),original)
+    db.exec('ROLLBACK')
+    assert.equal(renameBook(root,input).name,input.name)
+  } finally {db.close()}
 })

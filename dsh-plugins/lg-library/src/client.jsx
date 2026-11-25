@@ -65,9 +65,9 @@ function Library() {
   </main>
 }
 export function apply(ctx) {
-  ctx.effect(() => ctx.locale.register('lg-library', { zh: { title: '文学资料' }, en: { title: 'Literary references' } }), 'lg-library: locale')
+  ctx.effect(() => ctx.locale.register('lg-library', { zh: { title: '文学资料' }, en: { title: 'Literary References' } }), 'lg-library: locale')
   const t = ctx.locale.bind('lg-library')
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'lg-library', locale: 'lg-library' }, () => <Library/>))
   ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-library', order: 17,
-    locale: 'lg-library', label: () => t('title') }, () => <span aria-hidden="true">▤</span>))
+    locale: 'lg-library', label: () => 'Literary References' }, () => <span aria-hidden="true">▤</span>))
 }

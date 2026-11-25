@@ -1,0 +1,5 @@
+The storage composition bar is bundled from dsh-context 0.82.1,
+copyright 2025 bowenliang123, licensed under Apache-2.0.
+Upstream source: https://github.com/bowenliang123/dsh-context
+See LICENSE-dsh-context. LiteraryGiant supplies storage measurements,
+book-position controls, a shared legend and its own chart styling.

@@ -134,8 +134,8 @@ function Memory() {
   </main>
 }
 export function apply(ctx) {
-  ctx.effect(() => ctx.locale.register('lg-memory', { zh: { title: '故事记忆' }, en: { title: 'Story memory' } }), 'lg-memory: locale')
+  ctx.effect(() => ctx.locale.register('lg-memory', { zh: { title: '故事记忆' }, en: { title: 'Story Memory' } }), 'lg-memory: locale')
   const t = ctx.locale.bind('lg-memory')
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'lg-memory', locale: 'lg-memory' }, () => <Memory/>))
-  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-memory', order: 18, locale: 'lg-memory', label: () => t('title') }, () => <span aria-hidden="true">◇</span>))
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-memory', order: 18, locale: 'lg-memory', label: () => 'Story Memory' }, () => <span aria-hidden="true">◇</span>))
 }

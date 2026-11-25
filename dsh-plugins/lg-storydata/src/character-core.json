@@ -1,0 +1,250 @@
+[
+  {
+    "module": "core@1.identity",
+    "label": "身份与辨识",
+    "facets": [
+      {
+        "id": "name",
+        "label": "名称与称谓",
+        "vocabulary": "本名、别名、化名、绰号、封号、敬称、贬称"
+      },
+      {
+        "id": "identifiers",
+        "label": "基本辨识",
+        "vocabulary": "年龄或年龄段、性别／性别表达、族属／物种、出身地"
+      },
+      {
+        "id": "background",
+        "label": "身份背景",
+        "vocabulary": "家世、成长环境、职业／职务、社会地位、组织归属、阵营归属"
+      },
+      {
+        "id": "identity-layer",
+        "label": "身份层次",
+        "vocabulary": "真实身份、公开身份、掩护身份、被误认身份、旧身份"
+      },
+      {
+        "id": "appearance",
+        "label": "外貌与辨识特征",
+        "vocabulary": "体貌轮廓、发／眼特征、显著标记、体态步态、惯常装束、声音质地"
+      },
+      {
+        "id": "narrative-role",
+        "label": "叙事定位",
+        "vocabulary": "重要程度、叙事身份、视角承担"
+      }
+    ]
+  },
+  {
+    "module": "core@1.goals",
+    "label": "目标与动机",
+    "facets": [
+      {
+        "id": "objective",
+        "label": "目标内容与跨度",
+        "vocabulary": "当场意图、阶段目标、长期追求"
+      },
+      {
+        "id": "driver",
+        "label": "驱动力",
+        "vocabulary": "求生、自保、保护、归属、认可、责任、求知、自主、求强、利益、复仇、赎罪、信念"
+      },
+      {
+        "id": "tradeoff",
+        "label": "阻碍与取舍",
+        "vocabulary": "自身限制、他人阻挠、制度限制、资源短缺、信息不足、目标冲突；代价、底线"
+      },
+      {
+        "id": "progress",
+        "label": "目标进展",
+        "vocabulary": "建议固定为进行中、受阻、搁置、达成、放弃"
+      }
+    ]
+  },
+  {
+    "module": "core@1.personality",
+    "label": "性格与表达",
+    "facets": [
+      {
+        "id": "values",
+        "label": "价值与取舍倾向",
+        "vocabulary": "守诺、重情、重秩序、重自由、重公平、重实效、重名誉、重自保"
+      },
+      {
+        "id": "decisions",
+        "label": "决策与处事倾向",
+        "vocabulary": "审慎、果断、冲动、好疑、冒险、回避冲突、迎面交锋、先观察再行动"
+      },
+      {
+        "id": "emotion",
+        "label": "情绪机制与脆弱点",
+        "vocabulary": "触发因素、外显反应、自我调节、恐惧、软肋、防御方式"
+      },
+      {
+        "id": "expression",
+        "label": "语言与互动风格",
+        "vocabulary": "直陈、反问、讽刺、自嘲、安抚、试探、转移话题、命令、沉默；语域、句式、称呼习惯"
+      },
+      {
+        "id": "persona",
+        "label": "公众面具与内外差异",
+        "vocabulary": "刻意伪装、角色表演、言行反差、价值冲突、自我欺骗"
+      }
+    ]
+  },
+  {
+    "module": "core@1.abilities",
+    "label": "能力与限制",
+    "facets": [
+      {
+        "id": "domain",
+        "label": "能力领域",
+        "vocabulary": "体能、战斗、技艺、专业知识、调查推理、交涉、组织指挥、超凡能力"
+      },
+      {
+        "id": "mastery",
+        "label": "掌握程度",
+        "vocabulary": "初学、可独立使用、熟练、精通；未明"
+      },
+      {
+        "id": "conditions",
+        "label": "条件与边界",
+        "vocabulary": "前置知识、工具／材料、身体条件、环境条件、对象限制、距离／持续时间"
+      },
+      {
+        "id": "cost",
+        "label": "代价与失效",
+        "vocabulary": "消耗、反噬、冷却、受克制、失控、能力暂失"
+      },
+      {
+        "id": "learning",
+        "label": "学习与变化",
+        "vocabulary": "学会、突破、掌握新用法、退化、失去、恢复"
+      }
+    ]
+  },
+  {
+    "module": "core@1.situation",
+    "label": "当前处境与资源",
+    "facets": [
+      {
+        "id": "condition",
+        "label": "生存、身体与持续心理状态",
+        "vocabulary": "生存状态、伤病、中毒、疲惫、恢复中、持续恐惧／哀伤"
+      },
+      {
+        "id": "location",
+        "label": "位置与行动自由",
+        "vocabulary": "所在地、在途、受困、被拘禁、受监视、获释、可自由行动"
+      },
+      {
+        "id": "pressure",
+        "label": "处境与外部压力",
+        "vocabulary": "受追捕、身份暴露风险、期限将至、受保护、被孤立、受制于人"
+      },
+      {
+        "id": "resources",
+        "label": "物资与支配权",
+        "vocabulary": "资金、物品／装备、据点、人员、职权、渠道、时间窗口"
+      },
+      {
+        "id": "appearance-change",
+        "label": "身体外观的阶段变化",
+        "vocabulary": "伤痕、残疾、易容、标记、装束变化"
+      }
+    ]
+  },
+  {
+    "module": "core@1.knowledge",
+    "label": "认知与秘密",
+    "facets": [
+      {
+        "id": "proposition",
+        "label": "认知主题与命题",
+        "vocabulary": "身份、事实、规则、因果、动机、计划、危险"
+      },
+      {
+        "id": "stance",
+        "label": "持有态度",
+        "vocabulary": "相信、怀疑、否认、未确定"
+      },
+      {
+        "id": "source",
+        "label": "知情来源",
+        "vocabulary": "亲历、目击、被告知、听闻、推断、记忆、误导"
+      },
+      {
+        "id": "secret",
+        "label": "信息差与秘密",
+        "vocabulary": "隐藏身份、隐瞒意图、保密事实、错误归因、单方知情、部分揭露"
+      },
+      {
+        "id": "revision",
+        "label": "认知变化",
+        "vocabulary": "首次获知、产生怀疑、修正判断、被证实、被推翻、遗忘"
+      }
+    ]
+  },
+  {
+    "module": "core@1.relationships",
+    "label": "关系与承诺",
+    "facets": [
+      {
+        "id": "family",
+        "label": "血缘、家庭与亲密身份",
+        "vocabulary": "父母／子女、手足、配偶、伴侣、养育／被养育、监护／被监护、家族成员"
+      },
+      {
+        "id": "duty",
+        "label": "社会与职责关系",
+        "vocabulary": "师父／弟子、上级／下属、领主／臣属、雇主／受雇者、同僚、同门、同学"
+      },
+      {
+        "id": "alliance",
+        "label": "合作与利益关系",
+        "vocabulary": "伙伴、盟友、交易方、竞争者、对手、敌对方、庇护／受庇护、依附"
+      },
+      {
+        "id": "attitude",
+        "label": "单向情感与态度",
+        "vocabulary": "信任、怀疑、敬重、亲近、爱慕、依赖、畏惧、敌视、怨恨、嫉妒"
+      },
+      {
+        "id": "visibility",
+        "label": "关系的公开层与阶段变化",
+        "vocabulary": "公开关系、私下约定、伪装关系；建立、缓和、恶化、决裂、修复"
+      },
+      {
+        "id": "obligation",
+        "label": "承诺、债务与未决义务",
+        "vocabulary": "许诺、欠债、欠人情、契约、誓约、保密义务"
+      }
+    ]
+  },
+  {
+    "module": "core@1.milestones",
+    "label": "关键经历与变化",
+    "facets": [
+      {
+        "id": "impact",
+        "label": "经历对人物的作用",
+        "vocabulary": "身份改变、目标转向、认知反转、能力变化、关系转折、资源得失、价值动摇／确立"
+      },
+      {
+        "id": "role",
+        "label": "在事件中的角色",
+        "vocabulary": "决策者、行动者、承受者、见证者、受间接影响者"
+      },
+      {
+        "id": "transition",
+        "label": "变化与延续",
+        "vocabulary": "先前状态 → 新状态；出现先例、延续已有模式、形成转折"
+      },
+      {
+        "id": "sequence",
+        "label": "经历之间的关系",
+        "vocabulary": "先于／后于、触发、促成、阻碍、修正先前判断"
+      }
+    ]
+  }
+]

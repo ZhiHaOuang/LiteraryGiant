@@ -38,15 +38,15 @@ function Director({getEditor}){
       {preview&&<aside><p>{preview.plan.role} · {preview.plan.provider} / {preview.plan.model} · 输入 {preview.plan.inputBytes} 字节 · 本次预留 ¥{preview.plan.reservedCny.toFixed(6)}</p><details><summary>完整模型输入</summary><pre>{preview.plan.modelInput.system+'\n\n'+preview.plan.modelInput.input}</pre></details><button disabled={busy} onClick={()=>work(execute)}>确认范围并执行一次</button></aside>}
       {['running','stopped'].includes(selected.status)&&<button disabled={busy} onClick={()=>work(async()=>{const value=await api('recover',{id:selected.id});await show(selected.id);if(value.recoveryMessage)setError(value.recoveryMessage)})}>检查并恢复原结果</button>}
       {!['completed','dismissed'].includes(selected.status)&&<div><input aria-label="停止或驳回理由" value={reason} maxLength={2000} onChange={e=>setReason(e.target.value)}/><button disabled={!reason.trim()} onClick={stop}>{selected.status==='proposed'&&!busy?'驳回提议':'停止任务'}</button></div>}
-      {body&&<aside><h3>候选正文 · v{body.selected.version_number}</h3><textarea readOnly aria-label="分派生成候选" value={body.selected.content}/><p>尚未自动采用。请在章节编辑台比较并处理此候选。</p></aside>}
+      {body&&<aside><h3>候选正文 · v{body.selected.version_number}</h3><textarea readOnly aria-label="分派生成候选" value={body.selected.content}/><p>尚未自动采用。请在 Reading Review 中查看此候选。</p></aside>}
       {selected.result?.report&&(analysis?<AnalysisReport report={selected.result.report}/>:<aside><h3>审阅报告</h3>{selected.result.report.issues?.length?selected.result.report.issues.map(issue=><p key={issue.id}>{issue.category} · {issue.message}</p>):<p>报告未返回问题；这不代表要求已全部满足。</p>}<p>请在对应审阅面板核对证据、裁决及选择改稿问题。</p></aside>)}
-      {target&&getEditor()&&<button disabled={busy} onClick={()=>work(()=>getEditor().openVersion(path,target.document,target.version))}>在文学编辑台打开此版本</button>}
+      {target&&getEditor()&&<button disabled={busy} onClick={()=>work(()=>getEditor().openVersion(path,target.document,target.version))}>Open in Reading Review</button>}
       {selected.result&&<details><summary>执行结果与回执</summary><pre>{JSON.stringify({...selected.result,run:undefined},null,2)}</pre></details>}
     </article>}
     {error&&<p role="alert">{error}</p>}
   </main>
 }
 export function apply(ctx){
-  ctx.slots.inject('main',()=>ctx.slots.register({name:'main',key:'lg-director'},()=> <Director getEditor={()=>ctx.get('literaryWorkbench')}/>))
-  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-director',order:20,label:()=>'文学任务'},()=> <span aria-hidden="true">↗</span>))
+  ctx.slots.inject('main',()=>ctx.slots.register({name:'main',key:'lg-director'},()=> <Director getEditor={()=>ctx.get('literaryReading')}/>))
+  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-director',order:20,label:()=>'Literary Tasks'},()=> <span aria-hidden="true">↗</span>))
 }

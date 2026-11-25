@@ -1,3 +1,4 @@
+import {characterPortraits} from '../../lg-books/src/story-data/presentation-fields.js'
 import {requestBooks} from './api.js'
 export const STORY_READ_API='lg.story-data.read.v1'
 const object=v=>v!==null&&typeof v==='object'&&!Array.isArray(v)
@@ -26,3 +27,27 @@ export function validateStoryResponse(action,value){
  return value
 }
 export async function requestStory(input,signal){return validateStoryResponse(input.action,await requestBooks(input,signal))}
+
+// A running older books service can return raw portraits without the card summary.
+export async function withCharacterPortraits(page,input,cache,signal,read=requestStory){
+ if(!page.counts.portrait||page.records.every(r=>Object.hasOwn(r.display??{},'character_portrait')
+  &&(!r.display.character_portrait||Array.isArray(r.display.character_portrait.traits))))return page
+ const {through_chapter,confirmed_only,audience,holder}=input.options
+ const scope={through_chapter,confirmed_only,audience,holder}
+ const key=JSON.stringify([input.path,page.book_id,page.data_revision,scope])
+ if(cache.current?.key!==key){
+  const records=[]
+  do{
+   const offset=records.length
+   const batch=await read({action:'story-data',path:input.path,options:{...scope,type:'portrait',limit:200,offset}},signal)
+   signal.throwIfAborted()
+   if(batch.book_id!==page.book_id||batch.data_revision!==page.data_revision||batch.offset!==offset)throw Error('资料已更新，请刷新后查看侧写。')
+   records.push(...batch.records)
+   if(records.length>=batch.total)break
+   if(!batch.records.length)throw Error('人物侧写读取不完整，请刷新。')
+  }while(true)
+  cache.current={key,records}
+ }
+ const portraits=characterPortraits(cache.current.records,page.records)
+ return {...page,records:page.records.map(r=>({...r,display:{...r.display,character_portrait:portraits.get(r.id)??null}}))}
+}

@@ -140,8 +140,8 @@ function Planning({getWorkflows}) {
   </main>
 }
 export function apply(ctx) {
-  ctx.effect(() => ctx.locale.register('lg-planning', { zh: { title: '故事规划' }, en: { title: 'Story planning' } }), 'lg-planning: locale')
+  ctx.effect(() => ctx.locale.register('lg-planning', { zh: { title: '故事规划' }, en: { title: 'Story Planning' } }), 'lg-planning: locale')
   const t = ctx.locale.bind('lg-planning')
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'lg-planning', locale: 'lg-planning' }, () => <Planning getWorkflows={()=>ctx.get('literaryWorkflowPanel')}/>))
-  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-planning', order: 19, locale: 'lg-planning', label: () => t('title') }, () => <span aria-hidden="true">⌘</span>))
+  ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({ name: 'sidebar.panellist', id: 'lg-planning', order: 19, locale: 'lg-planning', label: () => 'Story Planning' }, () => <span aria-hidden="true">⌘</span>))
 }

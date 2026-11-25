@@ -1,14 +1,15 @@
-import {fitBubbleWidths} from './companion-layout.js'
+import {fitBubbleWidths,measureBubbleText} from './companion-layout.js'
+import {createResizeSettler} from './resize-settle.js'
 import React,{useEffect,useRef,useState,useLayoutEffect} from 'react'
 import {motion,animate,useMotionValue,useReducedMotion} from 'framer-motion'
 import {sparkDays} from './roster-data.js'
 import {short} from './team-data.js'
-import lord from './assets/lord-transparent.png'
-import romeo from './assets/romeo-transparent.png'
-import juliet from './assets/juliet-transparent.png'
-import frog from './assets/frog-transparent.png'
-import princess from './assets/princess-transparent.png'
-import yu from './assets/yu-transparent.png'
+import lord from './assets/display/lord-transparent.png'
+import romeo from './assets/display/romeo-transparent.png'
+import juliet from './assets/display/juliet-transparent.png'
+import frog from './assets/display/frog-transparent.png'
+import princess from './assets/display/princess-transparent.png'
+import yu from './assets/display/yu-transparent.png'
 import lines from './companion-lines.json'
 import motionStyles from './companion-motion.css'
 import {dialoguePairs,dialogueScenes,createDialogue,planDialogue} from './companion-dialogue.js'
@@ -42,58 +43,84 @@ const companions=[{image:princess,name:'公主'},{image:frog,name:'青蛙'},{ima
 const pairs=[...dialoguePairs(lines.active),...dialogueScenes(lines.conversations??[])]
 export function Companions({playlist=pairs}){
  const ref=useRef(null),[round,setRound]=useState(null),height=useMotionValue(0),reducedMotion=useReducedMotion()
+ const currentRound=useRef(round),refresh=useRef(()=>{})
  useLayoutEffect(()=>{
-  const root=ref.current,slot=root.parentElement,row=root.querySelector('.lgt-bubble-row'),avatarsRow=root.querySelector('.lgt-avatar-groups');let animation,lastTarget=null,lastWidth=-1
-  const measure=()=>{
-   // Keep the avatar row anchored; bubbles can only use the space above it.
-   const textCap=Math.max(0,slot.clientHeight-avatarsRow.offsetHeight-44) // 18 frame + 8 gap + 10 bubble + 8 top clearance
-   root.style.setProperty('--lgt-bubble-text-height',textCap+'px')
-   root.toggleAttribute('data-no-room',textCap<14)
+  const root=ref.current,slot=root.parentElement,row=root.querySelector('.lgt-bubble-row'),avatarsRow=root.querySelector('.lgt-avatar-groups')
+  const canvas=document.createElement('canvas').getContext('2d'),textMeasures=new Map()
+  let animation,lastTarget=null,lastWidth=null,lastPlan=null,resizing=false
+  const settling=createResizeSettler(window,()=>{resizing=false;root.removeAttribute('data-resizing');measure(true)})
+  const measure=(optimize=false)=>{
+   const round=currentRound.current,plan=round?.plan??planDialogue([]),width=row.clientWidth
+   if(width<=0)return
+   const changed=lastWidth!==null&&width!==lastWidth
+   if(changed){if(!resizing)root.setAttribute('data-resizing','');resizing=true;settling.schedule()}
+   const newScene=lastPlan!==round?.plan
+   optimize=!resizing&&(optimize||lastWidth===null||newScene)
+   lastWidth=width;lastPlan=round?.plan
+   const textCap=Math.max(0,slot.clientHeight-avatarsRow.offsetHeight-44)
    const boxes=[...root.querySelectorAll('.lgt-bubble-space')],avatars=[...root.querySelectorAll('.lgt-companion img')]
    const measures=boxes.map(box=>[...box.querySelectorAll('.lgt-bubble-measure')])
-   if(row.clientWidth!==lastWidth){
-    lastWidth=row.clientWidth
-    const canvas=document.createElement('canvas').getContext('2d'),style=getComputedStyle(measures.flat()[0]??row)
-    canvas.font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
-    const left=row.getBoundingClientRect().left,plan=round?.plan??planDialogue([])
-    const texts=measures.map(items=>Math.max(0,...items.map(el=>canvas.measureText(el.textContent).width)))
-    const anchors=plan.lanes.map((_,side)=>avatars.slice(side*plan.members,(side+1)*plan.members).map(el=>{const a=el.getBoundingClientRect();return a.left+a.width/2-left}))
-    // Measure browser line breaks too: CJK punctuation can wrap earlier than canvas predicts.
-    const widths=fitBubbleWidths(texts,row.clientWidth,anchors,10,(i,w)=>Math.max(1,...measures[i].map(el=>{
-     el.style.width=w+'px';el.style.maxWidth='none'
-     return Math.round((el.offsetHeight-10)/parseFloat(getComputedStyle(el).lineHeight))
-    })))
-    measures.flat().forEach(el=>{el.style.width='';el.style.maxWidth=''})
-    row.style.gridTemplateColumns=widths.map(w=>w+'px').join(' ')
-    // A lane reserves space; its bubble only needs the narrowest width that keeps its line count.
-    measures.forEach((items,i)=>items.forEach(el=>{
-     el.style.width=widths[i]+'px'
-     const height=el.offsetHeight;let lo=14,hi=Math.ceil(widths[i])
-     while(lo<hi){const mid=Math.floor((lo+hi)/2);el.style.width=mid+'px';if(el.offsetHeight<=height)hi=mid;else lo=mid+1}
-     el.style.width=hi+'px'
-    }))
+   const avatarBounds=avatars.map(el=>el.getBoundingClientRect()),rowLeft=row.getBoundingClientRect().left
+   // Cache font metrics across turns. Browser wrapping is measured only at the chosen widths.
+   const style=getComputedStyle(measures.flat()[0]??row),font=`${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+   canvas.font=font
+   const textMeasure=el=>{const key=font+'\n'+el.textContent;if(!textMeasures.has(key))textMeasures.set(key,measureBubbleText(el.textContent,text=>canvas.measureText(text).width));return textMeasures.get(key)}
+   const textWidth=el=>textMeasure(el).width
+   root.style.setProperty('--lgt-bubble-text-height',textCap+'px')
+   root.toggleAttribute('data-no-room',textCap<14)
+   if(resizing){
+    row.style.gridTemplateColumns=plan.weights.map(w=>`minmax(0,${w}fr)`).join(' ')
+   }else if(optimize){
+    const texts=measures.map(items=>Math.max(0,...items.map(textWidth)))
+    const anchors=plan.lanes.map((_,side)=>avatarBounds.slice(side*plan.members,(side+1)*plan.members).map(a=>a.left+a.width/2-rowLeft))
+    row.style.gridTemplateColumns=fitBubbleWidths(texts,width,anchors,6,(side,w)=>Math.max(1,...measures[side].map(el=>textMeasure(el).linesAt(w)))).map(w=>`minmax(0,${w}fr)`).join(' ')
    }
-   for(const bubble of root.querySelectorAll('.lgt-comic-bubble:not([data-hidden]):not(.lgt-bubble-measure)')){
-    const box=bubble.parentElement,bounds=box.getBoundingClientRect(),plan=round.plan,side=Number(box.dataset.lane)
-    const measured=measures[side].find(el=>el.dataset.measureOrder===bubble.dataset.lineOrder)
-    if(measured)bubble.style.width=measured.style.width
-    const text=bubble.querySelector('.lgt-bubble-text');text.toggleAttribute('data-clipped',text.scrollHeight>text.clientHeight+1)
-    const candidates=avatars.slice(side*plan.members,(side+1)*plan.members).map((el,i)=>({index:side*plan.members+i,x:el.getBoundingClientRect().left+el.clientWidth/2-bounds.left}))
-    const target=candidates.filter(a=>a.x>=4&&a.x<=box.clientWidth-4).sort((a,b)=>Math.abs(a.x-box.clientWidth/2)-Math.abs(b.x-box.clientWidth/2))[0]??candidates[0]
-    bubble.dataset.avatarIndex=String(target.index)
-    const center=target.x
-    const left=Math.max(0,Math.min(box.clientWidth-bubble.offsetWidth,center-bubble.offsetWidth/2))
-    bubble.style.left=left+'px';bubble.style.setProperty('--lgt-tail-offset',(center-left-bubble.offsetWidth/2)+'px')
+   // max-width keeps these natural text widths inside their lane during a drag.
+   if(resizing||optimize||newScene)for(const el of measures.flat())el.style.width=Math.ceil(textWidth(el)+15)+'px'
+   if(optimize){
+    // Tighten all final bubbles together. Each binary-search step costs one layout,
+    // not one layout per candidate per lane; this never runs during a resize.
+    const fitting=measures.flat().map(el=>({el,lo:1,hi:el.offsetWidth,height:el.offsetHeight}))
+    while(fitting.some(item=>item.lo<item.hi)){
+     for(const item of fitting)if(item.lo<item.hi){item.mid=Math.floor((item.lo+item.hi)/2);item.el.style.width=item.mid+'px'}
+     const heights=fitting.map(item=>item.el.offsetHeight)
+     fitting.forEach((item,i)=>{if(item.lo<item.hi){if(heights[i]<=item.height)item.hi=item.mid;else item.lo=item.mid+1}})
+    }
+    for(const item of fitting)item.el.style.width=item.hi+'px'
    }
-   const next=round&&round.phase!=='rest'&&textCap>=14?Math.min(textCap+10,Math.max(0,...measures.flat().map(el=>el.offsetHeight))):0
-   if(next===lastTarget)return
+   const bubbles=[...root.querySelectorAll('.lgt-comic-bubble:not([data-hidden]):not(.lgt-bubble-measure)')]
+   for(const bubble of bubbles){
+    const side=Number(bubble.parentElement.dataset.lane)
+    bubble.style.width=measures[side].find(el=>el.dataset.measureOrder===bubble.dataset.lineOrder).style.width
+   }
+   // Read in one batch after applying sizes; never alternate writes/reads per candidate.
+   const bounds=boxes.map(box=>box.getBoundingClientRect())
+   const heights=measures.flat().map(el=>el.offsetHeight)
+   const positions=bubbles.map(bubble=>{
+    const side=Number(bubble.parentElement.dataset.lane),box=bounds[side],bubbleWidth=bubble.offsetWidth
+    const text=bubble.querySelector('.lgt-bubble-text'),clipped=text.scrollHeight>text.clientHeight+1
+    const candidates=avatarBounds.slice(side*plan.members,(side+1)*plan.members).map((a,i)=>({index:side*plan.members+i,x:a.left+a.width/2-box.left}))
+    const target=candidates.filter(a=>a.x>=4&&a.x<=box.width-4).sort((a,b)=>Math.abs(a.x-box.width/2)-Math.abs(b.x-box.width/2))[0]??candidates[0]
+    const left=Math.max(0,Math.min(box.width-bubbleWidth,target.x-bubbleWidth/2))
+    return {bubble,text,clipped,index:target.index,left,tail:target.x-left-bubbleWidth/2}
+   })
+   for(const {bubble,text,clipped,index,left,tail} of positions){
+    text.toggleAttribute('data-clipped',clipped);bubble.dataset.avatarIndex=String(index)
+    bubble.style.left=left+'px';bubble.style.setProperty('--lgt-tail-offset',tail+'px')
+   }
+   const next=round&&round.phase!=='rest'&&textCap>=14?Math.min(textCap+10,Math.max(0,...heights)):0
+   if(next===lastTarget&&!resizing)return
    lastTarget=next;animation?.stop()
-   if(reducedMotion||document.body.dataset.dshClaudeMotion==='reduced')height.set(next)
+   if(resizing||reducedMotion||document.body.dataset.dshClaudeMotion==='reduced')height.set(next)
    else animation=animate(height,next,{type:'spring',stiffness:420,damping:28,mass:.7})
   }
-  measure();const observer=new ResizeObserver(measure);observer.observe(root);observer.observe(slot);observer.observe(avatarsRow)
-  return()=>{animation?.stop();observer.disconnect()}
- },[round?.id,round?.phase,round?.turn,reducedMotion])
+  refresh.current=()=>measure();measure()
+  const observer=new ResizeObserver(()=>measure());observer.observe(slot)
+  return()=>{
+   refresh.current=()=>{};settling.dispose();animation?.stop();observer.disconnect();root.removeAttribute('data-resizing')
+  }
+ },[reducedMotion,height])
+ useLayoutEffect(()=>{currentRound.current=round;refresh.current()},[round])
  useEffect(()=>{
   let visible=false
   const reduced=matchMedia('(prefers-reduced-motion: reduce)')

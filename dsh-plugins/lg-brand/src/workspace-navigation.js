@@ -61,3 +61,21 @@ export function bindWorkspaceBooks({workspaces,readBooks,openBook,document,windo
     for(const element of originals.keys())restore(element)
   }
 }
+
+// Keep native dialogs, but route registered books through their authoritative service.
+export function bindBookActions(ctx,requestBooks,onChanged) {
+  const find=async workspaceId=>matchedBook(workspaceId,ctx.workspaces.list.getSnapshot().items,await requestBooks({action:'list'}))
+  ctx.on('uiWorkspace/rename',async(workspaceId,name,next)=>{
+    const book=await find(workspaceId)
+    if(!book)return next()
+    await requestBooks({action:'rename',path:book.path,projectId:book.id,expectedName:book.name,name})
+    onChanged()
+  })
+  ctx.on('uiWorkspace/delete',async(workspaceId,next)=>{
+    const book=await find(workspaceId)
+    if(!book)return next()
+    const shelf=await requestBooks({action:'remove',path:book.path,id:book.id,confirmed:true})
+    onChanged()
+    if(shelf.workspaceErrors?.length)throw Error(shelf.workspaceErrors.map(item=>item.error).join(' · '))
+  })
+}

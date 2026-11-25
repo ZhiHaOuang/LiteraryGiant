@@ -36,7 +36,7 @@ export function RunHistory({api,getEditor,path,disabled}) {
       {r.events.length>0&&<details><summary>公开事件 · {r.events.length}</summary><ol>{r.events.slice(0,limit).map((e,i)=><li key={i}>{e.at} · {e.type} {e.stage} {e.message}</li>)}</ol>
         {limit<r.events.length&&<button onClick={()=>setLimit(limit+30)}>显示更多事件</button>}</details>}
       {r.versions.map(v=><p key={v.version}>{v.slug} · v{v.number} · 版本 ID {v.version}
-        {view.saved&&getEditor()&&<button onClick={()=>work(async()=>{const target=await api('history-version',{token:view.token,version:v.version});getEditor().openVersion(path,target.document,target.version)})}>在编辑台打开历史版本</button>}</p>)}
+        {view.saved&&getEditor()&&<button onClick={()=>work(async()=>{const target=await api('history-version',{token:view.token,version:v.version});getEditor().openVersion(path,target.document,target.version)})}>Open History in Reading Review</button>}</p>)}
       {r.candidateUnavailable&&<p>原任务标记的候选无法与本书版本对应。</p>}
       {view.saved?<p>已保存历史快照。</p>:<button onClick={()=>work(save)}>确认导入此历史快照</button>}
     </section>}

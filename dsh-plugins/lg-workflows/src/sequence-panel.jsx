@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { wordCount } from '../../lg-books/src/summary.js'
-import { reviewAcceptance } from '../../lg-workbench/src/api.js'
-import { Supervision } from '../../lg-workbench/src/supervision.jsx'
+import { reviewAcceptance } from '../../lg-review/src/api.js'
+import { Supervision } from '../../lg-review/src/supervision.jsx'
 
 export function SequencePicker({ path, chapter, request, scenes, setScenes, carry, setCarry }) {
   const [page,setPage] = useState({items:[]}), [error,setError] = useState('')

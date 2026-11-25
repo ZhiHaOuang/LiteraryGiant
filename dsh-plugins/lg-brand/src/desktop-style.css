@@ -1,0 +1,61 @@
+/* LG density on the existing DSH/Claude skin: no replacement controls. */
+body[data-lg-ui][data-dsh-claude-style] {
+  --dsw-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --dsh-claude-font-prose: var(--dsw-font-family);
+  --dsh-claude-font-brand: var(--dsw-font-family);
+  --dsh-claude-font-serif: var(--dsw-font-family);
+}
+
+/* Keep the native menu material, shadows, keyboard navigation and danger ink. */
+body[data-lg-ui] [role="menu"] {
+  border-radius: 8px;
+  padding: 4px;
+  font-family: var(--dsw-font-family);
+  --dsw-radius-lg: 8px;
+  --dsw-radius-md: 6px;
+}
+body[data-lg-ui] [role="menu"] :is([role="menuitem"], [role="menuitemcheckbox"], [role="menuitemradio"]) {
+  min-height: 24px;
+  padding: 2px 7px;
+  gap: 6px;
+  border-radius: 5px;
+  font: 400 13px/20px var(--dsw-font-family);
+}
+body[data-lg-ui] [role="menu"] [data-dsh-claude-part~="menu-item-label"] { font: inherit; }
+body[data-lg-ui] [role="menu"] [role="separator"] { margin-block: 3px; }
+
+/* Align the first child row with its parent row, accounting for the menu's
+   4px inset. Native anchors still own viewport clamping and left-side placement. */
+body[data-lg-ui] [role="menu"][data-contextual][data-submenu-layout="side"] {
+  top: max(var(--dsh-menu-window-top), min(
+    calc(anchor(top) + var(--dsh-submenu-row-offset, 0px) - 4px),
+    calc(100dvh - 12px - var(--dsh-submenu-height, 0px))
+  ));
+}
+
+/* Text density is scoped to chat; manuscript typography remains a reader choice. */
+body[data-lg-ui] [data-chat-flow] {
+  font-family: var(--dsw-font-family);
+  font-size: var(--dsh-content-font-size, 14px);
+}
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] {
+  font-family: var(--dsw-font-family);
+  line-height: calc(22px + var(--dsh-content-font-delta, 0px));
+}
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] p { margin-block: 8px; }
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] :is(h1,h2,h3,h4) {
+  font-family: var(--dsw-font-family);
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] :is(ul,ol) { margin-block: 8px; }
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] li { margin-block: 3px; }
+body[data-lg-ui] [data-chat-flow] [data-dsh-claude-part~="markdown"] :is(th,td) { padding-block: 8px; }
+body[data-lg-ui] [data-message-bubble] {
+  border-radius: 10px;
+  padding: 8px 12px;
+  line-height: calc(21px + var(--dsh-content-font-delta, 0px));
+  font-family: var(--dsw-font-family);
+}
+body[data-lg-ui] [data-chat-flow] :is([data-dsh-claude-part~="table-scroll"], .md-code-block) { border-radius: 8px; }
+

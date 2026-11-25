@@ -1,7 +1,10 @@
+import {realpathSync} from 'node:fs'
+import {createBookManagement} from './src/book-management.js'
 import {createShelf,prepareDirectories} from './src/bookshelf.js'
 import z from '@deepseek-ai/schemastery'
 import {oldRuns,legacyRun,verifyOldVersion} from './src/legacy-runs.js'
 import { describeBook, openBook, readBook } from './src/read.js'
+import { renameBook } from './src/book-title.js'
 import { ensurePolicy } from './src/supervision-policy.js'
 import { readManuscript,document,version,chapterSnapshot } from './src/manuscript.js'
 import {candidateLineage} from './src/legacy-chapter.js'
@@ -22,13 +25,21 @@ import {storyRecordHistory} from './src/story-data/store.js'
 import {readStoryPage,readStoryTimeline,readStoryOverview} from './src/story-data/read-model.js'
 
 export const inject = ['configEditor']
-export const Config = z.object({ projects: z.array(z.string()).default([]), rootDirectory: z.string().default(''), booksDirectory:z.string().default(''), libraryDirectory:z.string().default('') })
+export const Config = z.object({ projects: z.array(z.string()).default([]), archivedProjects:z.array(z.string()).default([]), removedProjects:z.array(z.string()).default([]), shelvedWorkspaces:z.array(z.object({path:z.string(),title:z.string(),sessionIds:z.array(z.string())})).default([]), rootDirectory: z.string().default(''), booksDirectory:z.string().default(''), libraryDirectory:z.string().default('') })
 
 export function apply(ctx, config) {
-  const shelf=createShelf(config,()=>ctx.get('workspaceRegistry'))
+  const persist=async update=>{
+    if(!ctx.fiber.entry)throw Error('当前宿主不支持保存插件配置。')
+    let saved
+    await ctx.configEditor.edit(ctx.fiber.entry,current=>(saved=update(current)))
+    shelf.setCatalog(saved)
+  }
+  const shelf=createShelf(config,()=>ctx.get('workspaceRegistry'),persist)
+  const management=createBookManagement(shelf,persist)
   ctx.inject(['workspaceRegistry'],scope=>{scope.effect(()=>{void shelf.sync().catch(()=>{});return ()=>{}},'lg-books: load book workspaces')})
   const registered = path => {
-    if (!(config.projects??[]).includes(path)&&!shelf.list().some(book=>!book.error&&book.path===path)) throw new Error('请先在控制台添加此作品。')
+    path=realpathSync(path)
+    if (!shelf.list({includeArchived:true}).some(book=>!book.error&&book.path===path)) throw new Error('请先在控制台添加此作品。')
     return path
   }
   const verifyGeneration = (path, generation) => {
@@ -76,6 +87,15 @@ export function apply(ctx, config) {
       shelf.setDirectories(selected)
       return shelf.sync()
     },
+    async rename(path,input) {
+      const renamed=renameBook(registered(path),input)
+      const workspace=ctx.get('workspaceRegistry')?.list().find(w=>w.path===renamed.path)
+      if(workspace && workspace.title!==renamed.name) {
+        try { await workspace.setTitle(renamed.name) }
+        catch { throw Error('书名已保存，侧栏同步失败。请重试。') }
+      }
+      return renamed
+    },
     snapshot(path) {
       return readBook(registered(path))
     },
@@ -90,14 +110,8 @@ export function apply(ctx, config) {
       })
     },
     candidate(path, input, generation) { return writeManuscript(registered(path), { ...input, action: 'candidate' }, generation,null,null,null,null,ctx.get('literaryPlanning')?.readDecisionInTransaction) },
-    async add(path) {
-      const book = describeBook(path)
-      if (!ctx.fiber.entry) throw new Error('当前宿主不支持保存插件配置。')
-      await ctx.configEditor.edit(ctx.fiber.entry, current => ({ ...current,
-        projects: [...new Set([...(current.projects ?? []), book.path])] }))
-      await ctx.get('workspaceRegistry')?.create(book.path,book.name)
-      return book
-    },
+    add:management.add,
+    manage:management.change,
   }
   books.documents = createDocuments(books, verifyGeneration)
   ctx.effect(() => ctx.provide('literaryBooks', books), 'lg-books: service')
@@ -112,6 +126,7 @@ export function apply(ctx, config) {
         if (input.action === 'shelf') value = await books.shelf()
         else if (input.action === 'configure-directories') value = await books.configureDirectories(input)
         else if (input.action === 'list') value = books.list()
+        else if (input.action === 'rename') value = await books.rename(input.path,input)
         else if (input.action === 'read') value = books.snapshot(input.path)
         else if (input.action === 'story-time') value = books.storyTime(input.path,input.options)
         else if (input.action === 'story-data') value = books.storyData(input.path,input.options)
@@ -133,6 +148,7 @@ export function apply(ctx, config) {
         }
         else if (input.action === 'integrity') value = integrity(registered(input.path))
         else if (input.action === 'add') value = await books.add(input.path)
+        else if (['archive','restore','remove'].includes(input.action)) value=await books.manage(input)
         else if (input.action === 'chapter-file-retry') value = retryChapterMirror(registered(input.path),input.document,input.operation)
         else if (['chapter-file-preview','chapter-file-apply'].includes(input.action)) value = chapterFile(registered(input.path), input)
         else if (input.action === 'story-index') value = storyIndex(registered(input.path), undefined, ctx.get('literaryPlanning')?.readDecisionInTransaction)

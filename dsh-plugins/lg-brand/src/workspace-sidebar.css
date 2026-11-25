@@ -1,26 +1,81 @@
+/* LG owns sidebar geometry here; menus and chat typography live in desktop-style.css. */
+body[data-lg-ui] [data-dsh-claude-part~="brand-name"] {
+  font: 500 14px/22px var(--dsw-font-family);
+  letter-spacing: 0;
+}
+body[data-lg-ui] [data-dsh-claude-part~="brand-button"] { font-family: var(--dsw-font-family); }
+body[data-lg-ui] [data-dsh-claude-part~="logo-row"] { margin-bottom: 8px; }
+body[data-lg-ui][data-dsh-claude-style][data-dsh-claude-custom-word="text"] [data-dsh-claude-part~="brand-identity"] > [data-dsh-claude-part~="brand-name"]::before {
+  font-size: 14px;
+  line-height: 22px;
+}
+
+/* One 20px icon seat for native SVGs and plugin text glyphs. Expanded rows own
+   their padding; the wrapper only paints hover/selection and holds Unpin. */
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) [data-dsh-claude-part~="panel-entry"] {
+  border-inline: 0;
+  margin-bottom: 0;
+  border-radius: 6px;
+}
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) > [data-dsh-claude-part~="sidebar-column"] :is(button[data-dsh-claude-part~="panel-row"], button[data-dsh-claude-part~="new-session"]) {
+  height: 26px;
+  min-height: 26px;
+  margin: 0;
+  padding: 2px 8px;
+  gap: 6px;
+  font: 400 14px/22px var(--dsw-font-family);
+  border-radius: 6px;
+  color: var(--dsw-alias-label-primary);
+}
+body[data-lg-ui] [data-dsh-claude-part~="panel-entry"] > button[data-dsh-claude-part~="panel-row"] { background: transparent; }
+body[data-lg-ui] [data-dsh-claude-part~="panel-entry"] > button:not([data-dsh-claude-part~="panel-row"]) { top: 0; }
+body[data-lg-ui] [data-dsh-claude-part~="layout-frame"]:not([data-sidebar-collapsed]) [data-dsh-claude-part~="panel-glyph"] {
+  width: 20px;
+  flex: 0 0 20px;
+  justify-content: center;
+}
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-dsh-claude-part~="section-header"] {
+  height: 26px;
+  color: var(--dsw-alias-label-secondary);
+}
+
+/* Keep the account's 32px target; avoid stacking footer and trigger spacing. */
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-dsh-claude-part~="foot-area"] {
+  padding-block: 3px;
+}
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-dsh-claude-part~="foot-area"] [data-dsh-claude-part~="settings-trigger"] {
+  margin-block: 0;
+}
+
+/* macOS draws this boundary on the opaque centre, not on the vibrant sidebar.
+   Keep that native edge and resize hit area; only soften its ink. */
+html[data-platform="darwin"] body[data-lg-ui] [data-dsh-claude-part~="center-column"] {
+  border-left-color: var(--dsw-alias-border-l1);
+}
+
 /* Adapt the native workspace tree, preserving its state, menus and drag handlers. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] {
-  height:28px; margin-top:8px; margin-bottom:2px; gap:6px; background:transparent;
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] {
+  height:26px; min-height:26px; margin:0; gap:4px; background:transparent;
 }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-title"] {
-  font-size:12px; line-height:18px; font-weight:500; color:var(--dsw-alias-label-secondary);
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-title"] {
+  font:400 13px/20px var(--dsw-font-family); color:var(--dsw-alias-label-primary);
 }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-chevron"] {
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-chevron"] {
   display:inline-flex !important; order:0; opacity:.6; flex:none;
 }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-project-text"] { order:1; flex:1; min-width:0; }
-body[data-dsh-claude-style] [data-lg-book-link]:hover [data-dsh-claude-part~="row-title"] { color:var(--dsw-alias-button-primary-fill,#d97757); }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-project-text"] { order:1; flex:1; min-width:0; }
+body[data-lg-ui][data-dsh-claude-style] [data-lg-book-link]:hover [data-dsh-claude-part~="row-title"] { color:var(--dsw-alias-button-primary-fill,#d97757); }
 [data-lg-book-link]:focus-visible { outline:2px solid var(--dsw-alias-button-primary-fill,#d97757); outline-offset:2px; border-radius:3px; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"] { display:inline-flex; order:2; opacity:1; visibility:visible; margin-left:auto; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) { opacity:1; position:relative; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) svg { visibility:hidden; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger])::after { content:''; position:absolute; left:50%; top:50%; width:12px; height:12px; transform:translate(-50%,-50%); background:var(--dsw-alias-label-secondary); mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 3v10M3 8h10' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; pointer-events:none; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] {
-  padding-inline-start:calc(22px + var(--dsh-workspace-indent,0px)); height:28px; gap:4px;
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"] { display:inline-flex; order:2; opacity:1; visibility:visible; margin-left:auto; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) { opacity:1; position:relative; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger]) svg { visibility:hidden; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="workspace:"] [data-dsh-claude-part~="row-actions"]>button:not([data-context-menu-trigger])::after { content:''; position:absolute; left:50%; top:50%; width:12px; height:12px; transform:translate(-50%,-50%); background:var(--dsw-alias-label-secondary); mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 3v10M3 8h10' fill='none' stroke='black' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat; pointer-events:none; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] {
+  padding-inline-start:calc(12px + var(--dsh-workspace-indent,0px)); height:26px; min-height:26px; gap:4px;
 }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] [data-dsh-claude-part~="row-title"] { font-size:13px; font-weight:400; }
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] { display:inline-flex !important; position:static; visibility:visible; width:10px; flex:none; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] [data-dsh-claude-part~="row-title"] { font:400 13px/20px var(--dsw-font-family); color:var(--dsw-alias-label-primary); }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] { display:inline-flex !important; position:static; visibility:visible; width:10px; flex:none; }
 
 /* Restore the reference screenshot's leading idle circle; occupied status slots keep their native icon. */
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"]:empty::after,
-body[data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] > [data-slot]:empty::after { content:""; }
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"]:empty::after,
+body[data-lg-ui][data-dsh-claude-style] [data-dsh-claude-part~="sidebar-column"] [data-row-key^="session:"] > [data-dsh-claude-part~="row-slot"] > [data-slot]:empty::after { content:""; }

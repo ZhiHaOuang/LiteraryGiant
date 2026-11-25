@@ -1,0 +1,44 @@
+{
+  "name": "lg-storydata",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Story data console, reviewed dossiers and book-level protocols",
+  "exports": {
+    ".": "./index.js",
+    "./contract.json": "./src/contract.json",
+    "./package.json": "./package.json",
+    "./client": "./client.js"
+  },
+  "files": [
+    "index.js",
+    "src",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE-dsh-context",
+    "NOTICE",
+    "client.js"
+  ],
+  "dependencies": {
+    "ajv": "8.20.0"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.1.0",
+    "lg-books": "0.1.0"
+  },
+  "engines": {
+    "node": ">=24.9",
+    "dsh": ">=0.2.2-rc.1 <0.2.3-0"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  }
+}

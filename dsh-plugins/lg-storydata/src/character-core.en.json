@@ -1,0 +1,82 @@
+{
+  "identity": {
+    "label": "Identity and Appearance",
+    "facets": {
+      "name": ["Names and Titles", "Birth name, alias, assumed name, nickname, formal title, honorific, insult"],
+      "identifiers": ["Identifying Details", "Age or age range, gender or gender expression, ancestry or species, birthplace"],
+      "background": ["Background", "Family history, upbringing, occupation, office, social status, organization, faction"],
+      "identity-layer": ["Layers of Identity", "True, public, cover, mistaken or former identity"],
+      "appearance": ["Distinguishing Features", "Build, hair, eyes, distinctive marks, posture, gait, usual clothing, voice"],
+      "narrative-role": ["Narrative Role", "Prominence, role in the story, viewpoint"]
+    }
+  },
+  "goals": {
+    "label": "Goals and Motives",
+    "facets": {
+      "objective": ["Objective and Time Span", "Immediate intention, current objective, long-term ambition"],
+      "driver": ["Motivation", "Survival, self-preservation, protection, belonging, recognition, duty, curiosity, autonomy, power, gain, revenge, redemption, conviction"],
+      "tradeoff": ["Obstacles and Trade-Offs", "Personal limits, opposition, institutional barriers, scarce resources, missing information, conflicting goals, costs, limits on compromise"],
+      "progress": ["Goal Status", "Active, blocked, paused, achieved, abandoned"]
+    }
+  },
+  "personality": {
+    "label": "Personality and Expression",
+    "facets": {
+      "values": ["Values and Priorities", "Keeping promises, loyalty, order, freedom, fairness, practicality, reputation, self-preservation"],
+      "decisions": ["Decision-Making", "Caution, decisiveness, impulsiveness, suspicion, risk-taking, conflict avoidance, confrontation, observation before action"],
+      "emotion": ["Emotional Responses", "Triggers, outward reactions, self-regulation, fears, vulnerabilities, defenses"],
+      "expression": ["Speech and Interaction", "Directness, rhetorical questions, sarcasm, self-deprecation, reassurance, probing, deflection, commands, silence, register, phrasing, forms of address"],
+      "persona": ["Public Persona", "Disguise, deliberate performance, gaps between words and actions, conflicting values, self-deception"]
+    }
+  },
+  "abilities": {
+    "label": "Abilities and Limits",
+    "facets": {
+      "domain": ["Skill Area", "Physical ability, combat, craft, professional knowledge, investigation, reasoning, negotiation, leadership, supernatural abilities"],
+      "mastery": ["Proficiency", "Novice, independent, proficient, expert, unknown"],
+      "conditions": ["Requirements and Limits", "Prior knowledge, tools, materials, physical condition, environment, target, range, duration"],
+      "cost": ["Costs and Failure", "Expenditure, backlash, cooldown, countermeasures, loss of control, temporary loss of ability"],
+      "learning": ["Learning and Change", "Acquisition, breakthrough, new use, decline, loss, recovery"]
+    }
+  },
+  "situation": {
+    "label": "Circumstances and Resources",
+    "facets": {
+      "condition": ["Physical and Mental Condition", "Survival, injury, illness, poisoning, fatigue, recovery, lasting fear or grief"],
+      "location": ["Location and Freedom of Movement", "Location, travel, entrapment, detention, surveillance, release, freedom of movement"],
+      "pressure": ["External Pressures", "Pursuit, risk of exposure, approaching deadline, protection, isolation, coercion"],
+      "resources": ["Resources and Control", "Money, equipment, bases, personnel, authority, access, windows of opportunity"],
+      "appearance-change": ["Changes in Appearance", "Scars, disability, disguise, marks, changes of clothing"]
+    }
+  },
+  "knowledge": {
+    "label": "Knowledge and Secrets",
+    "facets": {
+      "proposition": ["Subject and Belief", "Identity, fact, rule, cause, motive, plan, danger"],
+      "stance": ["Stance", "Belief, doubt, denial, uncertainty"],
+      "source": ["Source of Knowledge", "Experience, observation, testimony, rumor, inference, memory, deception"],
+      "secret": ["Secrets and Information Gaps", "Hidden identity, concealed intention, confidential fact, mistaken attribution, one-sided knowledge, partial revelation"],
+      "revision": ["Changes in Understanding", "Discovery, doubt, revised judgment, confirmation, disproof, forgetting"]
+    }
+  },
+  "relationships": {
+    "label": "Relationships and Commitments",
+    "facets": {
+      "family": ["Family and Intimate Bonds", "Parent and child, siblings, spouses, partners, caregiver and dependent, guardian and ward, extended family"],
+      "duty": ["Social and Professional Ties", "Master and apprentice, superior and subordinate, lord and vassal, employer and employee, colleagues, fellow disciples, classmates"],
+      "alliance": ["Alliances and Interests", "Partners, allies, trading partners, competitors, rivals, enemies, protector and protected, dependency"],
+      "attitude": ["Directed Feelings", "Trust, suspicion, respect, affection, attraction, dependence, fear, hostility, resentment, jealousy"],
+      "visibility": ["Visibility and Relationship Changes", "Public, private or feigned ties, formation, easing of tension, deterioration, rupture, reconciliation"],
+      "obligation": ["Promises and Obligations", "Promise, debt, favor owed, contract, oath, duty of confidentiality"]
+    }
+  },
+  "milestones": {
+    "label": "Milestones and Change",
+    "facets": {
+      "impact": ["Impact on the Character", "Changes in identity, goals, beliefs, abilities, relationships, resources or values"],
+      "role": ["Role in the Event", "Decision-maker, participant, person affected, witness, indirectly affected party"],
+      "transition": ["Change and Continuity", "Prior and new states, precedent, recurring pattern, turning point"],
+      "sequence": ["Connections between Events", "Precedes, follows, triggers, enables, impedes, revises an earlier judgment"]
+    }
+  }
+}

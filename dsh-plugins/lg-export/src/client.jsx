@@ -60,6 +60,6 @@ export function apply(ctx) {
   ctx.slots.inject('main', () => ctx.slots.register({ name: 'main', key: 'lg-export' },
     () => <ExportPanel files={ctx.fileActions}/>))
   ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name: 'sidebar.panellist', id: 'lg-export', order: 25, label: () => '作品导出',
+    name: 'sidebar.panellist', id: 'lg-export', order: 25, label: () => 'Manuscript Export',
   }, () => <span aria-hidden="true">↓</span>))
 }

@@ -83,3 +83,13 @@ node scripts/build.mjs lg-dashboard
 桌面回归比较宽屏/390px 窄栏的关键布局尺寸，并验证日期切换、作品和章节搜索、候选展开、单书导航、刷新请求数、目录独立保存、新建预览取消、主页面与首次设置失败后的重试。真实模型生成、正式正文采用和实际新书写入不属于这轮桌面回归；没有调用收费模型。
 
 本轮验收：Dashboard 单元测试 15/15、默认测试入口 339/339、插件构建及现有 LiteraryGiant App 的隔离 profile 回归均通过。合成场景中首次加载 shelf 请求由 3 次降至 2 次（含独立 onboarding），从全局打开单书由 `list → read → shelf` 降至一次 `read`；手动刷新仍为一次 shelf 加每本书一次 read。宽屏与窄栏关键卡片尺寸逐项一致，深色主题截图已检查。源码 `src/` 为 18 个文件，行数由 1167 增至 1186，体积由 100043 降至 99572 字节；新增的请求生命周期和纯统计模块用于减少重复职责，不追求机械减少行数。
+
+## Resize performance
+
+Companion lanes use proportional CSS widths during resizing. Width optimization runs after 150 ms without a size change and after the pointer is released. Font metrics are cached; the 2–3-lane search is bounded to 192 cells and never measures DOM candidates. Short replies reserve their natural width instead of a 64px minimum. Cached character advances account for whole characters and attached punctuation; narrow rows use pixel precision with a 6px inter-bubble gap. Once lanes are selected, a batched binary search tightens the bubbles without increasing their browser line counts; this only runs after resizing settles. Only the containing slot is observed, avoiding a feedback loop from animated bubble heights. The browser still owns actual line wrapping, clipping and text balance.
+
+People grids follow pointer width immediately; row changes retain their existing motion. Timeline aggregation is keyed by bucket capacity rather than every pixel; a new server resolution is requested only after capacity settles for 150 ms. The small PNGs in `src/assets/display/` cover 3× display resolution; high-resolution originals remain available without entering the client bundle. No runtime dependency or API was added.
+
+`tests/resize-desktop.mjs` uses the same three desktop environment variables and a marked isolated profile. It supplies synthetic character/Agent records, checks held-pointer and released-pointer bubble layout, pointer alignment, avatar dimensions, preserved chart totals, card row transitions and reduced motion, then records all three resize paths in `LG_PREVIEW_DIR` (default: the test profile's `perf-audit` directory). Timing is reported, not used as a machine-dependent pass/fail threshold; layout counts guard against reintroducing candidate-by-candidate browser reflow.
+
+人物详情默认展开「当前档案 Main」。八组及二级类别名称、顺序、范围、标签和关联均从作者只读接口 `lg.outline.character.v1` 读取。视图扩展入口是 `src/character-main.jsx`；插件契约和返回结构见 [lg-storydata](../lg-storydata/README.md)。

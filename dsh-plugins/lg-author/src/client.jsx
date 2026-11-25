@@ -38,5 +38,5 @@ function Author() {
 }
 export function apply(ctx) {
   ctx.slots.inject('main',()=>ctx.slots.register({name:'main',key:'lg-author'},Author))
-  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-author',order:22,label:()=>'作者偏好'},()=> <span aria-hidden="true">✧</span>))
+  ctx.slots.inject('sidebar.panellist',()=>ctx.slots.register({name:'sidebar.panellist',id:'lg-author',order:22,label:()=>'Author Preferences'},()=> <span aria-hidden="true">✧</span>))
 }

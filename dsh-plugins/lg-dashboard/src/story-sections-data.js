@@ -1,7 +1,9 @@
+import {storySectionLabels} from '../../lg-books/src/story-data/labels.js'
+
 export const storySections=[
- {id:'people',title:'Characters',icon:'person',description:'从一个人物出发，查看其内在、认知与变化。',topics:['人物简介','性格与侧写','认知与状态','经历与关系']},
- {id:'plot',title:'Plot',icon:'plot',description:'沿故事发展整理事件、章节与叙事节奏。',topics:['具体情节','章节梗概','伏笔与线索','读者揭示','节奏与情绪']},
- {id:'world',title:'Setting',icon:'world',description:'查看世界的规则，以及情节发生的地点。',topics:['世界设定','读者揭露','地点档案','情节场景']},
+ {id:'people',title:storySectionLabels.people,icon:'person',description:'从一个人物出发，查看其内在、认知与变化。',topics:['人物简介','性格与侧写','认知与状态','经历与关系']},
+ {id:'plot',title:storySectionLabels.plot,icon:'plot',description:'沿故事发展整理事件、章节与叙事节奏。',topics:['具体情节','章节梗概','伏笔与线索','读者揭示','节奏与情绪']},
+ {id:'world',title:storySectionLabels.world,icon:'world',description:'查看世界的规则，以及情节发生的地点。',topics:['世界设定','读者揭露','地点档案','情节场景']},
 ]
 export const personAreas=[
  {id:'profile',title:'人物简介',description:'身份、别名与背景',icon:'person'},
@@ -12,7 +14,13 @@ export const personAreas=[
  {id:'relation',title:'人物关系',description:'与其他人物的联系和变化',icon:'agent'},
 ]
 export const personTabs=personAreas.map(({id,title})=>[id,title])
-export const PEOPLE_PAGE_SIZE=6
+export function peopleLayout(width,view){
+ if(view==='pack')return {columns:1,pageSize:6}
+ const compact=view==='list',gap=compact?6:10
+ const minimum=compact?(width<400?136:155):(width<400?147:188)
+ const columns=Math.max(1,Math.floor((width+gap)/(minimum+gap)))
+ return {columns,pageSize:Math.min(200,columns*(compact?5:2))}
+}
 export function sectionStats(data){
  const count=type=>data?.counts[type]??0,entities=data?.entities??[]
  return {

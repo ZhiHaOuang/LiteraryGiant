@@ -73,7 +73,7 @@ async function inspect(baseline) {
     await win.locator('.lgd-chapter-head').first().click()
     await win.getByRole('button',{name:'审阅此版本',exact:true}).waitFor()
     await win.locator('.lgd-page').screenshot({path:stage+'/book'+suffix+'.png'})
-    await win.getByRole('button',{name:'‹ 全局 Dashboard',exact:true}).click()
+    await win.getByRole('button',{name:baseline?'‹ 全局 Dashboard':'Global Dashboard',exact:true}).click()
     await global().waitFor();await win.locator('.lgg-book-link').first().waitFor()
     await win.evaluate(()=>{dashboardRequests.length=0})
     await win.getByRole('button',{name:'刷新',exact:true}).click()
@@ -95,7 +95,7 @@ async function inspect(baseline) {
       await win.getByRole('button',{name:'确认创建并添加作品',exact:true}).waitFor()
       assert.equal(existsSync(stage+'/Books/合成预览作品'),false,'preview must not write a book')
       await win.getByRole('button',{name:'返回修改',exact:true}).click()
-      await win.getByRole('main').getByRole('button',{name:'‹ 全局 Dashboard',exact:true}).click()
+      await win.getByRole('button',{name:'Global Dashboard',exact:true}).click()
       await global().waitFor();await win.getByRole('button',{name:'刷新',exact:true}).waitFor()
       await win.evaluate(()=>{
         const original=window.fetch;let fail=true

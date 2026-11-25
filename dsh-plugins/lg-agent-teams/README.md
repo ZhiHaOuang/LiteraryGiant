@@ -1,5 +1,18 @@
 # LG 文学 Agent 预设（preset-v1）
 
+## 更新当前档案 Main
+
+在作品的 LG 主会话明确要求「分析这一章的指定情节，更新人物和情节 Main，独立审查后提交」。主会话固定章节来源，用同一个 source_id 依次派发两个 analysis 任务。
+
+| 环节 | 工具和可用数据 |
+|---|---|
+| 提议 | 委派时填 `outline_action: propose`、空 inputs。成员读任务上下文，用 `lg_outline_prior` 比较每个目标档案，提交文字、关联和逐字短引文。宿主附上实际读取的旧版本、文档 ID 和原文摘要。 |
+| 审查 | 新任务使用 `outline_action: review`，inputs 只含提议任务 ID。另一个成员读取原文与固定的 before/after，用 `lg_outline_review` 提交决定和具体理由。 |
+| 提交 | 主会话将已批准的审查任务 ID 交给 `lg_team_outline_commit`。Outline 复查版本和证据后，在同一事务内更新涉及的 Main 模块。驳回或无变化即结束。 |
+
+每次申请的证据及旧摘要须落在本次选定的章节与版本内。若旧档案引用其他章节，可以把这些章节一起纳入阅读范围。量化测试用原生主循环、两个独立的分析子会话和合成书。运行 `node --test lg-agent-teams/tests/outline*.test.mjs` 可复验批准、驳回、权限范围、引用和版本冲突。两个插件需同时启用。
+
+
 使用 DSH 原生 AgentLoop、subagents.startActivation 和自动成员回报。主 Agent 与作者讨论，并按需委派分析、规划、创作；简单讨论不创建成员。无自制模型循环，不改 Runtime，不依赖 Dashboard。
 
 ## 四个原生预设

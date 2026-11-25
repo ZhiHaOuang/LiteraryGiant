@@ -21,7 +21,11 @@ export function useShelf() {
     } catch(error){if(!controller.signal.aborted)setError(error.message)}
     finally{if(!controller.signal.aborted)setBusy(false)}
   },[])
-  useEffect(()=>{void reload();return()=>active.current?.abort()},[reload])
+  useEffect(()=>{
+    void reload()
+    window.addEventListener('lg-books-changed',reload)
+    return()=>{active.current?.abort();window.removeEventListener('lg-books-changed',reload)}
+  },[reload])
   return {shelf,error,busy,reload,accept}
 }
 export function DirectoryChooser({ctx,onLoaded,onCancel,initial}) {
@@ -36,12 +40,12 @@ export function DirectoryChooser({ctx,onLoaded,onCancel,initial}) {
     try{const shelf=await requestBooks({...Object.fromEntries(Object.entries(paths).map(([key,value])=>[key,value.trim()])),action:'configure-directories'});if(shelf.error)throw Error(shelf.error);onLoaded(shelf)}
     catch(e){setError(e.message)}finally{setBusy(false)}
   }
-  return <div className="lgd-page lgs-setup"><style>{styles}</style><div className="lgd-canvas"><Card title={l('分别选择 Books 和 Library','Choose Books and Library separately')}>
+  return <div className="lgd-page lgs-setup"><style>{styles}</style><div className="lgd-canvas"><Card title={l('分别选择 Books 和 Library','Choose Books and Library Separately')}>
     <h2>LiteraryGiant</h2><p>{l('无需登录。创作目录和参考库分别选择，可以放在不同的位置。','No sign-in required. Choose your writing and reference folders independently, anywhere on your computer.')}</p>
     <div className="lgd-columns"><div><b>Books/</b><p>{l('每本书一个文件夹，对应一个 workspace。','One folder and workspace for each book.')}</p></div><div><b>Library/</b><p>{l('共享的标准参考库，供文学工具与 Agent 调用。','Shared reference library for literary tools and agents.')}</p></div></div>
     <form onSubmit={submit}><fieldset disabled={busy}>
-      {[['booksDirectory',l('Books 创作目录','Books folder'),l('选择 Books 目录','Choose Books folder')],['libraryDirectory',l('Library 参考库目录','Library folder'),l('选择 Library 目录','Choose Library folder')]].map(([field,label,button])=><div key={field} className="lgs-directory-field"><label>{label}<input aria-label={label} value={paths[field]} onChange={e=>setPaths({...paths,[field]:e.target.value})} placeholder={l('所选文件夹本身即为该目录','The selected folder itself is used')}/></label><button type="button" onClick={()=>pick(field)}>{button}</button></div>)}
-      <div className="lgd-header-actions"><button disabled={!paths.booksDirectory.trim()||!paths.libraryDirectory.trim()}>{busy?l('加载中…','Loading…'):l('保存并加载','Save and load')}</button>{onCancel&&<button type="button" onClick={onCancel}>{l('取消','Cancel')}</button>}</div></fieldset></form>
+      {[['booksDirectory',l('Books 创作目录','Books Folder'),l('选择 Books 目录','Choose Books Folder')],['libraryDirectory',l('Library 参考库目录','Library Folder'),l('选择 Library 目录','Choose Library Folder')]].map(([field,label,button])=><div key={field} className="lgs-directory-field"><label>{label}<input aria-label={label} value={paths[field]} onChange={e=>setPaths({...paths,[field]:e.target.value})} placeholder={l('所选文件夹本身即为该目录','The selected folder itself is used')}/></label><button type="button" onClick={()=>pick(field)}>{button}</button></div>)}
+      <div className="lgd-header-actions"><button disabled={!paths.booksDirectory.trim()||!paths.libraryDirectory.trim()}>{busy?l('加载中…','Loading…'):l('保存并加载','Save and Load')}</button>{onCancel&&<button type="button" onClick={onCancel}>{l('取消','Cancel')}</button>}</div></fieldset></form>
     <small>{l('直接加载各自选中的文件夹，不追加 Books/ 或 Library/ 子目录，不移动已有文件。','Loads each selected folder directly, without adding Books/ or Library/ subfolders or moving existing files.')}</small>
     {error&&<p role="alert" className="lgd-error">{error}</p>}
   </Card></div></div>
@@ -57,18 +61,10 @@ export function StartupFolder({ctx}) {
 export function ShelfLocation({ctx,shelf,onChange,refreshAction}) {
   const zh=ctx.locale.getLocale?.().active==='zh',l=(cn,en)=>zh?cn:en
   const folderName=path=>path?.replace(/[\\/]+$/,'').split(/[\\/]/).pop()||path||l('未设置','Not set')
-  return <Card className="lgs-location-card" title={l('创作目录与参考库','Writing folder & library')} meta={<span className="lgs-folder-controls">
+  return <Card className="lgs-location-card" title={l('创作目录与参考库','Writing Folder & Library')} meta={<span className="lgs-folder-controls">
     {[['Books',shelf.booksPath],['Library',shelf.libraryPath]].map(([label,path])=><span className="lgs-folder-chip" key={label} title={path||l('未设置','Not set')}><span>{label}</span><span className="lgs-folder-name">{folderName(path)}</span></span>)}
-    <button onClick={onChange}>{l('设置目录','Set folders')}</button>{refreshAction}
+    <button onClick={onChange}>{l('设置目录','Set Folders')}</button>{refreshAction}
   </span>}>
     {shelf.error&&<p role="alert">{shelf.error}</p>}
   </Card>
-}
-
-export function BookWorkspace({ctx,path,onShelf,shelf}) {
-  const [error,setError]=useState('')
-  const book=shelf.books.find(b=>b.path===path),zh=ctx.locale.getLocale?.().active==='zh',l=(cn,en)=>zh?cn:en
-  return <div className="lgs-book-workspace"><button onClick={onShelf}>‹ {l('全局 Dashboard','Global Dashboard')}</button>
-    <button disabled={!book?.workspaceId} onClick={()=>{try{ctx.get('uiWorkspace').startSession(book.workspaceId)}catch(e){setError(e.message)}}}>{l('本书新对话','New book conversation')}</button>
-    <small className="lgs-path">Library · {shelf?.libraryPath||l('尚未选定','Not selected')}</small>{error&&<span role="alert">{error}</span>}</div>
 }

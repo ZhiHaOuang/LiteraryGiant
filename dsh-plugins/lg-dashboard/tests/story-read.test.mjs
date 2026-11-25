@@ -1,6 +1,6 @@
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {validateStoryResponse,STORY_READ_API,shouldRestartStoryPage} from '../src/story-read.js'
+import {validateStoryResponse,STORY_READ_API,shouldRestartStoryPage,withCharacterPortraits} from '../src/story-read.js'
 test('dashboard refuses incompatible/incomplete reads instead of displaying empty data',()=>{
  const value={api_version:STORY_READ_API,data_revision:'a'.repeat(64),book_id:'test-book',records:[],chapters:[],entities:[],runs:[],catalog:{},counts:{},directory:{},total:0,offset:0,limit:8}
  assert.equal(validateStoryResponse('story-data',value),value)
@@ -52,4 +52,25 @@ test('record-level incompatibilities fail at the adapter instead of crashing a d
  assert.equal(validateStoryResponse('story-data',value),value)
  assert.equal(validateStoryResponse('story-data',{...value,records:[{...record,payload:{...record.payload,future_field:'kept'}}]}).records[0].payload.future_field,'kept')
  for(const patch of [{payload:null},{scope:null},{links:null},{evidence:[null]},{related_changed:null}])assert.throws(()=>validateStoryResponse('story-data',{...value,records:[{...record,...patch}]}),/不完整/)
+})
+
+test('older services hydrate from visible portrait pages once per book revision and cutoff',async()=>{
+ const page={book_id:'book',data_revision:'rev',counts:{portrait:3},records:[{id:'lin',display:{}}]}
+ const input={path:'/book',options:{through_chapter:3,confirmed_only:true}},cache={current:null}
+ const calls=[],signal=new AbortController().signal
+ const read=async request=>{
+  const o=request.options
+  calls.push(o)
+  const r={type:'portrait',approval:'confirmed',freshness:'current',related_changed:[],display:{source:{chapter:2},facet:'行为倾向'},payload:{subject:'lin',aspect:'behavior',description:'保留旧信。'}}
+  return {...page,offset:o.offset,total:3,records:o.offset===0?[{...r,id:'wrong',approval:'rejected'}]:[{...r,id:'later',freshness:'stale'},{...r,id:'visible'}]}
+ }
+ const hydrated=await withCharacterPortraits(page,input,cache,signal,read)
+ assert.equal(hydrated.records[0].display.character_portrait.description,'保留旧信。')
+ assert.deepEqual(calls.map(o=>[o.offset,o.through_chapter,o.confirmed_only]),[[0,3,true],[1,3,true]])
+ await withCharacterPortraits(page,input,cache,signal,read)
+ await withCharacterPortraits({...page,records:[{id:'lin',display:{character_portrait:null}}]},input,{current:null},signal,read)
+ assert.equal(calls.length,2)
+ await withCharacterPortraits(page,{...input,options:{through_chapter:2}},cache,signal,read)
+ assert.equal(calls.length,4)
+ await assert.rejects(withCharacterPortraits({...page,data_revision:'changed'},input,cache,signal,read),/更新/)
 })

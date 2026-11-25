@@ -1,6 +1,6 @@
 import {test} from 'node:test'
 import assert from 'node:assert/strict'
-import {sectionStats,timelineItems} from '../src/story-sections-data.js'
+import {peopleLayout,sectionStats,timelineItems} from '../src/story-sections-data.js'
 
 test('section counts distinguish characters from locations and other entities',()=>{
  const result=sectionStats({entities:[{kind:'character'},{kind:'place'},{kind:'group'}],counts:{entity:3,event:4,portrait:2,scene:1}})
@@ -8,6 +8,13 @@ test('section counts distinguish characters from locations and other entities',(
  assert.deepEqual(result.world,[['设定',0],['地点',1],['场景',1]])
  assert.equal(result.plot[0][1],4)
  assert.equal(sectionStats(null).people[0][1],0)
+})
+
+test('the measured gallery width controls both tracks and page capacity',()=>{
+ assert.deepEqual(peopleLayout(810,'card'),{columns:4,pageSize:8})
+ assert.deepEqual(peopleLayout(810,'list'),{columns:5,pageSize:25})
+ assert.deepEqual(peopleLayout(310,'list'),{columns:2,pageSize:10})
+ assert.deepEqual(peopleLayout(310,'pack'),{columns:1,pageSize:6})
 })
 
 test('event display preserves partial order and unplaced events, filtering only registered actors',()=>{

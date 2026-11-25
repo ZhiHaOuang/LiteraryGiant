@@ -5,13 +5,14 @@ import z from '@deepseek-ai/schemastery'
 import {roles,roleOf,rolePrompt,promptHash,coordinator} from './src/roles.js'
 import {artifactSchemas,objectSchema,validateArtifact,hanCount} from './src/contracts.js'
 import {bookForAgent,prepareSource,verifySource} from './src/context.js'
+import {taskTools,proposalSchema,reviewSchema,priorKey,priorSummary,proposeSummary,reviewTarget} from './src/outline.js'
 import {TeamStore} from './src/store.js'
 
 export const name='lg-agent-teams'
 export const inject=['literaryBooks','agents','subagents','tools','systemPrompt','llm']
 export const Config=z.object({stateDirectory:z.string().default(''),budgetMode:z.union([z.const('auto'),z.const('limited'),z.const('usage')]).default('auto'),budgetId:z.string().default('literary-teams-v1'),requestLimit:z.number().step(1).min(1).max(100).default(100),provider:z.string().default(''),model:z.string().default(''),methods:z.boolean().default(true),activation:z.union([z.const('preset'),z.const('registered-book')]).default('preset')})
 const s={type:'string'},integer={type:'integer'},strings={type:'array',items:s}
-const mainTools=['lg_team_catalog','lg_team_prepare','lg_team_delegate','lg_team_result','lg_team_cancel']
+const mainTools=['lg_team_catalog','lg_team_prepare','lg_team_delegate','lg_team_result','lg_team_cancel','lg_team_outline_commit']
 const summary=t=>({id:t.id,role:t.role,child:t.child,status:t.status,source_id:t.source_id,error:t.error})
 
 /** Reuses native DSH activations and automatic parent delivery. No custom model loop. */
@@ -25,6 +26,11 @@ export function apply(ctx,config){
   const store=new TeamStore(directory,usageOnly?'interactive-usage':config.budgetId,usageOnly?null:config.requestLimit),releases=new Map(),active=new Map()
   try{store.claimRuntime()}catch(error){store.close();throw error}
   const books=ctx.literaryBooks
+  const outline=()=>{
+    const service=ctx.get('literaryStoryData') ?? ctx.get('literaryOutline')
+    if (!service) throw Error('请先启用 lg-storydata')
+    return service
+  }
   const selected=agent=>agent&&ctx.get('agentPresets')?.composedPreset(agent.ctx)
   const isNew=agent=>selected(agent)==='lg'
   const managed=agent=>!!agent&&(!!store.taskForChild(agent.id)||isNew(agent)||config.activation==='registered-book'&&!!bookForAgent(books,agent))
@@ -37,7 +43,7 @@ export function apply(ctx,config){
     async execute(args,exec){
       exec.signal.throwIfAborted();let value
       try{value=await execute(args,exec)}catch(error){if(name.endsWith('_submit'))throw Error(error.message+'。修正后重交完整对象（含原本正确的字段），不是局部补丁。');throw error}
-      if(name.endsWith('_submit')||(['lg_team_delegate','lg_team_result'].includes(name)&&['starting','running'].includes(value.status)))exec.concludeTurn()
+      if(name.endsWith('_submit')||['lg_outline_propose','lg_outline_review'].includes(name)||(['lg_team_delegate','lg_team_result'].includes(name)&&['starting','running'].includes(value.status)))exec.concludeTurn()
       return value
     },
   })
@@ -57,12 +63,19 @@ export function apply(ctx,config){
     return {...visible,chapters:source.chapters.map(c=>({...c,paragraphs:c.paragraphs.map((text,i)=>({paragraph:i+1,text}))})),candidate:true}
   })
   const delegateSchema=objectSchema({role:{type:'string',enum:roles.map(r=>r.id)},source_id:s,objective:s,inputs:strings,operation:s})
+  delegateSchema.properties.outline_action={type:'string',enum:['propose','review'],description:'仅在作者要求更新 Main 时用于 analysis。提议 inputs 为空；独立审查 inputs 仅填提议任务 ID。'}
   delegateSchema.properties.option_count={type:'integer',description:'规划方案数量 1—3，默认 1；只有作者要求多方案时提高。'}
   register('lg_team_delegate','按需委派分析、规划或创作。inputs 为本会话同来源已完成任务 ID。operation 是本次任务唯一标识；重放返回原任务，不重试失败。派发后自动等待成员回报。',delegateSchema,async(args,exec)=>{
     const agent=root(exec);roleOf(args.role)
     const source=store.readSource(agent.id,args.source_id)
     if(source.path!==bookForAgent(books,agent)?.path)throw Error('来源与当前作品不同，请在原作品会话继续')
     verifySource(books,source)
+    if (args.outline_action) {
+      outline()
+      if (args.role!=='analysis' || !['propose','review'].includes(args.outline_action)) throw Error('Main 更新需要分析成员')
+      if (!Array.isArray(args.inputs) || args.inputs.length!==(args.outline_action==='review'?1:0)) throw Error('Main 任务输入数不符')
+      if (args.outline_action==='review') reviewTarget(outline(),store,source,{...args,owner:agent.id})
+    }
     const option_count=args.option_count??1
     if(!Number.isInteger(option_count)||option_count<1||option_count>3)throw Error('规划方案数量只能为 1—3')
     const preset=isNew(agent)?presetIds[args.role]:undefined
@@ -72,7 +85,7 @@ export function apply(ctx,config){
       const activation=await ctx.subagents.startActivation({provider:'spawn',parent:agent,childId:task.child,label:'文学'+roleOf(task.role).name,name:task.role+'-'+task.id.slice(-8),maxDepth:1,
         delivery:'parent',signal:exec.signal,...task.preset?{agentPreset:task.preset}:{},
         agentOptions:{...(config.provider?{provider:config.provider}:{}),...(config.model?{model:config.model}:{}),reasoningEffort:'off',maxTokens:6000},
-        prompt:[{type:'text',text:`任务 ${task.id}\n职责：${roleOf(task.role).name}\n目标：${task.objective}\n${task.role==='planning'?'本任务方案数量：'+task.option_count+'，不要自行增加。\n':''}先调用 lg_team_context 读取已固定的作者要求、正文和上游制品。然后用 lg_${task.role}_submit 提交。你不能改变阅读范围。`}],
+        prompt:[{type:'text',text:`任务 ${task.id}\n职责：${roleOf(task.role).name}\n目标：${task.objective}\n${task.role==='planning'?'本任务方案数量：'+task.option_count+'，不要自行增加。\n':''}先调用 lg_team_context 读取已固定的作者要求、正文和上游制品。然后用 ${task.outline_action?'lg_outline_'+task.outline_action:'lg_'+task.role+'_submit'} 提交。你不能改变阅读范围。`}],
       })
       active.set(task.id,activation)
       if(store.task(task.id).status==='starting')store.update(task.id,{status:'running'})
@@ -101,12 +114,53 @@ export function apply(ctx,config){
   register('lg_team_context','读取当前成员被分配的作者要求、逐段正文、故事资料和上游候选，不接收任意路径。',objectSchema({}),(_args,exec)=>{
     const task=member(exec),source=store.readSource(task.owner,task.source_id);verifySource(books,source)
     const inputs=task.inputs.map(id=>{const t=store.task(id);return {id,role:t.role,candidate:true,artifact:t.artifact}})
+    const diff = task.outline_action==='review' ? reviewTarget(outline(),store,source,task) : undefined
     store.update(task.id,{context_read:true})
     const {path:_path,...publicSource}=source
-    return {task_id:task.id,objective:task.objective,source:{...publicSource,chapters:source.chapters.map(c=>({...c,paragraphs:c.paragraphs.map((text,i)=>({paragraph:i+1,text}))}))},inputs}
+    return {task_id:task.id,objective:task.objective,...task.outline_action?{character_protocol:outline().characterProtocol()}:{},...diff?{outline_diff:diff}:{},source:{...publicSource,chapters:source.chapters.map(c=>({...c,paragraphs:c.paragraphs.map((text,i)=>({paragraph:i+1,text}))}))},inputs}
+  })
+  function outlineTask(exec,mode) {
+    const task=member(exec)
+    if (task.role!=='analysis' || task.outline_action!==mode || !task.context_read) throw Error('先由指定成员读取本任务上下文')
+    const source=store.readSource(task.owner,task.source_id)
+    verifySource(books,source)
+    return {task,source}
+  }
+  function finishOutline(task,receipt,summary) {
+    const artifact={...receipt,summary}
+    store.update(task.id,{status:'completed',artifact,completed_at:new Date().toISOString()})
+    return {task_id:task.id,status:'completed',artifact}
+  }
+  const priorSchema=objectSchema({id:s})
+  priorSchema.properties.module={type:'string',description:'指定人物模块；省略时读取通用摘要'}
+  register('lg_outline_prior','查询当前档案的指定模块及版本。新模块版本为 0。',priorSchema,({id,module},exec)=>{
+    const {task,source}=outlineTask(exec,'propose')
+    if (typeof id!=='string' || !/^[A-Za-z0-9][A-Za-z0-9._:-]{0,119}$/u.test(id)) throw Error('档案 ID 格式无效')
+    const prior=priorSummary(outline(),source,id,module)
+    const readVersions={...task.outline_priors,[priorKey(id,module)]:prior.revision}
+    if(Object.keys(readVersions).length>24) throw Error('本次任务最多比较 24 个档案')
+    store.update(task.id,{outline_priors:readVersions})
+    return prior
+  })
+  register('lg_outline_propose','按情节点提交有证据的 Main 候选。复用已有人物 ID，先比较旧摘要；零变化可交空数组。',proposalSchema,(input,exec)=>{
+    const {task,source}=outlineTask(exec,'propose')
+    return finishOutline(task,proposeSummary(outline(),books,source,task,input),input.beat)
+  })
+  register('lg_outline_review','独立核对上下文中的 before/after、引文、关联和保留价值，提交批准或驳回及具体依据。',reviewSchema,(input,exec)=>{
+    const {task,source}=outlineTask(exec,'review')
+    const target=reviewTarget(outline(),store,source,task)
+    return finishOutline(task,outline().review(source.path,target.token,input,task.child),input.reason)
+  })
+  register('lg_team_outline_commit','按独立审查任务 ID 提交已批准的 Main 更新。',objectSchema({review_task_id:s}),({review_task_id},exec)=>{
+    const agent=root(exec),task=own(agent,review_task_id)
+    if(task.outline_action!=='review' || task.status!=='completed' || task.artifact?.status!=='approved') throw Error('需要已完成且批准的独立审查')
+    const source=store.readSource(agent.id,task.source_id),target=reviewTarget(outline(),store,source,task)
+    if(target.token!==task.artifact.token || target.reviewer!==task.child) throw Error('审查版本或身份不符')
+    if(target.status!=='committed') verifySource(books,source)
+    return outline().commit(source.path,target.token)
   })
   for(const role of roles)register('lg_'+role.id+'_submit','提交'+role.name+'候选并结束本轮；程序核验格式、来源与证据，正式采纳仍由作者决定。',artifactSchemas[role.id],(args,exec)=>{
-    const task=member(exec);if(task.role!==role.id||!task.context_read)throw Error('必须由正确职责成员先读取上下文')
+    const task=member(exec);if(task.outline_action||task.role!==role.id||!task.context_read)throw Error('必须由正确职责成员先读取上下文')
     const source=store.readSource(task.owner,task.source_id);verifySource(books,source)
     const artifact=validateArtifact(role.id,args,source,task.option_count)
     const evidence_bindings=role.id==='analysis'?artifact.findings.flatMap(f=>f.evidence.map(e=>{
@@ -125,11 +179,11 @@ export function apply(ctx,config){
     // Restrict the concrete session, where preset-local tools are now inherited.
     // Presets own their persona; legacy in-flight tasks keep their original one.
     if(task?.preset||isNew(agent)){
-      const allow=task?['lg_team_context','lg_'+task.role+'_submit']:mainPresetTools
+      const allow=task?taskTools(task):mainPresetTools
       releases.set(agent,agent.ctx.tools.restrict({allow}));return
     }
     if(!task&&!book)return
-    const allow=task?['lg_team_context','lg_'+task.role+'_submit']:mainTools
+    const allow=task?taskTools(task):mainTools
     const offTools=agent.ctx.tools.restrict({allow})
     const offPrompt=agent.ctx.systemPrompt.section({name:'deployment:persona-prefix',order:agent.ctx.systemPrompt.getSectionOrder('DEPLOYMENT_PERSONA_PREFIX'),interpolate:false,
       text:task?rolePrompt(task.role,task.method).replaceAll('lg_team_submit','lg_'+task.role+'_submit'):coordinator})
@@ -152,7 +206,7 @@ export function apply(ctx,config){
   store.recover(child=>ctx.agents.get(child))
   ctx.tools.guard(exec=>{
     const identity=exec.agent&&store.session(exec.agent.id);if(!identity||!managed(exec.agent))return undefined
-    const allow=identity.role==='coordinator'?rootTools(exec.agent):['lg_team_context','lg_'+identity.role+'_submit']
+    const allow=identity.role==='coordinator'?rootTools(exec.agent):taskTools(store.task(identity.task))
     return allow.includes(exec.name)?undefined:'本文学任务未授予此工具；不能绕过候选与作者控制'
   })
   ctx.on('llm/stream',async function*(options,next){

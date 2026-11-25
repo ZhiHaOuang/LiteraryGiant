@@ -98,6 +98,6 @@ function Impact() {
 export function apply(ctx) {
   ctx.slots.inject('main', () => ctx.slots.register({name:'main',key:'lg-impact'},Impact))
   ctx.slots.inject('sidebar.panellist', () => ctx.slots.register({
-    name:'sidebar.panellist',id:'lg-impact',order:24,label:()=>'修订影响',
+    name:'sidebar.panellist',id:'lg-impact',order:24,label:()=>'Revision Impact',
   }, () => <span aria-hidden="true">↳</span>))
 }
